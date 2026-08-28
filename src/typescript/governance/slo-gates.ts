@@ -4,6 +4,9 @@
 // machine-contract: SYNTHETIC and MEASURED evidence never share one decision; malformed provenance stops its bound gate.
 // machine-contract: SERVICE_RATE <= ARRIVAL_RATE, probability-mass error, or either chance-limit breach returns STOP without objective-score override.
 // machine-contract: calibration reads model scores and validation labels only; llmSelfReportedConfidencePpm is retained as input evidence but never used.
+// review_fix_event_uuid_v7=01a049ba-c4e3-753e-8c7d-c353034a2a3b
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T18:56:12.003Z
+// machine-contract: evidence observed after the evaluation instant is unavailable to that decision and must STOP.
 import { createHash, timingSafeEqual } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion, uuidV7EpochMs } from "../uuid.ts";
@@ -160,7 +163,11 @@ function gate(
   });
 }
 
-function provenanceErrors(provenance: SloEvidenceProvenance, payload: CanonicalValue): string[] {
+function provenanceErrors(
+  provenance: SloEvidenceProvenance,
+  payload: CanonicalValue,
+  evaluatedAtEpochMs: number,
+): string[] {
   const errors: string[] = [];
   if (!isUuidVersion(provenance.datasetId, 5)) errors.push("datasetId must be UUIDv5");
   if (
@@ -168,6 +175,10 @@ function provenanceErrors(provenance: SloEvidenceProvenance, payload: CanonicalV
     || !isUuidVersion(provenance.eventId, 7)
     || uuidV7EpochMs(provenance.eventId) !== provenance.observedAtEpochMs
   ) errors.push("event UUIDv7 must encode observedAtEpochMs");
+  if (
+    safeInteger(provenance.observedAtEpochMs)
+    && provenance.observedAtEpochMs > evaluatedAtEpochMs
+  ) errors.push("evidence observation cannot be later than the evaluation time");
   try {
     if (!sameDigest(provenance.payloadDigest, sloPayloadDigest(payload))) {
       errors.push("payload digest does not bind this evidence");
@@ -196,7 +207,11 @@ function assessProvenance(input: SloGateInput): ProvenanceAssessment {
     chanceConstraints: input.chanceConstraints,
   } as const;
   const sectionErrors = Object.fromEntries(
-    Object.entries(entries).map(([name, section]) => [name, Object.freeze(provenanceErrors(section.provenance, section.payload as unknown as CanonicalValue))]),
+    Object.entries(entries).map(([name, section]) => [name, Object.freeze(provenanceErrors(
+      section.provenance,
+      section.payload as unknown as CanonicalValue,
+      input.evaluation.evaluatedAtEpochMs,
+    ))]),
   ) as ProvenanceAssessment["sectionErrors"];
   const classes = new Set(Object.values(entries).map((section) => section.provenance.evidenceClass));
   const commonErrors: string[] = [];

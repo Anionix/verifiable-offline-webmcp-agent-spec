@@ -608,6 +608,15 @@ def main():
         slo_input_path = ROOT / slo_evidence["artifacts"]["input"]
         if not slo_input_path.is_file() or sha256(slo_input_path.read_bytes()) != slo_evidence["artifacts"]["inputSha256"]:
             errors.append("SLO gate input digest mismatch")
+        slo_input = load_json(slo_input_path)
+        input_evaluation_ms = slo_input["evaluation"]["evaluatedAtEpochMs"]
+        for section_name in ["queue", "calibration", "outcomeMass", "chanceConstraints"]:
+            section_provenance = slo_input[section_name]["provenance"]
+            if (
+                uuid7_ms(section_provenance["eventId"]) != section_provenance["observedAtEpochMs"]
+                or section_provenance["observedAtEpochMs"] > input_evaluation_ms
+            ):
+                errors.append(f"SLO {section_name} evidence identity is invalid or later than evaluation")
 
         slo_event = uuid.UUID(slo_evidence["identity"]["uuidV7"])
         slo_information = uuid.UUID(slo_evidence["identity"]["uuidV5"])

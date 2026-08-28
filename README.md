@@ -13,8 +13,9 @@ replay_browser_event_uuid_v7: "01a04987-5d7c-7ebe-9208-c468f5c24ebf"
 effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
 effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
+slo_gate_review_fix_event_uuid_v7: "01a049ba-c4e3-753e-8c7d-c353034a2a3b"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T18:41:14.617Z"
+updated_at: "2026-08-28T18:56:12.003Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -134,7 +135,7 @@ Open `http://127.0.0.1:4175`. The read-only screen shows one simulated candidate
 
 ## Operational-quality gate evidence / 運用品質判定の証拠
 
-Six hard gates check service capacity, Little's queueing relation, validation-data calibration, probability-mass conservation, bad-commit and duplicate-effect limits, and synthetic-versus-measured provenance separation. Any failed gate returns `STOP`; a high objective score cannot override either probability limit, and model self-reported confidence is never used.
+Six hard gates check service capacity, Little's queueing relation, validation-data calibration, probability-mass conservation, bad-commit and duplicate-effect limits, and synthetic-versus-measured provenance separation. Any failed gate returns `STOP`; evidence observed after the evaluation instant also stops. A high objective score cannot override either probability limit, and model self-reported confidence is never used.
 
 ```bash
 make evidence-slo

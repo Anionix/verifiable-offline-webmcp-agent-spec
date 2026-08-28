@@ -149,6 +149,36 @@ def build_outputs() -> tuple[bytes, bytes, int]:
     return catalog_bytes, manifest_bytes, len(rows)
 
 
+def explain_stale(expected: dict[Path, bytes]) -> None:
+    """Print bounded, secret-free diagnostics without changing tracked files."""
+    catalog_path = ROOT / CATALOG_PATH
+    expected_catalog = json.loads(expected[catalog_path])
+    actual_catalog = json.loads(catalog_path.read_bytes()) if catalog_path.exists() else {"files": []}
+    expected_rows = {row["path"]: row for row in expected_catalog.get("files", [])}
+    actual_rows = {row["path"]: row for row in actual_catalog.get("files", [])}
+    for path in sorted(set(expected_rows) | set(actual_rows)):
+        expected_row = expected_rows.get(path)
+        actual_row = actual_rows.get(path)
+        if expected_row != actual_row:
+            if expected_row is None:
+                print(f"catalog unexpected path: {path}")
+            elif actual_row is None:
+                print(f"catalog missing path: {path}")
+            else:
+                changed = sorted(key for key in set(expected_row) | set(actual_row) if expected_row.get(key) != actual_row.get(key))
+                print(f"catalog changed path: {path}; fields: {', '.join(changed)}")
+
+    manifest_path = ROOT / MANIFEST_NAME
+    expected_lines = set(expected[manifest_path].decode("utf-8").splitlines())
+    actual_lines = set(manifest_path.read_text(encoding="utf-8").splitlines()) if manifest_path.exists() else set()
+    for line in sorted(expected_lines - actual_lines)[:20]:
+        digest, _, path = line.partition("  ")
+        print(f"manifest expected: {path} sha256={digest}")
+    for line in sorted(actual_lines - expected_lines)[:20]:
+        digest, _, path = line.partition("  ")
+        print(f"manifest actual: {path} sha256={digest}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -163,6 +193,7 @@ def main() -> None:
     if args.check:
         stale = [str(path.relative_to(ROOT)) for path, content in expected.items() if not path.exists() or path.read_bytes() != content]
         if stale:
+            explain_stale(expected)
             raise SystemExit("generated integrity files are stale: " + ", ".join(stale))
         print(f"integrity files verified for {count} catalog records")
         return

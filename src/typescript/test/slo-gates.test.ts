@@ -147,7 +147,7 @@ test("TEST-SLO-005: bad-commit and duplicate limits are hard constraints", () =>
   assert.match(measuredGate.reasons.join(" "), /one-sided upper bounds|confidence level/);
 });
 
-test("TEST-SLO-006: mixed, mislabeled, or digest-unbound evidence stops", () => {
+test("TEST-SLO-006: mixed, mislabeled, future-observed, or digest-unbound evidence stops", () => {
   const mixed = fixture();
   mixed.calibration.provenance.evidenceClass = "MEASURED";
   mixed.calibration.provenance.illustrative = false;
@@ -174,4 +174,30 @@ test("TEST-SLO-006: mixed, mislabeled, or digest-unbound evidence stops", () => 
   const nonCanonicalGate = gate(evaluateSloGates(nonCanonical), "TEST-SLO-006");
   assert.equal(nonCanonicalGate.status, "STOP");
   assert.match(nonCanonicalGate.reasons.join(" "), /canonical safe-integer JSON/);
+
+  const futureMeasured = fixture();
+  for (const section of [
+    futureMeasured.queue,
+    futureMeasured.calibration,
+    futureMeasured.outcomeMass,
+    futureMeasured.chanceConstraints,
+  ]) {
+    section.provenance.evidenceClass = "MEASURED";
+    section.provenance.illustrative = false;
+    section.provenance.sourceKind = "RUNTIME_MEASUREMENT";
+    section.provenance.measurementEnvironment = "deterministic-test-host";
+  }
+  futureMeasured.chanceConstraints.payload.probabilityBasis = "MEASURED_ONE_SIDED_UPPER_BOUND";
+  futureMeasured.chanceConstraints.payload.confidenceLevelPpm = 950_000;
+  rebind(futureMeasured.chanceConstraints);
+  futureMeasured.queue.provenance.observedAtEpochMs = futureMeasured.evaluation.evaluatedAtEpochMs + 1;
+  futureMeasured.queue.provenance.eventId = "01a049a3-edbc-7b71-b18b-2499e365d809";
+  const futureResult = evaluateSloGates(futureMeasured);
+  const futureGate = gate(futureResult, "TEST-SLO-006");
+  assert.equal(futureResult.decision, "STOP");
+  assert.equal(futureResult.evidenceClass, "MEASURED");
+  assert.equal(gate(futureResult, "TEST-SLO-001").status, "STOP");
+  assert.equal(futureGate.status, "STOP");
+  assert.equal(futureGate.metrics.productionQualityMeasured, false);
+  assert.match(futureGate.reasons.join(" "), /later than the evaluation time/);
 });

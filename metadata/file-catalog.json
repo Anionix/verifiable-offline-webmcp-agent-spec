@@ -415,8 +415,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "e931f3f1debf3a00d18708dc28203f2668819ade55621d2634d0701978870095",
-      "bytes": 15450,
+      "sha256": "729da9aafd7e0f02f314353d7ace0afb57ae6a73af76a8fce7bc833eae1eaf41",
+      "bytes": 15583,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1612,8 +1612,8 @@
     },
     {
       "path": "docs/19-slo-gate-reference.ja.md",
-      "sha256": "ae7295fcf9ad297a9c47025db9cca2101e8e6ee8863aa3ee6b8412cccee943a1",
-      "bytes": 7032,
+      "sha256": "ac5a82c2b30304a76b10895cf1fa1563e6508dced978de062151c81b12a2a984",
+      "bytes": 7316,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3817,8 +3817,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "8105656e3d5ec8ee09cfc7ae9674010428eb2eb9faf6e297288046ea23173883",
-      "bytes": 40995,
+      "sha256": "663c080b8565dfc80cebacd6b686d5b25df7fca8bfff2a59ddd26bf72e6ba2e7",
+      "bytes": 41597,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {
@@ -3950,8 +3950,8 @@
     },
     {
       "path": "src/typescript/governance/slo-gates.ts",
-      "sha256": "536fbf42eb367e6ffc88c270d4c9ff0fe4a6ac94db944ba8ed6f5d946eebe367",
-      "bytes": 21608,
+      "sha256": "7b6b789759c170a009c626fe56e365ef12e9d112d07f5ca5a1af9d7fc55d8d85",
+      "bytes": 22160,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -4710,8 +4710,8 @@
     },
     {
       "path": "src/typescript/test/slo-gates.test.ts",
-      "sha256": "619cb137b44903d6204b96f85807bd8ef70266016429284d78ae7e75b93045ea",
-      "bytes": 8015,
+      "sha256": "5b37dc9e06c5b8284042122471de76acc4477209eb2d236cd3bc9ed0d7e099b8",
+      "bytes": 9341,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

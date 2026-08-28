@@ -12,6 +12,9 @@ import { createVisualState, reduceVisualState } from "../../../examples/notifica
 // information_uuid_v5=352a20a6-27a7-5b3c-b8af-4840c182d390
 // event_uuid_v7=01a048c5-b414-73be-bfee-952e95cc42fc
 // machine-contract: confirmed effect states reject both zero claims and duplicate claims.
+// information_uuid_v5=fd39f8d9-5fc5-56ae-8efc-bf4310a6a924
+// event_uuid_v7=01a048d1-d607-7161-8e76-35f6f5ff592c
+// machine-contract: the offline demo uses its local font stack without the overused web-font set.
 
 test("the visible flow converges two requests to one notification", () => {
   let state = reduceVisualState(createVisualState(), { type: "PREVIEWED" });
@@ -68,4 +71,6 @@ test("the visualization exposes status semantics and a reduced-motion path", asy
   assert.match(html, /<label[^>]+for="logical-operation"/);
   assert.match(css, /@media \(max-width: 820px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif/);
+  assert.doesNotMatch(css, /\b(?:Inter|Roboto|Fraunces|Geist|Plus Jakarta Sans|Space Grotesk)\b/i);
 });

@@ -224,8 +224,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "04a647e1216078625f7ede5ca558393214f093a3a6dd5da32bada7603c6f012d",
-      "bytes": 2793,
+      "sha256": "5e0d1ef5aa644e8bea84369aa9744c77138cbddfd985ddeab87906ade2d5f6de",
+      "bytes": 2945,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1327,8 +1327,8 @@
     },
     {
       "path": "docs/14-notification-visualization.ja.md",
-      "sha256": "f535c05316ba5844b618a8b2bc15201cce0754d73e81b39663cba64a10ad21a3",
-      "bytes": 6036,
+      "sha256": "f4acf047d3f55e2c0578f4014a714d97639e704382de314fad84f858cc390cb8",
+      "bytes": 6648,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1935,8 +1935,8 @@
     },
     {
       "path": "examples/notification-demo/styles.css",
-      "sha256": "7dbfe1ba5c1a93ce822f9192578e40001e613a09bab57892e0a2267ca6c3d8fe",
-      "bytes": 14337,
+      "sha256": "54560274b7dd75b0efcbd06a5be1ef0a605ff881c8fad21d957541a557a4eeaa",
+      "bytes": 14505,
       "mediaType": "text/css",
       "category": "examples",
       "identity": {
@@ -2353,8 +2353,8 @@
     },
     {
       "path": "knowledge/notification-demo.json",
-      "sha256": "24c57004124aca4b1470453e0160d84bd79f1aa7f427b3b264c3caada54f7052",
-      "bytes": 3480,
+      "sha256": "a5e47c7ee290479a03f639015fd5bad5e524363e976aabd25494ddfbde6542dd",
+      "bytes": 3598,
       "mediaType": "application/json",
       "category": "knowledge",
       "identity": {
@@ -3323,8 +3323,8 @@
     },
     {
       "path": "src/typescript/test/notification-visualization.test.js",
-      "sha256": "0da8c0d231baedde9cd446bc25f1d967773534ec71137050e35edb698e0b80be",
-      "bytes": 3330,
+      "sha256": "f7962362648e8c317c9471dffc1adb895b1077f9f9bc5ca554cd08de9d9204ff",
+      "bytes": 3748,
       "mediaType": "text/javascript",
       "category": "src",
       "identity": {

@@ -4,8 +4,10 @@ language: "ja"
 stable_uuid_v5: "92bc8b53-769f-5f52-a508-eb0bd71aa4e4"
 event_uuid_v7: "01a048b7-2626-78c5-869f-2c977eccd754"
 verified_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
+font_event_uuid_v7: "01a048d1-158c-7fc4-b3ca-da0ae9607f5b"
 generated_at: "2026-08-28T14:12:37.542Z"
 verified_at: "2026-08-28T14:25:32.776Z"
+updated_at: "2026-08-28T14:41:55.570Z"
 version: "0.3.0-candidate"
 status: "browser-verified"
 ---
@@ -41,6 +43,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 ## 画面設計
 
 - 背景は濃紺、主要操作は水色、確認済みは緑、照合待ちは黄、停止は赤系とします。
+- 書体は外部通信を使わず、欧文・数字を`Avenir Next`、日本語を`Hiragino Kaku Gothic ProN`、代替を`Yu Gothic`で構成します。
 - 色だけに頼らず、状態文、境界線の形、矢印、停止記号を併用します。
 - デスクトップは「通知内容」と「重複防止の動作」の二列です。
 - 狭い画面では、初回経路、再試行経路、件数、現在の状態の順に一列へ折りたたみます。
@@ -56,6 +59,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 | 通知内容と動作図の二列 | 一致 | デスクトップでは入力を左、証明したい流れを右へ配置 |
 | 初回要求と再試行の二経路 | 一致 | 同じ`Intent ID`台帳へ収束する二本の経路として表示 |
 | 色・線・文による状態区別 | 一致 | 成功、照合待ち、停止、安全条件違反を色だけに依存せず表現 |
+| 書体の人格とオフライン性 | 強化 | 汎用Web書体を外し、Mac内蔵の欧文・日本語書体へ固定 |
 | 通知件数 | 強化 | 固定の「1」ではなくSQLiteの外部効果開始件数を表示 |
 | 狭い画面 | 実装済み | 幅820画素以下で経路を縦積みにし、幅390画素で横はみ出しなし |
 | 技術ログ | 一致 | 主要説明の後ろへ折りたたみ、必要な場合だけ展開 |
@@ -63,6 +67,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 ## ブラウザー観測
 
 - デスクトップ相当の`1440 x 1000`で、見出し、入力、二経路、実測件数、状態台帳を目視確認しました。
+- 修正後の計算済み書体は、見出し・入力・ボタンで`Avenir Next / Hiragino Kaku Gothic ProN / Yu Gothic`、技術ログでローカル等幅書体でした。外部フォント取得は追加していません。
 - 幅`390`、高さ`844`では、文書幅と表示幅がともに`390`で、横方向のはみ出しはありませんでした。
 - 乾式実行後は`DRY_RUN / NOT_STARTED`、外部効果開始件数`0`と表示されました。今回の画面検証では実通知ボタンを押していません。
 - ブラウザーの意味構造では、主要部、領域、見出し、入力欄、ボタン、状態通知を識別でき、警告・エラーの実行ログは0件でした。

@@ -5,6 +5,22 @@
 # event_uuid_v7=01a049d1-b7e1-7443-a30b-4620165c8b17
 # state_transition=EXECUTING -> READY_FOR_PUBLIC_READBACK occurred_at=2026-08-28T19:21:16.001Z
 # machine-contract: final evidence preserves native WebMCP as INCONCLUSIVE, checks two finite-state engines against 38 states, and proves 67 automated records with zero new effects.
+# information_uuid_v5=2f981a59-3d10-5036-98da-3ef8ae14f518
+# event_uuid_v7=01a049fe-fe89-7814-9487-0ad568541f20
+# state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.209Z
+# machine-contract: every live notification audit event is bound to the single scoped intent before global counts can prove duplicate suppression.
+# information_uuid_v5=3a0187cc-7497-5325-a2ad-3df91330e778
+# event_uuid_v7=01a049ff-0159-7193-b343-dc803d80f4e0
+# state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.929Z
+# machine-contract: each global ingestion record must match the signed source device, sequence, operation, digest, and chain hash.
+# information_uuid_v5=bcad8087-6a22-59b1-99f9-cb3ce9179242
+# event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+# state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:42:18.694Z
+# machine-contract: every strict object schema has exactly the same declared property and required-key sets at every nesting depth.
+# information_uuid_v5=634d296a-aa05-536e-9874-70c499eee377
+# event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+# state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:56:11.012Z
+# machine-contract: scalar schema lower bounds never exceed upper bounds and all numeric bounds fit JavaScript safe integers.
 from __future__ import annotations
 
 import argparse
@@ -25,6 +41,7 @@ from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
+JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
 IGNORED_PARTS = {".git", ".jj", ".local", ".venv", "node_modules", "__pycache__"}
 
 
@@ -104,6 +121,67 @@ def eval_ir(ir):
     return "ALLOW" if good else "DENY"
 
 
+def live_event_matches_scope(event, scoped_intent_id):
+    return event.get("intentId") == scoped_intent_id
+
+
+def sync_source_matches_record(record, source):
+    return (
+        source is not None
+        and source.get("eventId") == record.get("sourceEventId")
+        and source.get("deviceId") == record.get("deviceId")
+        and source.get("sequence") == record.get("deviceSequence")
+        and source.get("operation") == record.get("operation")
+        and source.get("proof", {}).get("eventDigest") == record.get("sourceEventDigest")
+        and source.get("proof", {}).get("chainHash") == record.get("sourceChainHash")
+    )
+
+
+def strict_parameter_contract_errors(schema, path="parameters"):
+    findings = []
+    if not isinstance(schema, dict):
+        return [f"{path} must be an object"]
+    schema_type = schema.get("type")
+    if schema_type == "string":
+        minimum = schema.get("minLength")
+        maximum = schema.get("maxLength")
+        if minimum is not None and (type(minimum) is not int or minimum < 0 or minimum > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.minLength must be a non-negative JavaScript safe integer")
+        if maximum is not None and (type(maximum) is not int or maximum < 0 or maximum > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.maxLength must be a non-negative JavaScript safe integer")
+        if type(minimum) is int and type(maximum) is int and minimum > maximum:
+            findings.append(f"{path} minLength exceeds maxLength")
+        return findings
+    if schema_type == "integer":
+        minimum = schema.get("minimum")
+        maximum = schema.get("maximum")
+        if minimum is not None and (type(minimum) is not int or abs(minimum) > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.minimum must be a JavaScript safe integer")
+        if maximum is not None and (type(maximum) is not int or abs(maximum) > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.maximum must be a JavaScript safe integer")
+        if type(minimum) is int and type(maximum) is int and minimum > maximum:
+            findings.append(f"{path} minimum exceeds maximum")
+        return findings
+    if schema_type != "object":
+        return findings
+    properties = schema.get("properties")
+    required = schema.get("required")
+    if not isinstance(properties, dict) or not isinstance(required, list):
+        return [f"{path} object schema lacks properties or required"]
+    if any(not isinstance(name, str) for name in required):
+        return [f"{path} required entries must be strings"]
+    property_names = set(properties)
+    required_names = set(required)
+    if property_names != required_names:
+        findings.append(
+            f"{path} properties/required differ; "
+            f"missing={sorted(property_names - required_names)}, extra={sorted(required_names - property_names)}"
+        )
+    for name, child in properties.items():
+        findings.extend(strict_parameter_contract_errors(child, f"{path}.properties.{name}"))
+    return findings
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", type=Path)
@@ -131,6 +209,12 @@ def main():
     live_path = ROOT / "data/audit/notification-demo-live-events.ndjson"
     live_events = [json.loads(line) for line in live_path.read_text(encoding="utf-8").splitlines() if line]
     live_evidence = load_json(ROOT / "metadata/notification-demo-live-verification.json")
+    scoped_intent_id = live_evidence["scope"]["intent_id"]
+    try:
+        if uuid.UUID(scoped_intent_id).version != 5:
+            raise ValueError("scoped intent ID is not UUIDv5")
+    except Exception as exc:
+        errors.append(f"live notification scoped intent UUID: {exc}")
     previous_hash = ""
     for index, event in enumerate(live_events, 1):
         event_hash = event.get("eventHash", "")
@@ -148,7 +232,14 @@ def main():
                 raise ValueError("intent ID is not UUIDv5")
         except Exception as exc:
             errors.append(f"live notification event {index} UUID: {exc}")
+        if not live_event_matches_scope(event, scoped_intent_id):
+            errors.append(f"live notification event {index} belongs to a different intent")
         previous_hash = event_hash
+    if live_events:
+        mutation = dict(live_events[0])
+        mutation["intentId"] = str(uuid.uuid5(uuid.NAMESPACE_URL, "validator-regression/different-live-intent"))
+        if live_event_matches_scope(mutation, scoped_intent_id):
+            errors.append("live notification validator accepted a different-intent mutation")
     observation = live_evidence["observations"]
     execution_claims = sum(event["kind"] == "execution-claimed" for event in live_events)
     suppressed_retries = sum(event["kind"] == "duplicate-execution-suppressed" for event in live_events)
@@ -279,12 +370,91 @@ def main():
     )
     for e in planner_request_validator.iter_errors(planner_request):
         errors.append(f"schema {planner_evidence['artifacts']['requestSample']}: {e.message}")
+    for index, tool in enumerate(planner_request["tools"]):
+        for error in strict_parameter_contract_errors(tool["parameters"], f"tools[{index}].parameters"):
+            errors.append(f"strict planner parameter contract: {error}")
+    malformed_planner_request = json.loads(json.dumps(planner_request))
+    parameter_properties = malformed_planner_request["tools"][0]["parameters"]["properties"]
+    first_parameter = next(iter(parameter_properties))
+    parameter_properties[first_parameter] = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"nested": {"type": "string"}},
+        "required": ["different"],
+    }
+    malformed_schema_errors = list(planner_request_validator.iter_errors(malformed_planner_request))
+    malformed_contract_errors = strict_parameter_contract_errors(
+        malformed_planner_request["tools"][0]["parameters"],
+        "mutation.parameters",
+    )
+    if not malformed_schema_errors and not malformed_contract_errors:
+        errors.append("responses planner request schema accepted a malformed nested parameter schema")
+    inverted_planner_request = json.loads(json.dumps(planner_request))
+    inverted_properties = inverted_planner_request["tools"][0]["parameters"]["properties"]
+    inverted_properties[first_parameter] = {"type": "string", "minLength": 10, "maxLength": 1}
+    inverted_schema_errors = list(planner_request_validator.iter_errors(inverted_planner_request))
+    inverted_contract_errors = strict_parameter_contract_errors(
+        inverted_planner_request["tools"][0]["parameters"],
+        "mutation.invertedParameters",
+    )
+    if not inverted_schema_errors and not inverted_contract_errors:
+        errors.append("responses planner request schema accepted inverted scalar bounds")
     final_evidence = load_json(ROOT / "metadata/final-verification.json")
     final_evidence_validator = Draft202012Validator(
         schemas["final-verification"], registry=schema_registry, format_checker=format_checker
     )
     for e in final_evidence_validator.iter_errors(final_evidence):
         errors.append(f"schema metadata/final-verification.json: {e.message}")
+    review_reconciliation = load_json(ROOT / "metadata/review-thread-reconciliation.json")
+    review_reconciliation_validator = Draft202012Validator(
+        schemas["review-thread-reconciliation"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in review_reconciliation_validator.iter_errors(review_reconciliation):
+        errors.append(f"schema metadata/review-thread-reconciliation.json: {e.message}")
+    review_findings = review_reconciliation["findings"]
+    review_ids = [finding["informationUuidV5"] for finding in review_findings]
+    review_urls = [finding["reviewUrl"] for finding in review_findings]
+    if len(review_findings) != 31 or len(set(review_ids)) != len(review_findings) or len(set(review_urls)) != len(review_findings):
+        errors.append("review reconciliation must contain 31 distinct finding IDs and URLs")
+    for finding in review_findings:
+        for evidence_path in [*finding["fixEvidence"], *finding["testEvidence"]]:
+            local_path = ROOT / evidence_path.split("#", 1)[0]
+            if not local_path.is_file():
+                errors.append(f"review reconciliation evidence path is missing: {evidence_path}")
+    try:
+        review_event = uuid.UUID(review_reconciliation["identity"]["uuidV7"])
+        if review_event.version != 7 or uuid7_ms(str(review_event)) != review_reconciliation["temporal"]["epochMs"]:
+            raise ValueError("timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation UUIDv7: {exc}")
+    try:
+        review_verification = review_reconciliation["verification"]
+        verification_event = uuid.UUID(review_verification["eventUuidV7"])
+        if verification_event.version != 7 or uuid7_ms(str(verification_event)) != review_verification["epochMs"]:
+            raise ValueError("verification timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation verification UUIDv7: {exc}")
+    try:
+        for review_update in review_reconciliation["reviewUpdates"]:
+            review_update_event = uuid.UUID(review_update["eventUuidV7"])
+            if review_update_event.version != 7 or uuid7_ms(str(review_update_event)) != review_update["epochMs"]:
+                raise ValueError("review-update timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation update UUIDv7: {exc}")
+    try:
+        final_review_verification = review_reconciliation["finalVerification"]
+        final_review_event = uuid.UUID(final_review_verification["eventUuidV7"])
+        if final_review_event.version != 7 or uuid7_ms(str(final_review_event)) != final_review_verification["epochMs"]:
+            raise ValueError("final verification timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation final UUIDv7: {exc}")
+    if review_reconciliation["summary"] != {
+        "total": len(review_findings),
+        "fixedInPatch": sum(finding["disposition"] == "FIXED_IN_PATCH" for finding in review_findings),
+        "fixedBeforePatch": sum(finding["disposition"] == "FIXED_BEFORE_PATCH" for finding in review_findings),
+        "remaining": 0,
+    }:
+        errors.append("review reconciliation summary does not match findings")
     checks["json_schema"] = not errors
 
     # Source graph and cross-reference integrity.
@@ -459,10 +629,7 @@ def main():
         if (
             record["globalSequence"] != expected_global
             or record["previousGlobalHash"] != previous_global
-            or source is None
-            or source["proof"]["eventDigest"] != record["sourceEventDigest"]
-            or source["proof"]["chainHash"] != record["sourceChainHash"]
-            or source["sequence"] != record["deviceSequence"]
+            or not sync_source_matches_record(record, source)
         ):
             errors.append(f"offline sync ingestion source/order mismatch at {expected_global}")
         core = {key: value for key, value in record.items() if key != "globalHash"}
@@ -473,6 +640,13 @@ def main():
         if record["decision"] != expected_decision:
             errors.append(f"offline sync unsafe decision at {expected_global}")
         previous_global = record_hash
+
+    if sync_ingestion:
+        mutation = json.loads(json.dumps(sync_ingestion[0]))
+        mutation["operation"] = {"type": "SAFE_TAG_ADD", "setId": "mutation", "tag": "mutation"}
+        mutation_source = event_by_id.get(mutation["sourceEventId"])
+        if sync_source_matches_record(mutation, mutation_source):
+            errors.append("offline sync validator accepted an operation-relabel mutation")
 
     observations = sync_evidence["observations"]
     codes = {record["code"] for record in sync_quarantine}

@@ -1,6 +1,10 @@
 // information_uuid_v5=f81e22b7-6a8d-5d6a-9757-4ffec856e891
 // event_uuid_v7=01a0493d-49b6-745f-8cfd-fc3226590bfa
 // machine-contract: PREFLIGHT -> ONE_BOUNDED_REQUEST -> UNTRUSTED_PROPOSAL | STOPPED; timeout, response loss, or malformed output never retries and never authorizes execution.
+// information_uuid_v5=d0df026b-55c2-53b2-8b98-8c4652df78b7
+// event_uuid_v7=01a049ff-02a9-724e-b280-7b5029b74e33
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:44.265Z
+// machine-contract: every response entry labeled function_call must be structurally valid before any call is counted or accepted.
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { uuidV5, uuidV7 } from "../uuid.ts";
 import { PlannerAuditLog, sha256Hex } from "./audit-log.ts";
@@ -45,6 +49,10 @@ function functionCall(value: unknown): ResponsesFunctionCall | null {
     && typeof record.arguments === "string"
     ? { type: "function_call", call_id: record.call_id, name: record.name, arguments: record.arguments }
     : null;
+}
+
+function isFunctionCallEntry(value: unknown): boolean {
+  return value !== null && typeof value === "object" && (value as Record<string, unknown>).type === "function_call";
 }
 
 function validCallId(value: string): boolean {
@@ -161,7 +169,11 @@ export class OptionalResponsesPlanner {
     if (response.status !== "completed") {
       return this.#stopAfterTransport(runId, task, startedAt, inputDigest, requestDigest, disclosedContextKeys, exposedToolNames, "INCOMPLETE_RESPONSE", estimatedCost, observedCost);
     }
-    const calls = response.output.map(functionCall).filter((call): call is ResponsesFunctionCall => call !== null);
+    const functionCallEntries = response.output.filter(isFunctionCallEntry);
+    const calls = functionCallEntries.map(functionCall).filter((call): call is ResponsesFunctionCall => call !== null);
+    if (calls.length !== functionCallEntries.length) {
+      return this.#stopAfterTransport(runId, task, startedAt, inputDigest, requestDigest, disclosedContextKeys, exposedToolNames, "INVALID_ARGUMENTS", estimatedCost, observedCost);
+    }
     if (calls.length === 0) {
       return this.#stopAfterTransport(runId, task, startedAt, inputDigest, requestDigest, disclosedContextKeys, exposedToolNames, "NO_TOOL_CALL", estimatedCost, observedCost);
     }

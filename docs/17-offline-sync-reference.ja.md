@@ -8,6 +8,8 @@ version: "0.4.0-candidate"
 status: "reference-implementation"
 ---
 
+<!-- information_uuid_v5=133e9b91-5738-5e1c-8bcd-567a65bba243 event_uuid_v7=01a04a5f-6d38-7fc8-89b3-1e7daabc661d state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:56:03.000Z machine-contract=SQLite key material is accepted only when its normalized digest matches the external trust anchor -->
+
 # 二端末オフライン同期の参照実装
 
 ## 本質
@@ -27,10 +29,12 @@ status: "reference-implementation"
 | 部品 | 読めるもの | 書けるもの | 持たない権限 |
 |---|---|---|---|
 | `SignedDeviceLog` | 端末内の操作 | 端末内の署名付き出来事とチェックポイント | 他端末の台帳、通知実行 |
-| `LocalSyncLedger` | 登録済み公開鍵、署名付き出来事 | 全体取込順序、安全なタグ、人の確認待ち、隔離記録 | 通知、支払い、予約、削除の実行 |
+| `LocalSyncLedger` | SQLite外で固定した公開鍵要約値、登録済み公開鍵、署名付き出来事 | 信頼鍵台帳、全体取込順序、安全なタグ、人の確認待ち、隔離記録 | 通知、支払い、予約、削除の実行 |
 | 読取専用デモ | 公開済みJSONとJSON Lines | 画面表示だけ | 承認、実行、変更、秘密鍵読取 |
 
-同期役の公開操作は、端末公開鍵の登録、署名付き一式の取込、読み戻し、検証だけです。通知アダプターを引数に取る経路も、`execute`や`notify`という実行操作もありません。
+同期役の公開操作は、端末公開鍵の登録、署名付き一式の取込、読み戻し、検証だけです。端末公開鍵の登録は信頼を追加する操作なので、SQLiteから鍵を自動採用しません。正規化した公開鍵のSHA-256要約値を別ファイルへ先に固定し、以後はSQLite内の鍵と毎回照合します。通知アダプターを引数に取る経路も、`execute`や`notify`という実行操作もありません。
+
+この境界が防ぐのは、SQLiteだけを書き換えられる実行者による鍵・出来事・チェックポイントの一括差し替えです。別ファイルの信頼鍵台帳まで変更できる実行者への耐性は未実装であり、本番ではオペレーティングシステムの鍵保管庫や署名済み設定へ置き換える必要があります。
 
 ## 端末側の証拠
 
@@ -63,6 +67,7 @@ status: "reference-implementation"
 | 端末内連番の欠け | `SEQUENCE_GAP` | 0 |
 | 同じ端末内連番の別鎖 | `FORK_DETECTED` | 0 |
 | チェックポイント不一致 | `CHECKPOINT_MISMATCH` | 0 |
+| SQLite内の公開鍵を署名済み記録ごと差し替え | `TRUST_ANCHOR_MISMATCH` | 0 |
 
 `make validate`は、JSON Schema、公開鍵署名、端末内鎖、Merkle root、チェックポイント署名、全体取込鎖、出典出来事との結び付き、公開ファイル要約値、危険な意図2件から確認待ち1件への集約、実通知0件をTypeScriptとは別のPython実装でも読み戻します。
 

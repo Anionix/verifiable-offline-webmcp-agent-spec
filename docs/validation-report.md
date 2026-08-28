@@ -10,9 +10,23 @@ offline_sync_verification_event_uuid_v7: "01a04927-46cd-765b-912f-a63737578d9e"
 online_planner_verification_event_uuid_v7: "01a04948-c160-7499-9ba6-5e1dca93814a"
 final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 final_validation_event_uuid_v7: "01a049e8-9210-7989-b9a4-d58448cf6925"
+review_reconciliation_event_uuid_v7: "01a04a11-70f3-7dd6-8a87-97401a43b74e"
+review_followup_event_uuid_v7: "01a04a1b-eac6-7c5c-aa43-c19d4a593bfb"
+review_second_followup_event_uuid_v7: "01a04a28-9e04-7709-9ce3-49b9331fd953"
+review_third_followup_event_uuid_v7: "01a04a2c-246b-7e0e-bc66-2a7ff653aef0"
+review_fourth_followup_event_uuid_v7: "01a04a3b-7a18-7745-9b09-d8e5a2a74866"
+review_fifth_followup_event_uuid_v7: "01a04a4c-1be8-7fcc-a67f-5eaff2cc8030"
+review_final_verification_event_uuid_v7: "01a04a52-7dd3-7055-ac87-729f8708b6f0"
 generated_at: "2026-08-27T09:34:04.500Z"
 updated_at: "2026-08-28T19:46:13.648Z"
-version: "1.0.0-candidate"
+review_reconciliation_at: "2026-08-28T20:30:52.147Z"
+review_followup_at: "2026-08-28T20:42:18.694Z"
+review_second_followup_at: "2026-08-28T20:56:11.012Z"
+review_third_followup_at: "2026-08-28T21:00:02.027Z"
+review_fourth_followup_at: "2026-08-28T21:16:47.000Z"
+review_fifth_followup_at: "2026-08-28T21:34:57.000Z"
+review_final_verification_at: "2026-08-28T21:41:55.283Z"
+version: "1.0.1-candidate"
 status: "validation-report"
 ---
 
@@ -68,7 +82,7 @@ status: "validation-report"
 
 ### TypeScript
 
-- 89 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, optional planner guardrails, operational-quality gates, and all visual state contracts.
+- 111 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, invocation-isolated restoration, and measured-count violations, signed device chains, every retained checkpoint link including missing-parent rejection, external trusted-key anchoring, persistent global ingestion, signed-source chain, decision, and row-identity binding, legacy repair, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, optional planner guardrails, operational-quality gates, and all visual state contracts.
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
 - Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), [`src/typescript/test/online-planner.test.ts`](../src/typescript/test/online-planner.test.ts), and the three browser-state tests in [`src/typescript/test`](../src/typescript/test/).
 
@@ -90,6 +104,7 @@ status: "validation-report"
 - Two notification-intent sources became one `HUMAN_REVIEW_REQUIRED` case. External-effect starts and real notifications remained exactly `0`.
 - Independent Python verification checked public artifact digests, JSON Schemas, UUIDv7 time binding, both device signatures and hash chains, checkpoints, global ingestion links, and the four quarantine reasons.
 - Signature tampering, sequence gap, signed fork, and checkpoint mismatch all stopped before any effect. Evidence: [`metadata/offline-sync-verification.json`](../metadata/offline-sync-verification.json).
+- A self-consistent SQLite rewrite signed by a substituted key failed after restart because the key digest no longer matched the separately persisted trust anchor.
 - This is a bounded local simulation. Remote transport is unimplemented and production multi-device quality is `UNMEASURED`.
 
 ### Duplicate-safe visualization candidate
@@ -107,6 +122,13 @@ status: "validation-report"
 - The test catalog contains 67 implemented and automated records, with zero partial or specification-only records.
 - This final observation created zero tool calls, notification-permission requests, notifications, observed-page external requests, intent rows, attempt rows, effect rows, and audit events.
 - The tracked record intentionally remains `READY_FOR_PUBLIC_READBACK`; post-merge `main` readback, critical-review readback, and the final secret scan are external completion records. Evidence: [`metadata/final-verification.json`](../metadata/final-verification.json).
+
+### Closed-review reconciliation candidate
+
+- All 50 closed pull requests were scanned. Fourteen historical review threads were still marked unresolved; 2 were already fixed and 12 required current-code changes. Pull request #51 then added 17 actionable findings, all fixed from failing tests, mutation checks, or browser checks.
+- All 31 findings now map to a unique information identifier, the original review URL, current fix paths, and a regression check. Remaining findings are `0`.
+- The real page received the same logical operation twice, then overlapped two different dry-run operations. The delayed operation's visible input, intent identifier, and SQLite record agreed. Persisted state remained `DRY_RUN / NOT_STARTED`; effect starts, notification-permission requests, notifications, external requests, and console errors all remained `0`.
+- Native WebMCP conformance remains `INCONCLUSIVE`, and production quality remains `UNMEASURED`. Evidence: [`metadata/review-thread-reconciliation.json`](../metadata/review-thread-reconciliation.json).
 
 ### Duplicate-safe notification candidate
 

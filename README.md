@@ -68,6 +68,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 14. [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md) — six hard operational-quality gates with deterministic counterexamples / 6つの運用品質判定と固定した反例
 15. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 16. [`docs/20-final-verification.ja.md`](docs/20-final-verification.ja.md) — bounded browser observation, two formal checks, and the 67-test public-evidence boundary / ブラウザー実測・二つの形式検証・67件の公開証拠境界
+17. [`docs/21-review-thread-reconciliation.ja.md`](docs/21-review-thread-reconciliation.ja.md) — 31 review findings bound to fixes and regression evidence / 31件のレビューを修正と回帰証拠へ結合
 
 ## Machine-readable assets / 機械可読asset
 

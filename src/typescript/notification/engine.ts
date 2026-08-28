@@ -10,6 +10,10 @@
 // event_uuid_v7=01a04993-3867-7e11-b120-01b3bab8ec62
 // state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T18:13:00.135Z
 // machine-contract: a current ABSENT readback cannot erase an UNKNOWN historical effect start.
+// information_uuid_v5=97ce90b3-983b-56e7-9381-c8c2df3068e2
+// event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.523Z
+// machine-contract: Unicode limits use code points at both untrusted projection and engine boundaries.
 import { createHash } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import {
@@ -67,8 +71,9 @@ function digest(value: CanonicalValue): string {
 
 function normalizeText(value: string, label: string, maximum: number): string {
   const normalized = value.normalize("NFC").trim();
-  if (!normalized || normalized.length > maximum) {
-    throw new TypeError(`${label} must contain 1-${maximum} characters`);
+  const length = [...normalized].length;
+  if (length < 1 || length > maximum) {
+    throw new TypeError(`${label} must contain 1-${maximum} Unicode characters`);
   }
   return normalized;
 }

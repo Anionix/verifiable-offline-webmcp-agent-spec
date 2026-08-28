@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/review-thread-reconciliation.schema.json",
+  "$comment": "information_uuid_v5=639e8139-1107-51f4-9949-333119ddb0be event_uuid_v7=01a04a74-840d-7a37-9c02-acbe4413fec9 state_transition=REVIEW -> VERIFIED occurred_at=2026-08-28T22:19:05.101Z machine-contract=all 31 review findings map to current code and a regression check",
+  "title": "Pull request review reconciliation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "temporal", "status", "scope", "findings", "summary", "verification", "reviewUpdates", "finalVerification"],
+  "properties": {
+    "$schema": { "const": "../schemas/review-thread-reconciliation.schema.json" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uuidV5", "uuidV7", "namespace"],
+      "properties": {
+        "uuidV5": { "$ref": "#/$defs/uuidV5" },
+        "uuidV7": { "$ref": "#/$defs/uuidV7" },
+        "namespace": { "const": "47f3e535-0e27-559a-9556-aa79a84f95eb" }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observedAt", "epochMs", "timeZone"],
+      "properties": {
+        "observedAt": { "type": "string", "format": "date-time" },
+        "epochMs": { "type": "integer", "minimum": 0 },
+        "timeZone": { "const": "UTC" }
+      }
+    },
+    "status": { "enum": ["REVIEW", "VERIFIED"] },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "inspectedClosedPullRequests", "currentPullRequest", "newExternalReviewActivityAfterFinalMerge", "actualNotifications", "notificationPermissionRequests", "externalEffects"],
+      "properties": {
+        "repository": { "const": "Anionix/verifiable-offline-webmcp-agent-spec" },
+        "inspectedClosedPullRequests": { "const": 50 },
+        "currentPullRequest": { "const": 51 },
+        "newExternalReviewActivityAfterFinalMerge": { "const": 17 },
+        "actualNotifications": { "const": 0 },
+        "notificationPermissionRequests": { "const": 0 },
+        "externalEffects": { "const": 0 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "minItems": 31,
+      "maxItems": 31,
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "fixedInPatch", "fixedBeforePatch", "remaining"],
+      "properties": {
+        "total": { "const": 31 },
+        "fixedInPatch": { "const": 29 },
+        "fixedBeforePatch": { "const": 2 },
+        "remaining": { "const": 0 }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventUuidV7", "verifiedAt", "epochMs", "stateTransition", "browserDryRunRequests", "persistedControlState", "persistedEffectState", "effectStartCount", "notificationPermission", "consoleErrors", "externalNetworkRequests"],
+      "properties": {
+        "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "verifiedAt": { "type": "string", "format": "date-time" },
+        "epochMs": { "const": 1787949052147 },
+        "stateTransition": { "const": "REVIEW -> VERIFIED" },
+        "browserDryRunRequests": { "const": 2 },
+        "persistedControlState": { "const": "DRY_RUN" },
+        "persistedEffectState": { "const": "NOT_STARTED" },
+        "effectStartCount": { "const": 0 },
+        "notificationPermission": { "const": "default" },
+        "consoleErrors": { "const": 0 },
+        "externalNetworkRequests": { "const": 0 }
+      }
+    },
+    "reviewUpdates": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "prefixItems": [
+        { "$ref": "#/$defs/reviewUpdate1" },
+        { "$ref": "#/$defs/reviewUpdate2" },
+        { "$ref": "#/$defs/reviewUpdate3" },
+        { "$ref": "#/$defs/reviewUpdate4" },
+        { "$ref": "#/$defs/reviewUpdate5" },
+        { "$ref": "#/$defs/reviewUpdate6" },
+        { "$ref": "#/$defs/reviewUpdate7" }
+      ],
+      "items": false
+    },
+    "finalVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventUuidV7", "verifiedAt", "epochMs", "stateTransition", "reviewFindings", "nodeTests", "repositoryChecks", "browserDryRunRequests", "persistedControlState", "persistedEffectState", "effectStartCount", "notificationPermissionRequests", "actualNotifications", "consoleErrors", "externalNetworkRequests"],
+      "properties": {
+        "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "verifiedAt": { "const": "2026-08-28T22:19:05.101Z" },
+        "epochMs": { "const": 1787955545101 },
+        "stateTransition": { "const": "REVIEW -> VERIFIED" },
+        "reviewFindings": { "const": 31 },
+        "nodeTests": { "const": 111 },
+        "repositoryChecks": { "const": 18 },
+        "browserDryRunRequests": { "const": 4 },
+        "persistedControlState": { "const": "DRY_RUN" },
+        "persistedEffectState": { "const": "NOT_STARTED" },
+        "effectStartCount": { "const": 0 },
+        "notificationPermissionRequests": { "const": 0 },
+        "actualNotifications": { "const": 0 },
+        "consoleErrors": { "const": 0 },
+        "externalNetworkRequests": { "const": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "reviewUpdate1": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T20:42:18.694Z" }, "epochMs": { "const": 1787949738694 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 3 } } }
+      ]
+    },
+    "reviewUpdate2": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T20:56:11.012Z" }, "epochMs": { "const": 1787950571012 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 3 } } }
+      ]
+    },
+    "reviewUpdate3": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T21:00:02.027Z" }, "epochMs": { "const": 1787950802027 }, "stateTransition": { "const": "REVIEW -> REVIEW" }, "newFindings": { "const": 2 } } }
+      ]
+    },
+    "reviewUpdate4": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T21:16:47.000Z" }, "epochMs": { "const": 1787951807000 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 2 } } }
+      ]
+    },
+    "reviewUpdate5": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T21:34:57.000Z" }, "epochMs": { "const": 1787952897000 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 3 } } }
+      ]
+    },
+    "reviewUpdate6": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T21:51:08.000Z" }, "epochMs": { "const": 1787953868000 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 3 } } }
+      ]
+    },
+    "reviewUpdate7": {
+      "allOf": [
+        { "$ref": "#/$defs/reviewUpdate" },
+        { "properties": { "observedAt": { "const": "2026-08-28T21:56:03.000Z" }, "epochMs": { "const": 1787954163000 }, "stateTransition": { "const": "VERIFIED -> REVIEW" }, "newFindings": { "const": 1 } } }
+      ]
+    },
+    "reviewUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventUuidV7", "observedAt", "epochMs", "stateTransition", "sourcePullRequest", "newFindings"],
+      "properties": {
+        "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "epochMs": { "type": "integer", "minimum": 0 },
+        "stateTransition": { "enum": ["VERIFIED -> REVIEW", "REVIEW -> REVIEW"] },
+        "sourcePullRequest": { "const": 51 },
+        "newFindings": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "sourcePullRequest", "reviewUrl", "severity", "title", "disposition", "fixEvidence", "testEvidence"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "sourcePullRequest": { "type": "integer", "minimum": 1 },
+        "reviewUrl": { "type": "string", "format": "uri", "pattern": "^https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/[0-9]+#discussion_r[0-9]+$" },
+        "severity": { "enum": ["P1", "P2"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "disposition": { "enum": ["FIXED_IN_PATCH", "FIXED_BEFORE_PATCH"] },
+        "fixEvidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "testEvidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

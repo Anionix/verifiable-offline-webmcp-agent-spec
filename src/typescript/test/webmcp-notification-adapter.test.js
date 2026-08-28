@@ -10,8 +10,7 @@ import {
   registerNotificationWebMcpTool,
 } from "../webmcp/notification-adapter.js";
 
-function acceptedEnvelope(input, origin) {
-  const intentId = "bdb94700-a62b-59fa-b718-ea5d5dad7ec9";
+function acceptedEnvelope(input, origin, intentId = "bdb94700-a62b-59fa-b718-ea5d5dad7ec9") {
   const eventId = "01a048fe-b603-7ee6-a085-b7ffc52b4b81";
   const payloadDigest = "a".repeat(64);
   const provenance = {
@@ -25,6 +24,7 @@ function acceptedEnvelope(input, origin) {
   return {
     intent: {
       intentId,
+      logicalOperationId: input.logicalOperationId,
       target: "local-mac-notification",
       payloadDigest,
       controlState: "DRY_RUN",
@@ -33,6 +33,19 @@ function acceptedEnvelope(input, origin) {
       body: input.body,
     },
     preview: { intentId, payloadDigest, approvalRequired: true },
+    status: {
+      intent: {
+        intentId,
+        logicalOperationId: input.logicalOperationId,
+        target: "local-mac-notification",
+        payloadDigest,
+        controlState: "DRY_RUN",
+        effectState: "NOT_STARTED",
+        title: input.title,
+        body: input.body,
+      },
+      effectStartCount: 0,
+    },
     inputEvidence: {
       invocation: provenance,
       persisted: provenance,
@@ -44,6 +57,16 @@ function acceptedEnvelope(input, origin) {
     },
   };
 }
+
+// information_uuid_v5=a49f40c5-65fa-5363-b64f-be5d86766914
+// event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:56:11.012Z
+// machine-contract: repeated WebMCP preview accepts a newer persisted state and returns its measured effect count without requesting permission or starting an effect.
+// information_uuid_v5=d2cbf4dc-f6a8-53df-ae82-e3e84f51ee7f
+// information_uuid_v5=4eeca0e8-026c-559e-9496-885453aa6f30
+// event_uuid_v7=01a04a5a-ece0-7715-a44c-3fe4200880af
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T21:51:08.000Z
+// machine-contract: overlapping invocations keep input/result pairs isolated, while non-negative measured-count inconsistencies remain available to the safety-violation renderer.
 
 test("adapter reports a typed unavailable state without calling preview", async () => {
   let previewCalls = 0;
@@ -156,6 +179,137 @@ test("adapter accepts a duplicate only when SQLite and audit preserve the same f
   assert.equal(output.inputEvidence.durableEvidenceMatch, true);
 });
 
+test("adapter restores a verified persisted intent on repeated WebMCP preview", async () => {
+  const origin = "https://example.test";
+  let registeredTool;
+  await registerNotificationWebMcpTool({
+    runtime: {
+      location: { origin },
+      document: { modelContext: { registerTool(tool) { registeredTool = tool; } } },
+    },
+    preview: async (input) => {
+      const envelope = acceptedEnvelope(input, origin);
+      return {
+        ...envelope,
+        status: {
+          intent: {
+            ...envelope.status.intent,
+            controlState: "VERIFIED",
+            effectState: "CONFIRMED_PRESENT",
+          },
+          effectStartCount: 1,
+        },
+      };
+    },
+  });
+  const output = await registeredTool.execute({
+    logicalOperationId: "adapter-restored",
+    title: "Title",
+    body: "Body",
+  });
+  assert.equal(output.controlState, "VERIFIED");
+  assert.equal(output.effectState, "CONFIRMED_PRESENT");
+  assert.equal(output.effectStartCount, 1);
+  assert.equal(output.restored, true);
+});
+
+test("adapter passes measured-count inconsistencies to the violation renderer", async () => {
+  const origin = "https://example.test";
+  let registeredTool;
+  await registerNotificationWebMcpTool({
+    runtime: {
+      location: { origin },
+      document: { modelContext: { registerTool(tool) { registeredTool = tool; } } },
+    },
+    preview: async (input) => {
+      const envelope = acceptedEnvelope(input, origin);
+      const verified = input.logicalOperationId === "count-two";
+      return {
+        ...envelope,
+        status: {
+          intent: {
+            ...envelope.status.intent,
+            controlState: verified ? "VERIFIED" : "DRY_RUN",
+            effectState: verified ? "CONFIRMED_PRESENT" : "NOT_STARTED",
+          },
+          effectStartCount: verified ? 2 : 1,
+        },
+      };
+    },
+  });
+  const dryRunMismatch = await registeredTool.execute({
+    logicalOperationId: "count-one",
+    title: "Title one",
+    body: "Body one",
+  });
+  const verifiedMismatch = await registeredTool.execute({
+    logicalOperationId: "count-two",
+    title: "Title two",
+    body: "Body two",
+  });
+  assert.equal(dryRunMismatch.effectStartCount, 1);
+  assert.equal(verifiedMismatch.effectStartCount, 2);
+});
+
+test("overlapping executions emit only their own lifecycle input and result", async () => {
+  const origin = "https://example.test";
+  const intentIds = new Map([
+    ["overlap-a", "f9fb2e8d-7a49-52b2-990d-9180b2b55149"],
+    ["overlap-b", "9ea40120-57d2-5acf-9467-d4960006d6c8"],
+  ]);
+  const releases = new Map();
+  const completions = [];
+  let registeredTool;
+  await registerNotificationWebMcpTool({
+    runtime: {
+      location: { origin },
+      document: { modelContext: { registerTool(tool) { registeredTool = tool; } } },
+    },
+    preview: (input) => new Promise((resolve) => {
+      releases.set(input.logicalOperationId, () => resolve(acceptedEnvelope(
+        input,
+        origin,
+        intentIds.get(input.logicalOperationId),
+      )));
+    }),
+    onLifecycle: (event) => {
+      if (event.type === "DRY_RUN_COMPLETED") completions.push(event);
+    },
+  });
+  const executionA = registeredTool.execute({ logicalOperationId: "overlap-a", title: "A", body: "A body" });
+  const executionB = registeredTool.execute({ logicalOperationId: "overlap-b", title: "B", body: "B body" });
+  releases.get("overlap-b")();
+  await executionB;
+  releases.get("overlap-a")();
+  await executionA;
+
+  assert.deepEqual(completions.map((event) => [event.input.logicalOperationId, event.result.intentId]), [
+    ["overlap-b", intentIds.get("overlap-b")],
+    ["overlap-a", intentIds.get("overlap-a")],
+  ]);
+});
+
+test("adapter rejects a persisted intent that does not belong to the projected invocation", async () => {
+  const origin = "https://example.test";
+  let registeredTool;
+  await registerNotificationWebMcpTool({
+    runtime: {
+      location: { origin },
+      document: { modelContext: { registerTool(tool) { registeredTool = tool; } } },
+    },
+    preview: async (input) => {
+      const envelope = acceptedEnvelope(input, origin);
+      envelope.intent.title = "different invocation";
+      envelope.status.intent.title = "different invocation";
+      return envelope;
+    },
+  });
+  await assert.rejects(
+    registeredTool.execute({ logicalOperationId: "bound-input", title: "Expected", body: "Body" }),
+    /dry-run provenance readback mismatch/,
+  );
+});
+
 test("adapter rejects a claimed readback match that durable evidence does not support", async () => {
   const origin = "https://example.test";
   let registeredTool;
@@ -239,5 +393,7 @@ test("draft API references remain isolated from the application module", async (
   assert.match(adapter, /registerTool/);
   assert.doesNotMatch(app, /document\.modelContext/);
   assert.doesNotMatch(app, /registerTool/);
+  assert.doesNotMatch(app, /pendingResult/);
+  assert.match(app, /event\.result/);
   assert.doesNotMatch(adapter, /Notification\.requestPermission/);
 });

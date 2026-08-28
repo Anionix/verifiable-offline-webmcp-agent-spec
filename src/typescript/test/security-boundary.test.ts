@@ -22,6 +22,15 @@ import {
   type SignedMandate,
 } from "../governance/security-boundary.ts";
 
+// information_uuid_v5=5d103a11-f19a-5f3f-96e7-c0c0913ef27e
+// event_uuid_v7=01a049ff-0405-706b-86aa-20c06de08924
+// state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T20:10:44.613Z
+// machine-contract: lookup identity, secret values, evaluation clocks, and mutation read/write sets all fail closed before authority is granted.
+// information_uuid_v5=1f1b52fb-d801-5f64-97a1-dfd275841146
+// event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:56:11.012Z
+// machine-contract: secret field detection matches complete credential identifiers and does not reject ordinary public names that merely contain those words.
+
 const proposalTool = Object.freeze({
   contractVersion: "0.1.0",
   tool: { id: "notify_once_preview", class: "messaging", description: "Prepare a local dry-run notification" },
@@ -58,6 +67,18 @@ test("TEST-ARCH-002 discovers tools only after contract lookup", () => {
   }), /contract lookup failed/);
 });
 
+test("contract lookup rejects a registry value whose tool identity differs from its key", () => {
+  assert.throws(() => discoverPlannerTools({
+    discoveredToolIds: [proposalTool.tool.id],
+    contracts: new Map([[proposalTool.tool.id, {
+      ...proposalTool,
+      tool: { ...proposalTool.tool, id: "different.tool" },
+    }]]),
+    executorCapabilities: [proposalTool.tool.id],
+    requestedPlannerCapabilities: [proposalTool.tool.id],
+  }), /contract identity does not match lookup key/);
+});
+
 test("TEST-ARCH-003 records the WebMCP draft surface and checks compatibility", () => {
   assert.equal(WEBMCP_DRAFT_METADATA.status, "DRAFT_COMMUNITY_GROUP_REPORT");
   assert.equal(WEBMCP_DRAFT_METADATA.observedSurface, "document.modelContext.registerTool");
@@ -92,7 +113,11 @@ test("TEST-CONTRACT-002 requires declared read and write sets for mutation tools
   assert.throws(() => validateGovernedToolContract({
     ...proposalTool,
     semantics: { readSet: [], writeSet: [] },
-  }), /non-empty writeSet/);
+  }), /non-empty readSet and writeSet/);
+  assert.throws(() => validateGovernedToolContract({
+    ...proposalTool,
+    semantics: { readSet: [], writeSet: ["notification.preview"] },
+  }), /non-empty readSet and writeSet/);
 });
 
 test("TEST-CRITICAL-001 keeps critical operations HUMAN without a valid signed mandate", () => {
@@ -113,6 +138,8 @@ test("TEST-CRITICAL-001 keeps critical operations HUMAN without a valid signed m
   assert.equal(criticalAuthorityDecision(criticalProposal, mandate, 1_000), "HUMAN");
   assert.equal(criticalAuthorityDecision(criticalProposal, { ...mandate, signatureBase64: "invalid" }, 1_000, publicKey), "HUMAN");
   assert.equal(criticalAuthorityDecision(criticalProposal, mandate, 1_000, publicKey), "ALLOW");
+  assert.equal(criticalAuthorityDecision(criticalProposal, mandate, Number.NaN, publicKey), "DENY");
+  assert.equal(criticalAuthorityDecision(criticalProposal, mandate, -1, publicKey), "DENY");
 });
 
 test("TEST-CRITICAL-002 rejects critical commit tools at the planner boundary", () => {
@@ -172,6 +199,14 @@ test("TEST-SEC-006 rejects secret-shaped planner context", () => {
   assert.equal(Object.isFrozen(projected.nested), true);
   assert.throws(() => projectPlannerContext({ password: "example-redacted-value" }), /secret-like planner field/);
   assert.throws(() => projectPlannerContext({ note: ["BEGIN", "PRIVATE", "KEY"].join(" ") }), /secret-like planner value/);
+  assert.throws(() => projectPlannerContext({ note: "sk-abcdefghijklmnopqrstuvwxyz" }), /secret-like planner value/);
+  assert.throws(() => projectPlannerContext({ note: "Basic dXNlcjpwYXNzd29yZA==" }), /secret-like planner value/);
+  assert.throws(() => projectPlannerContext({ authorization: "public-looking" }), /secret-like planner field/);
+  assert.doesNotThrow(() => projectPlannerContext({
+    tokenCount: 3,
+    secretaryName: "public role",
+    authorizationStatus: "not-requested",
+  }));
 });
 
 test("TEST-SEC-008 keeps planner capability inside executor capability", () => {

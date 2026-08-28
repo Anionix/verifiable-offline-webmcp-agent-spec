@@ -1,6 +1,10 @@
 // information_uuid_v5=c2733a1c-ddf7-51f6-929e-3736349b8848
 // event_uuid_v7=01a0493d-49b4-7b9f-ac17-fa44d9bab232
 // machine-contract: DISCOVERED -> MINIMIZED -> COSTED | STOPPED_BEFORE_TRANSPORT; non-public or secret-looking values never cross the planner boundary.
+// information_uuid_v5=d0df026b-55c2-53b2-8b98-8c4652df78b7
+// event_uuid_v7=01a049ff-02a9-724e-b280-7b5029b74e33
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:44.265Z
+// machine-contract: the final serialized planner input must satisfy the same 4096 Unicode-character ceiling published by its request schema.
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion } from "../uuid.ts";
 import type {
@@ -140,13 +144,17 @@ export function preflightPlanner(task: PlannerTask, policy: PlannerPolicy, disco
     return { ok: false, reason: "SENSITIVE_VALUE_DETECTED", disclosedContextKeys: [], exposedToolNames: tools.map(tool => tool.name) };
   }
   const disclosedContext = Object.fromEntries(disclosed.map(field => [field.key, field.value]));
+  const inputText = canonicalJson({ taskKind: task.taskKind, context: disclosedContext } as CanonicalValue);
+  if ([...inputText].length > 4_096) {
+    return { ok: false, reason: "INVALID_TASK", disclosedContextKeys: [], exposedToolNames: tools.map(tool => tool.name) };
+  }
   return {
     ok: true,
     prepared: {
       task,
       tools,
       disclosedContext,
-      inputText: canonicalJson({ taskKind: task.taskKind, context: disclosedContext } as CanonicalValue),
+      inputText,
     },
   };
 }

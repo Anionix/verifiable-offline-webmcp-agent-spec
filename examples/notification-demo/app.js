@@ -13,16 +13,43 @@
 // information_uuid_v5=d53907bf-96cd-56e5-be92-5c4f3576e477
 // event_uuid_v7=01a04972-c11c-74d1-8639-c71dded7b68a
 // machine-contract: the six replay checks are rendered from reducer state; no visual PASS can grant execution authority.
+// information_uuid_v5=97ce90b3-983b-56e7-9381-c8c2df3068e2
+// event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.523Z
+// machine-contract: repeated preview reads persisted control/effect state and the SQLite effect count before rendering; it never invents a fresh zero-effect state.
+// information_uuid_v5=0a6e95b1-f829-5429-9caa-bd142f018915
+// event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:42:18.694Z
+// machine-contract: concurrent state advancement is accepted only after immutable intent identity is read back unchanged.
+// information_uuid_v5=a49f40c5-65fa-5363-b64f-be5d86766914
+// event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:56:11.012Z
+// machine-contract: the WebMCP path reads and renders the same persisted status as the local path; a repeated preview never resets visible truth.
+// information_uuid_v5=3093ad26-25f3-5912-b015-70a04c93fe08
+// event_uuid_v7=01a04a3b-7a18-76a0-b150-b1aacc95e727
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:16:47.000Z
+// machine-contract: the input-boundary panel receives the persisted control/effect pair and measured count instead of inventing DRY_RUN / NOT_STARTED.
+// information_uuid_v5=4cb035a8-f737-514f-90c6-da6c0672f814
+// event_uuid_v7=01a04a4c-1be8-727c-9b05-be91397708b3
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: every WebMCP restoration atomically resets the prior intent visualization before applying persisted state.
+// information_uuid_v5=d2cbf4dc-f6a8-53df-ae82-e3e84f51ee7f
+// information_uuid_v5=4eeca0e8-026c-559e-9496-885453aa6f30
+// event_uuid_v7=01a04a5a-ece0-7715-a44c-3fe4200880af
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:51:08.000Z
+// machine-contract: a WebMCP completion renders only its own lifecycle input/result pair, and measured-count mismatches remain visible as safety violations.
 import {
   NotificationInputError,
   registerNotificationWebMcpTool,
 } from "/webmcp-notification-adapter.js";
 import {
+  assertPersistedIntentMatchesPreview,
   createInputBoundaryState,
   createVisualState,
   REPLAY_GATE_KEYS,
   reduceInputBoundaryState,
   reduceVisualState,
+  visualEventFromPersistedStatus,
 } from "/visual-state.js";
 
 const elements = {
@@ -172,9 +199,9 @@ async function requestPreview(values, signal, path = "/api/preview") {
   return request(path, values, signal);
 }
 
-async function readStatus() {
-  if (!currentIntentId) throw new Error("状態を読むIntentがありません");
-  const response = await fetch(`/api/status?intentId=${encodeURIComponent(currentIntentId)}`, {
+async function readStatus(intentId = currentIntentId) {
+  if (!intentId) throw new Error("状態を読むIntentがありません");
+  const response = await fetch(`/api/status?intentId=${encodeURIComponent(intentId)}`, {
     headers: { "Accept": "application/json" },
     cache: "no-store",
   });
@@ -205,7 +232,7 @@ function render(result, message) {
   elements.log.textContent = message + "\n\n" + JSON.stringify(result, null, 2);
 }
 
-function assertLocalDryRunReadback(result) {
+function assertLocalPreviewReadback(result) {
   const intent = result?.intent;
   const previewResult = result?.preview;
   const inputEvidence = result?.inputEvidence;
@@ -217,12 +244,19 @@ function assertLocalDryRunReadback(result) {
     || !inputEvidence?.auditPersisted
     || inputEvidence.sqliteMatchesAudit !== true
     || inputEvidence.persistedEventId !== inputEvidence.auditEventId
-    || intent.controlState !== "DRY_RUN"
-    || intent.effectState !== "NOT_STARTED"
     || previewResult.intentId !== intent.intentId
     || previewResult.payloadDigest !== intent.payloadDigest
     || previewResult.approvalRequired !== true
-  ) throw new Error("dry-run readback mismatch");
+  ) throw new Error("preview readback mismatch");
+}
+
+function assertStatusReadback(status, expectedIntent) {
+  if (
+    !status?.intent
+    || !Number.isSafeInteger(status.effectStartCount)
+    || status.effectStartCount < 0
+  ) throw new Error("persisted status readback mismatch");
+  assertPersistedIntentMatchesPreview(status.intent, expectedIntent);
 }
 
 function renderProvenanceObservation(observation) {
@@ -234,6 +268,15 @@ function renderProvenanceObservation(observation) {
 }
 
 function renderInputEvidence(inputEvidence) {
+  if (inputEvidence?.channel && inputEvidence?.sourceOrigin) {
+    elements.provenanceChannel.textContent = inputEvidence.channel === "WEBMCP" ? "WebMCP" : "ローカル画面";
+    elements.provenanceTrust.textContent = inputEvidence.sourceTrust === "UNTRUSTED" ? "未信頼の印を保持" : "内部入力";
+    elements.provenanceOrigin.textContent = inputEvidence.sourceOrigin;
+    elements.provenanceReadback.textContent = inputEvidence.matchesPersisted
+      ? "SQLite・監査と一致"
+      : `既存台帳の${inputEvidence.persistedChannel}を保持`;
+    return;
+  }
   const invocation = inputEvidence?.invocation;
   const persisted = inputEvidence?.persisted;
   if (!invocation || !persisted) return;
@@ -245,13 +288,53 @@ function renderInputEvidence(inputEvidence) {
     : `既存台帳の${persisted.channel}を保持`;
 }
 
+function webMcpUiResult(event) {
+  const result = event.result;
+  const input = event.input;
+  if (
+    !result
+    || !input
+    || typeof result.intentId !== "string"
+    || typeof result.target !== "string"
+    || typeof result.payloadDigest !== "string"
+    || typeof result.controlState !== "string"
+    || typeof result.effectState !== "string"
+    || !Number.isSafeInteger(result.effectStartCount)
+    || result.effectStartCount < 0
+  ) throw new Error("WebMCP完了結果が入力と結び付いていません");
+  return {
+    intent: {
+      intentId: result.intentId,
+      logicalOperationId: input.logicalOperationId,
+      target: result.target,
+      payloadDigest: result.payloadDigest,
+      controlState: result.controlState,
+      effectState: result.effectState,
+      title: input.title,
+      body: input.body,
+    },
+    effectStartCount: result.effectStartCount,
+    inputEvidence: result.inputEvidence,
+  };
+}
+
 async function preview(values = formValue(), signal) {
   updateVisual({ type: "RESET" });
   const result = await requestPreview(values, signal);
-  assertLocalDryRunReadback(result);
-  render(result.intent, "乾式実行が完了しました。内容を確認してから承認してください。");
+  assertLocalPreviewReadback(result);
+  render(result.intent, "台帳の状態を読み戻しています。");
+  const status = await readStatus();
+  assertStatusReadback(status, result.intent);
+  const event = visualEventFromPersistedStatus(status.intent, status.effectStartCount);
+  const restored = status.intent.controlState !== "DRY_RUN";
+  render(
+    status.intent,
+    restored
+      ? `既存状態を読み戻しました: ${status.intent.controlState} / ${status.intent.effectState}`
+      : "乾式実行が完了しました。内容を確認してから承認してください。",
+  );
   renderInputEvidence(result.inputEvidence);
-  updateVisual({ type: "PREVIEWED" });
+  updateVisual(event);
   return result;
 }
 
@@ -333,11 +416,13 @@ elements.retry.addEventListener("click", () => handle(() => approveAndNotify("re
 elements.reconcile.addEventListener("click", () => handle(reconcile));
 
 async function registerWebMcp() {
-  let pendingResult = null;
   const registration = await registerNotificationWebMcpTool({
     preview: async (projected, context) => {
-      pendingResult = await requestPreview(projected, context.signal, "/api/webmcp-preview");
-      return pendingResult;
+      const result = await requestPreview(projected, context.signal, "/api/webmcp-preview");
+      assertLocalPreviewReadback(result);
+      const status = await readStatus(result.intent.intentId);
+      assertStatusReadback(status, result.intent);
+      return { ...result, status };
     },
     onLifecycle: (event) => {
       renderProvenanceObservation(event.observation);
@@ -350,14 +435,34 @@ async function registerWebMcp() {
         elements.log.textContent = `WebMCP入力を拒否: ${message}`;
       } else if (event.type === "INPUT_ACCEPTED") {
         updateInputBoundary({ type: "INPUT_ACCEPTED" });
-      } else if (event.type === "DRY_RUN_COMPLETED" && pendingResult && event.input) {
-        render(pendingResult.intent, "WebMCP入力の由来をSQLiteと監査記録から読み戻しました。実通知は開始していません。");
-        renderInputEvidence(pendingResult.inputEvidence);
-        updateVisual({ type: "PREVIEWED" });
+      } else if (event.type === "DRY_RUN_COMPLETED") {
+        const completion = webMcpUiResult(event);
+        const status = {
+          intent: completion.intent,
+          effectStartCount: completion.effectStartCount,
+        };
+        const restored = status.intent.controlState !== "DRY_RUN";
+        render(
+          status.intent,
+          restored
+            ? `WebMCPから既存状態を読み戻しました: ${status.intent.controlState} / ${status.intent.effectState}`
+            : "WebMCP入力の由来をSQLiteと監査記録から読み戻しました。実通知は開始していません。",
+        );
+        renderInputEvidence(completion.inputEvidence);
+        updateVisual({
+          type: "RESTORE_PERSISTED",
+          intent: status.intent,
+          effectStartCount: status.effectStartCount,
+        });
         elements.logicalOperation.value = event.input.logicalOperationId;
         elements.title.value = event.input.title;
         elements.body.value = event.input.body;
-        updateInputBoundary({ type: "DRY_RUN_COMPLETED" });
+        updateInputBoundary({
+          type: "DRY_RUN_COMPLETED",
+          controlState: status.intent.controlState,
+          effectState: status.intent.effectState,
+          effectStartCount: status.effectStartCount,
+        });
       } else if (event.type === "DRY_RUN_FAILED") {
         updateInputBoundary({ type: "DRY_RUN_FAILED" });
         elements.provenanceReadback.textContent = "結果不一致で停止";

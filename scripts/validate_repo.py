@@ -2,6 +2,9 @@
 # information_uuid_v5=cd034fcd-9a4a-5d32-bea8-375d2511206c
 # event_uuid_v7=01a04895-5146-74b1-af5b-00e8ce98730d
 # machine-contract: live notification evidence must preserve a valid hash chain, one effect claim, and an auditable suppressed retry.
+# event_uuid_v7=01a049d1-b7e1-7443-a30b-4620165c8b17
+# state_transition=EXECUTING -> READY_FOR_PUBLIC_READBACK occurred_at=2026-08-28T19:21:16.001Z
+# machine-contract: final evidence preserves native WebMCP as INCONCLUSIVE, checks two finite-state engines against 38 states, and proves 67 automated records with zero new effects.
 from __future__ import annotations
 
 import argparse
@@ -276,6 +279,12 @@ def main():
     )
     for e in planner_request_validator.iter_errors(planner_request):
         errors.append(f"schema {planner_evidence['artifacts']['requestSample']}: {e.message}")
+    final_evidence = load_json(ROOT / "metadata/final-verification.json")
+    final_evidence_validator = Draft202012Validator(
+        schemas["final-verification"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in final_evidence_validator.iter_errors(final_evidence):
+        errors.append(f"schema metadata/final-verification.json: {e.message}")
     checks["json_schema"] = not errors
 
     # Source graph and cross-reference integrity.
@@ -712,7 +721,22 @@ def main():
     if type_run.returncode: errors.append("TypeScript type check failed:\n" + type_run.stdout + type_run.stderr)
     checks["typescript_typecheck"] = type_run.returncode == 0
 
-    # Wolfram report sanity (actual evaluator output was captured at generation time).
+    # Final public evidence is rebuilt in memory and compared byte-for-byte.
+    # TLC is not bundled, so this lane checks the captured official-run report;
+    # `make verify-tla TLA2TOOLS_JAR=...` additionally reruns the official engine.
+    final_run = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/final_verification.py"), "--check"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if final_run.returncode:
+        errors.append("final public evidence failed:\n" + final_run.stdout + final_run.stderr)
+    checks["final_public_evidence"] = final_run.returncode == 0
+
+    # Wolfram report sanity. The final evidence separately records that no
+    # Wolfram runtime was available for this run and reproduces the sample with
+    # Python Fraction arithmetic instead of claiming a current kernel execution.
     wf = load_json(ROOT / "formal/wolfram/verification-report.json")
     if wf["results"]["probabilityMass"] != "1": errors.append("Wolfram probability mass check did not equal 1")
     checks["wolfram_report"] = wf["results"]["probabilityMass"] == "1"
@@ -722,7 +746,7 @@ def main():
         "validatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "checks": checks,
         "tlcExecuted": False,
-        "tlcNote": "TLA+ specification is provided; TLC is not bundled or executed by this local validation script.",
+        "tlcNote": "TLC is not bundled or started by make validate; the captured official v1.7.4 report, source hashes, and independent state count are checked. make verify-tla reruns TLC when a verified jar path is supplied.",
         "errorCount": len(errors),
         "errors": errors,
         "passed": not errors and all(checks.values()),

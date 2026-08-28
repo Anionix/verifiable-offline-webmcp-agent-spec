@@ -14,6 +14,7 @@ effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
 effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
 slo_gate_review_fix_event_uuid_v7: "01a049ba-c4e3-753e-8c7d-c353034a2a3b"
+final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 generated_at: "2026-08-27T09:34:00Z"
 updated_at: "2026-08-28T18:56:12.003Z"
 version: "0.1.0"
@@ -66,6 +67,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 13. [`docs/18-online-planner-reference.ja.md`](docs/18-online-planner-reference.ja.md) — optional candidate planner with tool, privacy, cost, latency, and authority boundaries / 道具・情報・費用・遅延・権限を制限した任意計画器
 14. [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md) — six hard operational-quality gates with deterministic counterexamples / 6つの運用品質判定と固定した反例
 15. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
+16. [`docs/20-final-verification.ja.md`](docs/20-final-verification.ja.md) — bounded browser observation, two formal checks, and the 67-test public-evidence boundary / ブラウザー実測・二つの形式検証・67件の公開証拠境界
 
 ## Machine-readable assets / 機械可読asset
 
@@ -76,9 +78,10 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `data/timeseries/*.ndjson` — source/design/runtime time series
 - `data/audit/*.json|ndjson` — signed sample log, Merkle checkpoint, inclusion proof, tamper report
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
+- `metadata/final-verification.json` — bounded WebMCP observation, formal results, 67-test count, and zero-effect final evidence
 - `MANIFEST.sha256` — artifact integrity manifest
 
-The first three 1.0.0 governance slices have promoted 23 security, contract, replay, verification, and operational-quality records. The catalog now contains **67 implemented tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), and [`docs/test-catalog.md`](docs/test-catalog.md).
+The four 1.0.0 governance slices bind security, replay, operational-quality, browser-observation, and formal-evidence claims. The catalog contains **67 implemented and automated tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`, and native WebMCP conformance remains `INCONCLUSIVE`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), [`metadata/final-verification.json`](metadata/final-verification.json), and [`docs/test-catalog.md`](docs/test-catalog.md).
 
 ## Validation / 検証
 
@@ -86,7 +89,7 @@ The first three 1.0.0 governance slices have promoted 23 security, contract, rep
 make validate
 ```
 
-The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-references, verifies UUID versions and UUIDv7 timestamps, runs TypeScript golden vectors, verifies Ed25519 signatures/hash chains/Merkle roots, and runs the independent reachability model.
+The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-references, verifies UUID versions and UUIDv7 timestamps, runs TypeScript golden vectors, verifies Ed25519 signatures/hash chains/Merkle roots, runs the independent reachability model, and rebuilds the final evidence in memory for a byte-for-byte comparison.
 
 `make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
 
@@ -104,7 +107,7 @@ make demo
 
 Open `http://127.0.0.1:4173`. The page first shows a dry run. A real Mac browser notification is requested only after an explicit click, and the same logical operation is then retried to prove that a second effect is blocked. If `document.modelContext` is absent, native WebMCP support remains `INCONCLUSIVE`; the same typed local path stays usable.
 
-The candidate screen makes that safety path visible: the first request and retry converge on the same intent ledger, while the count card reads the conservative SQLite effect-start ledger and exposes any value above one as a safety violation. A compact six-check rail also shows why a replay is allowed, stopped, unnecessary, or waiting for reconciliation. Desktop and 390-pixel-wide browser checks are documented in [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md), with machine-readable dry-run evidence in [`metadata/replay-independent-verification.json`](metadata/replay-independent-verification.json). One earlier Codex in-app browser exposed `document.modelContext`; the current Playwright browser did not. Broader native WebMCP conformance remains `INCONCLUSIVE`.
+The candidate screen makes that safety path visible: the first request and retry converge on the same intent ledger, while the count card reads the conservative SQLite effect-start ledger and exposes any value above one as a safety violation. A compact six-check rail also shows why a replay is allowed, stopped, unnecessary, or waiting for reconciliation. Desktop and 390-pixel-wide browser checks are documented in [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md), with machine-readable dry-run evidence in [`metadata/replay-independent-verification.json`](metadata/replay-independent-verification.json). In the final bounded observation, the Codex in-app browser discovered `notify_once` through its tab capability, while `document.modelContext` was absent in both the in-app page scope and the connected Chrome page scope. These observations are intentionally separate; broader native WebMCP conformance remains `INCONCLUSIVE`.
 
 The draft WebMCP surface is isolated in one notification adapter. External input provenance is derived from the server route, persisted with the first intent-created event, and independently read back before the browser shows a match. A same-operation request from another channel keeps the first provenance and creates no external effect. See [`metadata/webmcp-provenance-verification.json`](metadata/webmcp-provenance-verification.json); this bounded browser observation does not claim general WebMCP conformance.
 
@@ -143,6 +146,19 @@ make validate
 ```
 
 The public evidence is a deterministic synthetic fixture with six passing gates and fixed failing counterexamples. It generated no runtime measurement, external effect, or external spend. Production availability, latency, calibration, bad-commit probability, and duplicate-effect probability remain `UNMEASURED`. See [`metadata/slo-gate-verification.json`](metadata/slo-gate-verification.json) and [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md).
+
+## Final public evidence / 最終公開証拠
+
+The final evidence keeps three boundaries visible instead of flattening them into one claim: the in-app browser's bounded tool discovery is `CONFIRMED_PRESENT`; the standard `document.modelContext` surface was `CONFIRMED_ABSENT` in the observed Chrome page scope; general native WebMCP conformance and version remain `INCONCLUSIVE`. The observed page called no WebMCP tool, made no external page request, requested no notification permission, emitted no notification, and left intent, attempt, effect, and audit counts at zero.
+
+The independent Python explorer reached 38 states with no prohibited state, and an official TLA+ Tools v1.7.4 / TLC 2.19 run found the same 38 distinct states with no invariant error. No Wolfram runtime was available for the current run, so current Wolfram execution is `NOT_EXECUTED`; the captured report is checked separately with exact rational arithmetic. All 67 catalog records are implemented and automated. See [`metadata/final-verification.json`](metadata/final-verification.json) and [`docs/20-final-verification.ja.md`](docs/20-final-verification.ja.md).
+
+```bash
+make evidence-final
+make verify-tla TLA2TOOLS_JAR=/absolute/path/to/tla2tools.jar
+```
+
+The tracked evidence stops at `READY_FOR_PUBLIC_READBACK`. Post-merge `main` readback, unresolved critical-defect count, and the final secret scan belong in the external Issue #45 verification record because a commit cannot honestly attest to its own future public state.
 
 ## Primary-source posture / 一次情報源の扱い
 

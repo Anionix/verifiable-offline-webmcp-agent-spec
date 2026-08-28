@@ -1,0 +1,152 @@
+{
+  "identity": {
+    "uuidV5": "d1e09460-7fb3-5280-a82e-7516b56d1aa6",
+    "uuidV7": "01a049d0-77a7-7af0-813e-479c2252d1b4",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "observedAt": "2026-08-28T19:19:54.023Z",
+    "observedAtEpochMs": 1787944794023,
+    "timeZone": "UTC"
+  },
+  "issue": {
+    "number": 45,
+    "url": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/45",
+    "informationUuidV5": "75ab0acd-973c-53d0-a889-8940c52a0ca4"
+  },
+  "webMcpSpecification": {
+    "source": "https://webmachinelearning.github.io/webmcp/",
+    "publication": "Draft Community Group Report",
+    "publishedOn": "2026-08-26",
+    "standardsTrack": false,
+    "documentSurface": "document.modelContext",
+    "toolRegistrationSurface": "document.modelContext.registerTool",
+    "permissionsPolicyFeature": "tools"
+  },
+  "browserObservations": [
+    {
+      "identity": {
+        "uuidV5": "8f95ce7f-423d-5371-97fe-dbfc4d50fee7",
+        "uuidV7": "01a049c8-ba23-7d87-bf4c-0bdc93c5a0b7"
+      },
+      "temporal": {
+        "observedAt": "2026-08-28T19:11:26.755Z",
+        "observedAtEpochMs": 1787944286755
+      },
+      "context": "AUTOMATED_CHROMIUM",
+      "browserVersion": "Chromium 152.0.0.0",
+      "documentModelContext": "CONFIRMED_ABSENT",
+      "modelContextVersion": null,
+      "toolsPermissionsPolicyAllowed": false,
+      "notificationPermission": "default",
+      "serviceWorkerControllerPresent": false,
+      "tabWebMcpCapability": "NOT_OBSERVED",
+      "console": {
+        "errorCount": 0,
+        "warningCount": 1,
+        "warning": "Unrecognized feature: 'tools'."
+      },
+      "network": {
+        "localStaticGetRequests": 6,
+        "mutatingRequests": 0,
+        "externalRequests": 0
+      }
+    },
+    {
+      "identity": {
+        "uuidV5": "3d356981-a470-5a3e-93d5-a48e2e6eda1f",
+        "uuidV7": "01a049ce-4139-7390-af32-addf32bfdea7"
+      },
+      "temporal": {
+        "observedAt": "2026-08-28T19:17:29.017Z",
+        "observedAtEpochMs": 1787944649017
+      },
+      "context": "CONNECTED_CHROME_READ_ONLY",
+      "browserVersion": "UNAVAILABLE_IN_READ_ONLY_SCOPE",
+      "documentModelContext": "CONFIRMED_ABSENT",
+      "modelContextVersion": null,
+      "toolsPermissionsPolicyAllowed": null,
+      "notificationPermission": "UNAVAILABLE_IN_READ_ONLY_SCOPE",
+      "serviceWorkerControllerPresent": false,
+      "tabWebMcpCapability": "CONFIRMED_ABSENT",
+      "console": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "warning": null
+      },
+      "network": {
+        "localStaticGetRequests": null,
+        "mutatingRequests": 0,
+        "externalRequests": 0
+      }
+    },
+    {
+      "identity": {
+        "uuidV5": "19e9191a-7622-5290-b1b1-34f3f4e0cc0e",
+        "uuidV7": "01a049d0-77a7-7af0-813e-479c2252d1b4"
+      },
+      "temporal": {
+        "observedAt": "2026-08-28T19:19:54.023Z",
+        "observedAtEpochMs": 1787944794023
+      },
+      "context": "CODEX_IN_APP_BROWSER",
+      "browserVersion": "UNAVAILABLE_IN_READ_ONLY_SCOPE",
+      "documentModelContext": "CONFIRMED_ABSENT",
+      "modelContextVersion": null,
+      "toolsPermissionsPolicyAllowed": null,
+      "notificationPermission": "UNAVAILABLE_IN_READ_ONLY_SCOPE",
+      "serviceWorkerControllerPresent": false,
+      "tabWebMcpCapability": "CONFIRMED_PRESENT",
+      "console": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "warning": null
+      },
+      "network": {
+        "localStaticGetRequests": null,
+        "mutatingRequests": 0,
+        "externalRequests": 0
+      }
+    }
+  ],
+  "discoveredTools": [
+    {
+      "name": "notify_once",
+      "title": "Prepare one duplicate-safe local notification",
+      "description": "Creates a persistent local dry-run intent from three literal fields. It cannot request notification permission or create a visible notification.",
+      "origin": "http://127.0.0.1:4173",
+      "strictObjectInput": true,
+      "requiredFields": [
+        "logicalOperationId",
+        "title",
+        "body"
+      ],
+      "additionalProperties": false,
+      "called": false
+    }
+  ],
+  "conclusion": {
+    "boundedToolDiscovery": "CONFIRMED_PRESENT",
+    "standardDocumentSurfaceInObservedChrome": "CONFIRMED_ABSENT",
+    "nativeWebMcpConformance": "INCONCLUSIVE",
+    "nativeWebMcpVersion": "INCONCLUSIVE",
+    "reason": "The in-app browser exposed the page-defined tool through a browser capability while the standard document.modelContext surface was absent in both directly observed page scopes. These bounded observations do not prove general browser conformance or non-conformance."
+  },
+  "wolframCurrentRun": {
+    "observedAt": "2026-08-28T19:07:21.805Z",
+    "runtimeAvailability": "UNAVAILABLE",
+    "currentExecution": "NOT_EXECUTED",
+    "capturedReportStatus": "CONFIRMED",
+    "independentExactArithmetic": "REQUIRED"
+  },
+  "scope": {
+    "actualWebMcpToolCalls": 0,
+    "actualNotificationPermissionRequests": 0,
+    "actualNotifications": 0,
+    "actualObservedPageExternalNetworkRequests": 0,
+    "intentRows": 0,
+    "attemptRows": 0,
+    "effectRows": 0,
+    "auditEvents": 0
+  }
+}

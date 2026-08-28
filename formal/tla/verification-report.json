@@ -1,0 +1,79 @@
+{
+  "identity": {
+    "uuidV5": "65d35409-2864-52a8-b459-3d0927d870c8",
+    "uuidV7": "01a049d1-b7e0-79e5-ad2a-03d2499749f7",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "verifiedAt": "2026-08-28T19:21:16.000Z",
+    "verifiedAtEpochMs": 1787944876000,
+    "timeZone": "UTC"
+  },
+  "stateTransition": {
+    "from": "DRY_RUN",
+    "to": "VERIFIED",
+    "eventId": "01a049d1-b7e0-79e5-ad2a-03d2499749f7",
+    "occurredAt": "2026-08-28T19:21:16.000Z"
+  },
+  "engine": {
+    "name": "TLC",
+    "version": "2.19",
+    "revision": "5a47802",
+    "toolsRelease": "v1.7.4",
+    "releaseSource": "https://github.com/tlaplus/tlaplus/releases/tag/v1.7.4",
+    "jarSource": "https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar",
+    "jarBytes": 2274532,
+    "publishedSha1": "bee4a54f3ee3d4afc347c3240ec2d9e93b075104",
+    "observedSha1": "bee4a54f3ee3d4afc347c3240ec2d9e93b075104",
+    "observedSha256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88",
+    "binaryBundled": false
+  },
+  "inputs": {
+    "specification": "formal/tla/ToolExecution.tla",
+    "specificationSha256": "89b7d2b0ecacb17db706ad11416ec1e03a56241f9af80e7e5e08e264cce87d8f",
+    "configuration": "formal/tla/ToolExecution.cfg",
+    "configurationSha256": "a162d2dcca034c23cc4a5ee8eebdaeb4ce19062fbe92b5ffc1652d6d0b05e2f9",
+    "maxRetry": 2,
+    "workers": 1,
+    "fingerprintIndex": 0,
+    "checkDeadlock": false,
+    "command": [
+      "java",
+      "-XX:+UseParallelGC",
+      "-cp",
+      "<tla2tools.jar>",
+      "tlc2.TLC",
+      "-workers",
+      "1",
+      "-fp",
+      "0",
+      "-metadir",
+      "<temporary-directory>",
+      "-config",
+      "ToolExecution.cfg",
+      "ToolExecution.tla"
+    ]
+  },
+  "result": {
+    "status": "VERIFIED",
+    "noError": true,
+    "statesGenerated": 44,
+    "distinctStates": 38,
+    "statesLeftOnQueue": 0,
+    "completeGraphDepth": 13,
+    "invariants": [
+      "TypeOK",
+      "NoUnauthorizedExecution",
+      "NoDoubleEffect",
+      "NoCommitWithoutVerification",
+      "NoAmbiguousRetry",
+      "EffectRequiresAuthorization"
+    ]
+  },
+  "scope": {
+    "finiteModelOnly": true,
+    "actualNotificationEffects": 0,
+    "actualNetworkEffectsDuringModelCheck": 0,
+    "runtimeBrowserConformanceProved": false
+  }
+}

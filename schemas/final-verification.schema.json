@@ -1,0 +1,512 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/final-verification.schema.json",
+  "$comment": "information_uuid_v5=80ac633a-c935-5658-b315-5794e533baa4; event_uuid_v7=01a049d1-b7e1-7443-a30b-4620165c8b17; machine-contract=bounded evidence cannot become general WebMCP conformance and every external-effect counter remains zero.",
+  "title": "Final public verification evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "identity",
+    "temporal",
+    "version",
+    "status",
+    "issue",
+    "stateTransition",
+    "webMcp",
+    "formalVerification",
+    "testCatalog",
+    "effects",
+    "reviewBoundary",
+    "sources",
+    "artifacts"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/final-verification.schema.json"
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "temporal": {
+      "$ref": "#/$defs/temporal"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "const": "READY_FOR_PUBLIC_READBACK"
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "number",
+        "url",
+        "informationUuidV5"
+      ],
+      "properties": {
+        "number": {
+          "const": 45
+        },
+        "url": {
+          "const": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/45"
+        },
+        "informationUuidV5": {
+          "$ref": "#/$defs/uuidV5"
+        }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "eventId",
+        "occurredAt"
+      ],
+      "properties": {
+        "from": {
+          "const": "EXECUTING"
+        },
+        "to": {
+          "const": "READY_FOR_PUBLIC_READBACK"
+        },
+        "eventId": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "webMcp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conclusion",
+        "version",
+        "draftPublication",
+        "draftPublishedOn",
+        "standardsTrack",
+        "boundedObservationCount",
+        "standardDocumentSurfaceInObservedChrome",
+        "inAppBrowserToolDiscovery",
+        "discoveredToolNames",
+        "toolCalls"
+      ],
+      "properties": {
+        "conclusion": {
+          "const": "INCONCLUSIVE"
+        },
+        "version": {
+          "const": "INCONCLUSIVE"
+        },
+        "draftPublication": {
+          "const": "Draft Community Group Report"
+        },
+        "draftPublishedOn": {
+          "type": "string",
+          "format": "date"
+        },
+        "standardsTrack": {
+          "const": false
+        },
+        "boundedObservationCount": {
+          "const": 3
+        },
+        "standardDocumentSurfaceInObservedChrome": {
+          "const": "CONFIRMED_ABSENT"
+        },
+        "inAppBrowserToolDiscovery": {
+          "const": "CONFIRMED_PRESENT"
+        },
+        "discoveredToolNames": {
+          "const": [
+            "notify_once"
+          ]
+        },
+        "toolCalls": {
+          "const": 0
+        }
+      }
+    },
+    "formalVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finiteExplorer",
+        "tla",
+        "wolfram"
+      ],
+      "properties": {
+        "finiteExplorer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reachableStates",
+            "transitions",
+            "commitReachable",
+            "baselineViolations",
+            "mutationDetections"
+          ],
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "reachableStates": {
+              "const": 38
+            },
+            "transitions": {
+              "const": 43
+            },
+            "commitReachable": {
+              "const": true
+            },
+            "baselineViolations": {
+              "$ref": "#/$defs/zeroViolations"
+            },
+            "mutationDetections": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "unauthorizedExecution",
+                "doubleEffect",
+                "commitWithoutVerification",
+                "ambiguousRetry"
+              ],
+              "properties": {
+                "unauthorizedExecution": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "doubleEffect": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "commitWithoutVerification": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "ambiguousRetry": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "tla": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "toolsRelease",
+            "engineVersion",
+            "statesGenerated",
+            "distinctStates",
+            "statesLeftOnQueue",
+            "completeGraphDepth",
+            "jarPublishedSha1Matched",
+            "binaryBundled"
+          ],
+          "properties": {
+            "status": {
+              "const": "VERIFIED"
+            },
+            "toolsRelease": {
+              "const": "v1.7.4"
+            },
+            "engineVersion": {
+              "const": "2.19"
+            },
+            "statesGenerated": {
+              "const": 44
+            },
+            "distinctStates": {
+              "const": 38
+            },
+            "statesLeftOnQueue": {
+              "const": 0
+            },
+            "completeGraphDepth": {
+              "const": 13
+            },
+            "jarPublishedSha1Matched": {
+              "const": true
+            },
+            "binaryBundled": {
+              "const": false
+            }
+          }
+        },
+        "wolfram": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "runtimeAvailability",
+            "currentExecution",
+            "capturedReport",
+            "capturedReportSha256",
+            "modelSha256",
+            "independentExactArithmetic",
+            "probabilityMass",
+            "geometricFactorExact",
+            "expectedRetriesExact",
+            "duplicateProbabilityExact",
+            "duplicateProbabilityDecimal"
+          ],
+          "properties": {
+            "runtimeAvailability": {
+              "const": "UNAVAILABLE"
+            },
+            "currentExecution": {
+              "const": "NOT_EXECUTED"
+            },
+            "capturedReport": {
+              "const": "CONFIRMED"
+            },
+            "capturedReportSha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "modelSha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "independentExactArithmetic": {
+              "const": "VERIFIED"
+            },
+            "probabilityMass": {
+              "const": "1"
+            },
+            "geometricFactorExact": {
+              "type": "string",
+              "pattern": "^[0-9]+/[1-9][0-9]*$"
+            },
+            "expectedRetriesExact": {
+              "type": "string",
+              "pattern": "^[0-9]+/[1-9][0-9]*$"
+            },
+            "duplicateProbabilityExact": {
+              "type": "string",
+              "pattern": "^[0-9]+/[1-9][0-9]*$"
+            },
+            "duplicateProbabilityDecimal": {
+              "type": "string",
+              "pattern": "^0\\.[0-9]+$"
+            }
+          }
+        }
+      }
+    },
+    "testCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "total",
+        "implemented",
+        "automated",
+        "partial",
+        "specificationOnly",
+        "automationArtifactCount",
+        "catalogSha256"
+      ],
+      "properties": {
+        "status": {
+          "const": "VERIFIED"
+        },
+        "total": {
+          "const": 67
+        },
+        "implemented": {
+          "const": 67
+        },
+        "automated": {
+          "const": 67
+        },
+        "partial": {
+          "const": 0
+        },
+        "specificationOnly": {
+          "const": 0
+        },
+        "automationArtifactCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "catalogSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actualWebMcpToolCalls",
+        "actualNotificationPermissionRequests",
+        "actualNotifications",
+        "actualObservedPageExternalNetworkRequests",
+        "intentRows",
+        "attemptRows",
+        "effectRows",
+        "auditEvents"
+      ],
+      "properties": {
+        "actualWebMcpToolCalls": {
+          "const": 0
+        },
+        "actualNotificationPermissionRequests": {
+          "const": 0
+        },
+        "actualNotifications": {
+          "const": 0
+        },
+        "actualObservedPageExternalNetworkRequests": {
+          "const": 0
+        },
+        "intentRows": {
+          "const": 0
+        },
+        "attemptRows": {
+          "const": 0
+        },
+        "effectRows": {
+          "const": 0
+        },
+        "auditEvents": {
+          "const": 0
+        }
+      }
+    },
+    "reviewBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "postMergeMainReadback",
+        "unresolvedCriticalDefects",
+        "secretScan",
+        "recordTarget"
+      ],
+      "properties": {
+        "postMergeMainReadback": {
+          "const": "REQUIRED_EXTERNAL_RECORD"
+        },
+        "unresolvedCriticalDefects": {
+          "const": "PENDING_EXTERNAL_RECORD"
+        },
+        "secretScan": {
+          "const": "REQUIRED_BEFORE_PUSH"
+        },
+        "recordTarget": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "minProperties": 8,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/sha256"
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uuidV5",
+        "uuidV7",
+        "namespace"
+      ],
+      "properties": {
+        "uuidV5": {
+          "$ref": "#/$defs/uuidV5"
+        },
+        "uuidV7": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "namespace": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verifiedAt",
+        "verifiedAtEpochMs",
+        "timeZone"
+      ],
+      "properties": {
+        "verifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verifiedAtEpochMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timeZone": {
+          "const": "UTC"
+        }
+      }
+    },
+    "zeroViolations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unauthorizedExecution",
+        "doubleEffect",
+        "commitWithoutVerification",
+        "ambiguousRetry"
+      ],
+      "properties": {
+        "unauthorizedExecution": {
+          "const": 0
+        },
+        "doubleEffect": {
+          "const": 0
+        },
+        "commitWithoutVerification": {
+          "const": 0
+        },
+        "ambiguousRetry": {
+          "const": 0
+        }
+      }
+    }
+  }
+}

@@ -121,8 +121,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "architecture-requirement-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: plannerへ公開する前にtool discoveryとcontract lookupを実行しなければならない。",
         "en": "Verifies the following requirement(s): Tool discovery and contract lookup MUST occur before tools are exposed to a planner."
@@ -137,7 +137,17 @@
       "source_refs": [
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7045-8b17-303994807cb5",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-ARCH-003",
@@ -167,8 +177,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "architecture-requirement-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: WebMCP draft versionをmetadataへ記録し、互換性testをCIで実行しなければならない。",
         "en": "Verifies the following requirement(s): The WebMCP draft version MUST be recorded in metadata and compatibility tests run in CI."
@@ -183,7 +193,17 @@
       "source_refs": [
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-75c1-a34d-408c1e9e0992",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-AUDIT-001",
@@ -667,7 +687,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: approvalはtool、normalized args、target、amount/content digest、expiryにbindされなければならない。",
@@ -686,15 +706,17 @@
       ],
       "automation_artifacts": [
         "schemas/notification-intent.schema.json",
+        "src/typescript/governance/security-boundary.ts",
         "src/typescript/notification/engine.ts",
-        "src/typescript/test/notification.test.ts"
+        "src/typescript/test/notification.test.ts",
+        "src/typescript/test/security-boundary.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-30ae-7290-8651-0d90029bbccd",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "duplicate-safe local notification path"
+        "event_uuid_v7": "01a04967-af58-7e68-90e2-492357c25902",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
       }
     },
     {
@@ -839,8 +861,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "tool-contract-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: mutation toolはdeclared read setとwrite setを持たなければならない。",
         "en": "Verifies the following requirement(s): Mutation tools MUST declare read and write sets."
@@ -855,7 +877,17 @@
       "source_refs": [
         "SRC-TLA-LAMPORT"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7230-8343-0d3b6d5653fe",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-CRITICAL-001",
@@ -885,8 +917,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: financial、destructive、identity mutationは有効なmandateがない限りHUMANでなければならない。",
         "en": "Verifies the following requirement(s): Financial, destructive, and identity mutation actions MUST be HUMAN unless covered by a valid mandate."
@@ -901,7 +933,17 @@
       "source_refs": [
         "SRC-MCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-71a9-9fd6-f84bbc679a2b",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-CRITICAL-002",
@@ -931,8 +973,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: critical commit toolはplannerへ直接公開せず、policy engine内に保持すべきである。",
         "en": "Verifies the following requirement(s): Critical commit tools SHOULD remain inside the policy engine rather than being directly exposed to a planner."
@@ -947,7 +989,17 @@
       "source_refs": [
         "SRC-MCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7088-986f-82690ccf8c14",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-ID-001",
@@ -2329,8 +2381,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: UUIDを認可tokenまたは秘密として扱ってはならない。",
         "en": "Verifies the following requirement(s): UUIDs MUST NOT be treated as authorization tokens or secrets."
@@ -2345,7 +2397,17 @@
       "source_refs": [
         "SRC-RFC9562"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7d8f-9540-111c0c218555",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-002",
@@ -2375,8 +2437,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: MCP経由のtoolでもhost policyとuser consentを迂回してはならない。",
         "en": "Verifies the following requirement(s): Tools reached through MCP MUST NOT bypass host policy or user consent."
@@ -2391,7 +2453,17 @@
       "source_refs": [
         "SRC-MCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7e6d-b655-840d4a7cf019",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-003",
@@ -2483,8 +2555,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: LLM、tool output、web contentだけでauthorityを増加させてはならない。",
         "en": "Verifies the following requirement(s): Authority MUST NOT increase solely because of LLM output, tool output, or web content."
@@ -2500,7 +2572,17 @@
         "SRC-TLA-LAMPORT",
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7563-a8b7-6199b7451830",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-005",
@@ -2530,8 +2612,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: untrusted tool outputをinstructionではなくdataとして扱わなければならない。",
         "en": "Verifies the following requirement(s): Untrusted tool output MUST be treated as data, not instruction."
@@ -2546,7 +2628,17 @@
       "source_refs": [
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-78e3-a2aa-6b3739d3adf8",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-006",
@@ -2576,8 +2668,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: private key、access token、passwordをplanner contextへ渡してはならない。",
         "en": "Verifies the following requirement(s): Private keys, access tokens, and passwords MUST NOT enter planner context."
@@ -2593,7 +2685,17 @@
         "SRC-MCP-2026",
         "SRC-RFC8032"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7d2e-ac81-bbc90af97c22",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-007",
@@ -2688,8 +2790,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: planner capabilityはexecutor capabilityの真部分集合または等しい集合でなければならない。",
         "en": "Verifies the following requirement(s): Planner capability MUST be a subset of executor capability."
@@ -2704,7 +2806,17 @@
       "source_refs": [
         "SRC-MCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-7c3d-ad79-b7f114e38674",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SEC-009",
@@ -2734,8 +2846,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: tool description、tool output、page observationをprompt injectionの可能性がある入力として扱わなければならない。",
         "en": "Verifies the following requirement(s): Tool descriptions, tool outputs, and page observations MUST be treated as potentially prompt-injected inputs."
@@ -2750,7 +2862,17 @@
       "source_refs": [
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/governance/security-boundary.ts",
+        "src/typescript/test/security-boundary.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04967-af58-714b-878a-262f9c225a18",
+        "occurred_at": "2026-08-28T17:25:27.000Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "governance security boundary with Ed25519 mandate verification and deterministic counterexamples"
+      }
     },
     {
       "id": "TEST-SLO-001",

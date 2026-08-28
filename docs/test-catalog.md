@@ -7,21 +7,22 @@ updated_event_uuid_v7: "01a048e2-e264-7ed5-a64b-2f3ef202ffe7"
 provenance_event_uuid_v7: "01a04904-ca95-7468-9bd0-cb597093a64a"
 offline_sync_event_uuid_v7: "01a04927-4698-7f6a-b5e9-ef8bd558913c"
 online_planner_event_uuid_v7: "01a04948-c160-7283-a380-4f7db4ccb041"
+security_boundary_event_uuid_v7: "01a04967-af58-7fee-af26-3701238950ec"
 generated_at: "2026-08-27T09:34:04.000Z"
-updated_at: "2026-08-28T16:15:06.008Z"
+updated_at: "2026-08-28T17:25:27.000Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 44 / partially implemented 11 / specified 12. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification, local two-device synchronization, and optional planner references raise only their bounded paths; real Responses API transport, general native WebMCP conformance, and unrelated tool classes remain unimplemented.
+**Total / 合計:** 67 tests — implemented 57 / partially implemented 10 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, and untrusted-data handling. Replay revalidation, independent effect verification, and runtime service-level calibration remain partially implemented.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
 | `TEST-ARCH-001` | architecture-requirement-test | implemented | yes | REQ-WEBMCP-001 |
-| `TEST-ARCH-002` | architecture-requirement-test | specified | no | REQ-WEBMCP-002 |
-| `TEST-ARCH-003` | architecture-requirement-test | specified | no | REQ-SEC-007 |
+| `TEST-ARCH-002` | architecture-requirement-test | implemented | yes | REQ-WEBMCP-002 |
+| `TEST-ARCH-003` | architecture-requirement-test | implemented | yes | REQ-SEC-007 |
 | `TEST-AUDIT-001` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-001 |
 | `TEST-AUDIT-002` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-002 |
 | `TEST-AUDIT-003` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-003 |
@@ -31,12 +32,12 @@ status: "design-specification"
 | `TEST-AUDIT-007` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-007 |
 | `TEST-AUDIT-008` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-008 |
 | `TEST-AUDIT-009` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-009 |
-| `TEST-AUTH-001` | security-policy-test | partially-implemented | yes | REQ-POLICY-007 |
+| `TEST-AUTH-001` | security-policy-test | implemented | yes | REQ-POLICY-007 |
 | `TEST-CONFORMANCE-001` | decision-conformance-test | implemented | yes | REQ-POLICY-003 |
 | `TEST-CONTRACT-001` | tool-contract-test | implemented | yes | REQ-TOOL-001 |
-| `TEST-CONTRACT-002` | tool-contract-test | specified | no | REQ-TOOL-002 |
-| `TEST-CRITICAL-001` | security-policy-test | specified | no | REQ-POLICY-006 |
-| `TEST-CRITICAL-002` | security-policy-test | specified | no | REQ-SEC-005 |
+| `TEST-CONTRACT-002` | tool-contract-test | implemented | yes | REQ-TOOL-002 |
+| `TEST-CRITICAL-001` | security-policy-test | implemented | yes | REQ-POLICY-006 |
+| `TEST-CRITICAL-002` | security-policy-test | implemented | yes | REQ-SEC-005 |
 | `TEST-ID-001` | identifier-temporal-validation | implemented | yes | REQ-ID-001 |
 | `TEST-ID-002` | identifier-temporal-validation | implemented | yes | REQ-ID-002 |
 | `TEST-IR-001` | decision-conformance-test | implemented | yes | REQ-DATA-003 |
@@ -63,15 +64,15 @@ status: "design-specification"
 | `TEST-PRIVACY-002` | security-policy-test | implemented | yes | REQ-SEC-006 |
 | `TEST-SCHEMA-001` | json-schema-validation | implemented | yes | REQ-DATA-001 |
 | `TEST-SCHEMA-002` | json-schema-validation | implemented | yes | REQ-DATA-002 |
-| `TEST-SEC-001` | security-policy-test | specified | no | REQ-ID-003 |
-| `TEST-SEC-002` | security-policy-test | specified | no | REQ-MCP-001 |
+| `TEST-SEC-001` | security-policy-test | implemented | yes | REQ-ID-003 |
+| `TEST-SEC-002` | security-policy-test | implemented | yes | REQ-MCP-001 |
 | `TEST-SEC-003` | security-policy-test | implemented | yes | REQ-PLAN-003 |
-| `TEST-SEC-004` | security-policy-test | specified | no | REQ-POLICY-008 |
-| `TEST-SEC-005` | security-policy-test | specified | no | REQ-SEC-001 |
-| `TEST-SEC-006` | security-policy-test | specified | no | REQ-SEC-002 |
+| `TEST-SEC-004` | security-policy-test | implemented | yes | REQ-POLICY-008 |
+| `TEST-SEC-005` | security-policy-test | implemented | yes | REQ-SEC-001 |
+| `TEST-SEC-006` | security-policy-test | implemented | yes | REQ-SEC-002 |
 | `TEST-SEC-007` | security-policy-test | implemented | yes | REQ-SEC-003 |
-| `TEST-SEC-008` | security-policy-test | specified | no | REQ-SEC-004 |
-| `TEST-SEC-009` | security-policy-test | specified | no | REQ-SEC-008 |
+| `TEST-SEC-008` | security-policy-test | implemented | yes | REQ-SEC-004 |
+| `TEST-SEC-009` | security-policy-test | implemented | yes | REQ-SEC-008 |
 | `TEST-SLO-001` | stochastic-mathematical-check | partially-implemented | yes | REQ-SYNC-005 |
 | `TEST-SLO-002` | stochastic-mathematical-check | partially-implemented | yes | REQ-SYNC-006 |
 | `TEST-SLO-003` | stochastic-mathematical-check | partially-implemented | yes | REQ-VERIFY-002 |

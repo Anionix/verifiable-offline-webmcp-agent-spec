@@ -1,0 +1,15 @@
+// information_uuid_v5=a5d9201a-c24c-5d2a-af2e-f4f3a2b8d3e0
+// event_uuid_v7=01a04a96-683f-7f68-a170-63d5cb47b6bd state_transition=PORTABLE_STATIC_BUILD -> CLOUDFLARE_WORKERS_STATIC_ASSETS_READY occurred_at=2026-08-28T22:56:06Z
+// machine-contract: publish only ./dist as static assets; do not add a Worker entrypoint, dynamic fallback, or repository-wide upload.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "verifiable-offline-webmcp-agent-spec",
+  "compatibility_date": "2026-08-29",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

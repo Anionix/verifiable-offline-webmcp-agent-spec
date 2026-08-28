@@ -79,7 +79,7 @@ assert.deepEqual(evaluations.deterministicContractCases[0].expected, {
   effectStartCount: 0,
   humanApprovalRequired: true,
 });
-assert.equal(config.buildCommand, "npm run build:vercel");
+assert.equal(config.buildCommand, "npm run build:web");
 assert.equal(config.outputDirectory, "dist");
 assert(config.headers.some((entry) => entry.headers.some((header) => {
   return header.key === "Content-Security-Policy" && header.value.includes("default-src 'self'");

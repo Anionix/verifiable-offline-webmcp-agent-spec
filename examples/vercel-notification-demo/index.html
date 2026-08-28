@@ -2,8 +2,14 @@
 <!-- information_uuid_v5=e1b1806f-887a-521d-9e34-24f55036c447 -->
 <!-- event_uuid_v7=01a04a5f-5108-7da5-85b0-0edde298b712 -->
 <!-- event_uuid_v7=01a04a69-2b08-7b2d-b2f4-bf025dad5af7 state_transition=RESOURCE_REVIEWED -> JUDGE_GUIDE_PUBLISHED occurred_at=2026-08-28T22:06:43Z -->
+<!-- information_uuid_v5=0f4904f8-09f3-5365-afa9-6f500237bd3d -->
+<!-- event_uuid_v7=01a04a96-a919-7b0c-809f-0ff7182a41c4 state_transition=JUDGE_GUIDE_PUBLISHED -> SERVICE_BOUNDARIES_VISIBLE occurred_at=2026-08-28T22:56:22.809Z -->
+<!-- information_uuid_v5=e9044f40-9e5b-5ab0-8dbd-108896158181 -->
+<!-- event_uuid_v7=01a04a9c-0f45-7992-b30d-4c9221773eab state_transition=SERVICE_BOUNDARIES_VISIBLE -> DUPLICATE_RISK_VALUE_VISIBLE occurred_at=2026-08-28T23:02:16.645Z -->
 <!-- state_transition=DISCOVERED -> DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED occurred_at=2026-08-28T22:05:45.736Z -->
 <!-- machine-contract=WebMCP prepares a dry run; only the visible approval button can request permission and start at most one browser notification. -->
+<!-- machine-contract=Each service card exposes one stable service ID and one evidence-bounded integration state; CONFIGURED never means deployed. -->
+<!-- machine-contract=Every service card labels its duplicate-risk scenario ILLUSTRATIVE_NOT_OBSERVED and pairs it with one potential prevented outcome. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -26,9 +32,9 @@
 
     <header id="top" class="hero">
       <div class="eyebrow">HUMAN + AGENT · LOCAL-FIRST · FAIL-CLOSED</div>
-      <h1>Ask an agent to prepare it.<br><span>You decide whether it happens.</span></h1>
-      <p class="hero-copy">WebMCP can prepare a duplicate-safe browser notification, but it cannot request permission or display anything. The person on this page owns the final click.</p>
-      <p class="hero-copy ja" lang="ja">エージェントは重複しない通知を準備できます。ただし、許可要求も表示もできません。最後に実行する権限は、この画面の人が持ちます。</p>
+      <h1>Retry after a lost response.<br><span>Keep the effect to one.</span></h1>
+      <p class="hero-copy">A missing response can tempt an agent to try again. This demo gives the same logical operation one stable identity, then keeps notification permission and the final effect behind your click.</p>
+      <p class="hero-copy ja" lang="ja">応答が消えて再試行しても、同じ操作を同じ識別子で追います。通知許可と最後の実行は、この画面の人だけが決めます。</p>
       <div class="hero-proof" aria-label="Safety claim">
         <strong>2 requests</strong><span aria-hidden="true">→</span><strong>1 intent</strong><span aria-hidden="true">→</span><strong>≤ 1 effect</strong>
       </div>
@@ -139,6 +145,98 @@
         <a href="https://webmachinelearning.github.io/webmcp/" target="_blank" rel="noreferrer">Draft specification <span aria-hidden="true">↗</span></a>
         <a href="https://webmcp.devpost.com/resources" target="_blank" rel="noreferrer">Challenge resources <span aria-hidden="true">↗</span></a>
       </div>
+    </section>
+
+    <section class="integrations-section" aria-labelledby="integrations-title">
+      <div class="section-heading-wide">
+        <span class="section-index">07</span>
+        <div><h2 id="integrations-title">Eight services, one everyday risk: double sending</h2><p lang="ja">8サービスで起こり得る二重送信と、防げる生活上の負担</p></div>
+      </div>
+      <p class="integration-intro"><strong>Integration means a connectable boundary.</strong> It does not mean every service has been deployed or proven in production. <span lang="ja">ここでの連携は、接続できる境界を整えたという意味です。全サービスの本番実証ではありません。</span></p>
+      <p class="integration-observation" data-local-verification="VERIFIED" data-verification-event-id="01a04aa6-0a41-749e-b9d0-dd06d3e9c665" data-tool-calls="2" data-effect-start-count="0"><strong>Bounded local check:</strong> two calls to <code>notify_once</code> returned the same UUIDv5 intent and effect-start count <code>0</code>. At 320 pixels, all eight cards stayed inside the viewport; browser warnings and errors were <code>0</code>. Native WebMCP conformance remains <code>INCONCLUSIVE</code>.<span lang="ja">限定したローカル確認では、同じ道具を2回呼んでも同じIntentになり、外部効果開始は0件でした。320ピクセル幅でも8カードは横にはみ出さず、警告・エラーは0件です。ネイティブWebMCP適合性は未確定です。</span></p>
+      <ul class="integration-legend" aria-label="Integration state meanings">
+        <li><strong data-tone="verified">VERIFIED</strong><span>公開先を確認済み</span></li>
+        <li><strong data-tone="configured">CONFIGURED</strong><span>設定済み・未配置</span></li>
+        <li><strong data-tone="inconclusive">INCONCLUSIVE</strong><span>実行環境では未確定</span></li>
+        <li><strong data-tone="boundary">BOUNDARY_ONLY</strong><span>役割境界のみ</span></li>
+        <li><strong data-tone="resource">RESOURCE_CONFIRMED</strong><span>公式資料を確認済み</span></li>
+      </ul>
+
+      <div class="integration-grid">
+        <article class="integration-card" data-service-id="openai" data-integration-state="INCONCLUSIVE" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>OpenAI</h3><span class="integration-status" data-tone="inconclusive">INCONCLUSIVE</span></header>
+          <strong class="integration-role">Use tools + publish a Site <small lang="ja">道具利用＋公開</small></strong>
+          <p class="service-boundary">ChatGPT can use page tools, and Sites can host the artifact. This runtime is unverified here.</p>
+          <p class="duplicate-risk">Illustrative, not observed: after a response disappears, an agent repeats the same notification or request and the recipient receives it twice.</p>
+          <p class="prevented-outcome">One operation identity can reduce recipient confusion, trust loss, and cancellation work.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: 応答消失後の再実行で通知や依頼が相手へ2回届く。防げる価値: 混乱、信用低下、取消対応を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="cloudflare" data-integration-state="CONFIGURED" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Cloudflare</h3><span class="integration-status" data-tone="configured">CONFIGURED</span></header>
+          <strong class="integration-role">Host + test <small lang="ja">公開＋試験</small></strong>
+          <p class="service-boundary">Static Assets configuration is prepared. Browser Run is optional; neither lane was deployed here.</p>
+          <p class="duplicate-risk">Illustrative, not observed: after a mobile-network switch, an action from a Cloudflare-hosted page is retried and the same alert or webhook arrives twice.</p>
+          <p class="prevented-outcome">One effect ledger can reduce duplicate downstream work, cost, and cleanup.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: 移動通信の切替後、Cloudflare公開ページ上の操作が再試行され、同じ警告や外部通知が2回届く。防げる価値: 重複処理、費用、後片付けを減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="vercel" data-integration-state="CONFIGURED" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Vercel</h3><span class="integration-status" data-tone="configured">CONFIGURED</span></header>
+          <strong class="integration-role">Live baseline + pending update <small lang="ja">公開済み基準＋更新待ち</small></strong>
+          <p class="service-boundary">The previous build is live. This registry-bearing build is locally verified and awaits a separately approved redeployment.</p>
+          <p class="duplicate-risk">Illustrative, not observed: a double click or page reload on a Vercel-hosted page sends the same notification twice.</p>
+          <p class="prevented-outcome">Blocking a repeated effect can reduce confusion and preserve user trust.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: Vercel公開ページの二度押しや再読込で同じ通知が2回届く。防げる価値: 混乱と信用低下を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="shopify" data-integration-state="BOUNDARY_ONLY" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Shopify</h3><span class="integration-status" data-tone="boundary">BOUNDARY_ONLY</span></header>
+          <strong class="integration-role">Provide store tools <small lang="ja">店舗の道具を提供</small></strong>
+          <p class="service-boundary">Shopify can expose commerce tools. This demo has no store, customer data, or shop authorization.</p>
+          <p class="duplicate-risk">Illustrative, not observed: the same cart add runs twice, leaving two items when the shopper intended one.</p>
+          <p class="prevented-outcome">A single-operation guard can reduce cart correction, excess cost, refunds, and support work.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: カートへの商品追加が2回実行され、1個のつもりが2個になる。防げる価値: カート修正、余計な費用、返金や問い合わせ対応を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="google-chrome" data-integration-state="INCONCLUSIVE" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Google Chrome</h3><span class="integration-status" data-tone="inconclusive">INCONCLUSIVE</span></header>
+          <strong class="integration-role">Inspect + evaluate <small lang="ja">確認＋評価</small></strong>
+          <p class="service-boundary">Evaluation cases are published. Native WebMCP availability depends on the testing browser.</p>
+          <p class="duplicate-risk">Illustrative, not observed: a browser agent retry submits the same form or notification twice.</p>
+          <p class="prevented-outcome">A visible effect count can reduce duplicate requests, confusion, and correction work.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: ブラウザーのエージェント再試行で同じフォームや通知が2回送られる。防げる価値: 重複依頼、混乱、修正作業を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="render" data-integration-state="CONFIGURED" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Render</h3><span class="integration-status" data-tone="configured">CONFIGURED</span></header>
+          <strong class="integration-role">Optional public host <small lang="ja">任意の公開先</small></strong>
+          <p class="service-boundary">A static-site path is configured. Account connection and deployment remain unperformed.</p>
+          <p class="duplicate-risk">Illustrative, not observed: a future workflow restarts after work finishes but before acknowledgement, repeating the same email or job.</p>
+          <p class="prevented-outcome">A durable operation identity can reduce repeated work, cost, and recipient distrust.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: 将来の処理が完了後、受領確認前に再起動し、同じメールや仕事を2回実行する。防げる価値: 重複処理、費用、信用低下を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="netlify" data-integration-state="CONFIGURED" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Netlify</h3><span class="integration-status" data-tone="configured">CONFIGURED</span></header>
+          <strong class="integration-role">Optional public host <small lang="ja">任意の公開先</small></strong>
+          <p class="service-boundary">A file-based configuration targets the same static output. No production deployment is claimed.</p>
+          <p class="duplicate-risk">Illustrative, not observed: on a Netlify-hosted form, a weak connection causes the same booking or contact request to be submitted twice.</p>
+          <p class="prevented-outcome">Duplicate suppression can reduce scheduling conflicts, follow-up work, and confusion.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: Netlify公開フォームで通信が不安定になり、同じ予約や問い合わせが2回送られる。防げる価値: 予約衝突、確認作業、混乱を減らす。</small>
+        </article>
+
+        <article class="integration-card" data-service-id="devpost" data-integration-state="RESOURCE_CONFIRMED" data-scenario-status="ILLUSTRATIVE_NOT_OBSERVED">
+          <header><h3>Devpost</h3><span class="integration-status" data-tone="resource">RESOURCE_CONFIRMED</span></header>
+          <strong class="integration-role">Resources + submission <small lang="ja">公式資料＋提出</small></strong>
+          <p class="service-boundary">Official resources define these boundaries. Devpost is not this demo’s execution runtime.</p>
+          <p class="duplicate-risk">Illustrative, not observed: a team's submission helper repeats a version-update notice, leaving the latest version unclear.</p>
+          <p class="prevented-outcome">One ordered update can reduce team and reviewer confusion and trust loss.</p>
+          <small class="scenario-ja" lang="ja">想定例（未実測）: チームの提出補助が版更新の通知を2回送り、最新版が分からなくなる。防げる価値: チームと審査側の混乱、信用低下を減らす。</small>
+        </article>
+      </div>
+
+      <p class="integration-registry">Machine-readable status / 機械可読の状態: <a href="/service-integrations.json">service-integrations.json</a></p>
     </section>
 
     <details class="technical-log">

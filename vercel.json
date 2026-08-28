@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run build:web",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -14,7 +14,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), geolocation=(), microphone=()"
+          "value": "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
         },
         {
           "key": "Referrer-Policy",
@@ -23,6 +23,10 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
         },
         {
           "key": "Cross-Origin-Resource-Policy",

@@ -1,0 +1,129 @@
+{
+  "id": "EVID-WEBMCP-PROVENANCE-001",
+  "identity": {
+    "uuid_v5": "9d1b6e87-505c-5ef3-8346-cf1e76e1c07c",
+    "uuid_v7": "01a0490d-f64c-7c81-80a2-a6537e8eb038",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "webmcp-provenance-verification",
+    "category": "browser-verification"
+  },
+  "temporal": {
+    "observed_at": "2026-08-28T15:47:26.924Z",
+    "epoch_ms": 1787932046924,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-29T00:47:26.924+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "state": "BROWSER_VERIFIED",
+  "evidence_state": {
+    "dedicated_draft_adapter": "CONFIRMED",
+    "server_derived_provenance": "CONFIRMED",
+    "same_origin_enforcement": "CONFIRMED",
+    "sqlite_audit_round_trip": "CONFIRMED",
+    "cross_channel_duplicate_preserves_first_provenance": "CONFIRMED",
+    "untrusted_literal_not_reflected": "CONFIRMED",
+    "target_browser_native_webmcp_conformance": "INCONCLUSIVE",
+    "real_notification_during_this_verification": "CONFIRMED_ABSENT"
+  },
+  "environment": {
+    "browser": "Codex in-app browser",
+    "webmcp_page_origin": "http://127.0.0.1:4175",
+    "visual_check_origin": "http://127.0.0.1:4176",
+    "viewports": [
+      { "width": 1440, "height": 1000, "horizontal_overflow": false },
+      { "width": 390, "height": 844, "horizontal_overflow": false }
+    ],
+    "browser_error_log_count": 0,
+    "browser_warning_log_count": 0
+  },
+  "registration": {
+    "tool_name": "notify_once",
+    "origin": "http://127.0.0.1:4175",
+    "exposed_to": [],
+    "annotations": {
+      "readOnlyHint": false,
+      "untrustedContentHint": false
+    },
+    "annotation_rationale": "The dry run persists intent and audit records, while the returned result excludes the untrusted notification title and body."
+  },
+  "accepted_observation": {
+    "logical_operation_id": "webmcp-provenance-browser-001",
+    "intent_id": "5dd6b5fa-3eb5-5dd9-8a14-92ea03c62dbd",
+    "normalized_title": "Café provenance",
+    "control_state": "DRY_RUN",
+    "effect_state": "NOT_STARTED",
+    "effect_start_count": 0,
+    "human_approval_required": true,
+    "input_provenance": {
+      "channel": "WEBMCP",
+      "source_trust": "UNTRUSTED",
+      "source_origin": "http://127.0.0.1:4175",
+      "untrusted_content": true,
+      "annotation": "UNTRUSTED_LITERAL",
+      "derivation": "SERVER_ROUTE",
+      "matches_persisted_readback": true,
+      "sqlite_matches_audit": true,
+      "persisted_event_id": "01a048fe-b603-7ee6-a085-b7ffc52b4b81",
+      "audit_event_id": "01a048fe-b603-7ee6-a085-b7ffc52b4b81"
+    },
+    "webmcp_output_fields": [
+      "controlState",
+      "effectState",
+      "humanApprovalRequired",
+      "inputEvidence",
+      "intentId",
+      "payloadDigest",
+      "target"
+    ],
+    "title_or_body_reflected_in_output": false
+  },
+  "cross_channel_duplicate_observation": {
+    "requested_channel": "LOCAL_FORM",
+    "persisted_channel": "WEBMCP",
+    "same_intent_id": true,
+    "first_provenance_preserved": true,
+    "sqlite_matches_audit": true,
+    "effect_start_count": 0,
+    "audit_event_count": 2
+  },
+  "rejected_observations": {
+    "unknown_field": {
+      "reason_code": "UNKNOWN_FIELD",
+      "extra_field": "execute",
+      "rejected_intent_id": "5b7f3e8a-1ff2-5718-94f3-ece3e4e82f38",
+      "rejected_intent_found": false,
+      "effect_start_count": 0,
+      "audit_event_count_after_rejection": 2
+    },
+    "cross_origin": {
+      "supplied_origin": "https://attacker.example",
+      "expected_origin": "http://127.0.0.1:4175",
+      "http_status": 400,
+      "effect_start_count": 0,
+      "audit_event_count_after_rejection": 2
+    }
+  },
+  "audit": {
+    "event_count": 2,
+    "valid": true,
+    "last_hash": "2919eab7a6997987656991c3d4495f68e98a5735ec10c64b8ec61eba8bb0343f"
+  },
+  "external_effect": {
+    "notification_permission_requested": false,
+    "approval_endpoint_called": false,
+    "notification_adapter_called": false,
+    "real_notification_displayed": false
+  },
+  "artifacts": [
+    "schemas/input-provenance.schema.json",
+    "src/typescript/notification/input-provenance.ts",
+    "src/typescript/webmcp/notification-adapter.js",
+    "src/typescript/test/input-provenance.test.ts",
+    "src/typescript/test/webmcp-notification-adapter.test.js",
+    "data/audit/webmcp-provenance-events.ndjson",
+    "docs/16-webmcp-provenance-adapter.ja.md"
+  ],
+  "source_refs": ["SRC-WEBMCP-2026"]
+}

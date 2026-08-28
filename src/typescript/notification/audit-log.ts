@@ -50,6 +50,20 @@ export class AuditLog {
     return { valid: true, count, lastHash: previousHash };
   }
 
+  readIntentCreation(intentId: string): TransitionRecord | null {
+    const verification = this.verify();
+    if (!verification.valid) throw new Error("audit chain is invalid");
+    if (!existsSync(this.path)) return null;
+    for (const raw of readFileSync(this.path, "utf8").split("\n")) {
+      if (!raw.trim()) continue;
+      const line = JSON.parse(raw) as AuditLine;
+      if (line.intentId !== intentId || line.kind !== "intent-created") continue;
+      const { previousHash: _previousHash, eventHash: _eventHash, ...record } = line;
+      return record;
+    }
+    return null;
+  }
+
   private lastHash(): string {
     return this.verify().lastHash;
   }

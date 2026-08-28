@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { AuditLog } from "./audit-log.ts";
 import { NotificationEngine } from "./engine.ts";
 import { NotificationInputError } from "./input-projection.js";
+import { assertExpectedOrigin, externalInputProvenance } from "./input-provenance.ts";
 import { prepareNotificationPreview } from "./preview-boundary.ts";
 import { NotificationStore } from "./store.ts";
 import type { Presence } from "./types.ts";
@@ -25,6 +26,7 @@ const databasePath = process.env.NOTIFICATION_DEMO_DATABASE ?? join(localDirecto
 const auditPath = process.env.NOTIFICATION_DEMO_AUDIT ?? join(localDirectory, "notification-audit.ndjson");
 const port = Number(process.env.NOTIFICATION_DEMO_PORT ?? "4173");
 const host = "127.0.0.1";
+const expectedOrigin = `http://${host}:${port}`;
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new TypeError("NOTIFICATION_DEMO_PORT must be 1024-65535");
 
@@ -35,6 +37,8 @@ const staticFiles = new Map<string, readonly [string, string]>([
   ["/app.js", [join(publicDirectory, "app.js"), "text/javascript; charset=utf-8"]],
   ["/visual-state.js", [join(publicDirectory, "visual-state.js"), "text/javascript; charset=utf-8"]],
   ["/input-projection.js", [join(moduleDirectory, "input-projection.js"), "text/javascript; charset=utf-8"]],
+  ["/notification/input-projection.js", [join(moduleDirectory, "input-projection.js"), "text/javascript; charset=utf-8"]],
+  ["/webmcp-notification-adapter.js", [join(repositoryRoot, "src/typescript/webmcp/notification-adapter.js"), "text/javascript; charset=utf-8"]],
   ["/styles.css", [join(publicDirectory, "styles.css"), "text/css; charset=utf-8"]],
   ["/service-worker.js", [join(publicDirectory, "service-worker.js"), "text/javascript; charset=utf-8"]],
 ] as const);
@@ -73,10 +77,8 @@ function stringField(input: Record<string, unknown>, name: string): string {
   return value;
 }
 
-function requireSameOrigin(request: IncomingMessage): void {
-  const origin = request.headers.origin;
-  const expected = `http://${host}:${port}`;
-  if (origin !== expected) throw new TypeError(`origin must be ${expected}`);
+function requireSameOrigin(request: IncomingMessage): string {
+  return assertExpectedOrigin(request.headers.origin, expectedOrigin);
 }
 
 async function api(request: IncomingMessage, response: ServerResponse, pathname: string, search: URLSearchParams): Promise<void> {
@@ -94,10 +96,12 @@ async function api(request: IncomingMessage, response: ServerResponse, pathname:
     json(response, 405, { error: "method-not-allowed" });
     return;
   }
-  requireSameOrigin(request);
+  const sourceOrigin = requireSameOrigin(request);
   const input = await body(request);
-  if (pathname === "/api/preview") {
-    json(response, 200, await prepareNotificationPreview(engine, input));
+  if (pathname === "/api/preview" || pathname === "/api/webmcp-preview") {
+    const channel = pathname === "/api/webmcp-preview" ? "WEBMCP" : "LOCAL_FORM";
+    const provenance = externalInputProvenance(channel, sourceOrigin, expectedOrigin);
+    json(response, 200, await prepareNotificationPreview(engine, input, provenance));
     return;
   }
   const intentId = stringField(input, "intentId");

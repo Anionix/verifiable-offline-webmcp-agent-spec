@@ -6,6 +6,11 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import {
+  provenanceDetails,
+  provenanceFromDetails,
+  type InputProvenance,
+} from "./input-provenance.ts";
 import type {
   ClaimResult,
   ControlState,
@@ -41,8 +46,14 @@ export interface NewIntentRecord {
   body: string;
   target: NotificationTarget;
   payloadDigest: string;
+  inputProvenance: InputProvenance;
   eventId: string;
   now: number;
+}
+
+export interface StoredInputProvenanceEvidence {
+  eventId: string;
+  provenance: Readonly<InputProvenance>;
 }
 
 export class NotificationStore {
@@ -130,7 +141,11 @@ export class NotificationStore {
         toControl: "PROPOSED",
         fromEffect: null,
         toEffect: "NOT_STARTED",
-        details: { payloadDigest: record.payloadDigest, target: record.target },
+        details: {
+          payloadDigest: record.payloadDigest,
+          target: record.target,
+          ...provenanceDetails(record.inputProvenance),
+        },
       };
       this.insertAttempt(transition);
       return { intent: this.requireIntent(record.intentId), transition };
@@ -145,6 +160,23 @@ export class NotificationStore {
   getByLogicalOperation(logicalOperationId: string): NotificationIntent | null {
     const row = this.database.prepare("SELECT * FROM intents WHERE logical_operation_id = ?").get(logicalOperationId) as IntentRow | undefined;
     return row ? this.toIntent(row) : null;
+  }
+
+  getInputProvenance(intentId: string): Readonly<InputProvenance> | null {
+    return this.getInputProvenanceEvidence(intentId)?.provenance ?? null;
+  }
+
+  getInputProvenanceEvidence(intentId: string): StoredInputProvenanceEvidence | null {
+    const row = this.database.prepare(`
+      SELECT event_id, details_json FROM attempts
+      WHERE intent_id = ? AND kind = 'intent-created'
+      ORDER BY occurred_at ASC, rowid ASC LIMIT 1
+    `).get(intentId) as { event_id: string; details_json: string } | undefined;
+    if (!row) return null;
+    return Object.freeze({
+      eventId: row.event_id,
+      provenance: provenanceFromDetails(JSON.parse(row.details_json)),
+    });
   }
 
   markDryRun(intentId: string, eventId: string, now: number): { intent: NotificationIntent; transition: TransitionRecord | null } {

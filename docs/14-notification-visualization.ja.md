@@ -5,9 +5,12 @@ stable_uuid_v5: "92bc8b53-769f-5f52-a508-eb0bd71aa4e4"
 event_uuid_v7: "01a048b7-2626-78c5-869f-2c977eccd754"
 verified_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
 font_event_uuid_v7: "01a048d1-158c-7fc4-b3ca-da0ae9607f5b"
+provenance_event_uuid_v7: "01a04904-ca99-767a-8049-6ffa607f193e"
+provenance_verified_event_uuid_v7: "01a0490d-f64d-775f-aa28-f89a16ea3930"
 generated_at: "2026-08-28T14:12:37.542Z"
 verified_at: "2026-08-28T14:25:32.776Z"
-updated_at: "2026-08-28T14:41:55.570Z"
+updated_at: "2026-08-28T15:37:25.913Z"
+provenance_verified_at: "2026-08-28T15:47:26.925Z"
 version: "0.3.0-candidate"
 status: "browser-verified"
 ---
@@ -48,6 +51,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - デスクトップは「通知内容」と「重複防止の動作」の二列です。
 - 狭い画面では、初回経路、再試行経路、件数、現在の状態の順に一列へ折りたたみます。
 - 技術ログは折りたたみ、主要な安全説明を先に見せます。
+- 入力境界の直下へ、入力経路、信頼状態、生成元、永続証拠を開いた一本の証拠列として表示します。装飾的なカード群にはせず、文章だけでも状態を判別できます。
 - 状態変化は`aria-live`で読み上げ可能にします。WCAG 2.2のStatus Messagesは、フォーカスを移さず状態変化を支援技術へ提示できることを求めています。[W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/#status-messages)
 - 動きは状態の進行を補助する範囲に限定し、`prefers-reduced-motion: reduce`では実質的に停止します。[W3C Media Queries Level 5](https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion)
 
@@ -63,6 +67,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 | 通知件数 | 強化 | 固定の「1」ではなくSQLiteの外部効果開始件数を表示 |
 | 狭い画面 | 実装済み | 幅820画素以下で経路を縦積みにし、幅390画素で横はみ出しなし |
 | 技術ログ | 一致 | 主要説明の後ろへ折りたたみ、必要な場合だけ展開 |
+| 入力来歴 | 意図的に追加 | 草案のWebMCP入力が未信頼のままSQLite・監査へ届いたかを画面から読み戻せる証拠列を追加 |
 
 ## ブラウザー観測
 
@@ -72,6 +77,8 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - 乾式実行後は`DRY_RUN / NOT_STARTED`、外部効果開始件数`0`と表示されました。今回の画面検証では実通知ボタンを押していません。
 - ブラウザーの意味構造では、主要部、領域、見出し、入力欄、ボタン、状態通知を識別でき、警告・エラーの実行ログは0件でした。
 - Codex内蔵ブラウザーでは`document.modelContext`と`notify_once`登録を観測しました。これはその環境での登録確認に限られ、対象ブラウザー全体のネイティブWebMCP適合は引き続き`INCONCLUSIVE`です。
+- 来歴表示を加えた画面を`1440 x 1000`と`390 x 844`で再確認しました。狭い画面では証拠列が二列へ折り返され、横方向のはみ出し、警告、エラーは0でした。
+- 乾式実行後は「ローカル画面」「未信頼の印を保持」「生成元」「SQLite・監査と一致」を表示しました。実通知件数は0で、承認ボタンは押していません。
 
 ## 安全境界
 
@@ -80,6 +87,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - 通知タグはUUIDバージョン5の予定識別子です。
 - ネイティブWebMCPは`document.modelContext`を観測した場合だけ登録し、未観測時は`INCONCLUSIVE`を維持します。
 - WebMCPから通知予定へ入る前段は、[`15-webmcp-input-boundary.ja.md`](15-webmcp-input-boundary.ja.md)の「受信 → 厳格検査 → 乾式実行だけ」で可視化し、拒否時は入力欄・Intent・監査を変えません。
+- 入力来歴の永続化と専用アダプターは[`16-webmcp-provenance-adapter.ja.md`](16-webmcp-provenance-adapter.ja.md)に従い、呼び出し側が信頼済みを名乗ることを許しません。
 - 表示ロジックは安全性を生成しません。安全性の正本はSQLite一意制約、状態機械、外部効果開始台帳、読み戻し証拠です。
 
 通知タグと同一タグ通知の置換動作はNotifications APIの規範仕様に基づきます。[WHATWG Notifications API](https://notifications.spec.whatwg.org/)

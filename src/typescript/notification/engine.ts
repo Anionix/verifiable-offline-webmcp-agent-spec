@@ -7,7 +7,8 @@ import { createHash } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { uuidV5, uuidV7 } from "../uuid.ts";
 import { AuditLog } from "./audit-log.ts";
-import { NotificationStore } from "./store.ts";
+import { internalInputProvenance, type InputProvenance } from "./input-provenance.ts";
+import { NotificationStore, type StoredInputProvenanceEvidence } from "./store.ts";
 import {
   AmbiguousEffectError,
   ConfirmedAbsentError,
@@ -71,6 +72,7 @@ export class NotificationEngine {
     const body = normalizeText(input.body, "body", 1000);
     const target = input.target ?? "local-mac-notification";
     if (target !== "local-mac-notification") throw new TypeError("unsupported notification target");
+    const inputProvenance = input.inputProvenance ?? internalInputProvenance();
     const payloadDigest = digest({ body, target, title });
     const intentId = uuidV5(ROOT_UUID_NAMESPACE, `notification-intent/${logicalOperationId}`);
     const now = this.now();
@@ -81,6 +83,7 @@ export class NotificationEngine {
       body,
       target,
       payloadDigest,
+      inputProvenance,
       eventId: this.newEventId(now),
       now,
     });
@@ -185,6 +188,14 @@ export class NotificationEngine {
   getEffectStartCount(intentId: string): number {
     if (!this.getIntent(intentId)) return 0;
     return this.store.countEffectClaims(intentId);
+  }
+
+  getInputProvenance(intentId: string): Readonly<InputProvenance> | null {
+    return this.store.getInputProvenance(intentId);
+  }
+
+  getInputProvenanceEvidence(intentId: string): StoredInputProvenanceEvidence | null {
+    return this.store.getInputProvenanceEvidence(intentId);
   }
 
   private beginReconcile(intentId: string): NotificationIntent {

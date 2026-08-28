@@ -14,6 +14,7 @@
   },
   "include": [
     "**/*.ts",
-    "notification/input-projection.js"
+    "notification/input-projection.js",
+    "webmcp/notification-adapter.js"
   ]
 }

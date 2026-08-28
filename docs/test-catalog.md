@@ -4,19 +4,20 @@ language: "ja-en"
 stable_uuid_v5: "aaa566c6-2347-563d-810f-75d5eac39489"
 event_uuid_v7: "01a04291-c2e0-7d98-bf15-0be303646458"
 updated_event_uuid_v7: "01a048e2-e264-7ed5-a64b-2f3ef202ffe7"
+provenance_event_uuid_v7: "01a04904-ca95-7468-9bd0-cb597093a64a"
 generated_at: "2026-08-27T09:34:04.000Z"
-updated_at: "2026-08-28T15:00:23.780Z"
+updated_at: "2026-08-28T15:37:25.909Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 33 / partially implemented 15 / specified 19. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification reference raises only its bounded path; native WebMCP and unrelated tool classes remain unimplemented.
+**Total / 合計:** 67 tests — implemented 35 / partially implemented 13 / specified 19. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification reference raises only its bounded path; general native WebMCP conformance and unrelated tool classes remain unimplemented.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
-| `TEST-ARCH-001` | architecture-requirement-test | partially-implemented | yes | REQ-WEBMCP-001 |
+| `TEST-ARCH-001` | architecture-requirement-test | implemented | yes | REQ-WEBMCP-001 |
 | `TEST-ARCH-002` | architecture-requirement-test | specified | no | REQ-WEBMCP-002 |
 | `TEST-ARCH-003` | architecture-requirement-test | specified | no | REQ-SEC-007 |
 | `TEST-AUDIT-001` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-001 |
@@ -66,7 +67,7 @@ status: "design-specification"
 | `TEST-SEC-004` | security-policy-test | specified | no | REQ-POLICY-008 |
 | `TEST-SEC-005` | security-policy-test | specified | no | REQ-SEC-001 |
 | `TEST-SEC-006` | security-policy-test | specified | no | REQ-SEC-002 |
-| `TEST-SEC-007` | security-policy-test | partially-implemented | yes | REQ-SEC-003 |
+| `TEST-SEC-007` | security-policy-test | implemented | yes | REQ-SEC-003 |
 | `TEST-SEC-008` | security-policy-test | specified | no | REQ-SEC-004 |
 | `TEST-SEC-009` | security-policy-test | specified | no | REQ-SEC-008 |
 | `TEST-SLO-001` | stochastic-mathematical-check | partially-implemented | yes | REQ-SYNC-005 |

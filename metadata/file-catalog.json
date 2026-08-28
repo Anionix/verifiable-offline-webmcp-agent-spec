@@ -2620,7 +2620,7 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "ae1071a3f17321cb09583b681582ad9006ef57cdd896c91c14932a1695ab5a3a",
+      "sha256": "9c62cd6f3aba10fd8be8411ebde7f89fb622623b8c31780157360ee78ef6e00a",
       "bytes": 323,
       "mediaType": "application/toml",
       "category": "root",
@@ -3304,8 +3304,8 @@
     },
     {
       "path": "uv.lock",
-      "sha256": "b9834f6b0e279230b6316a3d90e838fdcc8da88a3359e04b650e7a0fe255704a",
-      "bytes": 76550,
+      "sha256": "42c66efd12c15a83d97bc17f1fee26ca9bb1ad35ca23be0d965315798589ca5c",
+      "bytes": 75620,
       "mediaType": "application/octet-stream",
       "category": "root",
       "identity": {

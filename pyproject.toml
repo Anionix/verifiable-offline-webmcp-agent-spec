@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Validation environment for the verifiable offline WebMCP agent specification"
 requires-python = ">=3.12,<3.15"
 dependencies = [
-  "cryptography>=45,<47",
+  "cryptography>=50,<51",
   "jsonschema[format]>=4.25,<5",
   "pyyaml>=6,<7",
 ]

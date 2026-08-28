@@ -18,6 +18,7 @@
 - Isolated `document.modelContext` and `registerTool()` behind one notification adapter, with typed unavailable, permission-denied, security-rejected, and registration-failed results.
 - Added a server-derived input-provenance contract and persisted WebMCP channel, trust, origin, annotation, and derivation in the first SQLite-backed audit event.
 - Added independent provenance readback, cross-channel duplicate preservation, exact-origin rejection, and a visible provenance rail without triggering a real notification.
+- Excluded ignored Playwright browser-output files from the reproducible public catalog after the first GitHub clean-checkout run exposed the host-only mismatch.
 
 <!-- information_uuid_v5=98e355d2-8469-5427-937c-a922fcf5ad50 event_uuid_v7=01a04896-44e4-74b6-803b-38cd809c1837 state_transition=REVIEW -> VERIFIED occurred_at=2026-08-28T13:36:42.724Z -->
 

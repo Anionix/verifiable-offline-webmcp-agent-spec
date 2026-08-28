@@ -3,9 +3,9 @@ title: "Duplicate-safe Mac notification demo"
 language: "en"
 stable_uuid_v5: "0326d30e-9d18-5222-9d7e-00c2f4bb02b9"
 event_uuid_v7: "01a04867-0d7b-72eb-bc39-587a456ea391"
-updated_event_uuid_v7: "01a04896-44e1-7afd-8cdd-cb682d88af0f"
+updated_event_uuid_v7: "01a048c2-e323-70ba-b5f4-31defb329ce0"
 generated_at: "2026-08-28T12:23:50Z"
-updated_at: "2026-08-28T13:36:42.721Z"
+updated_at: "2026-08-28T14:25:32.776Z"
 version: "0.2.0"
 status: "live-verified"
 ---
@@ -49,10 +49,14 @@ Automated coverage includes success, failure before effect, timeout after effect
 
 On 2026-08-28 this Mac measured a `8.99 ms` p95 across 100 simulated samples, below the `2,000 ms` bound. The environment and every sample are stored in [`metadata/notification-demo-latency.json`](../metadata/notification-demo-latency.json) and [`data/timeseries/notification-demo-latency.ndjson`](../data/timeseries/notification-demo-latency.ndjson). This is not a browser-notification latency measurement.
 
+## Duplicate-prevention visualization
+
+The `0.3.0` candidate page shows the initial request and same-operation retry converging on one `Intent ID` ledger, with only the second effect stopped. The count is read from the SQLite effect ledger rather than hard-coded; a value above one is rendered as a safety violation. The screen contract and the desktop and 390-pixel-wide checks are recorded in [`14-notification-visualization.ja.md`](14-notification-visualization.ja.md). This visual check used the dry run only and did not display another real notification.
+
 ## Live Mac evidence
 
 On 2026-08-28, Google Chrome `152.0.7977.64` displayed one notification tagged with UUIDv5 intent ID `03c9c953-71ea-5405-b1eb-3c0536e78ec1`. Service Worker readback returned one active notification, SQLite contained one external-effect claim, and retrying the same logical operation returned `ALREADY_VERIFIED` without a second claim. The final state was `VERIFIED / CONFIRMED_PRESENT`, and all six public JSON Lines audit entries form a valid hash chain.
 
 The public evidence is [`metadata/notification-demo-live-verification.json`](../metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](../data/audit/notification-demo-live-events.ndjson). External-service cost was zero. This is local observation plus Service Worker readback, not remote attestation.
 
-Native WebMCP remains `INCONCLUSIVE` unless `document.modelContext` is observed. Node.js 24 documents `node:sqlite` at release-candidate stability. Primary sources: [WHATWG Notifications API](https://notifications.spec.whatwg.org/), [Node.js SQLite](https://nodejs.org/download/release/v24.16.0/docs/api/sqlite.html), [SQLite transactions](https://www.sqlite.org/lang_transaction.html), and the [WebMCP Community Group draft](https://webmachinelearning.github.io/webmcp/).
+Codex's in-app browser exposed `document.modelContext` and registered `notify_once` during the visual check. Native WebMCP conformance across target browsers, including execution, permission, and contamination controls, remains `INCONCLUSIVE`. Node.js 24 documents `node:sqlite` at release-candidate stability. Primary sources: [WHATWG Notifications API](https://notifications.spec.whatwg.org/), [Node.js SQLite](https://nodejs.org/download/release/v24.16.0/docs/api/sqlite.html), [SQLite transactions](https://www.sqlite.org/lang_transaction.html), and the [WebMCP Community Group draft](https://webmachinelearning.github.io/webmcp/).

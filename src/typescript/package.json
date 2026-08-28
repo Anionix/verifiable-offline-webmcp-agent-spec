@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --experimental-strip-types --test test/*.test.ts",
-    "check": "node --experimental-strip-types --test test/*.test.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts test/*.test.js",
+    "check": "node --experimental-strip-types --test test/*.test.ts test/*.test.js",
     "typecheck": "tsc --noEmit",
     "demo:notification": "node --experimental-strip-types notification/demo-server.ts",
     "benchmark:notification": "node --experimental-strip-types notification/benchmark.ts"

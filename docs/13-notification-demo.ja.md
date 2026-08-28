@@ -3,9 +3,9 @@ title: "二重送信しないMac通知デモ"
 language: "ja"
 stable_uuid_v5: "4e376b00-450f-5799-a588-a7e3b0c41dd9"
 event_uuid_v7: "01a04867-0d48-7c05-8809-02be217e0c5a"
-updated_event_uuid_v7: "01a04896-44e0-7a6f-b602-573ad92db371"
+updated_event_uuid_v7: "01a048c2-e2ef-7332-9e24-8a995f68a859"
 generated_at: "2026-08-28T12:23:50Z"
-updated_at: "2026-08-28T13:36:42.720Z"
+updated_at: "2026-08-28T14:25:32.776Z"
 version: "0.2.0"
 status: "live-verified"
 ---
@@ -65,6 +65,10 @@ make demo
 
 2026-08-28のこのMac上の模擬実行では、100標本の95百分位は`8.99 ms`で、上限`2,000 ms`を満たしました。環境と全標本は[`metadata/notification-demo-latency.json`](../metadata/notification-demo-latency.json)と[`data/timeseries/notification-demo-latency.ndjson`](../data/timeseries/notification-demo-latency.ndjson)に保存しています。これはブラウザー実通知の遅延ではありません。
 
+## 二重送信防止の可視化
+
+`0.3.0`候補の試験ページは、初回要求と同じ操作の再試行が一つの`Intent ID`台帳へ集まり、二件目だけが停止する流れを二本の経路で示します。件数は固定値ではなくSQLiteの外部効果開始台帳から読み、2以上なら成功表示へ丸めず安全条件違反を示します。画面契約とデスクトップ・幅390画素の確認結果は[`14-notification-visualization.ja.md`](14-notification-visualization.ja.md)にあります。この確認では乾式実行だけを行い、新しい実通知は表示していません。
+
 ## 実Mac通知の検証証拠
 
 2026-08-28にGoogle Chrome `152.0.7977.64`から、UUIDバージョン5予定識別子`03c9c953-71ea-5405-b1eb-3c0536e78ec1`を通知タグとして1件表示しました。サービスワーカーの読み戻し件数は1、SQLiteの外部効果開始件数は1でした。同じ論理操作の再試行は`ALREADY_VERIFIED`となり、二件目を開始しませんでした。最終状態は`VERIFIED / CONFIRMED_PRESENT`、6件のJSON Lines監査ハッシュ鎖は有効です。
@@ -73,7 +77,7 @@ make demo
 
 ## 残る未確認
 
-- `document.modelContext`を提供するブラウザーでのネイティブWebMCP動作: `INCONCLUSIVE`
+- Codex内蔵ブラウザーでは`document.modelContext`と`notify_once`登録を確認済み。対象ブラウザー全体の実行・権限・汚染対策を含むネイティブWebMCP適合: `INCONCLUSIVE`
 - Node.js 24の`node:sqlite`は公式文書上、安定化前の公開候補段階
 
 根拠は[WHATWG Notifications API](https://notifications.spec.whatwg.org/)、[Node.js 24 SQLite](https://nodejs.org/download/release/v24.16.0/docs/api/sqlite.html)、[SQLite Transaction](https://www.sqlite.org/lang_transaction.html)、[WebMCP Community Group草案](https://webmachinelearning.github.io/webmcp/)です。

@@ -1,6 +1,8 @@
 // information_uuid_v5=fd2cf52a-0427-5987-ab5d-eab7d9faff43
 // event_uuid_v7=01a04872-04fc-748e-9c06-62a3b55b0240
 // machine-contract: DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED; AMBIGUOUS -> RECONCILING before any retry.
+// event_uuid_v7=01a048bc-86ba-79d9-8db9-31f8276c06e8
+// machine-contract: effect-start evidence is exposed as a measured integer so the UI cannot claim a decorative count of one.
 import { createHash } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { uuidV5, uuidV7 } from "../uuid.ts";
@@ -178,6 +180,11 @@ export class NotificationEngine {
 
   getIntent(intentId: string): NotificationIntent | null {
     return this.store.getIntent(intentId);
+  }
+
+  getEffectStartCount(intentId: string): number {
+    if (!this.getIntent(intentId)) return 0;
+    return this.store.countEffectClaims(intentId);
   }
 
   private beginReconcile(intentId: string): NotificationIntent {

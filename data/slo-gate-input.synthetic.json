@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "evaluation": {
+    "reportUuidV5": "4e1e46da-3252-5fdc-b62f-903ff4713791",
+    "eventUuidV7": "01a049a3-edbb-76f1-af65-5b3afd0e8015",
+    "evaluatedAtEpochMs": 1787941875131
+  },
+  "queue": {
+    "provenance": {
+      "datasetId": "a2e29b9e-5097-5d05-956e-b21916f39859",
+      "eventId": "01a049a3-edb7-7a32-87be-93854e0ea5d5",
+      "observedAtEpochMs": 1787941875127,
+      "evidenceClass": "SYNTHETIC",
+      "illustrative": true,
+      "sourceKind": "DETERMINISTIC_FIXTURE",
+      "payloadDigest": "25e072212e4000b07559896177d5dff3d2944105da497f0218f504b73754d272"
+    },
+    "payload": {
+      "observationDurationMs": 10000,
+      "arrivalCount": 10,
+      "serviceBusyDurationMs": 10000,
+      "serviceCompletionCount": 12,
+      "queueAreaItemMs": 20000,
+      "waitingTimeTotalMs": 20000,
+      "waitingSampleCount": 10,
+      "maximumLittleLawRelativeErrorPpm": 0
+    }
+  },
+  "calibration": {
+    "provenance": {
+      "datasetId": "d9ee3a99-e17e-55e2-b468-b04f763fd6f4",
+      "eventId": "01a049a3-edb8-7209-9c9c-918426ee9533",
+      "observedAtEpochMs": 1787941875128,
+      "evidenceClass": "SYNTHETIC",
+      "illustrative": true,
+      "sourceKind": "DETERMINISTIC_FIXTURE",
+      "payloadDigest": "11c49572a664783d36c05e1c3c85f26e52f6b8a037e57b9da7aa210c8a90be00"
+    },
+    "payload": {
+      "datasetRole": "VALIDATION",
+      "binCount": 10,
+      "maximumExpectedCalibrationErrorPpm": 0,
+      "maximumBrierScorePpm": 150000,
+      "samples": [
+        { "modelScorePpm": 100000, "outcome": 1, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 100000, "outcome": 0, "llmSelfReportedConfidencePpm": 999999 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 1, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 0, "llmSelfReportedConfidencePpm": 1 },
+        { "modelScorePpm": 800000, "outcome": 0, "llmSelfReportedConfidencePpm": 1 }
+      ]
+    }
+  },
+  "outcomeMass": {
+    "provenance": {
+      "datasetId": "bb6e2978-6de5-506a-9dc2-7fd06d774c5c",
+      "eventId": "01a049a3-edb9-7934-aa51-9b989f6830cb",
+      "observedAtEpochMs": 1787941875129,
+      "evidenceClass": "SYNTHETIC",
+      "illustrative": true,
+      "sourceKind": "DETERMINISTIC_FIXTURE",
+      "payloadDigest": "cdfeee32a1a8986184d5ed74639e368fc65c69df03651e509884b83288511d3f"
+    },
+    "payload": {
+      "qT": 929000,
+      "qB": 1000,
+      "qR": 60000,
+      "qH": 10000,
+      "scalePpm": 1000000
+    }
+  },
+  "chanceConstraints": {
+    "provenance": {
+      "datasetId": "5ecd3b95-dcab-5d44-a207-98d55540122e",
+      "eventId": "01a049a3-edba-7197-8a61-faa5f0363050",
+      "observedAtEpochMs": 1787941875130,
+      "evidenceClass": "SYNTHETIC",
+      "illustrative": true,
+      "sourceKind": "DETERMINISTIC_FIXTURE",
+      "payloadDigest": "a6c44714ceb13e30ce599679c601b5fbee8ddeb160ca7bfa3537d3514e56f42b"
+    },
+    "payload": {
+      "probabilityBasis": "EXACT_SYNTHETIC",
+      "badCommitUpperBoundNumerator": 1,
+      "badCommitUpperBoundDenominator": 10000000,
+      "duplicateEffectUpperBoundNumerator": 638,
+      "duplicateEffectUpperBoundDenominator": 1000000000,
+      "maximumBadCommitPpb": 100,
+      "maximumDuplicateEffectPpb": 1000,
+      "objectiveScoreMicroUnits": 999999999
+    }
+  },
+  "sourceRefs": [
+    "SRC-LITTLE-1961",
+    "SRC-CHOW-1970",
+    "SRC-GUO-2017",
+    "SRC-CMDP-1999"
+  ]
+}

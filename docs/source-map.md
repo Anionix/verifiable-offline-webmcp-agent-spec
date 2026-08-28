@@ -3,7 +3,9 @@ title: "Primary Source Map / 一次情報源対応表"
 language: "ja-en"
 stable_uuid_v5: "996e5fcf-8ad6-55db-874d-48ea873e5cf8"
 event_uuid_v7: "01a04291-b473-7b9f-8aa2-eb9ac997adc5"
+slo_gate_event_uuid_v7: "01a049a3-edbc-7d99-96f5-6bc46cd41163"
 generated_at: "2026-08-27T09:34:00Z"
+updated_at: "2026-08-28T18:31:15.132Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -313,6 +315,18 @@ Each source record also exists in [`knowledge/sources.json`](../knowledge/source
 - **UUIDv7:** `01a04291-b356-7004-94cf-eb2251e32346`
 - **Supports:** CLM-024, F-026, REQ-POLICY-009
 - **Topics:** reject option, abstention, classification risk
+
+## SRC-GUO-2017
+
+- **Title:** On Calibration of Modern Neural Networks
+- **Publisher:** Proceedings of Machine Learning Research / ICML
+- **Publication:** 2017
+- **Status:** Peer-reviewed ICML paper / author preprint
+- **URL:** https://arxiv.org/abs/1706.04599
+- **UUIDv5:** `32c34a80-cd1e-57e9-b125-6221b821548d`
+- **UUIDv7:** `01a049a3-edbc-7d99-96f5-6bc46cd41163`
+- **Supports:** REQ-VERIFY-002, TEST-SLO-003
+- **Topics:** confidence calibration, validation data, expected calibration error, temperature scaling
 
 ## SRC-NOTIFICATIONS
 

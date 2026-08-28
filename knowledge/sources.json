@@ -3,21 +3,21 @@
     "id": "DS-SOURCES",
     "identity": {
       "uuid_v5": "fa577775-5c7f-5972-82eb-ec59444e94b9",
-      "uuid_v7": "01a04948-c160-7acb-85ba-782a438891b0",
+      "uuid_v7": "01a049a3-edbc-7d99-96f5-6bc46cd41163",
       "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
       "canonical_name": "ds-sources",
       "category": "dataset"
     },
     "temporal": {
       "created_at": "2026-08-27T09:34:00Z",
-      "updated_at": "2026-08-28T16:51:40Z",
-      "observed_at": "2026-08-28T16:51:40Z",
+      "updated_at": "2026-08-28T18:31:15.132Z",
+      "observed_at": "2026-08-28T18:31:15.132Z",
       "valid_from": "2026-08-27T09:34:00Z",
       "valid_to": null,
-      "epoch_ms": 1787935900000,
+      "epoch_ms": 1787941875132,
       "time_zone": "UTC",
       "local_time_zone": "Asia/Tokyo",
-      "local_rendering": "2026-08-29T01:51:40+09:00",
+      "local_rendering": "2026-08-29T03:31:15.132+09:00",
       "precision": "millisecond",
       "standard": "RFC 3339 profile"
     },
@@ -27,7 +27,7 @@
     },
     "type": "Dataset",
     "version": "0.1.0",
-    "record_count": 28,
+    "record_count": 29,
     "format": "application/json",
     "license": "Apache-2.0"
   },
@@ -1410,6 +1410,46 @@
       "primary_source": true,
       "topics": ["function calling", "strict mode", "allowed tools", "parallel tool calls", "call identifiers"],
       "supports": ["REQ-PLAN-002", "REQ-PLAN-003", "REQ-TOOL-001"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-GUO-2017",
+      "identity": {
+        "uuid_v5": "32c34a80-cd1e-57e9-b125-6221b821548d",
+        "uuid_v7": "01a049a3-edbc-7d99-96f5-6bc46cd41163",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "guo-calibration-modern-neural-networks-2017",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T18:31:15.132Z",
+        "updated_at": "2026-08-28T18:31:15.132Z",
+        "observed_at": "2026-08-28T18:31:15.132Z",
+        "valid_from": "2026-08-28T18:31:15.132Z",
+        "valid_to": null,
+        "epoch_ms": 1787941875132,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-29T03:31:15.132+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "On Calibration of Modern Neural Networks",
+        "en": "On Calibration of Modern Neural Networks"
+      },
+      "type": "PrimarySource",
+      "publisher": "Proceedings of Machine Learning Research / ICML",
+      "authors": ["Chuan Guo", "Geoff Pleiss", "Yu Sun", "Kilian Q. Weinberger"],
+      "published_at": "2017",
+      "accessed_at": "2026-08-28T18:31:15.132Z",
+      "locator": {
+        "url": "https://arxiv.org/abs/1706.04599"
+      },
+      "status": "Peer-reviewed ICML paper / author preprint",
+      "primary_source": true,
+      "topics": ["confidence calibration", "validation data", "expected calibration error", "temperature scaling"],
+      "supports": ["REQ-VERIFY-002", "TEST-SLO-003"],
       "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
     }
   ]

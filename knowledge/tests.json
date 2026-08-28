@@ -2907,7 +2907,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: 長期運用では平均処理率μが平均流入率λを上回るようcapacity planningすべきである。",
@@ -2924,10 +2924,23 @@
         "SRC-LITTLE-1961"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-79b1-a74b-25379fd60683",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SLO-002",
@@ -2957,7 +2970,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: queue length、arrival rate、waiting timeを計測しL=λW整合性を監視しなければならない。",
@@ -2974,10 +2987,23 @@
         "SRC-LITTLE-1961"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-72a5-ad1d-1a0f28bd1c35",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SLO-003",
@@ -3007,7 +3033,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: confidenceはvalidation dataで校正し、LLMの自己申告confidenceを使うべきではない。",
@@ -3021,13 +3047,27 @@
         "REQ-VERIFY-002"
       ],
       "source_refs": [
-        "SRC-CHOW-1970"
+        "SRC-CHOW-1970",
+        "SRC-GUO-2017"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-73ff-8817-e19a099ba0c3",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SLO-004",
@@ -3057,7 +3097,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: qT、qB、qR、qHは非負で合計1でなければならない。",
@@ -3074,10 +3114,23 @@
         "SRC-CMDP-1999"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-776d-93a9-0750a8d45ff3",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SLO-005",
@@ -3107,7 +3160,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: P_badとP_dupは目的関数のpenaltyではなくhard chance constraintで制御しなければならない。",
@@ -3124,10 +3177,23 @@
         "SRC-CMDP-1999"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-76fc-a4ee-a74b93fe0c5a",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SLO-006",
@@ -3157,7 +3223,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "stochastic-mathematical-check",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: sample SLO parameterとruntime metricはsynthetic/illustrativeであることを明示しなければならない。",
@@ -3174,10 +3240,23 @@
         "SRC-CMDP-1999"
       ],
       "automation_artifacts": [
+        "data/slo-gate-input.synthetic.json",
+        "data/slo-parameters.sample.json",
+        "docs/19-slo-gate-reference.ja.md",
         "formal/wolfram/ReferenceModel.wl",
         "formal/wolfram/verification-report.json",
-        "data/slo-parameters.sample.json"
-      ]
+        "metadata/slo-gate-verification.json",
+        "src/typescript/governance/slo-gates.ts",
+        "src/typescript/slo/generate-evidence.ts",
+        "src/typescript/test/slo-gates.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a049ad-1379-7c20-8df6-159577c7d384",
+        "occurred_at": "2026-08-28T18:41:14.617Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "capacity, Little-law consistency, validation calibration, probability conservation, hard probability limits, and evidence-class separation"
+      }
     },
     {
       "id": "TEST-SYNC-001",

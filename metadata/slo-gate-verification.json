@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "EVID-SLO-GATE-VERIFICATION-001",
+  "identity": {
+    "uuidV5": "4e1e46da-3252-5fdc-b62f-903ff4713791",
+    "uuidV7": "01a049a3-edbb-76f1-af65-5b3afd0e8015"
+  },
+  "temporal": {
+    "evaluatedAtEpochMs": 1787941875131,
+    "evaluatedAt": "2026-08-28T18:31:15.131Z",
+    "timeZone": "UTC"
+  },
+  "status": "VERIFIED_SYNTHETIC",
+  "evidenceState": {
+    "deterministicSyntheticFixture": "CONFIRMED",
+    "productionRuntimeQuality": "UNMEASURED",
+    "modelSelfReportedConfidenceUsed": false,
+    "syntheticMeasuredMixing": "CONFIRMED_ABSENT"
+  },
+  "evaluation": {
+    "schemaVersion": "1.0.0",
+    "identity": {
+      "uuidV5": "4e1e46da-3252-5fdc-b62f-903ff4713791",
+      "uuidV7": "01a049a3-edbb-76f1-af65-5b3afd0e8015"
+    },
+    "temporal": {
+      "evaluatedAtEpochMs": 1787941875131,
+      "evaluatedAt": "2026-08-28T18:31:15.131Z",
+      "timeZone": "UTC"
+    },
+    "decision": "PASS",
+    "evidenceClass": "SYNTHETIC",
+    "gates": [
+      {
+        "testId": "TEST-SLO-001",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "arrivalRatePpmPerSecond": 1000000,
+          "serviceRatePpmPerSecond": 1200000,
+          "strictCapacityMargin": true
+        }
+      },
+      {
+        "testId": "TEST-SLO-002",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "observedMeanQueueLengthPpm": 2000000,
+          "expectedMeanQueueLengthPpm": 2000000,
+          "littleLawRelativeErrorPpm": 0,
+          "maximumLittleLawRelativeErrorPpm": 0,
+          "completeWaitingCohort": true
+        }
+      },
+      {
+        "testId": "TEST-SLO-003",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "datasetRole": "VALIDATION",
+          "validationSampleCount": 20,
+          "binCount": 10,
+          "expectedCalibrationErrorPpm": 0,
+          "maximumExpectedCalibrationErrorPpm": 0,
+          "brierScorePpm": 125000,
+          "maximumBrierScorePpm": 150000,
+          "selfReportedConfidenceUsed": false
+        }
+      },
+      {
+        "testId": "TEST-SLO-004",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "qT": 929000,
+          "qB": 1000,
+          "qR": 60000,
+          "qH": 10000,
+          "totalPpm": 1000000,
+          "scalePpm": 1000000
+        }
+      },
+      {
+        "testId": "TEST-SLO-005",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "probabilityBasis": "EXACT_SYNTHETIC",
+          "confidenceLevelPpm": 0,
+          "badCommitUpperBoundFraction": "1/10000000",
+          "badCommitUpperBoundPpb": 100,
+          "maximumBadCommitPpb": 100,
+          "duplicateEffectUpperBoundFraction": "638/1000000000",
+          "duplicateEffectUpperBoundPpb": 638,
+          "maximumDuplicateEffectPpb": 1000,
+          "objectiveScoreMicroUnits": 999999999,
+          "objectiveScoreUsedForSafetyDecision": false
+        }
+      },
+      {
+        "testId": "TEST-SLO-006",
+        "status": "PASS",
+        "reasons": [],
+        "metrics": {
+          "evidenceClass": "SYNTHETIC",
+          "mixedEvidence": false,
+          "syntheticExplicitlyIllustrative": true,
+          "productionQualityMeasured": false
+        }
+      }
+    ],
+    "selfReportedConfidenceUsed": false,
+    "sourceRefs": [
+      "SRC-LITTLE-1961",
+      "SRC-CHOW-1970",
+      "SRC-GUO-2017",
+      "SRC-CMDP-1999"
+    ]
+  },
+  "scope": {
+    "actualRuntimeMeasurements": 0,
+    "actualExternalEffects": 0,
+    "actualExternalSpendYen": 0,
+    "localHardwareAndDevelopmentCost": "UNMEASURED"
+  },
+  "artifacts": {
+    "input": "data/slo-gate-input.synthetic.json",
+    "inputSha256": "6f3e73209d2a9429d9fbef98aa66fe78155f5eb0bd488760c2c884e9e77039f0",
+    "implementation": "src/typescript/governance/slo-gates.ts",
+    "tests": "src/typescript/test/slo-gates.test.ts"
+  },
+  "testIds": [
+    "TEST-SLO-001",
+    "TEST-SLO-002",
+    "TEST-SLO-003",
+    "TEST-SLO-004",
+    "TEST-SLO-005",
+    "TEST-SLO-006"
+  ],
+  "requirements": [
+    "REQ-SYNC-005",
+    "REQ-SYNC-006",
+    "REQ-VERIFY-002",
+    "REQ-SLO-001",
+    "REQ-SLO-002",
+    "REQ-SLO-003"
+  ],
+  "sourceRefs": [
+    "SRC-LITTLE-1961",
+    "SRC-CHOW-1970",
+    "SRC-GUO-2017",
+    "SRC-CMDP-1999"
+  ],
+  "limitations": [
+    "All published values in this evidence record are deterministic synthetic fixtures, not production measurements.",
+    "Passing this fixture proves gate behavior and counterexample rejection; it does not establish production availability, latency, calibration, bad-commit rate, or duplicate rate."
+  ]
+}

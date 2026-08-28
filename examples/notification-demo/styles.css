@@ -1,8 +1,9 @@
 /* information_uuid_v5=1c10b1e3-7e9a-5f4e-bd0e-488cde83c015 event_uuid_v7=01a04872-0637-783a-b574-754a7c58bad5 */
 /* information_uuid_v5=ee4a2099-168f-5192-adfd-0a5094f074cf event_uuid_v7=01a048b7-2628-7e1e-88d6-87c9fb3d7fbe machine-contract=state is communicated by text, shape, and color; active motion respects reduced-motion preferences */
+/* information_uuid_v5=0ee54bc6-13c1-5b11-a06d-18b11bdef535 event_uuid_v7=01a048d1-158c-7fc4-b3ca-da0ae9607f5b machine-contract=the demo uses local Mac-safe typefaces and never depends on a remote font request */
 :root {
   color-scheme: dark;
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
   background: #07101b;
   color: #f4f7fb;
   --background: #07101b;

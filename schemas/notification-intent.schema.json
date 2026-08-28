@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/notification-intent.schema.json",
+  "$comment": "information_uuid_v5=1244ca4e-a9d9-5faf-a903-8acf59bb9b5b event_uuid_v7=01a0486c-4770-7d7f-a4f9-f96ebc91ded2 machine-contract=logical-operation-identity-is-UUIDv5-and-each-transition-is-UUIDv7",
+  "title": "Duplicate-safe local notification intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "intentId",
+    "eventId",
+    "logicalOperationId",
+    "title",
+    "body",
+    "target",
+    "payloadDigest",
+    "controlState",
+    "effectState",
+    "approvalExpiresAt",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "intentId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "logicalOperationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "target": {
+      "const": "local-mac-notification"
+    },
+    "payloadDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "controlState": {
+      "enum": [
+        "DISCOVERED",
+        "PROPOSED",
+        "DRY_RUN",
+        "USER_APPROVED",
+        "EXECUTING",
+        "VERIFIED",
+        "REJECTED",
+        "ABORTED"
+      ]
+    },
+    "effectState": {
+      "enum": [
+        "NOT_STARTED",
+        "AMBIGUOUS",
+        "RECONCILING",
+        "CONFIRMED_PRESENT",
+        "CONFIRMED_ABSENT"
+      ]
+    },
+    "approvalExpiresAt": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "createdAt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "updatedAt": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

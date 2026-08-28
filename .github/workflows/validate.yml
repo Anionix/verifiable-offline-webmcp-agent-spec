@@ -1,0 +1,71 @@
+# information_uuid_v5=9e422e36-b03d-544a-97ad-ce33c921a9d3
+# event_uuid_v7=01a04875-b4a6-7a03-9097-5d3b974e12fb
+# machine-contract: PROPOSED -> EXECUTING -> VERIFIED only when secrets, schemas, types, tests, and the tracked manifest all pass.
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the complete history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan Git history and working tree for secrets
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: .python-version
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          enable-cache: true
+
+      - name: Install locked Python dependencies
+        run: uv sync --frozen
+
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: src/typescript/package-lock.json
+
+      - name: Install locked Node.js dependencies
+        run: npm ci --prefix src/typescript
+
+      - name: Run the read-only verification pipeline
+        run: make validate
+
+      - name: Prove validation did not rewrite tracked files
+        run: git diff --exit-code
+
+      - name: Preserve the bounded validation receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validation-receipt
+          path: .local/build-report.json
+          if-no-files-found: warn
+          retention-days: 7

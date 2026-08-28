@@ -1,0 +1,52 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "id": "@id",
+    "type": "@type",
+    "title": "http://purl.org/dc/terms/title",
+    "description": "http://purl.org/dc/terms/description",
+    "created": {
+      "@id": "http://purl.org/dc/terms/created",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "modified": {
+      "@id": "http://purl.org/dc/terms/modified",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "source": {
+      "@id": "http://purl.org/dc/terms/source",
+      "@type": "@id"
+    },
+    "license": {
+      "@id": "http://purl.org/dc/terms/license",
+      "@type": "@id"
+    },
+    "prov": "http://www.w3.org/ns/prov#",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "schema": "https://schema.org/",
+    "spec": "https://example.org/verifiable-offline-webmcp-agent/vocab/",
+    "uuidV5": "spec:uuidV5",
+    "uuidV7": "spec:uuidV7",
+    "sourceRefs": {
+      "@id": "spec:sourceRef",
+      "@type": "@id"
+    },
+    "supports": {
+      "@id": "spec:supports",
+      "@type": "@id"
+    },
+    "latex": "spec:latex",
+    "normativeLevel": "spec:normativeLevel",
+    "eventTime": {
+      "@id": "spec:eventTime",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "verifies": {
+      "@id": "spec:verifies",
+      "@type": "@id"
+    },
+    "implementationStatus": "spec:implementationStatus",
+    "testKind": "spec:testKind"
+  }
+}

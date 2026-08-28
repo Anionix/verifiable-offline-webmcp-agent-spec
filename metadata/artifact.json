@@ -1,0 +1,49 @@
+{
+  "id": "ARTIFACT-001",
+  "identity": {
+    "uuid_v5": "74e3443e-d8ea-52d6-bf3b-b5393ba96624",
+    "uuid_v7": "01a04291-b562-70ef-ae07-40325be50894",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "verifiable-offline-webmcp-agent-spec-0.1.0",
+    "category": "artifact"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "title": {
+    "ja": "検証可能なオフライン WebMCP エージェント設計",
+    "en": "Verifiable Offline WebMCP Agent Architecture"
+  },
+  "version": "0.1.0",
+  "rootNamespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+  "license": "Apache-2.0",
+  "formats": [
+    "Markdown",
+    "JSON",
+    "JSON-LD",
+    "NDJSON",
+    "JSON Schema",
+    "OpenAPI",
+    "TLA+",
+    "Wolfram Language",
+    "TypeScript",
+    "Python",
+    "Mermaid"
+  ],
+  "validationCommand": "make validate",
+  "sourceCount": 23,
+  "claimCount": 27,
+  "formulaCount": 55,
+  "requirementCount": 69,
+  "testCount": 67
+}

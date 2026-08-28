@@ -1,0 +1,526 @@
+{
+  "dataset": {
+    "id": "DS-DECISIONS",
+    "identity": {
+      "uuid_v5": "c6fecba5-13b2-562b-b65d-7f26f40efa87",
+      "uuid_v7": "01a04291-b486-75fb-9f15-041735f3ba35",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-decisions",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "設計判断",
+      "en": "Architecture Decisions"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 12,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "ADR-001",
+      "identity": {
+        "uuid_v5": "5f86f818-e517-53ea-82b4-f79006dbe408",
+        "uuid_v7": "01a04291-b3a9-7b1d-bbf5-3bb47bbdcae7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-action-substrate",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCPを主要な行動基盤にする",
+        "en": "Use WebMCP as the primary action substrate"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "WebMCPを主要な行動基盤にする",
+        "en": "Use WebMCP as the primary action substrate"
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-002",
+      "identity": {
+        "uuid_v5": "8940ba6c-64d5-5171-9569-64b415333d16",
+        "uuid_v7": "01a04291-b3aa-74ac-9fd4-e1d0d16906e7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "responses-optional-planner",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Responses APIはオンライン時だけ使う候補計画生成器とする",
+        "en": "Use the Responses API only as an optional online candidate-plan generator"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "Responses APIはオンライン時だけ使う候補計画生成器とする",
+        "en": "Use the Responses API only as an optional online candidate-plan generator"
+      },
+      "source_refs": [
+        "SRC-OPENAI-RESPONSES-2025",
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-003",
+      "identity": {
+        "uuid_v5": "c249a76e-39e6-5787-87da-8ea8c0908abb",
+        "uuid_v7": "01a04291-b3ab-7be5-a71a-a2a679d7e228",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "policy-authority",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Tool Contract EngineだけがALLOW/DENY/HUMAN/RECONCILEを決める",
+        "en": "Only the Tool Contract Engine decides ALLOW/DENY/HUMAN/RECONCILE"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "Tool Contract EngineだけがALLOW/DENY/HUMAN/RECONCILEを決める",
+        "en": "Only the Tool Contract Engine decides ALLOW/DENY/HUMAN/RECONCILE"
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT",
+        "SRC-MCP-2026"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-004",
+      "identity": {
+        "uuid_v5": "003a04af-cfb1-5ee4-9c26-9e308e521f37",
+        "uuid_v7": "01a04291-b3ac-7a3e-a3be-a9cbe5ec9223",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "canonical-ir",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "全実装はCanonical IRを共有し整数演算で判定する",
+        "en": "All implementations share Canonical IR and use integer decision arithmetic"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "全実装はCanonical IRを共有し整数演算で判定する",
+        "en": "All implementations share Canonical IR and use integer decision arithmetic"
+      },
+      "source_refs": [
+        "SRC-RFC7493",
+        "SRC-JSONSCHEMA-2020-12"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-005",
+      "identity": {
+        "uuid_v5": "c9813073-a03e-578c-bd3c-e126ad3535ea",
+        "uuid_v7": "01a04291-b3ad-73c7-b06c-d02a9e316fe3",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "uuid-strategy",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "安定識別子にUUIDv5、イベント識別子にUUIDv7を使う",
+        "en": "Use UUIDv5 for stable identifiers and UUIDv7 for event identifiers"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "安定識別子にUUIDv5、イベント識別子にUUIDv7を使う",
+        "en": "Use UUIDv5 for stable identifiers and UUIDv7 for event identifiers"
+      },
+      "source_refs": [
+        "SRC-RFC9562",
+        "SRC-RFC3339"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-006",
+      "identity": {
+        "uuid_v5": "5fd344e3-7eb1-5081-80c2-eecb47ee0b95",
+        "uuid_v7": "01a04291-b3ae-732a-aebe-9cbf1bfc2ec1",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ambiguous-reconcile-first",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "UNKNOWN/timeoutではmutation retryよりreconciliationを先に行う",
+        "en": "Reconcile UNKNOWN/timeouts before any mutating retry"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "UNKNOWN/timeoutではmutation retryよりreconciliationを先に行う",
+        "en": "Reconcile UNKNOWN/timeouts before any mutating retry"
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-007",
+      "identity": {
+        "uuid_v5": "e0d4d877-a38f-5087-b3e6-51426a09bef9",
+        "uuid_v7": "01a04291-b3af-7472-9ddd-f978c02c446d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "event-sourcing",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "イベント列を真実の一次記録、snapshotを派生cacheとする",
+        "en": "Treat the event stream as the source record and snapshots as derived caches"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "イベント列を真実の一次記録、snapshotを派生cacheとする",
+        "en": "Treat the event stream as the source record and snapshots as derived caches"
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-008",
+      "identity": {
+        "uuid_v5": "ff3c8cf3-97e5-5a6b-9ef7-40d639666fe6",
+        "uuid_v7": "01a04291-b3b0-76f4-91c1-97f6c8ec15c4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tamper-evident-log",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JCS、SHA-256、Ed25519、Merkle checkpointで監査ログをbindする",
+        "en": "Bind the audit log with JCS, SHA-256, Ed25519, and Merkle checkpoints"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "JCS、SHA-256、Ed25519、Merkle checkpointで監査ログをbindする",
+        "en": "Bind the audit log with JCS, SHA-256, Ed25519, and Merkle checkpoints"
+      },
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-FIPS180-4",
+        "SRC-RFC8032",
+        "SRC-RFC9162"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-009",
+      "identity": {
+        "uuid_v5": "6a90e93c-ae60-5441-a057-99aa7dcbff61",
+        "uuid_v7": "01a04291-b3b1-7964-9760-0199fdb15697",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "offline-per-device-chain",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "オフライン中はdeviceごとの署名chainを作り、同期後にglobal sequenceを付与する",
+        "en": "Create a signed chain per device offline and assign global sequence after synchronization"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "オフライン中はdeviceごとの署名chainを作り、同期後にglobal sequenceを付与する",
+        "en": "Create a signed chain per device offline and assign global sequence after synchronization"
+      },
+      "source_refs": [
+        "SRC-RFC9562",
+        "SRC-PROVO-2013"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-010",
+      "identity": {
+        "uuid_v5": "09f345d0-f5a9-54b1-acb6-90e13cddab07",
+        "uuid_v7": "01a04291-b3b2-7432-886e-c52197d779b9",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "crdt-scope",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "CRDTは可換なデータへ限定し、金融・送信・削除などの副作用には使わない",
+        "en": "Limit CRDT merge to commutative data; do not use it for financial, messaging, or destructive effects"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "CRDTは可換なデータへ限定し、金融・送信・削除などの副作用には使わない",
+        "en": "Limit CRDT merge to commutative data; do not use it for financial, messaging, or destructive effects"
+      },
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-011",
+      "identity": {
+        "uuid_v5": "df667551-a3b4-5140-a293-f6c41fc493c8",
+        "uuid_v7": "01a04291-b3b3-7493-979a-51788c43cff2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "open-knowledge-profile",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSON-LD/PROV-O/DCAT風の知識グラフを採用するが、単一の公式Open Knowledge Format適合は主張しない",
+        "en": "Use a JSON-LD/PROV-O/DCAT-inspired knowledge graph without claiming conformance to a single official Open Knowledge Format"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "JSON-LD/PROV-O/DCAT風の知識グラフを採用するが、単一の公式Open Knowledge Format適合は主張しない",
+        "en": "Use a JSON-LD/PROV-O/DCAT-inspired knowledge graph without claiming conformance to a single official Open Knowledge Format"
+      },
+      "source_refs": [
+        "SRC-JSONLD-2020",
+        "SRC-PROVO-2013",
+        "SRC-DCAT3-2024"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    },
+    {
+      "id": "ADR-012",
+      "identity": {
+        "uuid_v5": "0234e7db-e468-5003-b07d-90416dfb4fb4",
+        "uuid_v7": "01a04291-b3b4-7889-a1a2-028c330d9e0f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "bilingual-normative",
+        "category": "decision"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "英日を併記し、競合時はmachine-readable JSONと英語規範文を優先する",
+        "en": "Provide English/Japanese text; on conflict, machine-readable JSON and normative English take precedence"
+      },
+      "type": "ArchitectureDecision",
+      "status": "accepted",
+      "decision": {
+        "ja": "英日を併記し、競合時はmachine-readable JSONと英語規範文を優先する",
+        "en": "Provide English/Japanese text; on conflict, machine-readable JSON and normative English take precedence"
+      },
+      "source_refs": [
+        "SRC-JSONLD-2020"
+      ],
+      "consequences": {
+        "ja": "安全境界と実装責任が明確になる。",
+        "en": "Safety boundaries and implementation responsibilities become explicit."
+      }
+    }
+  ]
+}

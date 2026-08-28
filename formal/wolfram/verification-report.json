@@ -1,0 +1,23 @@
+{
+  "engine": "Wolfram Language",
+  "checkedAt": "2026-08-27T09:34:00Z",
+  "results": {
+    "callThreshold": "(g + l)*p > k + l + u0",
+    "commitThreshold": "b + c*d >= d",
+    "geometricSum": "(1 - qR^(1 + R))/(1 - qR)",
+    "expectedRetries": "qR*(1 - qR^R)/(1 - qR)",
+    "probabilityMass": "1",
+    "duplicateProbability": "eta*qR*(1 - (qR*(1 - eta))^R)/(1 - qR*(1 - eta))",
+    "sample": {
+      "qT": 0.929,
+      "qB": 0.001,
+      "qR": 0.06,
+      "qH": 0.01,
+      "retryBudget": 3,
+      "geometricFactor": 1.063816,
+      "expectedRetries": 0.063816,
+      "duplicateProbabilityAtEta1e-5": 6.381595968002159e-07
+    }
+  },
+  "note": "Captured from a Wolfram Language kernel during artifact generation; formulas are also encoded in ReferenceModel.wl."
+}

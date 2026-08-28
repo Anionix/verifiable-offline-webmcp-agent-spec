@@ -1,0 +1,31 @@
+flowchart TB
+  subgraph Untrusted[Untrusted / Proposal Zone]
+    Page[Web page content]
+    ToolOut[Tool output claims]
+    LLM[Local/Remote planner output]
+  end
+  subgraph Policy[Trusted Policy Boundary]
+    Mandate[Signed user mandate]
+    Contract[Tool Contract Engine]
+    EFSM[EFSM]
+    Keys[OS keystore / secure key]
+  end
+  subgraph Effect[External Effect Zone]
+    Executor[WebMCP Executor]
+    World[Remote service / world]
+  end
+  subgraph Proof[Evidence and Provenance]
+    Evidence[Independent evidence]
+    Audit[Hash chain + signatures + checkpoint]
+  end
+  Page --> Contract
+  ToolOut --> Evidence
+  LLM --> Contract
+  Mandate --> Contract
+  Contract --> EFSM
+  EFSM --> Executor
+  Executor --> World
+  World --> Evidence
+  Evidence --> EFSM
+  Keys --> Audit
+  EFSM --> Audit

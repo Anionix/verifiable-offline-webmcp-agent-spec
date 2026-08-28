@@ -1,0 +1,3371 @@
+{
+  "dataset": {
+    "id": "DS-TESTS",
+    "identity": {
+      "uuid_v5": "0bb912e5-bdab-55d1-8dbd-70d304ce3555",
+      "uuid_v7": "01a04291-bef7-72b0-91d2-cea19f3c20bc",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-tests",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:02.999Z",
+      "updated_at": "2026-08-27T09:34:02.999Z",
+      "observed_at": "2026-08-27T09:34:02.999Z",
+      "valid_from": "2026-08-27T09:34:02.999Z",
+      "valid_to": null,
+      "epoch_ms": 1787823242999,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:02.999+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "検証test台帳",
+      "en": "Verification Test Registry"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 67,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "TEST-ARCH-001",
+      "identity": {
+        "uuid_v5": "f6062e47-f383-5a07-a1dc-e18167d2abd9",
+        "uuid_v7": "01a04291-bef8-7cfc-be09-f03ce1ba411e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-arch-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.000Z",
+        "updated_at": "2026-08-27T09:34:03.000Z",
+        "observed_at": "2026-08-27T09:34:03.000Z",
+        "valid_from": "2026-08-27T09:34:03.000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-ARCH-001 検証",
+        "en": "TEST-ARCH-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "architecture-requirement-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: WebMCPのdraft APIは専用adapterに隔離しなければならない。",
+        "en": "Verifies the following requirement(s): The draft WebMCP API MUST be isolated behind a dedicated adapter."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-WEBMCP-001"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-ARCH-002",
+      "identity": {
+        "uuid_v5": "2b495082-2ba2-55f7-b45f-148f9c8ff515",
+        "uuid_v7": "01a04291-bef9-764a-b5e0-021872c2fe2f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-arch-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.001Z",
+        "updated_at": "2026-08-27T09:34:03.001Z",
+        "observed_at": "2026-08-27T09:34:03.001Z",
+        "valid_from": "2026-08-27T09:34:03.001Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243001,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.001+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-ARCH-002 検証",
+        "en": "TEST-ARCH-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "architecture-requirement-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: plannerへ公開する前にtool discoveryとcontract lookupを実行しなければならない。",
+        "en": "Verifies the following requirement(s): Tool discovery and contract lookup MUST occur before tools are exposed to a planner."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-WEBMCP-002"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-ARCH-003",
+      "identity": {
+        "uuid_v5": "3a25756a-896f-54e5-b07d-ee5e87a53e0e",
+        "uuid_v7": "01a04291-befa-7339-ab4c-e70c8e4abbf4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-arch-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.002Z",
+        "updated_at": "2026-08-27T09:34:03.002Z",
+        "observed_at": "2026-08-27T09:34:03.002Z",
+        "valid_from": "2026-08-27T09:34:03.002Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243002,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.002+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-ARCH-003 検証",
+        "en": "TEST-ARCH-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "architecture-requirement-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: WebMCP draft versionをmetadataへ記録し、互換性testをCIで実行しなければならない。",
+        "en": "Verifies the following requirement(s): The WebMCP draft version MUST be recorded in metadata and compatibility tests run in CI."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-007"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-AUDIT-001",
+      "identity": {
+        "uuid_v5": "eeb3849a-49bc-5210-9654-13ec501b6295",
+        "uuid_v7": "01a04291-befb-7a5a-9e59-2e2a8f3b1af3",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.003Z",
+        "updated_at": "2026-08-27T09:34:03.003Z",
+        "observed_at": "2026-08-27T09:34:03.003Z",
+        "valid_from": "2026-08-27T09:34:03.003Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243003,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.003+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-001 検証",
+        "en": "TEST-AUDIT-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 署名・hash対象eventはJCSまたは互換な限定subsetでcanonicalizeしなければならない。",
+        "en": "Verifies the following requirement(s): Events used for signatures and hashes MUST be canonicalized with JCS or a compatible restricted subset."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-001"
+      ],
+      "source_refs": [
+        "SRC-RFC7493",
+        "SRC-RFC8785"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-002",
+      "identity": {
+        "uuid_v5": "6722676a-4797-5ee4-906f-5c615a6a6f8e",
+        "uuid_v7": "01a04291-befc-7a0f-9e0a-c52e29195296",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.004Z",
+        "updated_at": "2026-08-27T09:34:03.004Z",
+        "observed_at": "2026-08-27T09:34:03.004Z",
+        "valid_from": "2026-08-27T09:34:03.004Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243004,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.004+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-002 検証",
+        "en": "TEST-AUDIT-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: event digestとchain hashには承認済みhash algorithmを使わなければならない。v0.1はSHA-256とする。",
+        "en": "Verifies the following requirement(s): Event digests and chain hashes MUST use an approved hash algorithm; v0.1 uses SHA-256."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-002"
+      ],
+      "source_refs": [
+        "SRC-FIPS180-4"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-003",
+      "identity": {
+        "uuid_v5": "deb401a4-0ca2-50b4-b772-7a4012b97ee4",
+        "uuid_v7": "01a04291-befd-74cc-b3d1-58e9f51aa42b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.005Z",
+        "updated_at": "2026-08-27T09:34:03.005Z",
+        "observed_at": "2026-08-27T09:34:03.005Z",
+        "valid_from": "2026-08-27T09:34:03.005Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243005,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.005+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-003 検証",
+        "en": "TEST-AUDIT-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: device eventとcheckpointはkey identifier付きEd25519署名でbindしなければならない。",
+        "en": "Verifies the following requirement(s): Device events and checkpoints MUST be bound with Ed25519 signatures carrying a key identifier."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-003"
+      ],
+      "source_refs": [
+        "SRC-RFC8032"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-004",
+      "identity": {
+        "uuid_v5": "4716e954-addd-5542-b92d-70532f48d42d",
+        "uuid_v7": "01a04291-befe-762b-a25d-0e2e9d913ec7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.006Z",
+        "updated_at": "2026-08-27T09:34:03.006Z",
+        "observed_at": "2026-08-27T09:34:03.006Z",
+        "valid_from": "2026-08-27T09:34:03.006Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243006,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.006+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-004 検証",
+        "en": "TEST-AUDIT-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 因果順序はhash referenceとsequenceで表し、wall-clockだけに依存してはならない。 / event batchはMerkle rootへ集約しsigned checkpointを外部保存すべきである。",
+        "en": "Verifies the following requirement(s): Causal order MUST be represented by hash references and sequence numbers, not wall-clock time alone. / Event batches SHOULD be aggregated into a Merkle root and an externally stored signed checkpoint."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-TIME-002",
+        "REQ-AUDIT-004"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013",
+        "SRC-RFC9162"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-005",
+      "identity": {
+        "uuid_v5": "432e43e4-e257-5eba-92e4-08fa21e646ce",
+        "uuid_v7": "01a04291-beff-79eb-a3b3-d3dd894bd702",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-005",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.007Z",
+        "updated_at": "2026-08-27T09:34:03.007Z",
+        "observed_at": "2026-08-27T09:34:03.007Z",
+        "valid_from": "2026-08-27T09:34:03.007Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243007,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.007+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-005 検証",
+        "en": "TEST-AUDIT-005 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 重要eventについて全logを開示せずinclusion proofを生成できるべきである。",
+        "en": "Verifies the following requirement(s): The system SHOULD generate inclusion proofs for important events without disclosing the full log."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-005"
+      ],
+      "source_refs": [
+        "SRC-RFC9162"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-006",
+      "identity": {
+        "uuid_v5": "65c1f134-1d30-5588-bc81-041d934bd186",
+        "uuid_v7": "01a04291-bf00-72a5-acd4-54385fad0b58",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-006",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.008Z",
+        "updated_at": "2026-08-27T09:34:03.008Z",
+        "observed_at": "2026-08-27T09:34:03.008Z",
+        "valid_from": "2026-08-27T09:34:03.008Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243008,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.008+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-006 検証",
+        "en": "TEST-AUDIT-006 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: AUTHORIZE、EXECUTE、VERIFY、COMMITは同一intent digestを参照しなければならない。",
+        "en": "Verifies the following requirement(s): AUTHORIZE, EXECUTE, VERIFY, and COMMIT MUST reference the same intent digest."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-006"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013",
+        "SRC-RFC8785"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-007",
+      "identity": {
+        "uuid_v5": "05670273-faea-5486-a9e9-cfe8b3173247",
+        "uuid_v7": "01a04291-bf01-72bc-9b2d-8c2d8d3b9f7c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-007",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.009Z",
+        "updated_at": "2026-08-27T09:34:03.009Z",
+        "observed_at": "2026-08-27T09:34:03.009Z",
+        "valid_from": "2026-08-27T09:34:03.009Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243009,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.009+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-007 検証",
+        "en": "TEST-AUDIT-007 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: authorization時のpolicyとTool Contractのdigestをeventへ記録しなければならない。",
+        "en": "Verifies the following requirement(s): The event MUST record digests of the policy and Tool Contract used at authorization time."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-007"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-008",
+      "identity": {
+        "uuid_v5": "1b74a3a1-3dd4-5b43-ab4f-c46ade460be0",
+        "uuid_v7": "01a04291-bf02-78ce-9b9e-ec859bffaa94",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-008",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.010Z",
+        "updated_at": "2026-08-27T09:34:03.010Z",
+        "observed_at": "2026-08-27T09:34:03.010Z",
+        "valid_from": "2026-08-27T09:34:03.010Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243010,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.010+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-008 検証",
+        "en": "TEST-AUDIT-008 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 同じevent streamから同じstate projectionを再構築できなければならない。",
+        "en": "Verifies the following requirement(s): The same event stream MUST reconstruct the same state projection."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-008"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUDIT-009",
+      "identity": {
+        "uuid_v5": "24d20e2c-0b20-5dd3-bf48-19f450edfccb",
+        "uuid_v7": "01a04291-bf03-785a-becb-5be4a2f33d98",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-audit-009",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.011Z",
+        "updated_at": "2026-08-27T09:34:03.011Z",
+        "observed_at": "2026-08-27T09:34:03.011Z",
+        "valid_from": "2026-08-27T09:34:03.011Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243011,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.011+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUDIT-009 検証",
+        "en": "TEST-AUDIT-009 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "cryptographic-audit-verification",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: snapshotはevent logの派生cacheとして扱い、hash anchorを持たなければならない。",
+        "en": "Verifies the following requirement(s): A snapshot MUST be treated as a derived cache and carry a hash anchor to the event log."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-009"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "data/audit/events.sample.ndjson",
+        "data/audit/checkpoint.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-AUTH-001",
+      "identity": {
+        "uuid_v5": "b1229d69-80b3-5778-bf90-1d8b8194a7f0",
+        "uuid_v7": "01a04291-bf04-7e3b-87ae-edd5b6db0d4e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-auth-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.012Z",
+        "updated_at": "2026-08-27T09:34:03.012Z",
+        "observed_at": "2026-08-27T09:34:03.012Z",
+        "valid_from": "2026-08-27T09:34:03.012Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243012,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.012+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-AUTH-001 検証",
+        "en": "TEST-AUTH-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: approvalはtool、normalized args、target、amount/content digest、expiryにbindされなければならない。",
+        "en": "Verifies the following requirement(s): Approval MUST be bound to tool, normalized arguments, target, amount/content digest, and expiry."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-007"
+      ],
+      "source_refs": [
+        "SRC-RFC8032",
+        "SRC-RFC8785"
+      ],
+      "automation_artifacts": [
+        "schemas/notification-intent.schema.json",
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-30ae-7290-8651-0d90029bbccd",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "duplicate-safe local notification path"
+      }
+    },
+    {
+      "id": "TEST-CONFORMANCE-001",
+      "identity": {
+        "uuid_v5": "bf1a2c4b-15fe-5647-ad91-bb01fef1d507",
+        "uuid_v7": "01a04291-bf05-7621-817c-786e929b3b09",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-conformance-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.013Z",
+        "updated_at": "2026-08-27T09:34:03.013Z",
+        "observed_at": "2026-08-27T09:34:03.013Z",
+        "valid_from": "2026-08-27T09:34:03.013Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243013,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.013+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-CONFORMANCE-001 検証",
+        "en": "TEST-CONFORMANCE-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: TypeScriptとWolfram referenceは同じCanonical IRへ同じ判定を返さなければならない。",
+        "en": "Verifies the following requirement(s): TypeScript and the Wolfram reference MUST return the same decision for the same Canonical IR."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-003"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-CONTRACT-001",
+      "identity": {
+        "uuid_v5": "0df1f453-af24-56cd-b631-0463e12ebee2",
+        "uuid_v7": "01a04291-bf06-7a94-9997-4e7cd7d156ec",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-contract-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.014Z",
+        "updated_at": "2026-08-27T09:34:03.014Z",
+        "observed_at": "2026-08-27T09:34:03.014Z",
+        "valid_from": "2026-08-27T09:34:03.014Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243014,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.014+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-CONTRACT-001 検証",
+        "en": "TEST-CONTRACT-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "tool-contract-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 各toolはinput、precondition、transition、postcondition、cost、risk、evidenceのcontractを持たなければならない。",
+        "en": "Verifies the following requirement(s): Each tool MUST have a contract covering input, preconditions, transition, postconditions, cost, risk, and evidence."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-TOOL-001"
+      ],
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12",
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": [
+        "schemas/notification-intent.schema.json",
+        "src/typescript/notification/types.ts",
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-313b-726f-87dd-b9d1d2422a39",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "duplicate-safe local notification adapter"
+      }
+    },
+    {
+      "id": "TEST-CONTRACT-002",
+      "identity": {
+        "uuid_v5": "15b03565-2e93-554a-a280-692c3d8249ea",
+        "uuid_v7": "01a04291-bf07-7b14-a751-c95451021a52",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-contract-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.015Z",
+        "updated_at": "2026-08-27T09:34:03.015Z",
+        "observed_at": "2026-08-27T09:34:03.015Z",
+        "valid_from": "2026-08-27T09:34:03.015Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243015,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.015+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-CONTRACT-002 検証",
+        "en": "TEST-CONTRACT-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "tool-contract-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: mutation toolはdeclared read setとwrite setを持たなければならない。",
+        "en": "Verifies the following requirement(s): Mutation tools MUST declare read and write sets."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-TOOL-002"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-CRITICAL-001",
+      "identity": {
+        "uuid_v5": "4ccd74eb-dd73-5dca-bf81-721680576be5",
+        "uuid_v7": "01a04291-bf08-7276-b931-c8a3ab3852bb",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-critical-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.016Z",
+        "updated_at": "2026-08-27T09:34:03.016Z",
+        "observed_at": "2026-08-27T09:34:03.016Z",
+        "valid_from": "2026-08-27T09:34:03.016Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243016,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.016+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-CRITICAL-001 検証",
+        "en": "TEST-CRITICAL-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: financial、destructive、identity mutationは有効なmandateがない限りHUMANでなければならない。",
+        "en": "Verifies the following requirement(s): Financial, destructive, and identity mutation actions MUST be HUMAN unless covered by a valid mandate."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-006"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-CRITICAL-002",
+      "identity": {
+        "uuid_v5": "190dd40c-3574-5211-9b87-141b43a6d5a3",
+        "uuid_v7": "01a04291-bf09-7db4-949e-609b660c887c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-critical-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.017Z",
+        "updated_at": "2026-08-27T09:34:03.017Z",
+        "observed_at": "2026-08-27T09:34:03.017Z",
+        "valid_from": "2026-08-27T09:34:03.017Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243017,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.017+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-CRITICAL-002 検証",
+        "en": "TEST-CRITICAL-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: critical commit toolはplannerへ直接公開せず、policy engine内に保持すべきである。",
+        "en": "Verifies the following requirement(s): Critical commit tools SHOULD remain inside the policy engine rather than being directly exposed to a planner."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-005"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-ID-001",
+      "identity": {
+        "uuid_v5": "9211ddec-9c74-5ae4-a066-365daaf286f5",
+        "uuid_v7": "01a04291-bf0a-7cf2-9b4c-cc073b014e73",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-id-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.018Z",
+        "updated_at": "2026-08-27T09:34:03.018Z",
+        "observed_at": "2026-08-27T09:34:03.018Z",
+        "valid_from": "2026-08-27T09:34:03.018Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243018,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.018+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-ID-001 検証",
+        "en": "TEST-ID-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "identifier-temporal-validation",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: すべての知識エンティティはcanonical nameとroot namespaceからUUIDv5を持たなければならない。",
+        "en": "Verifies the following requirement(s): Every knowledge entity MUST have a UUIDv5 derived from its canonical name and the root namespace."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-ID-001"
+      ],
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "src/typescript/test/evaluator.test.ts"
+      ]
+    },
+    {
+      "id": "TEST-ID-002",
+      "identity": {
+        "uuid_v5": "f9b9ece5-c244-5b35-8ec0-bb32431bb8c6",
+        "uuid_v7": "01a04291-bf0b-7839-806e-bcedaf8d676c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-id-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.019Z",
+        "updated_at": "2026-08-27T09:34:03.019Z",
+        "observed_at": "2026-08-27T09:34:03.019Z",
+        "valid_from": "2026-08-27T09:34:03.019Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243019,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.019+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-ID-002 検証",
+        "en": "TEST-ID-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "identifier-temporal-validation",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: すべてのイベントはevent timeを反映するUUIDv7を持たなければならない。",
+        "en": "Verifies the following requirement(s): Every event MUST have a UUIDv7 reflecting its event time."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-ID-002"
+      ],
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "src/typescript/test/evaluator.test.ts"
+      ]
+    },
+    {
+      "id": "TEST-IR-001",
+      "identity": {
+        "uuid_v5": "b8314f98-61c0-58f4-9357-bcf4486cc026",
+        "uuid_v7": "01a04291-bf0c-7034-abb9-d5098bd6c94f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-ir-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.020Z",
+        "updated_at": "2026-08-27T09:34:03.020Z",
+        "observed_at": "2026-08-27T09:34:03.020Z",
+        "valid_from": "2026-08-27T09:34:03.020Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243020,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.020+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-IR-001 検証",
+        "en": "TEST-IR-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 金額、PPM、sequence、epoch_msなど判定に使う値は整数で表さなければならない。",
+        "en": "Verifies the following requirement(s): Decision-critical values such as money, PPM, sequence, and epoch_ms MUST be integers."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-DATA-003"
+      ],
+      "source_refs": [
+        "SRC-RFC7493"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-IR-002",
+      "identity": {
+        "uuid_v5": "25c0c215-8fde-5aa9-8f61-e8bdaf017eb0",
+        "uuid_v7": "01a04291-bf0d-7661-8e8b-f5af2f2b388f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-ir-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.021Z",
+        "updated_at": "2026-08-27T09:34:03.021Z",
+        "observed_at": "2026-08-27T09:34:03.021Z",
+        "valid_from": "2026-08-27T09:34:03.021Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243021,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.021+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-IR-002 検証",
+        "en": "TEST-IR-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: policy decisionはALLOW、DENY、HUMAN、RECONCILEのいずれかでなければならない。",
+        "en": "Verifies the following requirement(s): A policy decision MUST be one of ALLOW, DENY, HUMAN, or RECONCILE."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-001"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-KNOW-001",
+      "identity": {
+        "uuid_v5": "75b5e7e9-ec82-5dbd-9adc-1ea9457b89ab",
+        "uuid_v7": "01a04291-bf0e-7d3f-9b9d-0f66e12bd4ab",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-know-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.022Z",
+        "updated_at": "2026-08-27T09:34:03.022Z",
+        "observed_at": "2026-08-27T09:34:03.022Z",
+        "valid_from": "2026-08-27T09:34:03.022Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243022,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.022+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-KNOW-001 検証",
+        "en": "TEST-KNOW-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "knowledge-graph-integrity-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 知識エンティティはJSON-LD graphとしてリンク可能であるべきである。",
+        "en": "Verifies the following requirement(s): Knowledge entities SHOULD be linkable as a JSON-LD graph."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-KNOW-001"
+      ],
+      "source_refs": [
+        "SRC-JSONLD-2020"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "knowledge/graph.jsonld",
+        "docs/source-map.md"
+      ]
+    },
+    {
+      "id": "TEST-KNOW-002",
+      "identity": {
+        "uuid_v5": "82a751e3-fbfe-51fc-a3b7-4991f4f1ea4d",
+        "uuid_v7": "01a04291-bf0f-7a5b-8752-ad6587c33a7e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-know-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.023Z",
+        "updated_at": "2026-08-27T09:34:03.023Z",
+        "observed_at": "2026-08-27T09:34:03.023Z",
+        "valid_from": "2026-08-27T09:34:03.023Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243023,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.023+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-KNOW-002 検証",
+        "en": "TEST-KNOW-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "knowledge-graph-integrity-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: claim、formula、requirement、decisionは生成activityとsource provenanceを記録しなければならない。",
+        "en": "Verifies the following requirement(s): Claims, formulas, requirements, and decisions MUST record generation activity and source provenance."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-KNOW-002"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "knowledge/graph.jsonld",
+        "docs/source-map.md"
+      ]
+    },
+    {
+      "id": "TEST-KNOW-003",
+      "identity": {
+        "uuid_v5": "a998b669-9d26-5efb-a7a7-6d7f4cf37a8a",
+        "uuid_v7": "01a04291-bf10-709d-a033-3763c2ce3fcf",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-know-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.024Z",
+        "updated_at": "2026-08-27T09:34:03.024Z",
+        "observed_at": "2026-08-27T09:34:03.024Z",
+        "valid_from": "2026-08-27T09:34:03.024Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243024,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.024+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-KNOW-003 検証",
+        "en": "TEST-KNOW-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "knowledge-graph-integrity-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: distributionとmanifestはDCAT/SPDX風metadataで発見可能にすべきである。",
+        "en": "Verifies the following requirement(s): Distributions and manifests SHOULD be discoverable with DCAT/SPDX-style metadata."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-KNOW-003"
+      ],
+      "source_refs": [
+        "SRC-DCAT3-2024"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "knowledge/graph.jsonld",
+        "docs/source-map.md"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-001",
+      "identity": {
+        "uuid_v5": "ee0ba63e-c41c-5e82-9958-c7ea92054778",
+        "uuid_v7": "01a04291-bf11-7567-872b-c3a856187605",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.025Z",
+        "updated_at": "2026-08-27T09:34:03.025Z",
+        "observed_at": "2026-08-27T09:34:03.025Z",
+        "valid_from": "2026-08-27T09:34:03.025Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243025,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.025+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-001 検証",
+        "en": "TEST-MODEL-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: EXECUTING状態へ入るには有効なauthorizationが必要である。",
+        "en": "Verifies the following requirement(s): Entering EXECUTING MUST require valid authorization."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-EXEC-001"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-002",
+      "identity": {
+        "uuid_v5": "14e2d461-787a-5a91-be76-6c80187c29e1",
+        "uuid_v7": "01a04291-bf12-7c9d-98ef-3e17587b9456",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.026Z",
+        "updated_at": "2026-08-27T09:34:03.026Z",
+        "observed_at": "2026-08-27T09:34:03.026Z",
+        "valid_from": "2026-08-27T09:34:03.026Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243026,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.026+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-002 検証",
+        "en": "TEST-MODEL-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: AMBIGUOUS状態からmutation retryへ直接遷移してはならない。",
+        "en": "Verifies the following requirement(s): AMBIGUOUS MUST NOT transition directly to a mutating retry."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-EXEC-002"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-003",
+      "identity": {
+        "uuid_v5": "34e83950-6f9a-5a11-90b1-a03d191666e2",
+        "uuid_v7": "01a04291-bf13-7088-b47d-172e967bb4ac",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.027Z",
+        "updated_at": "2026-08-27T09:34:03.027Z",
+        "observed_at": "2026-08-27T09:34:03.027Z",
+        "valid_from": "2026-08-27T09:34:03.027Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243027,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.027+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-003 検証",
+        "en": "TEST-MODEL-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 同一intentの外部economic effectは高々1回でなければならない。",
+        "en": "Verifies the following requirement(s): An external economic effect for the same intent MUST occur at most once."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-EXEC-003"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-004",
+      "identity": {
+        "uuid_v5": "cb7ec7ac-f5d4-512f-b403-b8e26694a5c0",
+        "uuid_v7": "01a04291-bf14-738d-be45-3fb43bc7cada",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.028Z",
+        "updated_at": "2026-08-27T09:34:03.028Z",
+        "observed_at": "2026-08-27T09:34:03.028Z",
+        "valid_from": "2026-08-27T09:34:03.028Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243028,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.028+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-004 検証",
+        "en": "TEST-MODEL-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: COMMITTEDへ到達する前にVERIFIEDを通過しなければならない。",
+        "en": "Verifies the following requirement(s): The system MUST pass through VERIFIED before reaching COMMITTED."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-EXEC-004"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-005",
+      "identity": {
+        "uuid_v5": "86dd97d3-5662-5f91-98aa-45f8f0b4abab",
+        "uuid_v7": "01a04291-bf15-75d0-9363-a53546c2e5e1",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-005",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.029Z",
+        "updated_at": "2026-08-27T09:34:03.029Z",
+        "observed_at": "2026-08-27T09:34:03.029Z",
+        "valid_from": "2026-08-27T09:34:03.029Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243029,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.029+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-005 検証",
+        "en": "TEST-MODEL-005 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: autonomous retry、verify、reconcileのcycleではranking functionが減少しなければならない。",
+        "en": "Verifies the following requirement(s): The ranking function MUST decrease on autonomous retry, verification, and reconciliation cycles."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-EXEC-005"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-ALL",
+      "identity": {
+        "uuid_v5": "7bc5f203-d845-5109-8bd2-439cc1837a15",
+        "uuid_v7": "01a04291-bf16-786e-9480-2a5940ccd155",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-all",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.030Z",
+        "updated_at": "2026-08-27T09:34:03.030Z",
+        "observed_at": "2026-08-27T09:34:03.030Z",
+        "valid_from": "2026-08-27T09:34:03.030Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243030,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.030+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-ALL 検証",
+        "en": "TEST-MODEL-ALL verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 未承認実行、二重効果、未検証commit、ambiguous retryをTLA+ invariantとして定義しなければならない。",
+        "en": "Verifies the following requirement(s): Unauthorized execution, double effects, unverified commit, and ambiguous retry MUST be defined as TLA+ invariants."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-FORMAL-001"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-MODEL-MUTATION",
+      "identity": {
+        "uuid_v5": "2c3ef06d-7c01-522b-bd2b-a3ac0f273cec",
+        "uuid_v7": "01a04291-bf17-70f1-92a6-9c3e65899d24",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-model-mutation",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.031Z",
+        "updated_at": "2026-08-27T09:34:03.031Z",
+        "observed_at": "2026-08-27T09:34:03.031Z",
+        "valid_from": "2026-08-27T09:34:03.031Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243031,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.031+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-MODEL-MUTATION 検証",
+        "en": "TEST-MODEL-MUTATION verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "finite-state-model-check",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 各安全guardを意図的に破壊したmutation modelがcounterexampleを生成することを確認しなければならない。",
+        "en": "Verifies the following requirement(s): A mutation model that deliberately breaks each safety guard MUST produce a counterexample."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-FORMAL-002"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "formal/model-checker/reachability.py",
+        "formal/model-checker/report.json",
+        "formal/tla/ToolExecution.tla"
+      ]
+    },
+    {
+      "id": "TEST-OFFLINE-001",
+      "identity": {
+        "uuid_v5": "063da8ed-3d83-5ab0-af25-7aa5ad88ec8e",
+        "uuid_v7": "01a04291-bf18-7073-a1cf-8fac681538b8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-offline-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.032Z",
+        "updated_at": "2026-08-27T09:34:03.032Z",
+        "observed_at": "2026-08-27T09:34:03.032Z",
+        "valid_from": "2026-08-27T09:34:03.032Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243032,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.032+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-OFFLINE-001 検証",
+        "en": "TEST-OFFLINE-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: Responses APIはoptional plannerであり、system availabilityの単一障害点にしてはならない。 / network unavailable時にResponsesを候補から除外し、core local workflowを維持しなければならない。",
+        "en": "Verifies the following requirement(s): The Responses API MUST be an optional planner and MUST NOT be a single point of system availability. / When the network is unavailable, Responses MUST be removed from candidates and the local core workflow preserved."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-PLAN-001",
+        "REQ-OFFLINE-001"
+      ],
+      "source_refs": [
+        "SRC-OPENAI-RESPONSES-2025",
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/demo-server.ts",
+        "src/typescript/test/notification.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-317e-7e77-a24f-2a06534e68ea",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "local notification workflow without an online planner"
+      }
+    },
+    {
+      "id": "TEST-OFFLINE-002",
+      "identity": {
+        "uuid_v5": "0acd35f5-8ee9-5fa0-b899-6ee5ef761db8",
+        "uuid_v7": "01a04291-bf19-7321-9504-0a750cf6f1fc",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-offline-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.033Z",
+        "updated_at": "2026-08-27T09:34:03.033Z",
+        "observed_at": "2026-08-27T09:34:03.033Z",
+        "valid_from": "2026-08-27T09:34:03.033Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243033,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.033+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-OFFLINE-002 検証",
+        "en": "TEST-OFFLINE-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: offline queueは未実行intentを保存し、外部効果を開始してはならない。",
+        "en": "Verifies the following requirement(s): The offline queue MUST store unexecuted intent and MUST NOT start an external effect."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-OFFLINE-002"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT",
+        "SRC-NODE-SQLITE-24",
+        "SRC-SQLITE-TRANSACTIONS"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/store.ts",
+        "src/typescript/test/notification.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-31b7-7d5b-a0d4-c4543f03ee3a",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "persistent local notification queue"
+      }
+    },
+    {
+      "id": "TEST-OFFLINE-003",
+      "identity": {
+        "uuid_v5": "8d04c56b-4dc3-5cda-ac59-65fe98e900ba",
+        "uuid_v7": "01a04291-bf1a-7eb1-b8cc-716c13f2ad73",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-offline-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.034Z",
+        "updated_at": "2026-08-27T09:34:03.034Z",
+        "observed_at": "2026-08-27T09:34:03.034Z",
+        "valid_from": "2026-08-27T09:34:03.034Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243034,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.034+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-OFFLINE-003 検証",
+        "en": "TEST-OFFLINE-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: replay前にauthorization、permission、version、consent、TTL、preconditionを再評価しなければならない。",
+        "en": "Verifies the following requirement(s): Authorization, permission, version, consent, TTL, and preconditions MUST be re-evaluated before replay."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-OFFLINE-003"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts",
+        "examples/notification-demo/app.js"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-31f1-77d6-bedb-535b8bf27f47",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "notification approval expiry, payload, target, and browser permission checks"
+      }
+    },
+    {
+      "id": "TEST-POLICY-001",
+      "identity": {
+        "uuid_v5": "32317e0c-3173-5dfa-94cd-75dbdc991b58",
+        "uuid_v7": "01a04291-bf1b-7f65-8e8c-2c1f2c8f4f7d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-policy-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.035Z",
+        "updated_at": "2026-08-27T09:34:03.035Z",
+        "observed_at": "2026-08-27T09:34:03.035Z",
+        "valid_from": "2026-08-27T09:34:03.035Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243035,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.035+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-POLICY-001 検証",
+        "en": "TEST-POLICY-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: hard gateに失敗したtoolはplannerの候補集合から除外しなければならない。",
+        "en": "Verifies the following requirement(s): A tool that fails a hard gate MUST be removed from the planner candidate set."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-WEBMCP-003"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026",
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-POLICY-002",
+      "identity": {
+        "uuid_v5": "a22d6aea-b573-5a2d-842c-eca199d438e1",
+        "uuid_v7": "01a04291-bf1c-7f1a-84cc-492894e60ea4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-policy-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.036Z",
+        "updated_at": "2026-08-27T09:34:03.036Z",
+        "observed_at": "2026-08-27T09:34:03.036Z",
+        "valid_from": "2026-08-27T09:34:03.036Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243036,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.036+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-POLICY-002 検証",
+        "en": "TEST-POLICY-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: remote MCPまたはResponses tool exposureはfeasible toolだけに限定しなければならない。",
+        "en": "Verifies the following requirement(s): Remote MCP or Responses tool exposure MUST be limited to feasible tools."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-PLAN-002"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026",
+        "SRC-OPENAI-MCP-2025"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-POLICY-003",
+      "identity": {
+        "uuid_v5": "ad204375-e49d-52c9-8a3c-7aa7faef19e2",
+        "uuid_v7": "01a04291-bf1d-7115-8d7b-2319aadcbfc0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-policy-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.037Z",
+        "updated_at": "2026-08-27T09:34:03.037Z",
+        "observed_at": "2026-08-27T09:34:03.037Z",
+        "valid_from": "2026-08-27T09:34:03.037Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243037,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.037+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-POLICY-003 検証",
+        "en": "TEST-POLICY-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 判定優先順位はhard DENY、RECONCILE、HUMAN、utility DENY、ALLOWの順でなければならない。",
+        "en": "Verifies the following requirement(s): Decision precedence MUST be hard DENY, RECONCILE, HUMAN, utility DENY, then ALLOW."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-002"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-POLICY-004",
+      "identity": {
+        "uuid_v5": "4c0731fe-75c8-521b-b5b7-2657c6cee53e",
+        "uuid_v7": "01a04291-bf1e-7c0f-a1bd-5c804f518d86",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-policy-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.038Z",
+        "updated_at": "2026-08-27T09:34:03.038Z",
+        "observed_at": "2026-08-27T09:34:03.038Z",
+        "valid_from": "2026-08-27T09:34:03.038Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243038,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.038+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-POLICY-004 検証",
+        "en": "TEST-POLICY-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: commit thresholdはrisk class floorとexpected-loss thresholdの最大値でなければならない。",
+        "en": "Verifies the following requirement(s): The commit threshold MUST be the maximum of the risk-class floor and expected-loss threshold."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-004"
+      ],
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-POLICY-005",
+      "identity": {
+        "uuid_v5": "873fab9f-5cf2-5479-bf60-63034d1346f2",
+        "uuid_v7": "01a04291-bf1f-7318-87ae-e6201dab8fc6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-policy-005",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.039Z",
+        "updated_at": "2026-08-27T09:34:03.039Z",
+        "observed_at": "2026-08-27T09:34:03.039Z",
+        "valid_from": "2026-08-27T09:34:03.039Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243039,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.039+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-POLICY-005 検証",
+        "en": "TEST-POLICY-005 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "decision-conformance-test",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 最大効用がreject utility以下ならABSTAIN/HUMANを選ばなければならない。",
+        "en": "Verifies the following requirement(s): When maximum utility is no greater than reject utility, the system MUST choose ABSTAIN/HUMAN."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-009"
+      ],
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "automation_artifacts": [
+        "data/golden-vectors.json",
+        "src/typescript/test/evaluator.test.ts",
+        "scripts/validate_repo.py"
+      ]
+    },
+    {
+      "id": "TEST-PRIVACY-001",
+      "identity": {
+        "uuid_v5": "e1410356-d9db-5b1d-a7f6-152c330eda3a",
+        "uuid_v7": "01a04291-bf20-7a14-960f-07a40c7511df",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-privacy-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.040Z",
+        "updated_at": "2026-08-27T09:34:03.040Z",
+        "observed_at": "2026-08-27T09:34:03.040Z",
+        "valid_from": "2026-08-27T09:34:03.040Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243040,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.040+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-PRIVACY-001 検証",
+        "en": "TEST-PRIVACY-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: remote plannerへ送るデータは必要品質を満たす最小十分集合にしなければならない。",
+        "en": "Verifies the following requirement(s): Data sent to a remote planner MUST be the minimum sufficient set that meets required quality."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-005"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-PRIVACY-002",
+      "identity": {
+        "uuid_v5": "f10d11ad-fe0b-5fdb-bc49-ffd8c974eddb",
+        "uuid_v7": "01a04291-bf21-7fa4-99c6-287dfdc14c5a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-privacy-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.041Z",
+        "updated_at": "2026-08-27T09:34:03.041Z",
+        "observed_at": "2026-08-27T09:34:03.041Z",
+        "valid_from": "2026-08-27T09:34:03.041Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243041,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.041+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-PRIVACY-002 検証",
+        "en": "TEST-PRIVACY-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: audit logにsecretまたは不要なpersonal dataを直接保存してはならない。",
+        "en": "Verifies the following requirement(s): The audit log MUST NOT directly store secrets or unnecessary personal data."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-006"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SCHEMA-001",
+      "identity": {
+        "uuid_v5": "b98e840c-ddba-5ac3-a6e3-3650f6b9906e",
+        "uuid_v7": "01a04291-bf22-7c8d-b9be-d842707b9933",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-schema-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.042Z",
+        "updated_at": "2026-08-27T09:34:03.042Z",
+        "observed_at": "2026-08-27T09:34:03.042Z",
+        "valid_from": "2026-08-27T09:34:03.042Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243042,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.042+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SCHEMA-001 検証",
+        "en": "TEST-SCHEMA-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "json-schema-validation",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: Canonical IR、Tool Contract、Audit EventはJSON Schemaで検証されなければならない。",
+        "en": "Verifies the following requirement(s): Canonical IR, Tool Contract, and Audit Event MUST be validated with JSON Schema."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-DATA-001"
+      ],
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "schemas/"
+      ]
+    },
+    {
+      "id": "TEST-SCHEMA-002",
+      "identity": {
+        "uuid_v5": "898ee7f3-67d9-504d-948e-bf41dc5c4ad2",
+        "uuid_v7": "01a04291-bf23-7446-8ef3-8c6a3a7e8d21",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-schema-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.043Z",
+        "updated_at": "2026-08-27T09:34:03.043Z",
+        "observed_at": "2026-08-27T09:34:03.043Z",
+        "valid_from": "2026-08-27T09:34:03.043Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243043,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.043+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SCHEMA-002 検証",
+        "en": "TEST-SCHEMA-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "json-schema-validation",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: JSONはRFC 8259に適合し、duplicate keyを生成してはならない。",
+        "en": "Verifies the following requirement(s): JSON MUST conform to RFC 8259 and MUST NOT contain duplicate object member names."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-DATA-002"
+      ],
+      "source_refs": [
+        "SRC-RFC7493",
+        "SRC-RFC8259"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "schemas/"
+      ]
+    },
+    {
+      "id": "TEST-SEC-001",
+      "identity": {
+        "uuid_v5": "45363997-39ea-5370-ad78-94601e69f0bf",
+        "uuid_v7": "01a04291-bf24-7b85-a09a-04406a21f282",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.044Z",
+        "updated_at": "2026-08-27T09:34:03.044Z",
+        "observed_at": "2026-08-27T09:34:03.044Z",
+        "valid_from": "2026-08-27T09:34:03.044Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243044,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.044+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-001 検証",
+        "en": "TEST-SEC-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: UUIDを認可tokenまたは秘密として扱ってはならない。",
+        "en": "Verifies the following requirement(s): UUIDs MUST NOT be treated as authorization tokens or secrets."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-ID-003"
+      ],
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-002",
+      "identity": {
+        "uuid_v5": "b2639387-3b33-561e-b43b-798f599d6e78",
+        "uuid_v7": "01a04291-bf25-78f5-9c5d-91ba35247174",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.045Z",
+        "updated_at": "2026-08-27T09:34:03.045Z",
+        "observed_at": "2026-08-27T09:34:03.045Z",
+        "valid_from": "2026-08-27T09:34:03.045Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243045,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.045+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-002 検証",
+        "en": "TEST-SEC-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: MCP経由のtoolでもhost policyとuser consentを迂回してはならない。",
+        "en": "Verifies the following requirement(s): Tools reached through MCP MUST NOT bypass host policy or user consent."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-MCP-001"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-003",
+      "identity": {
+        "uuid_v5": "2332eab2-e9b7-5d2f-be9d-2912e22ba3c5",
+        "uuid_v7": "01a04291-bf26-713c-b1f2-fb89fbe58fb0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.046Z",
+        "updated_at": "2026-08-27T09:34:03.046Z",
+        "observed_at": "2026-08-27T09:34:03.046Z",
+        "valid_from": "2026-08-27T09:34:03.046Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243046,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.046+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-003 検証",
+        "en": "TEST-SEC-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: planner出力はcandidate proposalであり、authorizationを生成してはならない。",
+        "en": "Verifies the following requirement(s): Planner output MUST be treated as a candidate proposal and MUST NOT create authorization."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-PLAN-003"
+      ],
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-004",
+      "identity": {
+        "uuid_v5": "4d4cdca8-e278-5b6c-94e8-74b965ba9fe5",
+        "uuid_v7": "01a04291-bf27-7a41-847a-3d7e8fc86f93",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.047Z",
+        "updated_at": "2026-08-27T09:34:03.047Z",
+        "observed_at": "2026-08-27T09:34:03.047Z",
+        "valid_from": "2026-08-27T09:34:03.047Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243047,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.047+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-004 検証",
+        "en": "TEST-SEC-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: LLM、tool output、web contentだけでauthorityを増加させてはならない。",
+        "en": "Verifies the following requirement(s): Authority MUST NOT increase solely because of LLM output, tool output, or web content."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-POLICY-008"
+      ],
+      "source_refs": [
+        "SRC-TLA-LAMPORT",
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-005",
+      "identity": {
+        "uuid_v5": "75449abf-affe-54be-aa8a-fa3bae4e17d8",
+        "uuid_v7": "01a04291-bf28-794c-87fa-b519193ae6c0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-005",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.048Z",
+        "updated_at": "2026-08-27T09:34:03.048Z",
+        "observed_at": "2026-08-27T09:34:03.048Z",
+        "valid_from": "2026-08-27T09:34:03.048Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243048,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.048+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-005 検証",
+        "en": "TEST-SEC-005 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: untrusted tool outputをinstructionではなくdataとして扱わなければならない。",
+        "en": "Verifies the following requirement(s): Untrusted tool output MUST be treated as data, not instruction."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-001"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-006",
+      "identity": {
+        "uuid_v5": "0d44504a-0c30-5267-9a90-7b0b2a5d4da0",
+        "uuid_v7": "01a04291-bf29-722f-9380-173f070edd13",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-006",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.049Z",
+        "updated_at": "2026-08-27T09:34:03.049Z",
+        "observed_at": "2026-08-27T09:34:03.049Z",
+        "valid_from": "2026-08-27T09:34:03.049Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243049,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.049+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-006 検証",
+        "en": "TEST-SEC-006 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: private key、access token、passwordをplanner contextへ渡してはならない。",
+        "en": "Verifies the following requirement(s): Private keys, access tokens, and passwords MUST NOT enter planner context."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-002"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026",
+        "SRC-RFC8032"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-007",
+      "identity": {
+        "uuid_v5": "ea1c684c-8d06-5df1-b9d7-62e5303470b7",
+        "uuid_v7": "01a04291-bf2a-79b1-8490-0bc4c57cca4a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-007",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.050Z",
+        "updated_at": "2026-08-27T09:34:03.050Z",
+        "observed_at": "2026-08-27T09:34:03.050Z",
+        "valid_from": "2026-08-27T09:34:03.050Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243050,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.050+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-007 検証",
+        "en": "TEST-SEC-007 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: source trust、origin、untrusted annotationをtaint metadataとして伝播しなければならない。",
+        "en": "Verifies the following requirement(s): Source trust, origin, and untrusted annotations MUST propagate as taint metadata."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-003"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-008",
+      "identity": {
+        "uuid_v5": "a4a0f038-4ddb-5568-9e17-9f6edf2e9e7b",
+        "uuid_v7": "01a04291-bf2b-767c-8e6a-1a661780adad",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-008",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.051Z",
+        "updated_at": "2026-08-27T09:34:03.051Z",
+        "observed_at": "2026-08-27T09:34:03.051Z",
+        "valid_from": "2026-08-27T09:34:03.051Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243051,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.051+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-008 検証",
+        "en": "TEST-SEC-008 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: planner capabilityはexecutor capabilityの真部分集合または等しい集合でなければならない。",
+        "en": "Verifies the following requirement(s): Planner capability MUST be a subset of executor capability."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-004"
+      ],
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SEC-009",
+      "identity": {
+        "uuid_v5": "1433acd7-fe2a-5d5e-9d40-0d2c5b7472e7",
+        "uuid_v7": "01a04291-bf2c-7e1a-a98d-bdd8849d3c83",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sec-009",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.052Z",
+        "updated_at": "2026-08-27T09:34:03.052Z",
+        "observed_at": "2026-08-27T09:34:03.052Z",
+        "valid_from": "2026-08-27T09:34:03.052Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243052,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.052+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SEC-009 検証",
+        "en": "TEST-SEC-009 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "security-policy-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: tool description、tool output、page observationをprompt injectionの可能性がある入力として扱わなければならない。",
+        "en": "Verifies the following requirement(s): Tool descriptions, tool outputs, and page observations MUST be treated as potentially prompt-injected inputs."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SEC-008"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SLO-001",
+      "identity": {
+        "uuid_v5": "e20225f6-db67-5249-8cce-91653e2ad907",
+        "uuid_v7": "01a04291-bf2d-75f9-8670-0dbb098ab9fe",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.053Z",
+        "updated_at": "2026-08-27T09:34:03.053Z",
+        "observed_at": "2026-08-27T09:34:03.053Z",
+        "valid_from": "2026-08-27T09:34:03.053Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243053,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.053+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-001 検証",
+        "en": "TEST-SLO-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 長期運用では平均処理率μが平均流入率λを上回るようcapacity planningすべきである。",
+        "en": "Verifies the following requirement(s): Long-run capacity planning SHOULD keep average service rate μ above average arrival rate λ."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-005"
+      ],
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SLO-002",
+      "identity": {
+        "uuid_v5": "2c612c31-2a88-5342-90c7-853971644d0a",
+        "uuid_v7": "01a04291-bf2e-7a41-8305-edfe462479a6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.054Z",
+        "updated_at": "2026-08-27T09:34:03.054Z",
+        "observed_at": "2026-08-27T09:34:03.054Z",
+        "valid_from": "2026-08-27T09:34:03.054Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243054,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.054+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-002 検証",
+        "en": "TEST-SLO-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: queue length、arrival rate、waiting timeを計測しL=λW整合性を監視しなければならない。",
+        "en": "Verifies the following requirement(s): Queue length, arrival rate, and waiting time MUST be measured and monitored for consistency with L = λW."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-006"
+      ],
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SLO-003",
+      "identity": {
+        "uuid_v5": "3392c668-67be-593d-a3f5-fe7c9de8e2ef",
+        "uuid_v7": "01a04291-bf2f-71f8-9525-bca3a6195287",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.055Z",
+        "updated_at": "2026-08-27T09:34:03.055Z",
+        "observed_at": "2026-08-27T09:34:03.055Z",
+        "valid_from": "2026-08-27T09:34:03.055Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243055,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.055+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-003 検証",
+        "en": "TEST-SLO-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: confidenceはvalidation dataで校正し、LLMの自己申告confidenceを使うべきではない。",
+        "en": "Verifies the following requirement(s): Confidence SHOULD be calibrated on validation data and SHOULD NOT rely on an LLM self-report."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-VERIFY-002"
+      ],
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SLO-004",
+      "identity": {
+        "uuid_v5": "7f0b48d8-18f0-5695-85cd-0efe03f3fa1a",
+        "uuid_v7": "01a04291-bf30-7e47-bd27-c32c016ac0e4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.056Z",
+        "updated_at": "2026-08-27T09:34:03.056Z",
+        "observed_at": "2026-08-27T09:34:03.056Z",
+        "valid_from": "2026-08-27T09:34:03.056Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243056,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.056+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-004 検証",
+        "en": "TEST-SLO-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: qT、qB、qR、qHは非負で合計1でなければならない。",
+        "en": "Verifies the following requirement(s): qT, qB, qR, and qH MUST be nonnegative and sum to one."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SLO-001"
+      ],
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SLO-005",
+      "identity": {
+        "uuid_v5": "08c075f8-3da0-5b6b-abc5-f4aef10a8ec5",
+        "uuid_v7": "01a04291-bf31-722e-95ca-e2a6cf3f244c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-005",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.057Z",
+        "updated_at": "2026-08-27T09:34:03.057Z",
+        "observed_at": "2026-08-27T09:34:03.057Z",
+        "valid_from": "2026-08-27T09:34:03.057Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243057,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.057+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-005 検証",
+        "en": "TEST-SLO-005 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: P_badとP_dupは目的関数のpenaltyではなくhard chance constraintで制御しなければならない。",
+        "en": "Verifies the following requirement(s): P_bad and P_dup MUST be controlled as hard chance constraints, not only objective penalties."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SLO-002"
+      ],
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SLO-006",
+      "identity": {
+        "uuid_v5": "6891e15d-9c19-52ab-987f-81ebca64281c",
+        "uuid_v7": "01a04291-bf32-7307-95e2-01452474e595",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-slo-006",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.058Z",
+        "updated_at": "2026-08-27T09:34:03.058Z",
+        "observed_at": "2026-08-27T09:34:03.058Z",
+        "valid_from": "2026-08-27T09:34:03.058Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243058,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.058+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SLO-006 検証",
+        "en": "TEST-SLO-006 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "stochastic-mathematical-check",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: sample SLO parameterとruntime metricはsynthetic/illustrativeであることを明示しなければならない。",
+        "en": "Verifies the following requirement(s): Sample SLO parameters and runtime metrics MUST be labeled synthetic/illustrative."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SLO-003"
+      ],
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "automation_artifacts": [
+        "formal/wolfram/ReferenceModel.wl",
+        "formal/wolfram/verification-report.json",
+        "data/slo-parameters.sample.json"
+      ]
+    },
+    {
+      "id": "TEST-SYNC-001",
+      "identity": {
+        "uuid_v5": "9925fdbd-3d2a-5107-9a25-44e524a79035",
+        "uuid_v7": "01a04291-bf33-79b0-a061-d70932676501",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sync-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.059Z",
+        "updated_at": "2026-08-27T09:34:03.059Z",
+        "observed_at": "2026-08-27T09:34:03.059Z",
+        "valid_from": "2026-08-27T09:34:03.059Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243059,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.059+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SYNC-001 検証",
+        "en": "TEST-SYNC-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: 各deviceはoffline中に独立したsigned sequenceを維持しなければならない。",
+        "en": "Verifies the following requirement(s): Each device MUST maintain an independent signed sequence while offline."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-001"
+      ],
+      "source_refs": [
+        "SRC-RFC8032",
+        "SRC-RFC9562"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SYNC-002",
+      "identity": {
+        "uuid_v5": "c8da4e2d-876b-5d9f-8869-f445227739ef",
+        "uuid_v7": "01a04291-bf34-7696-903b-96f45bff790e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sync-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.060Z",
+        "updated_at": "2026-08-27T09:34:03.060Z",
+        "observed_at": "2026-08-27T09:34:03.060Z",
+        "valid_from": "2026-08-27T09:34:03.060Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243060,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.060+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SYNC-002 検証",
+        "en": "TEST-SYNC-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: server取り込み時にdevice sequenceを保持したままglobal sequenceを追加しなければならない。",
+        "en": "Verifies the following requirement(s): Server ingestion MUST preserve device sequence while adding a global sequence."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-002"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SYNC-003",
+      "identity": {
+        "uuid_v5": "afdd7d35-bcbf-51c4-af82-039cbf32cfd5",
+        "uuid_v7": "01a04291-bf35-7eb0-b97b-464f64a4d494",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sync-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.061Z",
+        "updated_at": "2026-08-27T09:34:03.061Z",
+        "observed_at": "2026-08-27T09:34:03.061Z",
+        "valid_from": "2026-08-27T09:34:03.061Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243061,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.061+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SYNC-003 検証",
+        "en": "TEST-SYNC-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: CRDT mergeは可換で冪等な状態へ限定しなければならない。",
+        "en": "Verifies the following requirement(s): CRDT merge MUST be limited to commutative, idempotent state."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-003"
+      ],
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-SYNC-004",
+      "identity": {
+        "uuid_v5": "32e779b5-c957-50de-963e-79ba2291d957",
+        "uuid_v7": "01a04291-bf36-706f-8dbd-36f53c6a4bfc",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-sync-004",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.062Z",
+        "updated_at": "2026-08-27T09:34:03.062Z",
+        "observed_at": "2026-08-27T09:34:03.062Z",
+        "valid_from": "2026-08-27T09:34:03.062Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243062,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.062+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-SYNC-004 検証",
+        "en": "TEST-SYNC-004 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "offline-sync-scenario-test",
+      "implementation_status": "specified",
+      "automated": false,
+      "description": {
+        "ja": "次の要件を検証する: 支払い、送信、削除、予約など非可換副作用をCRDT mergeしてはならない。",
+        "en": "Verifies the following requirement(s): Payments, sends, deletions, reservations, and other non-commutative effects MUST NOT be CRDT-merged."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-SYNC-004"
+      ],
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "automation_artifacts": []
+    },
+    {
+      "id": "TEST-TIME-001",
+      "identity": {
+        "uuid_v5": "c6b118f9-2223-5b1d-ac0a-fa2f8f8767af",
+        "uuid_v7": "01a04291-bf37-746b-b57f-be582482b0ba",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-time-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.063Z",
+        "updated_at": "2026-08-27T09:34:03.063Z",
+        "observed_at": "2026-08-27T09:34:03.063Z",
+        "valid_from": "2026-08-27T09:34:03.063Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243063,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.063+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-TIME-001 検証",
+        "en": "TEST-TIME-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "identifier-temporal-validation",
+      "implementation_status": "implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 規範時刻はRFC 3339 UTC文字列とepoch_msの両方で保存しなければならない。",
+        "en": "Verifies the following requirement(s): Normative time MUST be stored as both an RFC 3339 UTC string and epoch_ms."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-TIME-001"
+      ],
+      "source_refs": [
+        "SRC-RFC3339",
+        "SRC-RFC7493"
+      ],
+      "automation_artifacts": [
+        "scripts/validate_repo.py",
+        "src/typescript/test/evaluator.test.ts"
+      ]
+    },
+    {
+      "id": "TEST-VERIFY-001",
+      "identity": {
+        "uuid_v5": "88a7d267-da87-5fab-bce4-8629c0cbcd6b",
+        "uuid_v7": "01a04291-bf38-7dcb-927a-8d368b057bf5",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-verify-001",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.064Z",
+        "updated_at": "2026-08-27T09:34:03.064Z",
+        "observed_at": "2026-08-27T09:34:03.064Z",
+        "valid_from": "2026-08-27T09:34:03.064Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243064,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.064+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-VERIFY-001 検証",
+        "en": "TEST-VERIFY-001 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "evidence-verification-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 観測可能なwriteはread-backでpostconditionを確認すべきである。",
+        "en": "Verifies the following requirement(s): Observable writes SHOULD verify postconditions by read-back."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-TOOL-003"
+      ],
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-NOTIFICATIONS"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts",
+        "examples/notification-demo/app.js"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-322d-78ab-9e1b-be502ad59598",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "notification readback only"
+      }
+    },
+    {
+      "id": "TEST-VERIFY-002",
+      "identity": {
+        "uuid_v5": "5aa3dd27-4204-54ed-af73-f222610511e4",
+        "uuid_v7": "01a04291-bf39-7ca6-98b5-0962f5bde01c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-verify-002",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.065Z",
+        "updated_at": "2026-08-27T09:34:03.065Z",
+        "observed_at": "2026-08-27T09:34:03.065Z",
+        "valid_from": "2026-08-27T09:34:03.065Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243065,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.065+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-VERIFY-002 検証",
+        "en": "TEST-VERIFY-002 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "evidence-verification-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 外部副作用のcommitはtool自己申告だけでなく独立観測またはreceiptを必要とする。",
+        "en": "Verifies the following requirement(s): Committing an external side effect MUST require independent observation or a receipt, not only the tool self-report."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-VERIFY-001"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013",
+        "SRC-NOTIFICATIONS"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts",
+        "examples/notification-demo/service-worker.js"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-326b-724c-93a1-115b7f686bb1",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "notification receipt and service-worker readback"
+      }
+    },
+    {
+      "id": "TEST-VERIFY-003",
+      "identity": {
+        "uuid_v5": "88b0dc21-6483-59f0-9651-728cd198dd53",
+        "uuid_v7": "01a04291-bf3a-763f-a1ea-702fffb6de54",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "test-verify-003",
+        "category": "test"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:03.066Z",
+        "updated_at": "2026-08-27T09:34:03.066Z",
+        "observed_at": "2026-08-27T09:34:03.066Z",
+        "valid_from": "2026-08-27T09:34:03.066Z",
+        "valid_to": null,
+        "epoch_ms": 1787823243066,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:03.066+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TEST-VERIFY-003 検証",
+        "en": "TEST-VERIFY-003 verification"
+      },
+      "type": "VerificationTest",
+      "test_kind": "evidence-verification-test",
+      "implementation_status": "partially-implemented",
+      "automated": true,
+      "description": {
+        "ja": "次の要件を検証する: 記録されたclaimと独立に観測されたtruth estimateを区別しなければならない。",
+        "en": "Verifies the following requirement(s): The system MUST distinguish a recorded claim from an independently observed truth estimate."
+      },
+      "expected": {
+        "ja": "関連要件を満たし、禁止状態・不整合・検証差分を検出する。",
+        "en": "The linked requirements hold and prohibited states, inconsistencies, or conformance differences are detected."
+      },
+      "requirement_refs": [
+        "REQ-AUDIT-010"
+      ],
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "automation_artifacts": [
+        "src/typescript/notification/audit-log.ts",
+        "src/typescript/notification/engine.ts",
+        "src/typescript/test/notification.test.ts"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04874-32a4-7283-8fb0-aeb47fd98328",
+        "occurred_at": "2026-08-28T12:59:32.284Z",
+        "from": "specified",
+        "to": "partially-implemented",
+        "scope": "notification claim and observed presence separation"
+      }
+    }
+  ]
+}

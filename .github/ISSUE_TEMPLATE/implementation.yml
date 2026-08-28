@@ -1,0 +1,71 @@
+# information_uuid_v5=00608bfd-d80d-5eeb-aab2-dbc3b7fb77f1
+# event_uuid_v7=01a04875-b52a-7b52-9f9f-44d57b3c3b6a
+# machine-contract: DISCOVERED -> PROPOSED -> DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED.
+name: 実装作業
+description: 目的、依存関係、完了条件、検証証拠を一つの正本にします。
+title: "[実装] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Issueが作業の正本です。Projectには独自の作業内容を書かず、このIssueを表示します。
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的 / Purpose
+      description: 日本語を主文とし、短い英語要約を添えてください。
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 対象と対象外
+      description: 変更する責任境界と、今回実装しない範囲を明記してください。
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 依存関係
+      description: 先に検証済みにするIssueを記載してください。なければ「なし」。
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: 完了条件 / Completion criteria
+      description: 観測可能な判定条件と短い英語要約を記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 検証方法と証拠
+      description: コマンド、読み戻し対象、保存する証拠、結論不能条件を明記してください。
+    validations:
+      required: true
+  - type: input
+    id: stable_id
+    attributes:
+      label: 情報識別子（UUIDバージョン5）
+      placeholder: 00000000-0000-5000-8000-000000000000
+    validations:
+      required: true
+  - type: input
+    id: event_id
+    attributes:
+      label: 出来事識別子（UUIDバージョン7）
+      placeholder: 00000000-0000-7000-8000-000000000000
+    validations:
+      required: true
+  - type: dropdown
+    id: state
+    attributes:
+      label: 初期状態
+      options:
+        - DISCOVERED
+        - PROPOSED
+        - DRY_RUN
+        - USER_APPROVED
+    validations:
+      required: true

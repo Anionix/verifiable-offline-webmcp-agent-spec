@@ -1,0 +1,26 @@
+stateDiagram-v2
+  [*] --> PRE
+  PRE --> DENIED: hard gate or utility deny
+  PRE --> HUMAN_PENDING: human required
+  PRE --> AUTHORIZED: allowed
+  HUMAN_PENDING --> AUTHORIZED: exact intent approved
+  HUMAN_PENDING --> CANCELLED: rejected
+  AUTHORIZED --> QUEUED: offline and queueable
+  AUTHORIZED --> EXECUTING: guards revalidated
+  AUTHORIZED --> EXPIRED: mandate expired
+  QUEUED --> EXECUTING: online + revalidated
+  QUEUED --> EXPIRED: TTL expired
+  EXECUTING --> SUCCEEDED: known success
+  EXECUTING --> FAILED: known no effect/failure
+  EXECUTING --> AMBIGUOUS: unknown effect
+  AMBIGUOUS --> RECONCILING
+  RECONCILING --> SUCCEEDED: intended effect observed
+  RECONCILING --> FAILED: no effect proven
+  RECONCILING --> HUMAN_PENDING: inconclusive/budget exhausted
+  FAILED --> AUTHORIZED: safe retry + budget
+  SUCCEEDED --> VERIFYING
+  VERIFYING --> VERIFIED: postconditions + confidence
+  VERIFYING --> RECONCILING: more observation
+  VERIFYING --> ROLLBACK_PENDING: harmful effect
+  VERIFIED --> COMMITTED
+  ROLLBACK_PENDING --> ROLLED_BACK

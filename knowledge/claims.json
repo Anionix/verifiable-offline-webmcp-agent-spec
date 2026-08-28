@@ -1,0 +1,1072 @@
+{
+  "dataset": {
+    "id": "DS-CLAIMS",
+    "identity": {
+      "uuid_v5": "ffb0f8da-601a-5296-8a62-504c31ef82d2",
+      "uuid_v7": "01a04291-b483-7f14-b3b3-08ae503310ed",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-claims",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "主張",
+      "en": "Claims"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 27,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "CLM-001",
+      "identity": {
+        "uuid_v5": "d0b03d32-e877-55ac-9354-13478b34e576",
+        "uuid_v7": "01a04291-b357-7214-93c9-e3ae016d0285",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-draft-status",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCPは2026年8月26日付のCommunity Group Draftであり、W3C標準ではない。",
+        "en": "WebMCP is a Community Group Draft dated 26 August 2026 and is not a W3C Standard"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "WebMCPは2026年8月26日付のCommunity Group Draftであり、W3C標準ではない。",
+        "en": "WebMCP is a Community Group Draft dated 26 August 2026 and is not a W3C Standard."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-002",
+      "identity": {
+        "uuid_v5": "90dcd33c-4f6f-5019-9880-f5337d47d731",
+        "uuid_v7": "01a04291-b358-7185-a2ee-ba73f990ecaf",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-tool-interface",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCPはWebアプリが自然言語説明と構造化スキーマを持つJavaScriptツールをエージェントへ公開するAPIを定義する。",
+        "en": "WebMCP defines an API for web applications to expose JavaScript tools with natur"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "WebMCPはWebアプリが自然言語説明と構造化スキーマを持つJavaScriptツールをエージェントへ公開するAPIを定義する。",
+        "en": "WebMCP defines an API for web applications to expose JavaScript tools with natural-language descriptions and structured schemas to agents."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-003",
+      "identity": {
+        "uuid_v5": "05b4336b-815c-582d-96bb-4560e8fed34f",
+        "uuid_v7": "01a04291-b359-7fea-89bd-4d8283e33eb7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-annotations",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP草案はread-onlyおよびuntrusted-contentの注釈を定義している。",
+        "en": "The WebMCP draft defines read-only and untrusted-content annotations."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "WebMCP草案はread-onlyおよびuntrusted-contentの注釈を定義している。",
+        "en": "The WebMCP draft defines read-only and untrusted-content annotations."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-004",
+      "identity": {
+        "uuid_v5": "5faccddc-5d5d-509c-893b-2df685c03b47",
+        "uuid_v7": "01a04291-b35a-7a17-872e-5e45b8c2d2c9",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "responses-agent-primitive",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Responses APIは複数のツールとモデルターンを組み合わせるエージェント向けAPI primitiveとして提供された。",
+        "en": "The Responses API was introduced as an agent-oriented API primitive supporting m"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "Responses APIは複数のツールとモデルターンを組み合わせるエージェント向けAPI primitiveとして提供された。",
+        "en": "The Responses API was introduced as an agent-oriented API primitive supporting multiple tools and model turns."
+      },
+      "source_refs": [
+        "SRC-OPENAI-RESPONSES-2025"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-005",
+      "identity": {
+        "uuid_v5": "fb91aae7-318b-5724-ac5c-079df95d8469",
+        "uuid_v7": "01a04291-b35b-7d1b-b311-15fd9fe71bdf",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "responses-remote-mcp",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Responses APIはremote MCP serverをツールとして接続できる。",
+        "en": "The Responses API can connect to remote MCP servers as tools."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "Responses APIはremote MCP serverをツールとして接続できる。",
+        "en": "The Responses API can connect to remote MCP servers as tools."
+      },
+      "source_refs": [
+        "SRC-OPENAI-MCP-2025",
+        "SRC-MCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-006",
+      "identity": {
+        "uuid_v5": "c53d5d02-6ea2-5a1e-a90b-512079bc7e6d",
+        "uuid_v7": "01a04291-b35c-76d3-bd65-86a112edb93c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "model-proposes-runtime-executes",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "モデルが行動を提案し、実行環境がそれを実行して結果を返す分離は、公式のエージェント実行ループと整合する。",
+        "en": "The separation in which a model proposes actions and a runtime executes them is "
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "モデルが行動を提案し、実行環境がそれを実行して結果を返す分離は、公式のエージェント実行ループと整合する。",
+        "en": "The separation in which a model proposes actions and a runtime executes them is consistent with the official agent execution loop."
+      },
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-007",
+      "identity": {
+        "uuid_v5": "f62ca651-c1b4-5851-886d-3762519925c2",
+        "uuid_v7": "01a04291-b35d-706d-a293-ee7b7aff419e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "mcp-host-policy",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "MCPではhostがポリシー、同意、認可の境界を持つ設計が可能である。",
+        "en": "MCP permits the host to act as the boundary for policy, consent, and authorizati"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "MCPではhostがポリシー、同意、認可の境界を持つ設計が可能である。",
+        "en": "MCP permits the host to act as the boundary for policy, consent, and authorization."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-008",
+      "identity": {
+        "uuid_v5": "ef064dea-812c-5988-9120-cae641d34fa5",
+        "uuid_v7": "01a04291-b35e-71bc-90f0-14b26386cd47",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "jsonld-linked-data",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSON-LDはJSONをLinked Dataとして表現し、識別子とリンクを持つ機械可読グラフへ拡張する。",
+        "en": "JSON-LD extends JSON into a machine-readable linked graph with identifiers and l"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "JSON-LDはJSONをLinked Dataとして表現し、識別子とリンクを持つ機械可読グラフへ拡張する。",
+        "en": "JSON-LD extends JSON into a machine-readable linked graph with identifiers and links."
+      },
+      "source_refs": [
+        "SRC-JSONLD-2020"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-009",
+      "identity": {
+        "uuid_v5": "46efcdab-4270-5078-b416-8c04a5ffd3ad",
+        "uuid_v7": "01a04291-b35f-7eef-8729-21c8f38e213b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "prov-provenance",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "PROV-Oは異なるシステム間でprovenance情報を表現・交換する語彙を提供する。",
+        "en": "PROV-O provides vocabulary for representing and exchanging provenance across sys"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "PROV-Oは異なるシステム間でprovenance情報を表現・交換する語彙を提供する。",
+        "en": "PROV-O provides vocabulary for representing and exchanging provenance across systems."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-010",
+      "identity": {
+        "uuid_v5": "c3a68daa-2c09-53b5-9eff-7b16755a7fc1",
+        "uuid_v7": "01a04291-b360-7f0a-8518-8f21dac88822",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "dcat-catalog",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "DCAT 3はデータセット、配布物、version、checksumをカタログ化する標準語彙を提供する。",
+        "en": "DCAT 3 provides a standard vocabulary for cataloging datasets, distributions, ve"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "DCAT 3はデータセット、配布物、version、checksumをカタログ化する標準語彙を提供する。",
+        "en": "DCAT 3 provides a standard vocabulary for cataloging datasets, distributions, versions, and checksums."
+      },
+      "source_refs": [
+        "SRC-DCAT3-2024"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-011",
+      "identity": {
+        "uuid_v5": "4b3138c5-35c6-5377-b0dc-4ffe3a15f137",
+        "uuid_v7": "01a04291-b361-7e5f-8967-e1bff1c6e840",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "json-schema-structure",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSON SchemaはJSONデータの構造と制約を機械可読に記述する。",
+        "en": "JSON Schema describes JSON structure and constraints in machine-readable form."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "JSON SchemaはJSONデータの構造と制約を機械可読に記述する。",
+        "en": "JSON Schema describes JSON structure and constraints in machine-readable form."
+      },
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-012",
+      "identity": {
+        "uuid_v5": "50bb8e85-6b5a-552f-b552-3213f40fad12",
+        "uuid_v7": "01a04291-b362-76f5-a036-da5ceb6d890a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "jcs-hashable-json",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JCSはJSONを決定的に正規化し、暗号学的ハッシュへ入力できる表現を作る。",
+        "en": "JCS deterministically canonicalizes JSON into a representation suitable for cryp"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "JCSはJSONを決定的に正規化し、暗号学的ハッシュへ入力できる表現を作る。",
+        "en": "JCS deterministically canonicalizes JSON into a representation suitable for cryptographic hashing."
+      },
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-RFC8259",
+        "SRC-RFC7493"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-013",
+      "identity": {
+        "uuid_v5": "78e129c5-27f3-5b46-a1e0-605bcb6c634e",
+        "uuid_v7": "01a04291-b363-7f1e-a1f6-fef120b7269d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "uuidv5-stable",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "UUIDv5はnamespaceとnameから決定的な識別子を生成する。",
+        "en": "UUIDv5 creates a deterministic identifier from a namespace and name."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "UUIDv5はnamespaceとnameから決定的な識別子を生成する。",
+        "en": "UUIDv5 creates a deterministic identifier from a namespace and name."
+      },
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-014",
+      "identity": {
+        "uuid_v5": "8dd89cda-0c11-5eff-8c9e-715dadc67152",
+        "uuid_v7": "01a04291-b364-7482-b137-48ef8e5c781f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "uuidv7-time",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "UUIDv7はUnix epochのミリ秒を含む時間順序付きUUIDである。",
+        "en": "UUIDv7 is time ordered and contains Unix epoch milliseconds."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "UUIDv7はUnix epochのミリ秒を含む時間順序付きUUIDである。",
+        "en": "UUIDv7 is time ordered and contains Unix epoch milliseconds."
+      },
+      "source_refs": [
+        "SRC-RFC9562",
+        "SRC-RFC3339"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-015",
+      "identity": {
+        "uuid_v5": "e4076021-bed6-54a9-8372-74c029fc69c3",
+        "uuid_v7": "01a04291-b365-7729-a508-16343e7d18ac",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc3339-time",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 3339はインターネットプロトコル向けの日時表現を定義する。",
+        "en": "RFC 3339 defines a date-time format for Internet protocols."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "RFC 3339はインターネットプロトコル向けの日時表現を定義する。",
+        "en": "RFC 3339 defines a date-time format for Internet protocols."
+      },
+      "source_refs": [
+        "SRC-RFC3339"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-016",
+      "identity": {
+        "uuid_v5": "d6a754fc-7e43-5590-8e8b-a9bbe7c2505f",
+        "uuid_v7": "01a04291-b366-76f1-a602-a2f7fb40172c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ed25519-signature",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Ed25519はRFC 8032で定義されたEdDSA署名方式である。",
+        "en": "Ed25519 is an EdDSA signature scheme specified by RFC 8032."
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "Ed25519はRFC 8032で定義されたEdDSA署名方式である。",
+        "en": "Ed25519 is an EdDSA signature scheme specified by RFC 8032."
+      },
+      "source_refs": [
+        "SRC-RFC8032"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-017",
+      "identity": {
+        "uuid_v5": "60fbe95f-99ba-5ab5-8c84-2e33cbad438c",
+        "uuid_v7": "01a04291-b367-709e-92a8-e1757a89451e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "merkle-audit",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 9162はprefix分離されたMerkle leaf/internal nodeとinclusion/consistency proofを定義する。",
+        "en": "RFC 9162 defines domain-separated Merkle leaves/internal nodes plus inclusion an"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "RFC 9162はprefix分離されたMerkle leaf/internal nodeとinclusion/consistency proofを定義する。",
+        "en": "RFC 9162 defines domain-separated Merkle leaves/internal nodes plus inclusion and consistency proofs."
+      },
+      "source_refs": [
+        "SRC-RFC9162",
+        "SRC-FIPS180-4"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-018",
+      "identity": {
+        "uuid_v5": "ed1b9356-4ff9-59c9-a6ee-e64caa239794",
+        "uuid_v7": "01a04291-b368-7b0f-aae0-e3a0727abb8c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tla-state-spec",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TLA+仕様はInitとNextの時間論理式で状態遷移を記述し、不変条件を検査できる。",
+        "en": "A TLA+ specification describes state transitions with Init and Next temporal for"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "TLA+仕様はInitとNextの時間論理式で状態遷移を記述し、不変条件を検査できる。",
+        "en": "A TLA+ specification describes state transitions with Init and Next temporal formulas and can check invariants."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-019",
+      "identity": {
+        "uuid_v5": "67c4fc88-e10a-506b-90d5-3f992fb549a4",
+        "uuid_v7": "01a04291-b369-7a61-b67e-d89627358b08",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "pomdp-belief",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "部分観測環境ではbelief stateにより履歴を確率分布へ圧縮して意思決定できる。",
+        "en": "In a partially observable environment, a belief state can summarize history as a"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "部分観測環境ではbelief stateにより履歴を確率分布へ圧縮して意思決定できる。",
+        "en": "In a partially observable environment, a belief state can summarize history as a probability distribution for decision making."
+      },
+      "source_refs": [
+        "SRC-POMDP-1998"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-020",
+      "identity": {
+        "uuid_v5": "bb234fe1-9f3a-5ed4-a72c-ee9ba94cb475",
+        "uuid_v7": "01a04291-b36a-79ea-baf3-23a3808aa66b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-security",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP草案はtool poisoning、output injection、intent misrepresentation、privacy leakag",
+        "en": "The WebMCP draft treats tool poisoning, output injection, intent misrepresentati"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "WebMCP草案はtool poisoning、output injection、intent misrepresentation、privacy leakageを明示的なリスクとして扱う。",
+        "en": "The WebMCP draft treats tool poisoning, output injection, intent misrepresentation, and privacy leakage as explicit risks."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-021",
+      "identity": {
+        "uuid_v5": "ff47408a-75f4-579c-8be8-111fe9602ec5",
+        "uuid_v7": "01a04291-b36b-770b-afe3-24ee662b79a4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "cmdp-constraints",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "CMDPは期待報酬を最適化しつつ、複数の期待コスト制約を扱う形式化を提供する。",
+        "en": "CMDPs formalize optimization of expected reward subject to multiple expected-cos"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "CMDPは期待報酬を最適化しつつ、複数の期待コスト制約を扱う形式化を提供する。",
+        "en": "CMDPs formalize optimization of expected reward subject to multiple expected-cost constraints."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-022",
+      "identity": {
+        "uuid_v5": "28c42526-264f-5fcf-a087-66e192917180",
+        "uuid_v7": "01a04291-b36c-73fa-bb45-6ca946e225e5",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "crdt-convergence",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "CRDTは交換・結合・冪等なmerge等により分散複製状態の収束を設計できる。",
+        "en": "CRDTs support convergence of replicated state through merge properties such as c"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "CRDTは交換・結合・冪等なmerge等により分散複製状態の収束を設計できる。",
+        "en": "CRDTs support convergence of replicated state through merge properties such as commutativity, associativity, and idempotence."
+      },
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-023",
+      "identity": {
+        "uuid_v5": "57b92147-55f7-508c-9d15-f38d929a6669",
+        "uuid_v7": "01a04291-b36d-791a-a168-1ad51529f31d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "little-law",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "安定した待ち行列では平均個数L、到着率λ、平均滞在時間Wの関係L=λWを利用できる。",
+        "en": "For a stable queue, the relation L = λW connects average population, arrival rat"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "安定した待ち行列では平均個数L、到着率λ、平均滞在時間Wの関係L=λWを利用できる。",
+        "en": "For a stable queue, the relation L = λW connects average population, arrival rate, and average time in system."
+      },
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-024",
+      "identity": {
+        "uuid_v5": "39b809e0-6ccd-5950-87a7-488df053c884",
+        "uuid_v7": "01a04291-b36e-7f8b-9f0c-8cdae20e4ad4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "reject-option",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "誤判定コストが高い場合、reject/abstainを意思決定の正式な選択肢として扱える。",
+        "en": "When error cost is high, reject or abstain can be treated as a formal decision o"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "誤判定コストが高い場合、reject/abstainを意思決定の正式な選択肢として扱える。",
+        "en": "When error cost is high, reject or abstain can be treated as a formal decision option."
+      },
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "evidence_relation": "direct",
+      "confidence": "high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-025",
+      "identity": {
+        "uuid_v5": "eeadcae2-16e9-528e-ac03-54068fb27d8c",
+        "uuid_v7": "01a04291-b36f-719e-b3fb-2cb39a4edc42",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "architecture-inference",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "本設計ではLLMを候補計画生成器、Tool Contract Engineを決定権者、WebMCPを実行界面、Evidence Engineを真偽推定器として分",
+        "en": "This design separates the LLM as candidate-plan generator, the Tool Contract Eng"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "本設計ではLLMを候補計画生成器、Tool Contract Engineを決定権者、WebMCPを実行界面、Evidence Engineを真偽推定器として分離する。",
+        "en": "This design separates the LLM as candidate-plan generator, the Tool Contract Engine as decision authority, WebMCP as execution interface, and the Evidence Engine as truth estimator."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-OPENAI-RUNTIME-2026",
+        "SRC-TLA-LAMPORT"
+      ],
+      "evidence_relation": "design-inference",
+      "confidence": "medium-high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-026",
+      "identity": {
+        "uuid_v5": "b2da523e-bb33-5ec8-a549-a4503c8c976e",
+        "uuid_v7": "01a04291-b370-7dfe-ba05-6b3767b38c8c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ambiguous-reconcile",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "timeoutやUNKNOWNをfailureと同一視せず、mutation retry前に現実状態を再観測する。",
+        "en": "A timeout or UNKNOWN outcome is not treated as failure; the real state is re-obs"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "timeoutやUNKNOWNをfailureと同一視せず、mutation retry前に現実状態を再観測する。",
+        "en": "A timeout or UNKNOWN outcome is not treated as failure; the real state is re-observed before any mutating retry."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT",
+        "SRC-RFC9162"
+      ],
+      "evidence_relation": "design-inference",
+      "confidence": "medium-high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    },
+    {
+      "id": "CLM-027",
+      "identity": {
+        "uuid_v5": "d5659f3c-76db-5240-92c4-1973e7fa90a2",
+        "uuid_v7": "01a04291-b371-7d9c-b8da-a8a0d75e6178",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "event-log-limits",
+        "category": "claim"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "暗号学的ログは記録の整合性とprovenanceを証明するが、記録された主張そのものの物理的真実性は独立証拠なしには証明しない。",
+        "en": "A cryptographic log proves record integrity and provenance, but not the physical"
+      },
+      "type": "Claim",
+      "statement": {
+        "ja": "暗号学的ログは記録の整合性とprovenanceを証明するが、記録された主張そのものの物理的真実性は独立証拠なしには証明しない。",
+        "en": "A cryptographic log proves record integrity and provenance, but not the physical truth of the recorded claim without independent evidence."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013",
+        "SRC-RFC8785",
+        "SRC-RFC9162"
+      ],
+      "evidence_relation": "design-inference",
+      "confidence": "medium-high",
+      "falsifiability": "Re-evaluate when a cited specification is revised or the design assumptions change."
+    }
+  ]
+}

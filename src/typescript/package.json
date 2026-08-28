@@ -1,0 +1,20 @@
+{
+  "name": "@open-knowledge/verifiable-tool-policy-reference",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "check": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "demo:notification": "node --experimental-strip-types notification/demo-server.ts",
+    "benchmark:notification": "node --experimental-strip-types notification/benchmark.ts"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

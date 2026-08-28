@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this design specification, cite this repository and its pinned primary sources."
+title: "Verifiable Offline WebMCP Agent Architecture"
+type: software
+version: "0.1.0"
+date-released: 2026-08-27
+license: Apache-2.0
+abstract: >-
+  Bilingual, machine-readable architecture specification for an offline-first,
+  verifiable agent using WebMCP as the action substrate and an optional online planner.
+keywords:
+  - WebMCP
+  - offline-first
+  - agent architecture
+  - formal methods
+  - audit log
+  - UUIDv7
+  - TLA+

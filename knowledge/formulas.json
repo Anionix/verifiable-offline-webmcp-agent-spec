@@ -1,0 +1,2097 @@
+{
+  "dataset": {
+    "id": "DS-FORMULAS",
+    "identity": {
+      "uuid_v5": "082748dc-37c9-5314-b2e6-514008834022",
+      "uuid_v7": "01a04291-b484-7b15-b83a-8a640b7d5272",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-formulas",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "数式",
+      "en": "Formulas"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 55,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "F-001",
+      "identity": {
+        "uuid_v5": "7487b78b-95d4-58f8-a593-db5e1b5c8d60",
+        "uuid_v7": "01a04291-b372-773f-8f34-85ca343d6aa1",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "system-composition",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "システム構成",
+        "en": "System composition"
+      },
+      "type": "Formula",
+      "latex": "\\mathrm{System}=\\mathrm{StateEstimation}+\\mathrm{ToolObservation}+\\mathrm{ConstrainedPlanning}+\\mathrm{WebMCPExecution}+\\mathrm{Verification}+\\mathrm{OfflineQueue}+\\mathrm{Synchronization}",
+      "kind": "definition",
+      "source_refs": [
+        "SRC-POMDP-1998",
+        "SRC-CMDP-1999",
+        "SRC-WEBMCP-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-002",
+      "identity": {
+        "uuid_v5": "c757ab22-c64c-5b28-9d54-0e22bb664cdb",
+        "uuid_v7": "01a04291-b373-783c-869b-2fd646fdcbca",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "constrained-pomdp",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "制約付きPOMDP",
+        "en": "Constrained POMDP"
+      },
+      "type": "Formula",
+      "latex": "\\mathcal{M}=\\langle S,O,B,A,T,Z,R,C,\\gamma\\rangle",
+      "kind": "model",
+      "source_refs": [
+        "SRC-POMDP-1998",
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-003",
+      "identity": {
+        "uuid_v5": "9c76ab05-e211-5857-9758-8cc205a0bcf5",
+        "uuid_v7": "01a04291-b374-7568-b56e-dcacd2b25916",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "state-vector",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "状態ベクトル",
+        "en": "State vector"
+      },
+      "type": "Formula",
+      "latex": "x_t=(g_t,w_t,d_t,n_t,b_t,q_t,r_t,p_t,h_t,\\mathcal{T}_t,v_t)",
+      "kind": "definition",
+      "source_refs": [
+        "SRC-POMDP-1998"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-004",
+      "identity": {
+        "uuid_v5": "cf571be3-c5f9-52c3-a875-15b2d57ddcf8",
+        "uuid_v7": "01a04291-b375-7c56-b746-1e0579be49cb",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "progress",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "重み付き進捗",
+        "en": "Weighted progress"
+      },
+      "type": "Formula",
+      "latex": "\\mathrm{Progress}_t=\\frac{\\sum_k w_k g_{k,t}}{\\sum_k w_k}",
+      "kind": "derived",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-005",
+      "identity": {
+        "uuid_v5": "f612249c-4436-548d-949b-a8e02aacdfb9",
+        "uuid_v7": "01a04291-b376-71a0-bc78-b4accb3b09c7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tool-feasibility",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "ツール実行可能性",
+        "en": "Tool feasibility"
+      },
+      "type": "Formula",
+      "latex": "\\mathrm{Feasible}_j= A_jS_jO_jP_jN_jD_jV_j",
+      "kind": "policy",
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-MCP-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-006",
+      "identity": {
+        "uuid_v5": "684e89b7-a1b1-5405-afc2-322cd5090fee",
+        "uuid_v7": "01a04291-b377-767e-9831-10a1495f3fa6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "feasible-action-set",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "実行可能行動集合",
+        "en": "Feasible action set"
+      },
+      "type": "Formula",
+      "latex": "A_t^+=\\{a_j\\mid \\mathrm{Feasible}_j(t)=1\\}",
+      "kind": "definition",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-007",
+      "identity": {
+        "uuid_v5": "be6e8ec5-7162-50c3-965b-9323908bf5d7",
+        "uuid_v7": "01a04291-b378-75d6-bcdb-3974a002d738",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-response-projection",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCPからplannerへの射影",
+        "en": "Projection from WebMCP to planner"
+      },
+      "type": "Formula",
+      "latex": "\\Phi(\\tau_j)=(name_j,description_j,schema_j)",
+      "kind": "design",
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-OPENAI-RESPONSES-2025"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-008",
+      "identity": {
+        "uuid_v5": "9d37ea09-a0e6-5f43-bd43-cc95bee8606e",
+        "uuid_v7": "01a04291-b379-7019-9e05-9ebbb54b2386",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "planner-utility",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "planner効用",
+        "en": "Planner utility"
+      },
+      "type": "Formula",
+      "latex": "U_m=w_QQ_m-w_LL_m-w_CC_m-w_EE_m-w_RR_m-w_PP_m",
+      "kind": "utility",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-009",
+      "identity": {
+        "uuid_v5": "8283f144-6afd-5113-b67f-480df98bbc85",
+        "uuid_v7": "01a04291-b37a-7e3b-a096-680501efac4e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "planner-selection",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "planner選択",
+        "en": "Planner selection"
+      },
+      "type": "Formula",
+      "latex": "m^*=\\arg\\max_{m\\in\\mathcal{P}_t^+} U_m",
+      "kind": "optimization",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-010",
+      "identity": {
+        "uuid_v5": "a3777015-fad5-52e7-8c0b-1456a2b05fed",
+        "uuid_v7": "01a04291-b37b-780a-a854-7c768debe5b0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "remote-break-even",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "remote planner損益分岐",
+        "en": "Remote planner break-even"
+      },
+      "type": "Formula",
+      "latex": "Q_R>Q_L+\\frac{w_L(L_R-L_L)+w_C(C_R-C_L)+w_E(E_R-E_L)+w_R(R_R-R_L)+w_P(P_R-P_L)}{w_Q}",
+      "kind": "derived",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-011",
+      "identity": {
+        "uuid_v5": "88985b94-0f93-5be4-9629-a798b1f5d13e",
+        "uuid_v7": "01a04291-b37c-76cc-83df-a50371112abe",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "offline-hard-gate",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "オフラインhard gate",
+        "en": "Offline hard gate"
+      },
+      "type": "Formula",
+      "latex": "online=0\\Rightarrow \\mathrm{Feasible}_{Responses}=0",
+      "kind": "invariant",
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-012",
+      "identity": {
+        "uuid_v5": "e043ac95-90fb-5201-8f06-dd764a921557",
+        "uuid_v7": "01a04291-b37d-7f5f-a42a-4917f8dc8b80",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "remote-latency",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "remote遅延",
+        "en": "Remote latency"
+      },
+      "type": "Formula",
+      "latex": "L_R=RTT+\\frac{B_\\uparrow}{BW_\\uparrow}+L_{API}+L_{planning}+L_{tool}+\\frac{B_\\downarrow}{BW_\\downarrow}",
+      "kind": "cost-model",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-013",
+      "identity": {
+        "uuid_v5": "c968907e-8f44-5583-bf15-90fe00c4780d",
+        "uuid_v7": "01a04291-b37e-7e64-a77c-672fc27b4776",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "api-cost",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "APIコスト",
+        "en": "API cost"
+      },
+      "type": "Formula",
+      "latex": "Cost_R=N_{in}p_{in}+N_{out}p_{out}+\\sum_j c_j^{tool}",
+      "kind": "cost-model",
+      "source_refs": [
+        "SRC-OPENAI-RESPONSES-2025"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-014",
+      "identity": {
+        "uuid_v5": "025d13aa-fef6-5558-b4b2-22732d28efae",
+        "uuid_v7": "01a04291-b37f-7c2c-88fb-43730e89b16c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tool-reliability-beta",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Beta事後平均",
+        "en": "Beta posterior mean"
+      },
+      "type": "Formula",
+      "latex": "\\widehat r_j=\\frac{\\alpha_0+s_j}{\\alpha_0+\\beta_0+s_j+f_j}",
+      "kind": "statistical",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-015",
+      "identity": {
+        "uuid_v5": "dda88f08-a6be-54a7-b6ec-59b6f89103bf",
+        "uuid_v7": "01a04291-b380-7f14-9dfe-12bb2441745f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "freshness",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "鮮度減衰",
+        "en": "Freshness decay"
+      },
+      "type": "Formula",
+      "latex": "Freshness_i(t)=e^{-\\lambda_i(t-t_i)},\\quad \\lambda_i=\\frac{\\ln 2}{h_i}",
+      "kind": "statistical",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-016",
+      "identity": {
+        "uuid_v5": "47e68ca2-7016-5e34-8b34-d44cfe8c23a0",
+        "uuid_v7": "01a04291-b381-7f20-9fa0-6517d2a6ec7a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "belief-update",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "belief更新",
+        "en": "Belief update"
+      },
+      "type": "Formula",
+      "latex": "b_{t+1}(s\\prime)=\\eta Z(o_{t+1}\\mid s\\prime,a_t)\\sum_s T(s\\prime\\mid s,a_t)b_t(s)",
+      "kind": "probability",
+      "source_refs": [
+        "SRC-POMDP-1998"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-017",
+      "identity": {
+        "uuid_v5": "1c8c60f0-2661-5df0-8c50-1e97fb290f37",
+        "uuid_v7": "01a04291-b382-7b9c-a644-4ef6f0e3ebeb",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "expected-harm",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "期待損失",
+        "en": "Expected harm"
+      },
+      "type": "Formula",
+      "latex": "H(a)=\\sum_k p_k(a)s_k(a)",
+      "kind": "risk",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-018",
+      "identity": {
+        "uuid_v5": "ccc28003-0a1f-51cf-8992-1363ec62ba62",
+        "uuid_v7": "01a04291-b383-7897-ad31-377ed0d5989a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "privacy-cost",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "privacyコスト",
+        "en": "Privacy cost"
+      },
+      "type": "Formula",
+      "latex": "PrivacyCost(a)=\\sum_i sensitivity_i\\,x_i",
+      "kind": "risk",
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-019",
+      "identity": {
+        "uuid_v5": "c4a3dd3a-9023-519f-af90-362fea9059af",
+        "uuid_v7": "01a04291-b384-74fc-8c52-710582b757e1",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "dag-ready",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "DAG準備条件",
+        "en": "DAG readiness"
+      },
+      "type": "Formula",
+      "latex": "Ready(v_i)=\\mathbf{1}[\\forall v_j\\in Pred(v_i):status(v_j)=done]\\cdot Precondition(v_i)",
+      "kind": "planning",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-020",
+      "identity": {
+        "uuid_v5": "adc5a4fa-892e-50ba-bb39-0d064b9cbfb1",
+        "uuid_v7": "01a04291-b385-771a-9037-d49dd5852573",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "parallel-independence",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "並列独立条件",
+        "en": "Parallel independence"
+      },
+      "type": "Formula",
+      "latex": "W_i\\cap W_j=\\varnothing\\land W_i\\cap R_j=\\varnothing\\land W_j\\cap R_i=\\varnothing",
+      "kind": "concurrency",
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-021",
+      "identity": {
+        "uuid_v5": "46d2a899-8ce8-547b-9012-eeb54c6b55da",
+        "uuid_v7": "01a04291-b386-73b4-a77f-b1378806e0d5",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "queue-replay",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "queue replay条件",
+        "en": "Queue replay condition"
+      },
+      "type": "Formula",
+      "latex": "Replay_i=Online\\cdot NotExpired_i\\cdot Preconditions_i\\cdot VersionCompatible_i\\cdot ConsentValid_i",
+      "kind": "policy",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-022",
+      "identity": {
+        "uuid_v5": "fcf20725-c3c9-5b0d-9e33-33222104b1f2",
+        "uuid_v7": "01a04291-b387-769e-ba10-dae590d69486",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "little-law",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Littleの法則",
+        "en": "Little's Law"
+      },
+      "type": "Formula",
+      "latex": "L=\\lambda W",
+      "kind": "queueing",
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-023",
+      "identity": {
+        "uuid_v5": "5e2d8a37-7893-5bc0-b563-019223dc68c5",
+        "uuid_v7": "01a04291-b388-748f-a2d9-8ae1eef9349d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "crdt-merge",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "CRDT merge",
+        "en": "CRDT merge"
+      },
+      "type": "Formula",
+      "latex": "S_{merged}=S_{local}\\sqcup S_{remote},\\quad a\\sqcup b=b\\sqcup a,\\;(a\\sqcup b)\\sqcup c=a\\sqcup(b\\sqcup c),\\;a\\sqcup a=a",
+      "kind": "distributed",
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-024",
+      "identity": {
+        "uuid_v5": "d4e18488-7c1c-5a7b-b8ec-8c883d489ad5",
+        "uuid_v7": "01a04291-b389-7af7-bbd3-a5f13a3f03a1",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "verification",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "実行後検証",
+        "en": "Post-execution verification"
+      },
+      "type": "Formula",
+      "latex": "V=SchemaValid\\cdot PostCondition\\cdot EffectObserved\\cdot ForbiddenEffectAbsent",
+      "kind": "policy",
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-025",
+      "identity": {
+        "uuid_v5": "709a3f7a-1ea7-5d32-bbf2-8ae812d2268d",
+        "uuid_v7": "01a04291-b38a-7102-a3c8-d993a5fd9191",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "evi",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "情報価値",
+        "en": "Expected value of information"
+      },
+      "type": "Formula",
+      "latex": "EVI(a)=\\mathbb{E}[V(b_{t+1})\\mid a]-V(b_t)-Cost(a)",
+      "kind": "decision",
+      "source_refs": [
+        "SRC-POMDP-1998"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-026",
+      "identity": {
+        "uuid_v5": "7f901f2c-a7fd-57de-99ef-e8019046dbf8",
+        "uuid_v7": "01a04291-b38b-7da5-a824-790a4c8ed742",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "abstention",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "棄却条件",
+        "en": "Abstention condition"
+      },
+      "type": "Formula",
+      "latex": "\\max_{a\\in A_t^+}U(a)\\le U_\\bot\\Rightarrow ABSTAIN",
+      "kind": "decision",
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-027",
+      "identity": {
+        "uuid_v5": "ace1d5ea-a8d0-5027-9c32-9b8422888d07",
+        "uuid_v7": "01a04291-b38c-752b-830e-40a1614b0368",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "done",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "完了条件",
+        "en": "Completion condition"
+      },
+      "type": "Formula",
+      "latex": "DONE=GoalSatisfied\\land Verified\\land Confidence\\ge\\theta_C\\land Risk\\le\\theta_R\\land RequiredQueue=\\varnothing",
+      "kind": "invariant",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-028",
+      "identity": {
+        "uuid_v5": "406704b3-9c4c-5a17-b531-cedfd10723f8",
+        "uuid_v7": "01a04291-b38d-7998-ae7e-3625c0009220",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "global-objective",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "全体目的関数",
+        "en": "Global objective"
+      },
+      "type": "Formula",
+      "latex": "\\max_\\pi\\mathbb{E}_\\pi\\left[\\sum_{t=0}^T\\gamma^t(R_t-\\lambda_LL_t-\\lambda_CC_t-\\lambda_EE_t-\\lambda_RH_t-\\lambda_PP_t)\\right]",
+      "kind": "optimization",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-101",
+      "identity": {
+        "uuid_v5": "d54eb8d1-5300-561c-a675-d7bed3b39769",
+        "uuid_v7": "01a04291-b38e-785b-9798-0a6354615ec4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tool-contract-tuple",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Tool Contract 7項組",
+        "en": "Seven-part Tool Contract"
+      },
+      "type": "Formula",
+      "latex": "\\tau_j=\\langle I_j,P_j,T_j,Q_j,C_j,R_j,E_j\\rangle",
+      "kind": "definition",
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12",
+        "SRC-WEBMCP-2026"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-102",
+      "identity": {
+        "uuid_v5": "ed59f45c-414c-582a-a014-8dd145ee4799",
+        "uuid_v7": "01a04291-b38f-7e9f-a1c0-c15bb69693f0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "predicted-success",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "予測成功確率",
+        "en": "Predicted success probability"
+      },
+      "type": "Formula",
+      "latex": "\\pi_j=q^{pre}_j r_j q^{env}_j",
+      "kind": "statistical",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-103",
+      "identity": {
+        "uuid_v5": "17bc13b0-4730-58c2-b049-3e971c2347ac",
+        "uuid_v7": "01a04291-b390-7d5c-816f-86277899d72b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "expected-utility-tool",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "tool expected utility",
+        "en": "Tool expected utility"
+      },
+      "type": "Formula",
+      "latex": "EU_j=\\pi_jG_j-(1-\\pi_j)L_j^F-\\kappa_j-\\lambda_HH_j",
+      "kind": "utility",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-104",
+      "identity": {
+        "uuid_v5": "63678539-d1d3-5418-9c52-1035f115418b",
+        "uuid_v7": "01a04291-b391-73cb-85fc-addee868c792",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "call-threshold",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "呼出最低成功確率",
+        "en": "Minimum call success probability"
+      },
+      "type": "Formula",
+      "latex": "\\pi_j>\\frac{K_j+L_j^F+U_\\bot}{G_j+L_j^F}",
+      "kind": "derived",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "verified",
+        "report": "../formal/wolfram/verification-report.json"
+      }
+    },
+    {
+      "id": "F-105",
+      "identity": {
+        "uuid_v5": "25c5e414-3051-54dc-b3fd-441adfa46331",
+        "uuid_v7": "01a04291-b392-7a7c-bd1d-06a60a4d5eab",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "likelihood-ratio",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "証拠尤度比",
+        "en": "Evidence likelihood ratio"
+      },
+      "type": "Formula",
+      "latex": "LR_i=\\frac{P(e_i\\mid Success)}{P(e_i\\mid Failure)}",
+      "kind": "statistical",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-106",
+      "identity": {
+        "uuid_v5": "f435f3ba-b8a8-5849-8fdf-cfff7db96657",
+        "uuid_v7": "01a04291-b393-77e2-826c-50f41cc0d0e6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "posterior-confidence",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "事後confidence",
+        "en": "Posterior confidence"
+      },
+      "type": "Formula",
+      "latex": "Confidence_{post}=\\frac{O_0\\prod_i LR_i}{1+O_0\\prod_i LR_i}",
+      "kind": "statistical",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-107",
+      "identity": {
+        "uuid_v5": "d72b94d7-6195-5962-ba70-da7e61c1807a",
+        "uuid_v7": "01a04291-b394-7448-a99f-c95ec9deba0e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "commit-threshold",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "commit閾値",
+        "en": "Commit threshold"
+      },
+      "type": "Formula",
+      "latex": "c_j\\ge\\max\\left(\\theta_j^{class},1-\\frac{B_j}{D_j}\\right)",
+      "kind": "derived",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "verified",
+        "report": "../formal/wolfram/verification-report.json"
+      }
+    },
+    {
+      "id": "F-108",
+      "identity": {
+        "uuid_v5": "684d956d-5f26-5e8a-aa39-cab7ac8c3917",
+        "uuid_v7": "01a04291-b395-76ab-a322-5d195a2ffd4f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "plan-success",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "plan成功確率",
+        "en": "Plan success probability"
+      },
+      "type": "Formula",
+      "latex": "P(success_\\Pi)=\\prod_{j=1}^n\\pi_j,\\quad \\log P(success_\\Pi)=\\sum_j\\log\\pi_j",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-109",
+      "identity": {
+        "uuid_v5": "c228e4da-b40c-55ee-9dfe-d927f782f3aa",
+        "uuid_v7": "01a04291-b396-75ec-8853-ccb197be63e2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "plan-optimization",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "plan最適化",
+        "en": "Plan optimization"
+      },
+      "type": "Formula",
+      "latex": "\\max_{x_j\\in\\{0,1\\}}\\sum_jx_jEU_j\\;\\text{s.t. constraints}",
+      "kind": "optimization",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-201",
+      "identity": {
+        "uuid_v5": "e39d2a1e-6689-566b-aef7-104c09a91b20",
+        "uuid_v7": "01a04291-b397-74e9-8573-d68e1c2aec0b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "canonical-ir-decision-set",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Canonical IR判定集合",
+        "en": "Canonical IR decision set"
+      },
+      "type": "Formula",
+      "latex": "D=\\{ALLOW,DENY,HUMAN,RECONCILE\\}",
+      "kind": "definition",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-202",
+      "identity": {
+        "uuid_v5": "b172ac95-c8be-5825-9886-59cd2b8f99eb",
+        "uuid_v7": "01a04291-b398-778c-b76d-3258729baf94",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "integer-pre-decision",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "整数pre判定",
+        "en": "Integer pre-decision"
+      },
+      "type": "Formula",
+      "latex": "p_{ppm}(G+L)>10^6(K+L+U_0)",
+      "kind": "implementation",
+      "source_refs": [
+        "SRC-RFC7493"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-203",
+      "identity": {
+        "uuid_v5": "85d2b658-e53f-5e01-bcbb-cb92a838fc0d",
+        "uuid_v7": "01a04291-b399-78c8-8650-a9a3311ad130",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "integer-post-decision",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "整数post判定",
+        "en": "Integer post-decision"
+      },
+      "type": "Formula",
+      "latex": "(10^6-c_{ppm})D\\le 10^6B",
+      "kind": "implementation",
+      "source_refs": [
+        "SRC-RFC7493"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-301",
+      "identity": {
+        "uuid_v5": "925bc3fd-3644-54c6-a1b4-754b09c5d910",
+        "uuid_v7": "01a04291-b39a-7467-ba2f-835b14b7a794",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "efsm",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "実行EFSM",
+        "en": "Execution EFSM"
+      },
+      "type": "Formula",
+      "latex": "\\mathcal{M}_E=\\langle Q,\\Sigma,X,G,A,\\delta,q_0,F\\rangle",
+      "kind": "formal",
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-302",
+      "identity": {
+        "uuid_v5": "ef3128ab-c950-53d2-960f-26b24a62b54c",
+        "uuid_v7": "01a04291-b39b-7ff7-a651-ef5673495b97",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ranking-function",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "終了ranking function",
+        "en": "Termination ranking function"
+      },
+      "type": "Formula",
+      "latex": "\\rho_t=retryLeft_t+verifyLeft_t+reconcileLeft_t,\\quad \\rho_{t+1}<\\rho_t",
+      "kind": "liveness",
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-401",
+      "identity": {
+        "uuid_v5": "b49d10b9-5a78-51fc-810a-72d9ea287d2e",
+        "uuid_v7": "01a04291-b39c-7516-a47f-ba9821bfd024",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tla-spec",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TLA+仕様",
+        "en": "TLA+ specification"
+      },
+      "type": "Formula",
+      "latex": "Spec=Init\\land\\Box[Next]_{vars}",
+      "kind": "formal",
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-402",
+      "identity": {
+        "uuid_v5": "d751ac81-42b8-5faf-b08b-96d79ec831bb",
+        "uuid_v7": "01a04291-b39d-7e2a-8c94-67e7b2a66688",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "at-most-once",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "at-most-once",
+        "en": "At-most-once effect"
+      },
+      "type": "Formula",
+      "latex": "\\sum_a Effect(intentID,a)\\le 1",
+      "kind": "safety",
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-501",
+      "identity": {
+        "uuid_v5": "708b3fb4-9379-596c-b127-b4dd11b11787",
+        "uuid_v7": "01a04291-b39e-7e2a-aaa9-c5799f693c96",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "event-digest",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "event digest",
+        "en": "Event digest"
+      },
+      "type": "Formula",
+      "latex": "d_i=H(0x00\\parallel C(E_i^{core}))",
+      "kind": "cryptographic",
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-FIPS180-4"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-502",
+      "identity": {
+        "uuid_v5": "7ab18bee-5133-5cab-87f0-27b924d6e3e2",
+        "uuid_v7": "01a04291-b39f-7754-927c-4e57ebbf36a7",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "hash-chain",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "hash chain",
+        "en": "Hash chain"
+      },
+      "type": "Formula",
+      "latex": "h_i=H(0x01\\parallel h_{i-1}\\parallel d_i\\parallel Encode(i))",
+      "kind": "cryptographic",
+      "source_refs": [
+        "SRC-FIPS180-4"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-503",
+      "identity": {
+        "uuid_v5": "a0cd6402-bde7-5c07-8abe-e5fc1453ac20",
+        "uuid_v7": "01a04291-b3a0-7184-8d44-cb7ff122ab09",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "signature",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "event署名",
+        "en": "Event signature"
+      },
+      "type": "Formula",
+      "latex": "\\sigma_i=Sign_{sk}(Domain\\parallel logID\\parallel deviceID\\parallel sequence_i\\parallel h_i)",
+      "kind": "cryptographic",
+      "source_refs": [
+        "SRC-RFC8032"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-504",
+      "identity": {
+        "uuid_v5": "7e5c3c11-c3c8-55cc-b917-9c8fc43e5f31",
+        "uuid_v7": "01a04291-b3a1-76ab-b5d3-fded21710214",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "merkle",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Merkle tree",
+        "en": "Merkle tree"
+      },
+      "type": "Formula",
+      "latex": "Leaf_i=H(0x00\\parallel d_i),\\quad Node=H(0x01\\parallel Left\\parallel Right)",
+      "kind": "cryptographic",
+      "source_refs": [
+        "SRC-RFC9162"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-601",
+      "identity": {
+        "uuid_v5": "845f6b87-47ee-5e49-9105-7271b12c2c3a",
+        "uuid_v7": "01a04291-b3a2-75e3-8860-16432c688fed",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "outcome-partition",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "結果確率分割",
+        "en": "Outcome probability partition"
+      },
+      "type": "Formula",
+      "latex": "q_T+q_B+q_R+q_H=1",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-602",
+      "identity": {
+        "uuid_v5": "17f9794a-6aec-5989-b317-6d50fd8f11fe",
+        "uuid_v7": "01a04291-b3a3-7ef4-bc6d-eb192a1aefcc",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "retry-geometric",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "有限retry幾何級数",
+        "en": "Finite retry geometric series"
+      },
+      "type": "Formula",
+      "latex": "G_R=\\sum_{k=0}^Rq_R^k=\\frac{1-q_R^{R+1}}{1-q_R}",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "verified",
+        "report": "../formal/wolfram/verification-report.json"
+      }
+    },
+    {
+      "id": "F-603",
+      "identity": {
+        "uuid_v5": "e15536c9-7e19-5023-bb43-df58da80d2c5",
+        "uuid_v7": "01a04291-b3a4-7f08-8ca2-9e24d2ff8422",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "good-commit",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "正commit確率",
+        "en": "Good commit probability"
+      },
+      "type": "Formula",
+      "latex": "P_{good}=q_T[1-\\beta(\\theta,V)]G_R",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-604",
+      "identity": {
+        "uuid_v5": "cb2d0862-38e0-53b0-ab04-5f649fd7486d",
+        "uuid_v7": "01a04291-b3a5-7c28-a30d-abdd54b6944e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "bad-commit",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "誤commit確率",
+        "en": "Bad commit probability"
+      },
+      "type": "Formula",
+      "latex": "P_{bad}=q_B\\alpha(\\theta,V)G_R",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    },
+    {
+      "id": "F-605",
+      "identity": {
+        "uuid_v5": "6b1bd420-6f96-52c4-abea-9a4ab3227658",
+        "uuid_v7": "01a04291-b3a6-7004-8ce0-2fa7930dd04c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "human-probability",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "人間退避確率",
+        "en": "Human/non-commit probability"
+      },
+      "type": "Formula",
+      "latex": "P_H=[q_H+q_T\\beta+q_B(1-\\alpha)]G_R+q_R^{R+1}",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "verified",
+        "report": "../formal/wolfram/verification-report.json"
+      }
+    },
+    {
+      "id": "F-606",
+      "identity": {
+        "uuid_v5": "50c98ea5-670f-5394-af5e-98599eb24a5e",
+        "uuid_v7": "01a04291-b3a7-795c-8c28-38915ef9744f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "duplicate-probability",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "重複効果確率",
+        "en": "Duplicate-effect probability"
+      },
+      "type": "Formula",
+      "latex": "P_{dup}=\\frac{\\eta q_R[1-(q_R(1-\\eta))^R]}{1-q_R(1-\\eta)}",
+      "kind": "probability",
+      "source_refs": [],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "verified",
+        "report": "../formal/wolfram/verification-report.json"
+      }
+    },
+    {
+      "id": "F-607",
+      "identity": {
+        "uuid_v5": "1a356746-dc65-517f-8fb6-e794f84ff4c5",
+        "uuid_v7": "01a04291-b3a8-7f32-a429-f813b8f3445f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "slo-optimization",
+        "category": "formula"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "SLO最適化",
+        "en": "SLO optimization"
+      },
+      "type": "Formula",
+      "latex": "\\min_{\\theta,R,V,z}J\\quad\\text{s.t. }P_{good}\\ge S_{min},\\;P_{bad}\\le\\epsilon_{bad},\\;P_{dup}\\le\\epsilon_{dup},\\;E[T]\\le L_{max}",
+      "kind": "optimization",
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "assumptions": [],
+      "verification": {
+        "wolfram": "not-required",
+        "report": null
+      }
+    }
+  ]
+}

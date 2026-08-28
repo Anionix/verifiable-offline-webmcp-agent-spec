@@ -1,0 +1,71 @@
+{
+  "id": "PROV-001",
+  "identity": {
+    "uuid_v5": "463b8c32-0176-56d8-8f4a-8c3427721399",
+    "uuid_v7": "01a04291-b561-71e2-a332-93546068bdda",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "artifact-generation-v0.1",
+    "category": "provenance"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "type": "prov:Activity",
+  "label": {
+    "ja": "設計仕様書生成",
+    "en": "Design specification generation"
+  },
+  "startedAtTime": "2026-08-27T09:34:00Z",
+  "endedAtTime": "2026-08-27T09:34:00Z",
+  "used": [
+    "5512b64a-cffd-55db-a665-97f06b0754b3",
+    "cc769e2e-dd5a-5e6c-9846-a6e255180914",
+    "c3559101-59f2-508b-9f90-f095310c8865",
+    "695b8f5a-ed77-5c3c-b9a7-7d8573f622c5",
+    "0040f552-6e8a-555a-8d77-ff88cf190932",
+    "6ea7c25d-7b9e-50b9-9b59-127cd124d5b7",
+    "a6ebf827-b311-50da-be6e-c0bbe61838f5",
+    "7c4e7328-dbfe-55a6-8365-8783fc8f55c1",
+    "d0bc2765-2f7b-534d-a88e-09d1a42cc364",
+    "2206143d-75e7-5f56-9fd3-7740940f85dc",
+    "e17022d8-a733-5fa9-a23b-e6d4ba08b9ec",
+    "2f53445e-1dbd-5f35-954c-69af5e93690e",
+    "dc6a4a7e-d313-5725-8bf7-ef3001781a2e",
+    "b50a5b84-01d7-5eed-9304-bb8de74d36fd",
+    "60f7c6da-80a1-59d2-98fb-39c76bd555de",
+    "2791987b-30bb-5a18-93c8-58f8c88aee80",
+    "aa6e88e6-e003-5321-a9ea-689c5e330000",
+    "f5c97a48-75c1-5e0f-82e6-c989fdc2ea7d",
+    "52606e63-c0da-5134-b5c7-a8d4425ce4c2",
+    "1dbda155-9584-5df2-bead-cd6aa3279b18",
+    "46666d42-bcff-5bb9-82cc-0fb4f1f9adc4",
+    "fcb67262-133c-58c1-89b0-b2630ce06ad7",
+    "0c619fd4-b636-5983-8e75-2a63d7688c45"
+  ],
+  "generated": "93f29c90-928f-5378-9ea8-12d8d878722c",
+  "wasAssociatedWith": [
+    {
+      "type": "Human",
+      "role": "requester-and-design-collaborator"
+    },
+    {
+      "type": "AI",
+      "role": "compiler-and-reference-implementation-generator"
+    },
+    {
+      "type": "WolframLanguageKernel",
+      "role": "symbolic-reference-checker"
+    }
+  ],
+  "method": "Primary-source synthesis, formalization, executable reference generation, independent validation."
+}

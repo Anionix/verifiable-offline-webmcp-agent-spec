@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- information_uuid_v5=e434d3fa-6b55-5904-99ee-c9d8155aed3e event_uuid_v7=01a04872-0602-7927-b9a2-0772b1df3f4f machine-contract=DRY_RUN->USER_APPROVED->EXECUTING->VERIFIED -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>二重送信しないMac通知デモ</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Verifiable Offline WebMCP Agent</p>
+    <h1>二重送信しないMac通知デモ</h1>
+    <p class="lead">乾式実行で内容を確認し、直前承認後に通知します。同じ論理操作は、再試行しても二度表示しません。</p>
+
+    <section class="panel">
+      <label>論理操作識別子
+        <input id="logical-operation" value="mac-notification-demo-001" maxlength="128">
+      </label>
+      <label>通知タイトル
+        <input id="title" value="検証通知" maxlength="120">
+      </label>
+      <label>通知本文
+        <textarea id="body" maxlength="1000">この通知は一度だけ表示されます。</textarea>
+      </label>
+      <div class="actions">
+        <button id="preview" class="secondary">1. 乾式実行</button>
+        <button id="approve" disabled>2. 承認して1回通知</button>
+        <button id="retry" disabled class="secondary">3. 同じ操作を再試行</button>
+        <button id="reconcile" disabled class="secondary">結果を照合</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <h2>現在の状態</h2>
+      <dl>
+        <div><dt>WebMCP</dt><dd id="webmcp">確認中</dd></div>
+        <div><dt>Intent ID</dt><dd id="intent">未作成</dd></div>
+        <div><dt>制御状態</dt><dd id="control">DISCOVERED</dd></div>
+        <div><dt>外部効果状態</dt><dd id="effect">NOT_STARTED</dd></div>
+      </dl>
+      <pre id="log">乾式実行を開始してください。</pre>
+    </section>
+
+    <p class="safety">通知権限は承認ボタンを押すまで要求しません。データはこのMacの <code>.local/</code> にだけ保存されます。</p>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

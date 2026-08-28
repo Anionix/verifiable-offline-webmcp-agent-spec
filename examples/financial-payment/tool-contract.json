@@ -1,0 +1,163 @@
+{
+  "contractVersion": "0.1.0",
+  "identity": {
+    "uuid_v5": "b8808b01-f66a-5985-b8d0-2e16e298742a",
+    "uuid_v7": "01a04291-b424-7024-a521-690168c07060",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "payments.commit",
+    "category": "tool-contract"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "tool": {
+    "id": "payments.commit",
+    "name": "commit_payment",
+    "class": "financial"
+  },
+  "interface": {
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intentId",
+        "payeeId",
+        "amountMinor",
+        "currency",
+        "quoteDigest",
+        "approvalDigest"
+      ],
+      "properties": {
+        "intentId": {
+          "type": "string"
+        },
+        "payeeId": {
+          "type": "string"
+        },
+        "amountMinor": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "quoteDigest": {
+          "type": "string"
+        },
+        "approvalDigest": {
+          "type": "string"
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": [
+        "transactionId",
+        "receiptDigest"
+      ],
+      "properties": {
+        "transactionId": {
+          "type": "string"
+        },
+        "receiptDigest": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "semantics": {
+    "readSet": [
+      "payment.quote",
+      "mandate",
+      "payee.allowlist"
+    ],
+    "writeSet": [
+      "ledger.transaction"
+    ],
+    "preconditions": [
+      {
+        "id": "mandate",
+        "expression": "amountMinor <= mandate.maxAmountMinor"
+      },
+      {
+        "id": "payee",
+        "expression": "payeeId in mandate.allowedPayees"
+      },
+      {
+        "id": "approval",
+        "expression": "approvalDigest == digest(normalizedIntent)"
+      },
+      {
+        "id": "quote",
+        "expression": "quote.validUntil >= now"
+      }
+    ],
+    "postconditions": [
+      {
+        "id": "receipt",
+        "expression": "receipt.intentId == intentId"
+      },
+      {
+        "id": "at-most-once",
+        "expression": "countEconomicEffects(intentId) <= 1"
+      }
+    ]
+  },
+  "properties": {
+    "externalSideEffect": true,
+    "reversible": false,
+    "idempotent": false,
+    "commutative": false,
+    "networkRequired": true
+  },
+  "policy": {
+    "offline": "INTENT_ONLY",
+    "humanApproval": "MANDATE_OR_HUMAN",
+    "retry": "NONE"
+  },
+  "models": {
+    "success": {
+      "priorAlpha": 1,
+      "priorBeta": 1,
+      "calibrationDatasetRef": "dataset://tool-outcomes"
+    },
+    "cost": {
+      "unit": "micro-utility",
+      "latencyWeightPPM": 250000,
+      "energyWeightPPM": 150000,
+      "moneyWeightPPM": 200000
+    },
+    "risk": {
+      "classFloorPPM": 999000,
+      "damageExpression": "amountMinor + feesMinor + liabilityMinor + recoveryCostMinor"
+    },
+    "evidence": {
+      "required": [
+        "provider-receipt",
+        "ledger-read-back"
+      ],
+      "minimumIndependentSources": 2
+    }
+  },
+  "recovery": {
+    "reconcileTool": "payments.get_intent_status",
+    "rollbackTool": null
+  },
+  "audit": {
+    "logInputs": "redacted",
+    "logOutputs": "redacted",
+    "recordEvidence": true,
+    "canonicalization": "RFC8785-compatible-subset"
+  }
+}

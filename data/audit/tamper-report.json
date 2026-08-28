@@ -1,0 +1,14 @@
+{
+  "originalHead": "b9f9bc8e3cb382668ab4bb428132c14f8f61526e9d6e9a5ef812be1e0e0a4c4d",
+  "tamperedHead": "8fc90b4bd1bdd6b91824623e2bc44beffc5ae200260b779a7f413d49eb47559c",
+  "headChanged": true,
+  "chainChangedByIndex": [
+    false,
+    true,
+    true,
+    true
+  ],
+  "originalMerkleRoot": "560b877732054a8379908164dbdb510e1834b8ef107f4ddea816ecb227ccb58a",
+  "tamperedMerkleRoot": "191fa8884410372a6e3c7a923eaa26188ce124381d7558f84eb6a0506843db6e",
+  "signaturesWouldFail": true
+}

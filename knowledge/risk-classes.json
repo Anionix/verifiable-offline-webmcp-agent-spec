@@ -1,0 +1,288 @@
+{
+  "dataset": {
+    "id": "DS-RISK-CLASSES",
+    "identity": {
+      "uuid_v5": "98f5ee9e-6d5b-5342-bf45-e308bee66715",
+      "uuid_v7": "01a04291-b488-75e6-bd89-0cb5f8ea95a6",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-risk-classes",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "リスククラス",
+      "en": "Risk Classes"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 6,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "RISK-READ",
+      "identity": {
+        "uuid_v5": "15621adb-653f-5f0e-952b-55f46c7ddbde",
+        "uuid_v7": "01a04291-b409-7f15-8d70-d47cebdbc3e5",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "read",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "read class",
+        "en": "read class"
+      },
+      "type": "RiskClass",
+      "class": "read",
+      "commit_floor_ppm": 800000,
+      "offline_policy": "CACHE",
+      "human_policy": "AUTO",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    },
+    {
+      "id": "RISK-WRITE",
+      "identity": {
+        "uuid_v5": "6d832a5f-f26a-58db-adc5-25e764c2e576",
+        "uuid_v7": "01a04291-b40a-71a2-b289-b8515f63f997",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "write",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "write class",
+        "en": "write class"
+      },
+      "type": "RiskClass",
+      "class": "write",
+      "commit_floor_ppm": 950000,
+      "offline_policy": "QUEUE",
+      "human_policy": "CONDITIONAL",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    },
+    {
+      "id": "RISK-MESSAGING",
+      "identity": {
+        "uuid_v5": "f567a629-86d8-55ef-b5a5-bc24bff36265",
+        "uuid_v7": "01a04291-b40b-7633-b43f-0fbc55f6aa0b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "messaging",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "messaging class",
+        "en": "messaging class"
+      },
+      "type": "RiskClass",
+      "class": "messaging",
+      "commit_floor_ppm": 980000,
+      "offline_policy": "DRAFT",
+      "human_policy": "MANDATE_OR_HUMAN",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    },
+    {
+      "id": "RISK-IDENTITY",
+      "identity": {
+        "uuid_v5": "9b8d55d5-b868-5106-8259-caa01ee35d50",
+        "uuid_v7": "01a04291-b40c-7c50-a214-8ac4f131c0c8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "identity",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "identity class",
+        "en": "identity class"
+      },
+      "type": "RiskClass",
+      "class": "identity",
+      "commit_floor_ppm": 995000,
+      "offline_policy": "LOCAL_AUTH",
+      "human_policy": "HUMAN",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    },
+    {
+      "id": "RISK-DESTRUCTIVE",
+      "identity": {
+        "uuid_v5": "bde4a262-d027-5e6c-b525-01e39568aecc",
+        "uuid_v7": "01a04291-b40d-7ef5-9198-fd72cd2fd4d0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "destructive",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "destructive class",
+        "en": "destructive class"
+      },
+      "type": "RiskClass",
+      "class": "destructive",
+      "commit_floor_ppm": 999000,
+      "offline_policy": "INTENT_ONLY",
+      "human_policy": "HUMAN",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    },
+    {
+      "id": "RISK-FINANCIAL",
+      "identity": {
+        "uuid_v5": "2fe2215f-1c96-5623-9671-891592bec3e0",
+        "uuid_v7": "01a04291-b40e-72c9-b169-ce8dae83587c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "financial",
+        "category": "risk-class"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "financial class",
+        "en": "financial class"
+      },
+      "type": "RiskClass",
+      "class": "financial",
+      "commit_floor_ppm": 999000,
+      "offline_policy": "INTENT_ONLY",
+      "human_policy": "MANDATE_OR_HUMAN",
+      "initial_engineering_default": true,
+      "scientific_claim": false,
+      "note": {
+        "ja": "実測校正前の安全側初期値。",
+        "en": "Safety-oriented initial value before empirical calibration."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999",
+        "SRC-CHOW-1970"
+      ]
+    }
+  ]
+}

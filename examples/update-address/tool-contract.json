@@ -1,0 +1,145 @@
+{
+  "contractVersion": "0.1.0",
+  "identity": {
+    "uuid_v5": "856a8906-5459-50f9-972b-542398023536",
+    "uuid_v7": "01a04291-b423-710b-8e77-e665b62331ab",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "account.update_address",
+    "category": "tool-contract"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "tool": {
+    "id": "account.update_address",
+    "name": "update_address",
+    "class": "write"
+  },
+  "interface": {
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "newAddress",
+        "baseVersion"
+      ],
+      "properties": {
+        "newAddress": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "baseVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": [
+        "accepted",
+        "newVersion"
+      ],
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        },
+        "newVersion": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "semantics": {
+    "readSet": [
+      "account.address",
+      "account.version"
+    ],
+    "writeSet": [
+      "account.address",
+      "account.version"
+    ],
+    "preconditions": [
+      {
+        "id": "auth",
+        "expression": "authenticated == true"
+      },
+      {
+        "id": "version",
+        "expression": "baseVersion == serverVersion"
+      },
+      {
+        "id": "consent",
+        "expression": "consent.scope contains account.address.write"
+      }
+    ],
+    "postconditions": [
+      {
+        "id": "readback",
+        "expression": "observed.address == normalized(newAddress)"
+      },
+      {
+        "id": "write-set",
+        "expression": "changedFields subsetOf declaredWriteSet"
+      }
+    ]
+  },
+  "properties": {
+    "externalSideEffect": true,
+    "reversible": true,
+    "idempotent": false,
+    "commutative": false,
+    "networkRequired": true
+  },
+  "policy": {
+    "offline": "QUEUE",
+    "humanApproval": "CONDITIONAL",
+    "retry": "RECONCILE_THEN_RETRY"
+  },
+  "models": {
+    "success": {
+      "priorAlpha": 1,
+      "priorBeta": 1,
+      "calibrationDatasetRef": "dataset://tool-outcomes"
+    },
+    "cost": {
+      "unit": "micro-utility",
+      "latencyWeightPPM": 250000,
+      "energyWeightPPM": 150000,
+      "moneyWeightPPM": 200000
+    },
+    "risk": {
+      "classFloorPPM": 950000,
+      "damageMinorUnits": 10000,
+      "lossBudgetMinorUnits": 500
+    },
+    "evidence": {
+      "required": [
+        "tool-result",
+        "read-back"
+      ],
+      "minimumIndependentSources": 1
+    }
+  },
+  "recovery": {
+    "reconcileTool": "account.get_address",
+    "rollbackTool": "account.restore_address"
+  },
+  "audit": {
+    "logInputs": "redacted",
+    "logOutputs": "redacted",
+    "recordEvidence": true,
+    "canonicalization": "RFC8785-compatible-subset"
+  }
+}

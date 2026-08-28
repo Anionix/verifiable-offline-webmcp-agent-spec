@@ -1,0 +1,546 @@
+{
+  "dataset": {
+    "id": "DS-COMPONENTS",
+    "identity": {
+      "uuid_v5": "62eec157-4773-50e5-9602-949f194eeed9",
+      "uuid_v7": "01a04291-b487-78a5-8182-cd2905dcd5ac",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-components",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "構成要素",
+      "en": "Components"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 15,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "CMP-001",
+      "identity": {
+        "uuid_v5": "6162e001-9b82-5dbe-8d2b-fb68fb6e55e1",
+        "uuid_v7": "01a04291-b3fa-7ce5-8e92-8528f076ec4a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "mobile-ui",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "モバイルUI／Human Approval",
+        "en": "Mobile UI / Human Approval"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "trusted-user-boundary",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "意図capture、承認、例外処理を行う。",
+        "en": "Captures intent, obtains approval, and handles exceptions."
+      }
+    },
+    {
+      "id": "CMP-002",
+      "identity": {
+        "uuid_v5": "67e34c2e-4da8-51be-9e0a-830169e8cf04",
+        "uuid_v7": "01a04291-b3fb-739c-b9e6-1841a85801ef",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "local-state-store",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Local State Store",
+        "en": "Local State Store"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "device-trusted",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "belief、cache、queue、snapshotを保持する。",
+        "en": "Stores belief, cache, queue, and snapshots."
+      }
+    },
+    {
+      "id": "CMP-003",
+      "identity": {
+        "uuid_v5": "a5c40ead-983b-5d88-96ee-e8f353450646",
+        "uuid_v7": "01a04291-b3fc-7549-a12a-4ebedd2e9b79",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "goal-graph",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Goal Graph / Task DAG",
+        "en": "Goal Graph / Task DAG"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "device-trusted",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "目的をDAGへ分解しdependencyを管理する。",
+        "en": "Decomposes goals into a DAG and manages dependencies."
+      }
+    },
+    {
+      "id": "CMP-004",
+      "identity": {
+        "uuid_v5": "18be9a48-2373-51af-87b9-f77374a7f2a9",
+        "uuid_v7": "01a04291-b3fd-7ea0-9a82-e807cf6c213d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tool-registry",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP Tool Registry Adapter",
+        "en": "WebMCP Tool Registry Adapter"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "browser-boundary",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "WebMCP draft APIをadapterへ隔離する。",
+        "en": "Isolates the draft WebMCP API behind an adapter."
+      }
+    },
+    {
+      "id": "CMP-005",
+      "identity": {
+        "uuid_v5": "729f9cca-9143-5c83-a7b0-ad91998044bb",
+        "uuid_v7": "01a04291-b3fe-7022-ad35-16b1fe5dbafe",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "policy-engine",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Tool Contract / Policy Engine",
+        "en": "Tool Contract / Policy Engine"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "decision-authority",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "hard gate、expected utility、risk classを評価する。",
+        "en": "Evaluates hard gates, expected utility, and risk classes."
+      }
+    },
+    {
+      "id": "CMP-006",
+      "identity": {
+        "uuid_v5": "ca831003-90ae-5592-9016-5ed65e1799ca",
+        "uuid_v7": "01a04291-b3ff-758c-bc26-abdb97ba0ea6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "local-planner",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Local Planner",
+        "en": "Local Planner"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "unprivileged-planner",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "offline/低コスト計画を生成する。",
+        "en": "Generates offline and low-cost plans."
+      }
+    },
+    {
+      "id": "CMP-007",
+      "identity": {
+        "uuid_v5": "6eea2d1e-dca7-5cd7-957a-f3b276c116c0",
+        "uuid_v7": "01a04291-b400-75eb-8cf5-68fe8468757b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "responses-bridge",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Responses API Bridge",
+        "en": "Responses API Bridge"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "remote-untrusted-planner",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "feasible toolだけをremote plannerへ射影する。",
+        "en": "Projects only feasible tools to the remote planner."
+      }
+    },
+    {
+      "id": "CMP-008",
+      "identity": {
+        "uuid_v5": "6badd351-58ce-55bc-aece-26a9ab837149",
+        "uuid_v7": "01a04291-b401-7fd6-a55f-174e7e383645",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-executor",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP Executor",
+        "en": "WebMCP Executor"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "privileged-executor",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "許可済みtoolを実行する。",
+        "en": "Executes authorized tools."
+      }
+    },
+    {
+      "id": "CMP-009",
+      "identity": {
+        "uuid_v5": "5a19ab00-42c7-51ad-909e-fbeba9285ba5",
+        "uuid_v7": "01a04291-b402-76b4-a84f-8dd0ba21f577",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "evidence-engine",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Evidence Engine",
+        "en": "Evidence Engine"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "verification-authority",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "read-back、receipt、state diffからconfidenceを計算する。",
+        "en": "Computes confidence from read-back, receipts, and state diffs."
+      }
+    },
+    {
+      "id": "CMP-010",
+      "identity": {
+        "uuid_v5": "c9ce902c-e8a5-51d8-89e7-57b1f8ef87d2",
+        "uuid_v7": "01a04291-b403-78fa-b61c-597db992d70e",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "offline-queue",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Offline Intent Queue",
+        "en": "Offline Intent Queue"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "device-trusted",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "未実行intentをTTL/version付きで保存する。",
+        "en": "Stores unexecuted intents with TTL and versions."
+      }
+    },
+    {
+      "id": "CMP-011",
+      "identity": {
+        "uuid_v5": "81c73daf-aec7-5ded-8948-0d72ab69e7e4",
+        "uuid_v7": "01a04291-b404-7433-9068-d36552b8f60f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "sync-server",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Sync / Ingestion Server",
+        "en": "Sync / Ingestion Server"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "server-trusted",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "device chainを検証しglobal sequenceを付与する。",
+        "en": "Verifies device chains and assigns global sequence."
+      }
+    },
+    {
+      "id": "CMP-012",
+      "identity": {
+        "uuid_v5": "d9c09833-7e63-5ca6-8fd1-379e153a3450",
+        "uuid_v7": "01a04291-b405-70c5-916c-1bb69b06c50a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "audit-log",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Signed Event Log",
+        "en": "Signed Event Log"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "tamper-evident-store",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "canonical event、hash chain、署名を保存する。",
+        "en": "Stores canonical events, hash chains, and signatures."
+      }
+    },
+    {
+      "id": "CMP-013",
+      "identity": {
+        "uuid_v5": "593b8be5-63e4-5764-ba93-9f9cafb8a8b7",
+        "uuid_v7": "01a04291-b406-72fe-9212-a1f924716d43",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "checkpoint-service",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Merkle Checkpoint Service",
+        "en": "Merkle Checkpoint Service"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "external-anchor",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "Merkle rootを署名し外部anchorへ保存する。",
+        "en": "Signs Merkle roots and stores external anchors."
+      }
+    },
+    {
+      "id": "CMP-014",
+      "identity": {
+        "uuid_v5": "7f809a7b-be41-5bdb-9fa6-f0fa0f051536",
+        "uuid_v7": "01a04291-b407-711c-b98b-ac257956ea21",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "slo-optimizer",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "SLO Optimizer",
+        "en": "SLO Optimizer"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "offline-analytics",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "threshold/retry/verify budgetを制約付き最適化する。",
+        "en": "Optimizes thresholds and retry/verification budgets under constraints."
+      }
+    },
+    {
+      "id": "CMP-015",
+      "identity": {
+        "uuid_v5": "aec4097e-58c7-5f53-a442-2b6682c1dcbe",
+        "uuid_v7": "01a04291-b408-72a2-8384-37e14dc4eaa4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "key-store",
+        "category": "component"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "OS Key Store / Secure Enclave",
+        "en": "OS Key Store / Secure Enclave"
+      },
+      "type": "ArchitectureComponent",
+      "trust_zone": "highest-trust",
+      "source_refs": [],
+      "responsibility": {
+        "ja": "秘密鍵とcredentialをplannerから隔離する。",
+        "en": "Isolates private keys and credentials from planners."
+      }
+    }
+  ]
+}

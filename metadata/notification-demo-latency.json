@@ -1,0 +1,21 @@
+{
+  "benchmarkId": "53e5f7ef-03db-5609-8b28-abf8c9a05327",
+  "runEventId": "01a04877-9e9a-7e64-93bb-e608055977d2",
+  "measuredAt": "2026-08-28T13:03:15.330Z",
+  "environment": {
+    "node": "v24.15.0",
+    "platform": "darwin",
+    "platformRelease": "27.0.0",
+    "architecture": "arm64",
+    "adapter": "SimulatedNotificationAdapter(success)",
+    "externalServiceCostYen": 0
+  },
+  "sampleCount": 100,
+  "medianMs": 4.745416,
+  "p95Ms": 8.99,
+  "maximumMs": 10.14275,
+  "thresholdP95Ms": 2000,
+  "passed": true,
+  "samplesPath": "data/timeseries/notification-demo-latency.ndjson",
+  "evidenceState": "CONFIRMED"
+}

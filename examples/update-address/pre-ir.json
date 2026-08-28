@@ -1,0 +1,56 @@
+{
+  "irVersion": "0.1.0",
+  "identity": {
+    "uuid_v5": "02655d28-fb56-5fd5-91c9-3193e8a00527",
+    "uuid_v7": "01a04291-b426-7979-ad0c-2e4346ccfea2",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "update-address-pre",
+    "category": "canonical-ir"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "tool": {
+    "id": "account.update_address",
+    "class": "write",
+    "contractVersion": "0.1.0"
+  },
+  "phase": "pre",
+  "gates": {
+    "schema": true,
+    "auth": true,
+    "permission": true,
+    "network": true,
+    "version": true,
+    "dependency": true,
+    "privacy": true,
+    "consent": true
+  },
+  "state": {
+    "ambiguousPreviousEffect": false,
+    "humanRequired": false
+  },
+  "utility": {
+    "successProbabilityPPM": 910000,
+    "successGain": 1000000,
+    "failureLoss": 600000,
+    "totalPenalty": 120000,
+    "abstainUtility": 0
+  },
+  "verification": {
+    "confidencePPM": null,
+    "classFloorPPM": 950000,
+    "damage": null,
+    "lossBudget": null
+  }
+}

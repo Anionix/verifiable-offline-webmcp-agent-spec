@@ -1,0 +1,3084 @@
+{
+  "dataset": {
+    "id": "DS-REQUIREMENTS",
+    "identity": {
+      "uuid_v5": "a6614018-ed1b-514c-918b-922867992d5a",
+      "uuid_v7": "01a04291-b485-7665-989d-4d49b221126f",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-requirements",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "要件",
+      "en": "Requirements"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 69,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "REQ-ID-001",
+      "identity": {
+        "uuid_v5": "bf03aa47-8e39-54b5-afee-e45f47077ab7",
+        "uuid_v7": "01a04291-b3b5-7568-9dfc-8beeef1b8eb8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "stable-uuid-v5",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "すべての知識エンティティはcanonical nameとroot namespaceからUUIDv5を持たなければならない。",
+        "en": "Every knowledge entity MUST have a UUIDv5 derived from its canonical nam"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "すべての知識エンティティはcanonical nameとroot namespaceからUUIDv5を持たなければならない。",
+        "en": "Every knowledge entity MUST have a UUIDv5 derived from its canonical name and the root namespace."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "verification_refs": [
+        "TEST-ID-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-ID-002",
+      "identity": {
+        "uuid_v5": "4a5015e0-76b6-57a7-80b8-380bd72c165c",
+        "uuid_v7": "01a04291-b3b6-7cab-af40-a186b3151b3d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "event-uuid-v7",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "すべてのイベントはevent timeを反映するUUIDv7を持たなければならない。",
+        "en": "Every event MUST have a UUIDv7 reflecting its event time."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "すべてのイベントはevent timeを反映するUUIDv7を持たなければならない。",
+        "en": "Every event MUST have a UUIDv7 reflecting its event time."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "verification_refs": [
+        "TEST-ID-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-ID-003",
+      "identity": {
+        "uuid_v5": "aeda8d6f-718d-50d7-9871-24d870cc51a5",
+        "uuid_v7": "01a04291-b3b7-7d73-af6a-bb13a512fd54",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "uuid-not-authority",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "UUIDを認可tokenまたは秘密として扱ってはならない。",
+        "en": "UUIDs MUST NOT be treated as authorization tokens or secrets."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST NOT",
+      "statement": {
+        "ja": "UUIDを認可tokenまたは秘密として扱ってはならない。",
+        "en": "UUIDs MUST NOT be treated as authorization tokens or secrets."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC9562"
+      ],
+      "verification_refs": [
+        "TEST-SEC-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-TIME-001",
+      "identity": {
+        "uuid_v5": "680ffb1f-d047-5a44-950e-f0260b063bfc",
+        "uuid_v7": "01a04291-b3b8-71b4-9584-e39da0ee82fc",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc3339-utc",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "規範時刻はRFC 3339 UTC文字列とepoch_msの両方で保存しなければならない。",
+        "en": "Normative time MUST be stored as both an RFC 3339 UTC string and epoch_m"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "規範時刻はRFC 3339 UTC文字列とepoch_msの両方で保存しなければならない。",
+        "en": "Normative time MUST be stored as both an RFC 3339 UTC string and epoch_ms."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC3339",
+        "SRC-RFC7493"
+      ],
+      "verification_refs": [
+        "TEST-TIME-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-TIME-002",
+      "identity": {
+        "uuid_v5": "39b278b2-8c41-5e43-a927-6e9149a9ed2a",
+        "uuid_v7": "01a04291-b3b9-7c6d-b1f2-62cbb61f24a2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "causal-over-wallclock",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "因果順序はhash referenceとsequenceで表し、wall-clockだけに依存してはならない。",
+        "en": "Causal order MUST be represented by hash references and sequence numbers"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "因果順序はhash referenceとsequenceで表し、wall-clockだけに依存してはならない。",
+        "en": "Causal order MUST be represented by hash references and sequence numbers, not wall-clock time alone."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013",
+        "SRC-RFC9162"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-DATA-001",
+      "identity": {
+        "uuid_v5": "48085c9c-c1e1-5716-bc9b-9fd1faa70b52",
+        "uuid_v7": "01a04291-b3ba-7632-a34c-17bcaea4c061",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "json-schema",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Canonical IR、Tool Contract、Audit EventはJSON Schemaで検証されなければならない。",
+        "en": "Canonical IR, Tool Contract, and Audit Event MUST be validated with JSON"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "Canonical IR、Tool Contract、Audit EventはJSON Schemaで検証されなければならない。",
+        "en": "Canonical IR, Tool Contract, and Audit Event MUST be validated with JSON Schema."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12"
+      ],
+      "verification_refs": [
+        "TEST-SCHEMA-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-DATA-002",
+      "identity": {
+        "uuid_v5": "cbe0f3e2-8226-5721-8294-4b5ec4c052c2",
+        "uuid_v7": "01a04291-b3bb-7c72-848a-3bc1b2f95683",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "json-interoperable",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSONはRFC 8259に適合し、duplicate keyを生成してはならない。",
+        "en": "JSON MUST conform to RFC 8259 and MUST NOT contain duplicate object memb"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "JSONはRFC 8259に適合し、duplicate keyを生成してはならない。",
+        "en": "JSON MUST conform to RFC 8259 and MUST NOT contain duplicate object member names."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8259",
+        "SRC-RFC7493"
+      ],
+      "verification_refs": [
+        "TEST-SCHEMA-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-DATA-003",
+      "identity": {
+        "uuid_v5": "93ebbae2-279e-54a0-b0f0-e28cca717104",
+        "uuid_v7": "01a04291-b3bc-79ed-ac67-d58e61c606dd",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "integer-critical-values",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "金額、PPM、sequence、epoch_msなど判定に使う値は整数で表さなければならない。",
+        "en": "Decision-critical values such as money, PPM, sequence, and epoch_ms MUST"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "金額、PPM、sequence、epoch_msなど判定に使う値は整数で表さなければならない。",
+        "en": "Decision-critical values such as money, PPM, sequence, and epoch_ms MUST be integers."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC7493"
+      ],
+      "verification_refs": [
+        "TEST-IR-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-KNOW-001",
+      "identity": {
+        "uuid_v5": "b9fd8efb-bdb1-5dfc-994e-f5dd07ae8447",
+        "uuid_v7": "01a04291-b3bd-76c6-8458-0f430860359f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "jsonld-graph",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "知識エンティティはJSON-LD graphとしてリンク可能であるべきである。",
+        "en": "Knowledge entities SHOULD be linkable as a JSON-LD graph."
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "知識エンティティはJSON-LD graphとしてリンク可能であるべきである。",
+        "en": "Knowledge entities SHOULD be linkable as a JSON-LD graph."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-JSONLD-2020"
+      ],
+      "verification_refs": [
+        "TEST-KNOW-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-KNOW-002",
+      "identity": {
+        "uuid_v5": "d3a81a4e-8c75-5933-ac8f-8dac5126db04",
+        "uuid_v7": "01a04291-b3be-727b-a22c-bc99230531b8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "provenance",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "claim、formula、requirement、decisionは生成activityとsource provenanceを記録しなければな",
+        "en": "Claims, formulas, requirements, and decisions MUST record generation act"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "claim、formula、requirement、decisionは生成activityとsource provenanceを記録しなければならない。",
+        "en": "Claims, formulas, requirements, and decisions MUST record generation activity and source provenance."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-KNOW-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-KNOW-003",
+      "identity": {
+        "uuid_v5": "238898c6-bfc8-59eb-80c1-53d98e630a6a",
+        "uuid_v7": "01a04291-b3bf-7bb7-b143-e2feab977c5b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "catalog",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "distributionとmanifestはDCAT/SPDX風metadataで発見可能にすべきである。",
+        "en": "Distributions and manifests SHOULD be discoverable with DCAT/SPDX-style "
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "distributionとmanifestはDCAT/SPDX風metadataで発見可能にすべきである。",
+        "en": "Distributions and manifests SHOULD be discoverable with DCAT/SPDX-style metadata."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-DCAT3-2024"
+      ],
+      "verification_refs": [
+        "TEST-KNOW-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-WEBMCP-001",
+      "identity": {
+        "uuid_v5": "7f3a824f-08c5-59de-ad8d-4e88d28355e2",
+        "uuid_v7": "01a04291-b3c0-7910-bb3e-59cbada496d5",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-adapter",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCPのdraft APIは専用adapterに隔離しなければならない。",
+        "en": "The draft WebMCP API MUST be isolated behind a dedicated adapter."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "WebMCPのdraft APIは専用adapterに隔離しなければならない。",
+        "en": "The draft WebMCP API MUST be isolated behind a dedicated adapter."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-ARCH-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-WEBMCP-002",
+      "identity": {
+        "uuid_v5": "f4f7db8c-c9ce-5e3c-8300-2fa5ac0b620c",
+        "uuid_v7": "01a04291-b3c1-739d-9995-00f458dc7b9a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "discover-before-plan",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "plannerへ公開する前にtool discoveryとcontract lookupを実行しなければならない。",
+        "en": "Tool discovery and contract lookup MUST occur before tools are exposed t"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "plannerへ公開する前にtool discoveryとcontract lookupを実行しなければならない。",
+        "en": "Tool discovery and contract lookup MUST occur before tools are exposed to a planner."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-ARCH-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-WEBMCP-003",
+      "identity": {
+        "uuid_v5": "a629f2cd-de50-58db-8efe-19fdda073067",
+        "uuid_v7": "01a04291-b3c2-7010-a00d-bdbbcf6a5797",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "capability-filter",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "hard gateに失敗したtoolはplannerの候補集合から除外しなければならない。",
+        "en": "A tool that fails a hard gate MUST be removed from the planner candidate"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "hard gateに失敗したtoolはplannerの候補集合から除外しなければならない。",
+        "en": "A tool that fails a hard gate MUST be removed from the planner candidate set."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-POLICY-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-MCP-001",
+      "identity": {
+        "uuid_v5": "bd72b9e2-33af-5678-8fbe-cd7a7d76e91c",
+        "uuid_v7": "01a04291-b3c3-7c30-817e-9438632026b2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "mcp-policy-host",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "MCP経由のtoolでもhost policyとuser consentを迂回してはならない。",
+        "en": "Tools reached through MCP MUST NOT bypass host policy or user consent."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "MCP経由のtoolでもhost policyとuser consentを迂回してはならない。",
+        "en": "Tools reached through MCP MUST NOT bypass host policy or user consent."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-PLAN-001",
+      "identity": {
+        "uuid_v5": "cf6475e2-d1a3-53aa-8f76-a4deddaee41e",
+        "uuid_v7": "01a04291-b3c4-7580-825b-b843513ad623",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "responses-optional",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Responses APIはoptional plannerであり、system availabilityの単一障害点にしてはならない。",
+        "en": "The Responses API MUST be an optional planner and MUST NOT be a single p"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "Responses APIはoptional plannerであり、system availabilityの単一障害点にしてはならない。",
+        "en": "The Responses API MUST be an optional planner and MUST NOT be a single point of system availability."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-OPENAI-RESPONSES-2025"
+      ],
+      "verification_refs": [
+        "TEST-OFFLINE-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-PLAN-002",
+      "identity": {
+        "uuid_v5": "d2ad6445-26da-572e-b6b7-68a816e97a73",
+        "uuid_v7": "01a04291-b3c5-7e52-98b5-6d3bb13ddc2c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "remote-mcp-gated",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "remote MCPまたはResponses tool exposureはfeasible toolだけに限定しなければならない。",
+        "en": "Remote MCP or Responses tool exposure MUST be limited to feasible tools."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "remote MCPまたはResponses tool exposureはfeasible toolだけに限定しなければならない。",
+        "en": "Remote MCP or Responses tool exposure MUST be limited to feasible tools."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-OPENAI-MCP-2025",
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-POLICY-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-PLAN-003",
+      "identity": {
+        "uuid_v5": "687f6076-94c1-561c-8c54-14d1c037d9c9",
+        "uuid_v7": "01a04291-b3c6-75d6-bbf7-f92b00f436dd",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "planner-proposal-only",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "planner出力はcandidate proposalであり、authorizationを生成してはならない。",
+        "en": "Planner output MUST be treated as a candidate proposal and MUST NOT crea"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "planner出力はcandidate proposalであり、authorizationを生成してはならない。",
+        "en": "Planner output MUST be treated as a candidate proposal and MUST NOT create authorization."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-TOOL-001",
+      "identity": {
+        "uuid_v5": "8b7b9add-4954-55f0-9c5e-91cec57d08d2",
+        "uuid_v7": "01a04291-b3c7-7f52-a14b-0a4e7d24e253",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tool-contract",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "各toolはinput、precondition、transition、postcondition、cost、risk、evidenceのcon",
+        "en": "Each tool MUST have a contract covering input, preconditions, transition"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "各toolはinput、precondition、transition、postcondition、cost、risk、evidenceのcontractを持たなければならない。",
+        "en": "Each tool MUST have a contract covering input, preconditions, transition, postconditions, cost, risk, and evidence."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-JSONSCHEMA-2020-12",
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-CONTRACT-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-TOOL-002",
+      "identity": {
+        "uuid_v5": "a3a103a7-322f-5d42-ba54-3c247f254115",
+        "uuid_v7": "01a04291-b3c8-73e0-83ab-a86750544f06",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "read-write-set",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "mutation toolはdeclared read setとwrite setを持たなければならない。",
+        "en": "Mutation tools MUST declare read and write sets."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "mutation toolはdeclared read setとwrite setを持たなければならない。",
+        "en": "Mutation tools MUST declare read and write sets."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-CONTRACT-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-TOOL-003",
+      "identity": {
+        "uuid_v5": "8d089165-35cd-542d-a9a8-a4f19c97835e",
+        "uuid_v7": "01a04291-b3c9-783f-9300-f580843cc236",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "readback",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "観測可能なwriteはread-backでpostconditionを確認すべきである。",
+        "en": "Observable writes SHOULD verify postconditions by read-back."
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "観測可能なwriteはread-backでpostconditionを確認すべきである。",
+        "en": "Observable writes SHOULD verify postconditions by read-back."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-VERIFY-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-001",
+      "identity": {
+        "uuid_v5": "ff52874a-0dc7-5498-9170-ab5629ef1635",
+        "uuid_v7": "01a04291-b3ca-7f59-b849-2810dcdf1ba4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "decision-set",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "policy decisionはALLOW、DENY、HUMAN、RECONCILEのいずれかでなければならない。",
+        "en": "A policy decision MUST be one of ALLOW, DENY, HUMAN, or RECONCILE."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "policy decisionはALLOW、DENY、HUMAN、RECONCILEのいずれかでなければならない。",
+        "en": "A policy decision MUST be one of ALLOW, DENY, HUMAN, or RECONCILE."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-IR-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-002",
+      "identity": {
+        "uuid_v5": "2e6510a4-88ee-57c0-b2bb-5afe2132dc64",
+        "uuid_v7": "01a04291-b3cb-773d-85fa-7246e99b2735",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "precedence",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "判定優先順位はhard DENY、RECONCILE、HUMAN、utility DENY、ALLOWの順でなければならない。",
+        "en": "Decision precedence MUST be hard DENY, RECONCILE, HUMAN, utility DENY, t"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "判定優先順位はhard DENY、RECONCILE、HUMAN、utility DENY、ALLOWの順でなければならない。",
+        "en": "Decision precedence MUST be hard DENY, RECONCILE, HUMAN, utility DENY, then ALLOW."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-POLICY-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-003",
+      "identity": {
+        "uuid_v5": "13ece2cc-283e-5e87-8163-c4c10727e516",
+        "uuid_v7": "01a04291-b3cc-77b8-854b-e2926a0141c8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "same-ir",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "TypeScriptとWolfram referenceは同じCanonical IRへ同じ判定を返さなければならない。",
+        "en": "TypeScript and the Wolfram reference MUST return the same decision for t"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "TypeScriptとWolfram referenceは同じCanonical IRへ同じ判定を返さなければならない。",
+        "en": "TypeScript and the Wolfram reference MUST return the same decision for the same Canonical IR."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-CONFORMANCE-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-004",
+      "identity": {
+        "uuid_v5": "53700c7f-654c-5f0e-a5ef-3c32dcec4f4a",
+        "uuid_v7": "01a04291-b3cd-71c0-a6d7-33655acf782d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "risk-class-floor",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "commit thresholdはrisk class floorとexpected-loss thresholdの最大値でなければならない。",
+        "en": "The commit threshold MUST be the maximum of the risk-class floor and exp"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "commit thresholdはrisk class floorとexpected-loss thresholdの最大値でなければならない。",
+        "en": "The commit threshold MUST be the maximum of the risk-class floor and expected-loss threshold."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "verification_refs": [
+        "TEST-POLICY-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-005",
+      "identity": {
+        "uuid_v5": "18f3f912-6a11-5af9-81fe-5a42f7f0beba",
+        "uuid_v7": "01a04291-b3ce-7912-ac29-d73ea69dd558",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "privacy-minimize",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "remote plannerへ送るデータは必要品質を満たす最小十分集合にしなければならない。",
+        "en": "Data sent to a remote planner MUST be the minimum sufficient set that me"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "remote plannerへ送るデータは必要品質を満たす最小十分集合にしなければならない。",
+        "en": "Data sent to a remote planner MUST be the minimum sufficient set that meets required quality."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-PRIVACY-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-006",
+      "identity": {
+        "uuid_v5": "3f76c524-c2ba-5355-8e3e-a912e5fcd7c4",
+        "uuid_v7": "01a04291-b3cf-7cc5-9e1b-8b326957accf",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "financial-human",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "financial、destructive、identity mutationは有効なmandateがない限りHUMANでなければならない。",
+        "en": "Financial, destructive, and identity mutation actions MUST be HUMAN unle"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "financial、destructive、identity mutationは有効なmandateがない限りHUMANでなければならない。",
+        "en": "Financial, destructive, and identity mutation actions MUST be HUMAN unless covered by a valid mandate."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-CRITICAL-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-007",
+      "identity": {
+        "uuid_v5": "4c09d56e-113d-5360-97f9-eece170c3188",
+        "uuid_v7": "01a04291-b3d0-752e-be5a-597ed7f4ba9b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "approval-binding",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "approvalはtool、normalized args、target、amount/content digest、expiryにbindされ",
+        "en": "Approval MUST be bound to tool, normalized arguments, target, amount/con"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "approvalはtool、normalized args、target、amount/content digest、expiryにbindされなければならない。",
+        "en": "Approval MUST be bound to tool, normalized arguments, target, amount/content digest, and expiry."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-RFC8032"
+      ],
+      "verification_refs": [
+        "TEST-AUTH-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-008",
+      "identity": {
+        "uuid_v5": "d96922b0-3849-5196-bf45-0550be1dd998",
+        "uuid_v7": "01a04291-b3d1-7fe6-9449-df5a93d1b615",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "no-privilege-amplification",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "LLM、tool output、web contentだけでauthorityを増加させてはならない。",
+        "en": "Authority MUST NOT increase solely because of LLM output, tool output, o"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "LLM、tool output、web contentだけでauthorityを増加させてはならない。",
+        "en": "Authority MUST NOT increase solely because of LLM output, tool output, or web content."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026",
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-SEC-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-POLICY-009",
+      "identity": {
+        "uuid_v5": "d2857255-a357-5a59-a264-c864dbadb98e",
+        "uuid_v7": "01a04291-b3d2-7080-a5ed-13c60f0b10e2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "abstain",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "最大効用がreject utility以下ならABSTAIN/HUMANを選ばなければならない。",
+        "en": "When maximum utility is no greater than reject utility, the system MUST "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "最大効用がreject utility以下ならABSTAIN/HUMANを選ばなければならない。",
+        "en": "When maximum utility is no greater than reject utility, the system MUST choose ABSTAIN/HUMAN."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "verification_refs": [
+        "TEST-POLICY-005"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-EXEC-001",
+      "identity": {
+        "uuid_v5": "dd260fae-9d9d-58bb-8de8-51d059a90dab",
+        "uuid_v7": "01a04291-b3d3-7d05-a235-e4b3b83f1960",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "authorized-execution",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "EXECUTING状態へ入るには有効なauthorizationが必要である。",
+        "en": "Entering EXECUTING MUST require valid authorization."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "EXECUTING状態へ入るには有効なauthorizationが必要である。",
+        "en": "Entering EXECUTING MUST require valid authorization."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-EXEC-002",
+      "identity": {
+        "uuid_v5": "09985d46-0cfc-5213-a0dc-100fa17e1e6d",
+        "uuid_v7": "01a04291-b3d4-795c-9c05-2bfc7db3de4a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ambiguous-reconcile",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "AMBIGUOUS状態からmutation retryへ直接遷移してはならない。",
+        "en": "AMBIGUOUS MUST NOT transition directly to a mutating retry."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "AMBIGUOUS状態からmutation retryへ直接遷移してはならない。",
+        "en": "AMBIGUOUS MUST NOT transition directly to a mutating retry."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-EXEC-003",
+      "identity": {
+        "uuid_v5": "c5a6f165-1697-5341-8c02-dba657a42cfb",
+        "uuid_v7": "01a04291-b3d5-75f3-b00d-9fb5c825a3b6",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "at-most-once",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "同一intentの外部economic effectは高々1回でなければならない。",
+        "en": "An external economic effect for the same intent MUST occur at most once."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "同一intentの外部economic effectは高々1回でなければならない。",
+        "en": "An external economic effect for the same intent MUST occur at most once."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-EXEC-004",
+      "identity": {
+        "uuid_v5": "0d9dabdf-8254-5fde-99ae-fc58e8de2839",
+        "uuid_v7": "01a04291-b3d6-7958-a3a6-90e9ac07574c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "verify-before-commit",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "COMMITTEDへ到達する前にVERIFIEDを通過しなければならない。",
+        "en": "The system MUST pass through VERIFIED before reaching COMMITTED."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "COMMITTEDへ到達する前にVERIFIEDを通過しなければならない。",
+        "en": "The system MUST pass through VERIFIED before reaching COMMITTED."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-EXEC-005",
+      "identity": {
+        "uuid_v5": "c8a31de2-7297-527a-8a1c-04192b5e70bb",
+        "uuid_v7": "01a04291-b3d7-73cc-aa28-5c4c47fa7f66",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "bounded-autonomy",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "autonomous retry、verify、reconcileのcycleではranking functionが減少しなければならない。",
+        "en": "The ranking function MUST decrease on autonomous retry, verification, an"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "autonomous retry、verify、reconcileのcycleではranking functionが減少しなければならない。",
+        "en": "The ranking function MUST decrease on autonomous retry, verification, and reconciliation cycles."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-005"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-OFFLINE-001",
+      "identity": {
+        "uuid_v5": "6fd8e809-f768-5490-b369-818b5ac3364c",
+        "uuid_v7": "01a04291-b3d8-78ac-a1ff-0a9c84bb9322",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "offline-local-core",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "network unavailable時にResponsesを候補から除外し、core local workflowを維持しなければならない。",
+        "en": "When the network is unavailable, Responses MUST be removed from candidat"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "network unavailable時にResponsesを候補から除外し、core local workflowを維持しなければならない。",
+        "en": "When the network is unavailable, Responses MUST be removed from candidates and the local core workflow preserved."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-OPENAI-RUNTIME-2026"
+      ],
+      "verification_refs": [
+        "TEST-OFFLINE-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-OFFLINE-002",
+      "identity": {
+        "uuid_v5": "8fd53663-7b3a-56cc-8f14-295e48a36b82",
+        "uuid_v7": "01a04291-b3d9-7e57-90e3-381e8409a404",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "queue-intent",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "offline queueは未実行intentを保存し、外部効果を開始してはならない。",
+        "en": "The offline queue MUST store unexecuted intent and MUST NOT start an ext"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "offline queueは未実行intentを保存し、外部効果を開始してはならない。",
+        "en": "The offline queue MUST store unexecuted intent and MUST NOT start an external effect."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-OFFLINE-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-OFFLINE-003",
+      "identity": {
+        "uuid_v5": "60b013c2-5918-5b69-a4fe-6c4adbcb325b",
+        "uuid_v7": "01a04291-b3da-7dda-bc87-2b244bb3e65c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "revalidate-replay",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "replay前にauthorization、permission、version、consent、TTL、preconditionを再評価しなけ",
+        "en": "Authorization, permission, version, consent, TTL, and preconditions MUST"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "replay前にauthorization、permission、version、consent、TTL、preconditionを再評価しなければならない。",
+        "en": "Authorization, permission, version, consent, TTL, and preconditions MUST be re-evaluated before replay."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-OFFLINE-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-001",
+      "identity": {
+        "uuid_v5": "31e5c547-4072-51a5-a761-698b4464a2fa",
+        "uuid_v7": "01a04291-b3db-73fe-9e33-17c9ec1df1c9",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "per-device-chain",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "各deviceはoffline中に独立したsigned sequenceを維持しなければならない。",
+        "en": "Each device MUST maintain an independent signed sequence while offline."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "各deviceはoffline中に独立したsigned sequenceを維持しなければならない。",
+        "en": "Each device MUST maintain an independent signed sequence while offline."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8032",
+        "SRC-RFC9562"
+      ],
+      "verification_refs": [
+        "TEST-SYNC-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-002",
+      "identity": {
+        "uuid_v5": "bcbfcabb-9ac1-5156-b135-28b998095170",
+        "uuid_v7": "01a04291-b3dc-74dc-8ec9-e313d48278ae",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "global-sequence",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "server取り込み時にdevice sequenceを保持したままglobal sequenceを追加しなければならない。",
+        "en": "Server ingestion MUST preserve device sequence while adding a global seq"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "server取り込み時にdevice sequenceを保持したままglobal sequenceを追加しなければならない。",
+        "en": "Server ingestion MUST preserve device sequence while adding a global sequence."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-SYNC-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-003",
+      "identity": {
+        "uuid_v5": "a13087f5-3d0a-50ca-8b53-ad9a62bf1d79",
+        "uuid_v7": "01a04291-b3dd-7488-9ade-7e0c59c42095",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "crdt-only-commutative",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "CRDT mergeは可換で冪等な状態へ限定しなければならない。",
+        "en": "CRDT merge MUST be limited to commutative, idempotent state."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "CRDT mergeは可換で冪等な状態へ限定しなければならない。",
+        "en": "CRDT merge MUST be limited to commutative, idempotent state."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "verification_refs": [
+        "TEST-SYNC-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-004",
+      "identity": {
+        "uuid_v5": "425df0e7-8f13-5d7a-9018-6f217f0bfec6",
+        "uuid_v7": "01a04291-b3de-7972-930d-462f2468e183",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "no-crdt-side-effect",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "支払い、送信、削除、予約など非可換副作用をCRDT mergeしてはならない。",
+        "en": "Payments, sends, deletions, reservations, and other non-commutative effe"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST NOT",
+      "statement": {
+        "ja": "支払い、送信、削除、予約など非可換副作用をCRDT mergeしてはならない。",
+        "en": "Payments, sends, deletions, reservations, and other non-commutative effects MUST NOT be CRDT-merged."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CRDT-2011"
+      ],
+      "verification_refs": [
+        "TEST-SYNC-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-005",
+      "identity": {
+        "uuid_v5": "c794d09f-bfbc-58a0-ad49-4589d1006bee",
+        "uuid_v7": "01a04291-b3df-779d-a7bf-821eb6fa8638",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "queue-stability",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "長期運用では平均処理率μが平均流入率λを上回るようcapacity planningすべきである。",
+        "en": "Long-run capacity planning SHOULD keep average service rate μ above aver"
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "長期運用では平均処理率μが平均流入率λを上回るようcapacity planningすべきである。",
+        "en": "Long-run capacity planning SHOULD keep average service rate μ above average arrival rate λ."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "verification_refs": [
+        "TEST-SLO-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SYNC-006",
+      "identity": {
+        "uuid_v5": "e58d4c17-b3bb-52b5-a39f-2870017fe4b7",
+        "uuid_v7": "01a04291-b3e0-73e7-9b1c-ad0822fe958d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "queue-metrics",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "queue length、arrival rate、waiting timeを計測しL=λW整合性を監視しなければならない。",
+        "en": "Queue length, arrival rate, and waiting time MUST be measured and monito"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "queue length、arrival rate、waiting timeを計測しL=λW整合性を監視しなければならない。",
+        "en": "Queue length, arrival rate, and waiting time MUST be measured and monitored for consistency with L = λW."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-LITTLE-1961"
+      ],
+      "verification_refs": [
+        "TEST-SLO-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-001",
+      "identity": {
+        "uuid_v5": "415fc15e-2a55-5635-829c-ddaf3e73b97e",
+        "uuid_v7": "01a04291-b3e1-7cdc-aa1e-26ac3e10a319",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "untrusted-tool-output",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "untrusted tool outputをinstructionではなくdataとして扱わなければならない。",
+        "en": "Untrusted tool output MUST be treated as data, not instruction."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "untrusted tool outputをinstructionではなくdataとして扱わなければならない。",
+        "en": "Untrusted tool output MUST be treated as data, not instruction."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-005"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-002",
+      "identity": {
+        "uuid_v5": "284af628-4234-5a6c-be4e-401fadbdd8f0",
+        "uuid_v7": "01a04291-b3e2-79eb-9acd-2073bf626d47",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "secret-boundary",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "private key、access token、passwordをplanner contextへ渡してはならない。",
+        "en": "Private keys, access tokens, and passwords MUST NOT enter planner contex"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "private key、access token、passwordをplanner contextへ渡してはならない。",
+        "en": "Private keys, access tokens, and passwords MUST NOT enter planner context."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026",
+        "SRC-RFC8032"
+      ],
+      "verification_refs": [
+        "TEST-SEC-006"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-003",
+      "identity": {
+        "uuid_v5": "34a80811-f2c0-5a16-9799-e62c0a6a628e",
+        "uuid_v7": "01a04291-b3e3-77c6-8dd2-b78d81904ecb",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "taint",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "source trust、origin、untrusted annotationをtaint metadataとして伝播しなければならない。",
+        "en": "Source trust, origin, and untrusted annotations MUST propagate as taint "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "source trust、origin、untrusted annotationをtaint metadataとして伝播しなければならない。",
+        "en": "Source trust, origin, and untrusted annotations MUST propagate as taint metadata."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-007"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-004",
+      "identity": {
+        "uuid_v5": "c2c80cd3-7306-5317-b7a2-39ddfbc606c1",
+        "uuid_v7": "01a04291-b3e4-7037-8ebf-7652de8a3ffd",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "least-capability",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "planner capabilityはexecutor capabilityの真部分集合または等しい集合でなければならない。",
+        "en": "Planner capability MUST be a subset of executor capability."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "planner capabilityはexecutor capabilityの真部分集合または等しい集合でなければならない。",
+        "en": "Planner capability MUST be a subset of executor capability."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-008"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-005",
+      "identity": {
+        "uuid_v5": "02baa276-bdd4-5dca-87e8-0996dbb6b6ef",
+        "uuid_v7": "01a04291-b3e5-7e86-af5a-532f99f3dd1a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "critical-commit-hidden",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "critical commit toolはplannerへ直接公開せず、policy engine内に保持すべきである。",
+        "en": "Critical commit tools SHOULD remain inside the policy engine rather than"
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "critical commit toolはplannerへ直接公開せず、policy engine内に保持すべきである。",
+        "en": "Critical commit tools SHOULD remain inside the policy engine rather than being directly exposed to a planner."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-MCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-CRITICAL-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-006",
+      "identity": {
+        "uuid_v5": "c5e6ad4a-30bc-54e4-a06a-4275def71f57",
+        "uuid_v7": "01a04291-b3e6-7857-8cc1-a1fbadd68c66",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "audit-redaction",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "audit logにsecretまたは不要なpersonal dataを直接保存してはならない。",
+        "en": "The audit log MUST NOT directly store secrets or unnecessary personal da"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "audit logにsecretまたは不要なpersonal dataを直接保存してはならない。",
+        "en": "The audit log MUST NOT directly store secrets or unnecessary personal data."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-PRIVACY-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-007",
+      "identity": {
+        "uuid_v5": "19264750-f89c-5898-979f-4a9b87094f2a",
+        "uuid_v7": "01a04291-b3e7-70c5-b7ef-fc808ed60869",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-draft-change",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP draft versionをmetadataへ記録し、互換性testをCIで実行しなければならない。",
+        "en": "The WebMCP draft version MUST be recorded in metadata and compatibility "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "WebMCP draft versionをmetadataへ記録し、互換性testをCIで実行しなければならない。",
+        "en": "The WebMCP draft version MUST be recorded in metadata and compatibility tests run in CI."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-ARCH-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SEC-008",
+      "identity": {
+        "uuid_v5": "53f729c3-5b53-5dc3-8f65-49a5f8cb9210",
+        "uuid_v7": "01a04291-b3e8-77b2-93e5-b3a04d3b186b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "prompt-injection",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "tool description、tool output、page observationをprompt injectionの可能性がある入力と",
+        "en": "Tool descriptions, tool outputs, and page observations MUST be treated a"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "tool description、tool output、page observationをprompt injectionの可能性がある入力として扱わなければならない。",
+        "en": "Tool descriptions, tool outputs, and page observations MUST be treated as potentially prompt-injected inputs."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-WEBMCP-2026"
+      ],
+      "verification_refs": [
+        "TEST-SEC-009"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-VERIFY-001",
+      "identity": {
+        "uuid_v5": "b09cdaf0-a0ad-5b98-9aae-d88c7f5b2ea3",
+        "uuid_v7": "01a04291-b3e9-7631-aecd-e8a8de590d27",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "independent-evidence",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "外部副作用のcommitはtool自己申告だけでなく独立観測またはreceiptを必要とする。",
+        "en": "Committing an external side effect MUST require independent observation "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "外部副作用のcommitはtool自己申告だけでなく独立観測またはreceiptを必要とする。",
+        "en": "Committing an external side effect MUST require independent observation or a receipt, not only the tool self-report."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-VERIFY-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-VERIFY-002",
+      "identity": {
+        "uuid_v5": "c1a89274-7a5d-5e68-b1d2-808bb3149ce5",
+        "uuid_v7": "01a04291-b3ea-76e9-9acf-6a07ba3add82",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "confidence-calibrated",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "confidenceはvalidation dataで校正し、LLMの自己申告confidenceを使うべきではない。",
+        "en": "Confidence SHOULD be calibrated on validation data and SHOULD NOT rely o"
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "confidenceはvalidation dataで校正し、LLMの自己申告confidenceを使うべきではない。",
+        "en": "Confidence SHOULD be calibrated on validation data and SHOULD NOT rely on an LLM self-report."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CHOW-1970"
+      ],
+      "verification_refs": [
+        "TEST-SLO-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-001",
+      "identity": {
+        "uuid_v5": "39f764ec-9ae9-5dcf-9e9b-613bb5826082",
+        "uuid_v7": "01a04291-b3eb-7630-aa34-a7b7f60f90ca",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "canonical-event",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "署名・hash対象eventはJCSまたは互換な限定subsetでcanonicalizeしなければならない。",
+        "en": "Events used for signatures and hashes MUST be canonicalized with JCS or "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "署名・hash対象eventはJCSまたは互換な限定subsetでcanonicalizeしなければならない。",
+        "en": "Events used for signatures and hashes MUST be canonicalized with JCS or a compatible restricted subset."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-RFC7493"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-001"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-002",
+      "identity": {
+        "uuid_v5": "c5a922ff-c299-54a3-b0fd-0c7b185b5866",
+        "uuid_v7": "01a04291-b3ec-7da5-a837-5e7b398f5b07",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "sha256-chain",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "event digestとchain hashには承認済みhash algorithmを使わなければならない。v0.1はSHA-256とする。",
+        "en": "Event digests and chain hashes MUST use an approved hash algorithm; v0.1"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "event digestとchain hashには承認済みhash algorithmを使わなければならない。v0.1はSHA-256とする。",
+        "en": "Event digests and chain hashes MUST use an approved hash algorithm; v0.1 uses SHA-256."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-FIPS180-4"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-002"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-003",
+      "identity": {
+        "uuid_v5": "63d72bae-472f-5d6f-a940-62148e13b927",
+        "uuid_v7": "01a04291-b3ed-731e-8b3d-d5cff9f6a8a0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "ed25519-sign",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "device eventとcheckpointはkey identifier付きEd25519署名でbindしなければならない。",
+        "en": "Device events and checkpoints MUST be bound with Ed25519 signatures carr"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "device eventとcheckpointはkey identifier付きEd25519署名でbindしなければならない。",
+        "en": "Device events and checkpoints MUST be bound with Ed25519 signatures carrying a key identifier."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8032"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-004",
+      "identity": {
+        "uuid_v5": "8508851d-f414-5cac-bbc2-e6e4f61cb706",
+        "uuid_v7": "01a04291-b3ee-708c-ae14-d0187605ddc3",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "merkle-checkpoint",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "event batchはMerkle rootへ集約しsigned checkpointを外部保存すべきである。",
+        "en": "Event batches SHOULD be aggregated into a Merkle root and an externally "
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "event batchはMerkle rootへ集約しsigned checkpointを外部保存すべきである。",
+        "en": "Event batches SHOULD be aggregated into a Merkle root and an externally stored signed checkpoint."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC9162"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-005",
+      "identity": {
+        "uuid_v5": "b717efb0-3270-5d0d-9546-7d8106377adb",
+        "uuid_v7": "01a04291-b3ef-78c1-a4d2-2fc8ab90ae66",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "inclusion-proof",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "重要eventについて全logを開示せずinclusion proofを生成できるべきである。",
+        "en": "The system SHOULD generate inclusion proofs for important events without"
+      },
+      "type": "Requirement",
+      "normative_level": "SHOULD",
+      "statement": {
+        "ja": "重要eventについて全logを開示せずinclusion proofを生成できるべきである。",
+        "en": "The system SHOULD generate inclusion proofs for important events without disclosing the full log."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC9162"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-005"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-006",
+      "identity": {
+        "uuid_v5": "65dc2c80-363f-54bb-b502-edc09eeb323f",
+        "uuid_v7": "01a04291-b3f0-7142-b430-f9234979722a",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "same-intent-digest",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "AUTHORIZE、EXECUTE、VERIFY、COMMITは同一intent digestを参照しなければならない。",
+        "en": "AUTHORIZE, EXECUTE, VERIFY, and COMMIT MUST reference the same intent di"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "AUTHORIZE、EXECUTE、VERIFY、COMMITは同一intent digestを参照しなければならない。",
+        "en": "AUTHORIZE, EXECUTE, VERIFY, and COMMIT MUST reference the same intent digest."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-RFC8785",
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-006"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-007",
+      "identity": {
+        "uuid_v5": "134a5d02-7aa1-53ea-93aa-b179cc70fc3f",
+        "uuid_v7": "01a04291-b3f1-7b10-a642-d0d263508da2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "policy-snapshot",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "authorization時のpolicyとTool Contractのdigestをeventへ記録しなければならない。",
+        "en": "The event MUST record digests of the policy and Tool Contract used at au"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "authorization時のpolicyとTool Contractのdigestをeventへ記録しなければならない。",
+        "en": "The event MUST record digests of the policy and Tool Contract used at authorization time."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-007"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-008",
+      "identity": {
+        "uuid_v5": "33c903f3-47bc-5973-801d-b178c84b08c6",
+        "uuid_v7": "01a04291-b3f2-7156-846f-08c829feb91d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "replay-deterministic",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "同じevent streamから同じstate projectionを再構築できなければならない。",
+        "en": "The same event stream MUST reconstruct the same state projection."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "同じevent streamから同じstate projectionを再構築できなければならない。",
+        "en": "The same event stream MUST reconstruct the same state projection."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-008"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-009",
+      "identity": {
+        "uuid_v5": "3ce861da-9c0d-5108-a56e-2256a05e2996",
+        "uuid_v7": "01a04291-b3f3-7618-9efe-2f72139deb63",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "snapshot-derived",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "snapshotはevent logの派生cacheとして扱い、hash anchorを持たなければならない。",
+        "en": "A snapshot MUST be treated as a derived cache and carry a hash anchor to"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "snapshotはevent logの派生cacheとして扱い、hash anchorを持たなければならない。",
+        "en": "A snapshot MUST be treated as a derived cache and carry a hash anchor to the event log."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-AUDIT-009"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-AUDIT-010",
+      "identity": {
+        "uuid_v5": "a8eab8b6-dfa7-5e8a-a6d7-8255d5d3caf0",
+        "uuid_v7": "01a04291-b3f4-7db5-92d4-1e21236a468b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "claim-not-truth",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "記録されたclaimと独立に観測されたtruth estimateを区別しなければならない。",
+        "en": "The system MUST distinguish a recorded claim from an independently obser"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "記録されたclaimと独立に観測されたtruth estimateを区別しなければならない。",
+        "en": "The system MUST distinguish a recorded claim from an independently observed truth estimate."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-PROVO-2013"
+      ],
+      "verification_refs": [
+        "TEST-VERIFY-003"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-FORMAL-001",
+      "identity": {
+        "uuid_v5": "9b62b0e4-3ee5-51df-b7bf-10ba11d6c4b2",
+        "uuid_v7": "01a04291-b3f5-790e-9749-747c6ed886b8",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "tla-invariants",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "未承認実行、二重効果、未検証commit、ambiguous retryをTLA+ invariantとして定義しなければならない。",
+        "en": "Unauthorized execution, double effects, unverified commit, and ambiguous"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "未承認実行、二重効果、未検証commit、ambiguous retryをTLA+ invariantとして定義しなければならない。",
+        "en": "Unauthorized execution, double effects, unverified commit, and ambiguous retry MUST be defined as TLA+ invariants."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-ALL"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-FORMAL-002",
+      "identity": {
+        "uuid_v5": "4a7c98bf-cc25-5097-b54e-f6616021c390",
+        "uuid_v7": "01a04291-b3f6-7d6c-bb0f-b118b80f5e21",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "mutation-tests",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "各安全guardを意図的に破壊したmutation modelがcounterexampleを生成することを確認しなければならない。",
+        "en": "A mutation model that deliberately breaks each safety guard MUST produce"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "各安全guardを意図的に破壊したmutation modelがcounterexampleを生成することを確認しなければならない。",
+        "en": "A mutation model that deliberately breaks each safety guard MUST produce a counterexample."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-TLA-LAMPORT"
+      ],
+      "verification_refs": [
+        "TEST-MODEL-MUTATION"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SLO-001",
+      "identity": {
+        "uuid_v5": "c1f0c7bf-b94b-5e09-8c2f-421ef46bd6d3",
+        "uuid_v7": "01a04291-b3f7-759b-891e-9bd460980b31",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "outcome-partition",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "qT、qB、qR、qHは非負で合計1でなければならない。",
+        "en": "qT, qB, qR, and qH MUST be nonnegative and sum to one."
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "qT、qB、qR、qHは非負で合計1でなければならない。",
+        "en": "qT, qB, qR, and qH MUST be nonnegative and sum to one."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "verification_refs": [
+        "TEST-SLO-004"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SLO-002",
+      "identity": {
+        "uuid_v5": "3414520d-588c-5e99-9332-3ec9182bc198",
+        "uuid_v7": "01a04291-b3f8-7716-9772-fc593901bab4",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "hard-chance-constraints",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "P_badとP_dupは目的関数のpenaltyではなくhard chance constraintで制御しなければならない。",
+        "en": "P_bad and P_dup MUST be controlled as hard chance constraints, not only "
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "P_badとP_dupは目的関数のpenaltyではなくhard chance constraintで制御しなければならない。",
+        "en": "P_bad and P_dup MUST be controlled as hard chance constraints, not only objective penalties."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "verification_refs": [
+        "TEST-SLO-005"
+      ],
+      "status": "proposed"
+    },
+    {
+      "id": "REQ-SLO-003",
+      "identity": {
+        "uuid_v5": "fff22f65-8060-5868-968c-ae0f6e2d0866",
+        "uuid_v7": "01a04291-b3f9-76fc-ad4c-762429cae74f",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "synthetic-label",
+        "category": "requirement"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "sample SLO parameterとruntime metricはsynthetic/illustrativeであることを明示しなければな",
+        "en": "Sample SLO parameters and runtime metrics MUST be labeled synthetic/illu"
+      },
+      "type": "Requirement",
+      "normative_level": "MUST",
+      "statement": {
+        "ja": "sample SLO parameterとruntime metricはsynthetic/illustrativeであることを明示しなければならない。",
+        "en": "Sample SLO parameters and runtime metrics MUST be labeled synthetic/illustrative."
+      },
+      "rationale": {
+        "ja": "安全性、再現性、監査可能性のため。",
+        "en": "For safety, reproducibility, and auditability."
+      },
+      "source_refs": [
+        "SRC-CMDP-1999"
+      ],
+      "verification_refs": [
+        "TEST-SLO-006"
+      ],
+      "status": "proposed"
+    }
+  ]
+}

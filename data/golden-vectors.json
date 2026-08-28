@@ -1,0 +1,548 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-08-27T09:34:00Z",
+  "pre": [
+    {
+      "id": "GV-PRE-ALLOW",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "cdc108a4-0e6f-55c0-81b6-5f1db8615f7f",
+          "uuid_v7": "01a04291-b42b-7227-a02c-7d48bc2d2cda",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-pre-allow",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "account.update_address",
+          "class": "write",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "pre",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 700000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": null,
+          "classFloorPPM": 950000,
+          "damage": null,
+          "lossBudget": null
+        }
+      },
+      "expected": "ALLOW"
+    },
+    {
+      "id": "GV-PRE-UTILITY-DENY",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "48f84d81-f72f-5164-8b18-5550091edc74",
+          "uuid_v7": "01a04291-b42c-7bee-b2ac-61b876b27572",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-pre-deny",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "account.update_address",
+          "class": "write",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "pre",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 400000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": null,
+          "classFloorPPM": 950000,
+          "damage": null,
+          "lossBudget": null
+        }
+      },
+      "expected": "DENY"
+    },
+    {
+      "id": "GV-PRE-HUMAN",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "167d0aee-eacd-5ff1-ac1f-2162d4cd54c5",
+          "uuid_v7": "01a04291-b42d-71ad-ad00-ca42d52fee2e",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-pre-human",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "payments.commit",
+          "class": "financial",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "pre",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": true
+        },
+        "utility": {
+          "successProbabilityPPM": 999500,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": null,
+          "classFloorPPM": 999000,
+          "damage": null,
+          "lossBudget": null
+        }
+      },
+      "expected": "HUMAN"
+    },
+    {
+      "id": "GV-PRE-HARD-DENY",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "f67022a5-1a59-5c73-a8e2-6b12a90fe118",
+          "uuid_v7": "01a04291-b42e-7565-8d9f-889cb9de7af6",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-pre-hard-deny",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "account.update_address",
+          "class": "write",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "pre",
+        "gates": {
+          "schema": true,
+          "auth": false,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 1000000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": null,
+          "classFloorPPM": 950000,
+          "damage": null,
+          "lossBudget": null
+        }
+      },
+      "expected": "DENY"
+    },
+    {
+      "id": "GV-PRE-RECONCILE",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "eae426c8-f429-5a50-9e0d-9948ee42b276",
+          "uuid_v7": "01a04291-b42f-79d6-9674-02bb489bc1ab",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-pre-reconcile",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "messaging.send",
+          "class": "messaging",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "pre",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": true,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 1000000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": null,
+          "classFloorPPM": 980000,
+          "damage": null,
+          "lossBudget": null
+        }
+      },
+      "expected": "RECONCILE"
+    }
+  ],
+  "post": [
+    {
+      "id": "GV-POST-ALLOW",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "3a086531-595b-5674-8810-38c51e6a8be2",
+          "uuid_v7": "01a04291-b430-7aec-be7e-3a76a816f0c1",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-post-allow",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "account.update_address",
+          "class": "write",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "post",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 910000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": 960000,
+          "classFloorPPM": 950000,
+          "damage": 10000,
+          "lossBudget": 500
+        }
+      },
+      "expected": "ALLOW"
+    },
+    {
+      "id": "GV-POST-DENY",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "05f357b2-a448-54b3-a07f-30edf3fd80ab",
+          "uuid_v7": "01a04291-b431-76d8-9125-aa8c7712182f",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-post-deny",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "account.update_address",
+          "class": "write",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "post",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 910000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": 940000,
+          "classFloorPPM": 950000,
+          "damage": 10000,
+          "lossBudget": 500
+        }
+      },
+      "expected": "DENY"
+    },
+    {
+      "id": "GV-POST-RECONCILE",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "10c019d4-cc88-5db2-9c9f-e881f1f807b4",
+          "uuid_v7": "01a04291-b432-7a5f-8e68-e72b7cc19a41",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-post-reconcile",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "messaging.send",
+          "class": "messaging",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "post",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": true,
+          "humanRequired": false
+        },
+        "utility": {
+          "successProbabilityPPM": 910000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": 1000000,
+          "classFloorPPM": 980000,
+          "damage": 50000,
+          "lossBudget": 1000
+        }
+      },
+      "expected": "RECONCILE"
+    },
+    {
+      "id": "GV-POST-HUMAN",
+      "input": {
+        "irVersion": "0.1.0",
+        "identity": {
+          "uuid_v5": "8864e632-28b9-5d5f-871a-2226dc06b7e8",
+          "uuid_v7": "01a04291-b433-7785-83a5-875d7cfe8f98",
+          "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+          "canonical_name": "gv-post-human",
+          "category": "canonical-ir"
+        },
+        "temporal": {
+          "created_at": "2026-08-27T09:34:00Z",
+          "updated_at": "2026-08-27T09:34:00Z",
+          "observed_at": "2026-08-27T09:34:00Z",
+          "valid_from": "2026-08-27T09:34:00Z",
+          "valid_to": null,
+          "epoch_ms": 1787823240000,
+          "time_zone": "UTC",
+          "local_time_zone": "Asia/Tokyo",
+          "local_rendering": "2026-08-27T18:34:00+09:00",
+          "precision": "millisecond",
+          "standard": "RFC 3339 profile"
+        },
+        "tool": {
+          "id": "payments.commit",
+          "class": "financial",
+          "contractVersion": "0.1.0"
+        },
+        "phase": "post",
+        "gates": {
+          "schema": true,
+          "auth": true,
+          "permission": true,
+          "network": true,
+          "version": true,
+          "dependency": true,
+          "privacy": true,
+          "consent": true
+        },
+        "state": {
+          "ambiguousPreviousEffect": false,
+          "humanRequired": true
+        },
+        "utility": {
+          "successProbabilityPPM": 910000,
+          "successGain": 1000000,
+          "failureLoss": 600000,
+          "totalPenalty": 120000,
+          "abstainUtility": 0
+        },
+        "verification": {
+          "confidencePPM": 1000000,
+          "classFloorPPM": 999000,
+          "damage": 100000,
+          "lossBudget": 100
+        }
+      },
+      "expected": "HUMAN"
+    }
+  ]
+}

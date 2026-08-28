@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/canonical-ir.schema.json",
+  "title": "Canonical Tool Decision IR v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "irVersion",
+    "identity",
+    "temporal",
+    "tool",
+    "phase",
+    "gates",
+    "state",
+    "utility",
+    "verification"
+  ],
+  "properties": {
+    "irVersion": {
+      "const": "0.1.0"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uuid_v5",
+        "uuid_v7",
+        "uuid_namespace",
+        "canonical_name",
+        "category"
+      ],
+      "properties": {
+        "uuid_v5": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "uuid_v7": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "uuid_namespace": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "canonical_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created_at",
+        "updated_at",
+        "observed_at",
+        "valid_from",
+        "epoch_ms",
+        "time_zone",
+        "local_time_zone",
+        "local_rendering",
+        "precision",
+        "standard"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "epoch_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_zone": {
+          "const": "UTC"
+        },
+        "local_time_zone": {
+          "type": "string"
+        },
+        "local_rendering": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "precision": {
+          "enum": [
+            "millisecond",
+            "second",
+            "day",
+            "year"
+          ]
+        },
+        "standard": {
+          "type": "string"
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "class",
+        "contractVersion"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "class": {
+          "enum": [
+            "read",
+            "write",
+            "messaging",
+            "identity",
+            "destructive",
+            "financial"
+          ]
+        },
+        "contractVersion": {
+          "type": "string"
+        }
+      }
+    },
+    "phase": {
+      "enum": [
+        "pre",
+        "post"
+      ]
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "auth",
+        "permission",
+        "network",
+        "version",
+        "dependency",
+        "privacy",
+        "consent"
+      ],
+      "properties": {
+        "schema": {
+          "type": "boolean"
+        },
+        "auth": {
+          "type": "boolean"
+        },
+        "permission": {
+          "type": "boolean"
+        },
+        "network": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "boolean"
+        },
+        "dependency": {
+          "type": "boolean"
+        },
+        "privacy": {
+          "type": "boolean"
+        },
+        "consent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ambiguousPreviousEffect",
+        "humanRequired"
+      ],
+      "properties": {
+        "ambiguousPreviousEffect": {
+          "type": "boolean"
+        },
+        "humanRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "utility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "successProbabilityPPM",
+        "successGain",
+        "failureLoss",
+        "totalPenalty",
+        "abstainUtility"
+      ],
+      "properties": {
+        "successProbabilityPPM": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        },
+        "successGain": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failureLoss": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalPenalty": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "abstainUtility": {
+          "type": "integer"
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confidencePPM",
+        "classFloorPPM",
+        "damage",
+        "lossBudget"
+      ],
+      "properties": {
+        "confidencePPM": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1000000
+        },
+        "classFloorPPM": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        },
+        "damage": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "lossBudget": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

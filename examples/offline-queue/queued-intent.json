@@ -1,0 +1,28 @@
+{
+  "intentId": "cc730a99-99f4-5c16-ad4c-8e4d4316a974",
+  "eventId": "01a04291-b42a-7983-b386-09a2577bdf1f",
+  "createdAt": "2026-08-27T09:34:00Z",
+  "epochMs": 1787823240000,
+  "status": "QUEUED",
+  "toolId": "account.update_address",
+  "normalizedArgs": {
+    "newAddress": "1-2-3 Example, Tokyo",
+    "baseVersion": 17
+  },
+  "dependencies": [],
+  "baseVersion": 17,
+  "ttlSeconds": 86400,
+  "riskClass": "write",
+  "replayPolicy": {
+    "requiresOnline": true,
+    "revalidate": [
+      "auth",
+      "permission",
+      "version",
+      "consent",
+      "ttl",
+      "preconditions"
+    ]
+  },
+  "externalEffectStarted": false
+}

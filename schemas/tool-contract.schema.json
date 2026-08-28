@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/tool-contract.schema.json",
+  "title": "Tool Contract v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "identity",
+    "temporal",
+    "tool",
+    "interface",
+    "semantics",
+    "properties",
+    "policy",
+    "models",
+    "recovery",
+    "audit"
+  ],
+  "properties": {
+    "contractVersion": {
+      "const": "0.1.0"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uuid_v5",
+        "uuid_v7",
+        "uuid_namespace",
+        "canonical_name",
+        "category"
+      ],
+      "properties": {
+        "uuid_v5": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "uuid_v7": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "uuid_namespace": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "canonical_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created_at",
+        "updated_at",
+        "observed_at",
+        "valid_from",
+        "epoch_ms",
+        "time_zone",
+        "local_time_zone",
+        "local_rendering",
+        "precision",
+        "standard"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "epoch_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_zone": {
+          "const": "UTC"
+        },
+        "local_time_zone": {
+          "type": "string"
+        },
+        "local_rendering": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "precision": {
+          "enum": [
+            "millisecond",
+            "second",
+            "day",
+            "year"
+          ]
+        },
+        "standard": {
+          "type": "string"
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "class"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "class": {
+          "enum": [
+            "read",
+            "write",
+            "messaging",
+            "identity",
+            "destructive",
+            "financial"
+          ]
+        }
+      }
+    },
+    "interface": {
+      "type": "object",
+      "required": [
+        "inputSchema",
+        "outputSchema"
+      ],
+      "properties": {
+        "inputSchema": {
+          "type": "object"
+        },
+        "outputSchema": {
+          "type": "object"
+        }
+      }
+    },
+    "semantics": {
+      "type": "object",
+      "required": [
+        "readSet",
+        "writeSet",
+        "preconditions",
+        "postconditions"
+      ],
+      "properties": {
+        "readSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "writeSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preconditions": {
+          "type": "array"
+        },
+        "postconditions": {
+          "type": "array"
+        }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "required": [
+        "externalSideEffect",
+        "reversible",
+        "idempotent",
+        "commutative",
+        "networkRequired"
+      ],
+      "properties": {
+        "externalSideEffect": {
+          "type": "boolean"
+        },
+        "reversible": {
+          "type": "boolean"
+        },
+        "idempotent": {
+          "type": "boolean"
+        },
+        "commutative": {
+          "type": "boolean"
+        },
+        "networkRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "offline",
+        "humanApproval",
+        "retry"
+      ],
+      "properties": {
+        "offline": {
+          "enum": [
+            "CACHE",
+            "QUEUE",
+            "DRAFT",
+            "INTENT_ONLY",
+            "LOCAL_AUTH",
+            "NO_REPLAY"
+          ]
+        },
+        "humanApproval": {
+          "enum": [
+            "AUTO",
+            "CONDITIONAL",
+            "MANDATE_OR_HUMAN",
+            "HUMAN"
+          ]
+        },
+        "retry": {
+          "enum": [
+            "NONE",
+            "SAFE_ONLY",
+            "RECONCILE_THEN_RETRY"
+          ]
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "required": [
+        "success",
+        "cost",
+        "risk",
+        "evidence"
+      ],
+      "properties": {
+        "success": {
+          "type": "object"
+        },
+        "cost": {
+          "type": "object"
+        },
+        "risk": {
+          "type": "object"
+        },
+        "evidence": {
+          "type": "object"
+        }
+      }
+    },
+    "recovery": {
+      "type": "object"
+    },
+    "audit": {
+      "type": "object"
+    }
+  }
+}

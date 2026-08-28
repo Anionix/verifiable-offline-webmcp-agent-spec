@@ -1,0 +1,25 @@
+{
+  "artifact": "verifiable-offline-webmcp-agent-spec",
+  "validatedAt": "2026-08-28T13:03:35.246072Z",
+  "snapshotEventId": "01a04878-183e-7abc-898c-ae2f3f18d768",
+  "checks": {
+    "structured_parse": true,
+    "local_markdown_links": true,
+    "json_schema": true,
+    "source_graph": true,
+    "uuid_v5_v7": true,
+    "golden_vectors_python": true,
+    "audit_chain_signatures": true,
+    "merkle_checkpoint": true,
+    "no_private_keys": true,
+    "reachability_and_mutation": true,
+    "typescript_tests": true,
+    "typescript_typecheck": true,
+    "wolfram_report": true
+  },
+  "tlcExecuted": false,
+  "tlcNote": "TLA+ specification is provided; TLC is not bundled or executed by this local validation script.",
+  "errorCount": 0,
+  "errors": [],
+  "passed": true
+}

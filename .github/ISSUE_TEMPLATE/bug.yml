@@ -1,0 +1,59 @@
+# information_uuid_v5=981106af-7a2a-5ced-adf6-e5e168565e75
+# event_uuid_v7=01a04875-b561-798b-8a9e-c80ffa942496
+# machine-contract: DISCOVERED -> PROPOSED; a report does not become VERIFIED without reproducible evidence.
+name: 仕様・実装の不具合
+description: 矛盾、失敗する検証、危険な状態遷移を報告します。
+title: "[不具合] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 主文は日本語で記載し、目的と完了条件には短い英語要約も添えてください。秘密情報は貼らないでください。
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的 / Purpose
+      description: 何を安全にしたいか。英語要約も一文追加してください。
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: 観測結果と再現手順
+      description: ファイル、状態、時刻、実行した検証、最小の反例を記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する不変条件
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 一次情報源・検証証拠
+      description: 公式仕様、原論文、make validateの結果を記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: 完了条件 / Completion criteria
+      description: 日本語の判定条件と短い英語要約を記載してください。
+    validations:
+      required: true
+  - type: input
+    id: stable_id
+    attributes:
+      label: 情報識別子（UUIDバージョン5）
+      placeholder: 00000000-0000-5000-8000-000000000000
+    validations:
+      required: true
+  - type: input
+    id: event_id
+    attributes:
+      label: 出来事識別子（UUIDバージョン7）
+      placeholder: 00000000-0000-7000-8000-000000000000
+    validations:
+      required: true

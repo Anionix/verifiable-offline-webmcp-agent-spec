@@ -1,0 +1,77 @@
+{
+  "@context": "context.jsonld",
+  "@id": "urn:uuid:99b989b2-1650-587c-bcaa-3ed05713a6db",
+  "@type": "dcat:Catalog",
+  "title": {
+    "ja": "検証可能なオフライン WebMCP エージェント設計",
+    "en": "Verifiable Offline WebMCP Agent Architecture"
+  },
+  "issued": "2026-08-27T09:34:00Z",
+  "license": "https://spdx.org/licenses/Apache-2.0.html",
+  "datasets": [
+    {
+      "@id": "urn:uuid:e829a994-c052-5549-a5ba-45b4bbc6dc86",
+      "@type": "dcat:Dataset",
+      "title": {
+        "ja": "設計知識グラフ",
+        "en": "Design Knowledge Graph"
+      },
+      "distribution": [
+        {
+          "id": "1663f4a0-494d-5578-a465-c94c3fb3e3a7",
+          "title": "sources",
+          "downloadURL": "knowledge/sources.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "89b6df00-a132-5c4d-ba5c-3e228e264e22",
+          "title": "claims",
+          "downloadURL": "knowledge/claims.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "5d524216-3d39-50fd-b500-f08b47990c54",
+          "title": "formulas",
+          "downloadURL": "knowledge/formulas.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "6ec9b3b6-45b5-57b2-b6bd-7a589261a3e2",
+          "title": "requirements",
+          "downloadURL": "knowledge/requirements.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "0fc8c11c-c299-58c2-b1e7-9fa37f445ffd",
+          "title": "decisions",
+          "downloadURL": "knowledge/decisions.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "108f5d22-9f52-56a9-9cb5-8c7ea270cf47",
+          "title": "components",
+          "downloadURL": "knowledge/components.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "c3ed63b0-abf2-5959-a501-d61b1a92277d",
+          "title": "risk-classes",
+          "downloadURL": "knowledge/risk-classes.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "b6c7fc20-4f8d-5146-91d1-6cd63b9b7776",
+          "title": "timeline",
+          "downloadURL": "knowledge/timeline.json",
+          "mediaType": "application/json"
+        },
+        {
+          "id": "d75e74f3-967a-569e-86c5-f6209218d03f",
+          "title": "tests",
+          "downloadURL": "knowledge/tests.json",
+          "mediaType": "application/json"
+        }
+      ]
+    }
+  ]
+}

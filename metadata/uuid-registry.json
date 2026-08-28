@@ -1,0 +1,1954 @@
+{
+  "root_namespace_uuid_v5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+  "algorithm": {
+    "stable": "UUIDv5(root_namespace, lower(category + \"/\" + canonical_name))",
+    "event": "RFC 9562 UUIDv7 with 48-bit Unix epoch millisecond timestamp"
+  },
+  "generated_at": "2026-08-27T09:34:00Z",
+  "categories": {
+    "project": [
+      {
+        "id": "PROJECT-001",
+        "uuid_v5": "93f29c90-928f-5378-9ea8-12d8d878722c",
+        "uuid_v7": "01a04291-b422-73a9-b478-dc94abbe7596",
+        "canonical_name": "verifiable-offline-webmcp-agent-spec",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "sources": [
+      {
+        "id": "SRC-WEBMCP-2026",
+        "uuid_v5": "5512b64a-cffd-55db-a665-97f06b0754b3",
+        "uuid_v7": "01a04291-b340-79a1-ab18-e18e2715a156",
+        "canonical_name": "webmcp-community-group-draft-2026-08-26",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "SRC-OPENAI-RESPONSES-2025",
+        "uuid_v5": "cc769e2e-dd5a-5e6c-9846-a6e255180914",
+        "uuid_v7": "01a04291-b341-7d24-90d7-837e775a15a3",
+        "canonical_name": "openai-new-tools-for-building-agents-2025-03-11",
+        "created_at": "2026-08-27T09:34:00.001000Z"
+      },
+      {
+        "id": "SRC-OPENAI-MCP-2025",
+        "uuid_v5": "c3559101-59f2-508b-9f90-f095310c8865",
+        "uuid_v7": "01a04291-b342-7b48-9ad3-6ca6d9475561",
+        "canonical_name": "openai-responses-api-remote-mcp-2025-05-21",
+        "created_at": "2026-08-27T09:34:00.002000Z"
+      },
+      {
+        "id": "SRC-OPENAI-RUNTIME-2026",
+        "uuid_v5": "695b8f5a-ed77-5c3c-b9a7-7d8573f622c5",
+        "uuid_v7": "01a04291-b343-72e2-b58e-b8723e7f9b6d",
+        "canonical_name": "openai-equipping-responses-api-computer-environment-2026-03-11",
+        "created_at": "2026-08-27T09:34:00.003000Z"
+      },
+      {
+        "id": "SRC-MCP-2026",
+        "uuid_v5": "0040f552-6e8a-555a-8d77-ff88cf190932",
+        "uuid_v7": "01a04291-b344-79ab-9484-041f613ef2b2",
+        "canonical_name": "model-context-protocol-specification-2026-07-28",
+        "created_at": "2026-08-27T09:34:00.004000Z"
+      },
+      {
+        "id": "SRC-JSONLD-2020",
+        "uuid_v5": "6ea7c25d-7b9e-50b9-9b59-127cd124d5b7",
+        "uuid_v7": "01a04291-b345-73b3-ace6-8d3927af50b2",
+        "canonical_name": "w3c-json-ld-1-1",
+        "created_at": "2026-08-27T09:34:00.005000Z"
+      },
+      {
+        "id": "SRC-PROVO-2013",
+        "uuid_v5": "a6ebf827-b311-50da-be6e-c0bbe61838f5",
+        "uuid_v7": "01a04291-b346-7331-b4e8-5e09bc780954",
+        "canonical_name": "w3c-prov-o",
+        "created_at": "2026-08-27T09:34:00.006000Z"
+      },
+      {
+        "id": "SRC-DCAT3-2024",
+        "uuid_v5": "7c4e7328-dbfe-55a6-8365-8783fc8f55c1",
+        "uuid_v7": "01a04291-b347-7a79-b861-6b258e6b9507",
+        "canonical_name": "w3c-dcat-version-3",
+        "created_at": "2026-08-27T09:34:00.007000Z"
+      },
+      {
+        "id": "SRC-JSONSCHEMA-2020-12",
+        "uuid_v5": "d0bc2765-2f7b-534d-a88e-09d1a42cc364",
+        "uuid_v7": "01a04291-b348-7740-9d11-bbbd00c96e96",
+        "canonical_name": "json-schema-draft-2020-12-core",
+        "created_at": "2026-08-27T09:34:00.008000Z"
+      },
+      {
+        "id": "SRC-RFC8259",
+        "uuid_v5": "2206143d-75e7-5f56-9fd3-7740940f85dc",
+        "uuid_v7": "01a04291-b349-71d0-b336-27a2ff871858",
+        "canonical_name": "rfc-8259-json",
+        "created_at": "2026-08-27T09:34:00.009000Z"
+      },
+      {
+        "id": "SRC-RFC7493",
+        "uuid_v5": "e17022d8-a733-5fa9-a23b-e6d4ba08b9ec",
+        "uuid_v7": "01a04291-b34a-73ba-ae4c-eded234796e2",
+        "canonical_name": "rfc-7493-i-json",
+        "created_at": "2026-08-27T09:34:00.010000Z"
+      },
+      {
+        "id": "SRC-RFC8785",
+        "uuid_v5": "2f53445e-1dbd-5f35-954c-69af5e93690e",
+        "uuid_v7": "01a04291-b34b-7e17-9a69-fdd64d342d30",
+        "canonical_name": "rfc-8785-jcs",
+        "created_at": "2026-08-27T09:34:00.011000Z"
+      },
+      {
+        "id": "SRC-RFC9562",
+        "uuid_v5": "dc6a4a7e-d313-5725-8bf7-ef3001781a2e",
+        "uuid_v7": "01a04291-b34c-7b8a-9af9-692ebcbc65fc",
+        "canonical_name": "rfc-9562-uuid",
+        "created_at": "2026-08-27T09:34:00.012000Z"
+      },
+      {
+        "id": "SRC-RFC3339",
+        "uuid_v5": "b50a5b84-01d7-5eed-9304-bb8de74d36fd",
+        "uuid_v7": "01a04291-b34d-7528-b02f-71fb20841f3d",
+        "canonical_name": "rfc-3339-timestamps",
+        "created_at": "2026-08-27T09:34:00.013000Z"
+      },
+      {
+        "id": "SRC-FIPS180-4",
+        "uuid_v5": "60f7c6da-80a1-59d2-98fb-39c76bd555de",
+        "uuid_v7": "01a04291-b34e-7cca-8348-3af9ef27f517",
+        "canonical_name": "nist-fips-180-4-secure-hash-standard",
+        "created_at": "2026-08-27T09:34:00.014000Z"
+      },
+      {
+        "id": "SRC-RFC8032",
+        "uuid_v5": "2791987b-30bb-5a18-93c8-58f8c88aee80",
+        "uuid_v7": "01a04291-b34f-7e7e-961a-10fb8cea5ba0",
+        "canonical_name": "rfc-8032-eddsa",
+        "created_at": "2026-08-27T09:34:00.015000Z"
+      },
+      {
+        "id": "SRC-RFC9162",
+        "uuid_v5": "aa6e88e6-e003-5321-a9ea-689c5e330000",
+        "uuid_v7": "01a04291-b350-7997-a5ee-6b92deb71073",
+        "canonical_name": "rfc-9162-certificate-transparency-v2",
+        "created_at": "2026-08-27T09:34:00.016000Z"
+      },
+      {
+        "id": "SRC-TLA-LAMPORT",
+        "uuid_v5": "f5c97a48-75c1-5e0f-82e6-c989fdc2ea7d",
+        "uuid_v7": "01a04291-b351-7a43-9e6b-9bc0696a9015",
+        "canonical_name": "lamport-specifying-and-verifying-systems",
+        "created_at": "2026-08-27T09:34:00.017000Z"
+      },
+      {
+        "id": "SRC-POMDP-1998",
+        "uuid_v5": "52606e63-c0da-5134-b5c7-a8d4425ce4c2",
+        "uuid_v7": "01a04291-b352-7ebd-8b81-a4928f375e0d",
+        "canonical_name": "kaelbling-littman-cassandra-pomdp-1998",
+        "created_at": "2026-08-27T09:34:00.018000Z"
+      },
+      {
+        "id": "SRC-CMDP-1999",
+        "uuid_v5": "1dbda155-9584-5df2-bead-cd6aa3279b18",
+        "uuid_v7": "01a04291-b353-79df-a9da-a2dc0fe953fd",
+        "canonical_name": "altman-constrained-markov-decision-processes",
+        "created_at": "2026-08-27T09:34:00.019000Z"
+      },
+      {
+        "id": "SRC-CRDT-2011",
+        "uuid_v5": "46666d42-bcff-5bb9-82cc-0fb4f1f9adc4",
+        "uuid_v7": "01a04291-b354-7a6d-8a90-86c4c3b1801c",
+        "canonical_name": "shapiro-crdt-2011",
+        "created_at": "2026-08-27T09:34:00.020000Z"
+      },
+      {
+        "id": "SRC-LITTLE-1961",
+        "uuid_v5": "fcb67262-133c-58c1-89b0-b2630ce06ad7",
+        "uuid_v7": "01a04291-b355-7b3e-a255-def914f71aa0",
+        "canonical_name": "little-proof-queueing-formula-1961",
+        "created_at": "2026-08-27T09:34:00.021000Z"
+      },
+      {
+        "id": "SRC-CHOW-1970",
+        "uuid_v5": "0c619fd4-b636-5983-8e75-2a63d7688c45",
+        "uuid_v7": "01a04291-b356-7004-94cf-eb2251e32346",
+        "canonical_name": "chow-reject-tradeoff-1970",
+        "created_at": "2026-08-27T09:34:00.022000Z"
+      }
+    ],
+    "claims": [
+      {
+        "id": "CLM-001",
+        "uuid_v5": "d0b03d32-e877-55ac-9354-13478b34e576",
+        "uuid_v7": "01a04291-b357-7214-93c9-e3ae016d0285",
+        "canonical_name": "webmcp-draft-status",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-002",
+        "uuid_v5": "90dcd33c-4f6f-5019-9880-f5337d47d731",
+        "uuid_v7": "01a04291-b358-7185-a2ee-ba73f990ecaf",
+        "canonical_name": "webmcp-tool-interface",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-003",
+        "uuid_v5": "05b4336b-815c-582d-96bb-4560e8fed34f",
+        "uuid_v7": "01a04291-b359-7fea-89bd-4d8283e33eb7",
+        "canonical_name": "webmcp-annotations",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-004",
+        "uuid_v5": "5faccddc-5d5d-509c-893b-2df685c03b47",
+        "uuid_v7": "01a04291-b35a-7a17-872e-5e45b8c2d2c9",
+        "canonical_name": "responses-agent-primitive",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-005",
+        "uuid_v5": "fb91aae7-318b-5724-ac5c-079df95d8469",
+        "uuid_v7": "01a04291-b35b-7d1b-b311-15fd9fe71bdf",
+        "canonical_name": "responses-remote-mcp",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-006",
+        "uuid_v5": "c53d5d02-6ea2-5a1e-a90b-512079bc7e6d",
+        "uuid_v7": "01a04291-b35c-76d3-bd65-86a112edb93c",
+        "canonical_name": "model-proposes-runtime-executes",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-007",
+        "uuid_v5": "f62ca651-c1b4-5851-886d-3762519925c2",
+        "uuid_v7": "01a04291-b35d-706d-a293-ee7b7aff419e",
+        "canonical_name": "mcp-host-policy",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-008",
+        "uuid_v5": "ef064dea-812c-5988-9120-cae641d34fa5",
+        "uuid_v7": "01a04291-b35e-71bc-90f0-14b26386cd47",
+        "canonical_name": "jsonld-linked-data",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-009",
+        "uuid_v5": "46efcdab-4270-5078-b416-8c04a5ffd3ad",
+        "uuid_v7": "01a04291-b35f-7eef-8729-21c8f38e213b",
+        "canonical_name": "prov-provenance",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-010",
+        "uuid_v5": "c3a68daa-2c09-53b5-9eff-7b16755a7fc1",
+        "uuid_v7": "01a04291-b360-7f0a-8518-8f21dac88822",
+        "canonical_name": "dcat-catalog",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-011",
+        "uuid_v5": "4b3138c5-35c6-5377-b0dc-4ffe3a15f137",
+        "uuid_v7": "01a04291-b361-7e5f-8967-e1bff1c6e840",
+        "canonical_name": "json-schema-structure",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-012",
+        "uuid_v5": "50bb8e85-6b5a-552f-b552-3213f40fad12",
+        "uuid_v7": "01a04291-b362-76f5-a036-da5ceb6d890a",
+        "canonical_name": "jcs-hashable-json",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-013",
+        "uuid_v5": "78e129c5-27f3-5b46-a1e0-605bcb6c634e",
+        "uuid_v7": "01a04291-b363-7f1e-a1f6-fef120b7269d",
+        "canonical_name": "uuidv5-stable",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-014",
+        "uuid_v5": "8dd89cda-0c11-5eff-8c9e-715dadc67152",
+        "uuid_v7": "01a04291-b364-7482-b137-48ef8e5c781f",
+        "canonical_name": "uuidv7-time",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-015",
+        "uuid_v5": "e4076021-bed6-54a9-8372-74c029fc69c3",
+        "uuid_v7": "01a04291-b365-7729-a508-16343e7d18ac",
+        "canonical_name": "rfc3339-time",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-016",
+        "uuid_v5": "d6a754fc-7e43-5590-8e8b-a9bbe7c2505f",
+        "uuid_v7": "01a04291-b366-76f1-a602-a2f7fb40172c",
+        "canonical_name": "ed25519-signature",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-017",
+        "uuid_v5": "60fbe95f-99ba-5ab5-8c84-2e33cbad438c",
+        "uuid_v7": "01a04291-b367-709e-92a8-e1757a89451e",
+        "canonical_name": "merkle-audit",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-018",
+        "uuid_v5": "ed1b9356-4ff9-59c9-a6ee-e64caa239794",
+        "uuid_v7": "01a04291-b368-7b0f-aae0-e3a0727abb8c",
+        "canonical_name": "tla-state-spec",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-019",
+        "uuid_v5": "67c4fc88-e10a-506b-90d5-3f992fb549a4",
+        "uuid_v7": "01a04291-b369-7a61-b67e-d89627358b08",
+        "canonical_name": "pomdp-belief",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-020",
+        "uuid_v5": "bb234fe1-9f3a-5ed4-a72c-ee9ba94cb475",
+        "uuid_v7": "01a04291-b36a-79ea-baf3-23a3808aa66b",
+        "canonical_name": "webmcp-security",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-021",
+        "uuid_v5": "ff47408a-75f4-579c-8be8-111fe9602ec5",
+        "uuid_v7": "01a04291-b36b-770b-afe3-24ee662b79a4",
+        "canonical_name": "cmdp-constraints",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-022",
+        "uuid_v5": "28c42526-264f-5fcf-a087-66e192917180",
+        "uuid_v7": "01a04291-b36c-73fa-bb45-6ca946e225e5",
+        "canonical_name": "crdt-convergence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-023",
+        "uuid_v5": "57b92147-55f7-508c-9d15-f38d929a6669",
+        "uuid_v7": "01a04291-b36d-791a-a168-1ad51529f31d",
+        "canonical_name": "little-law",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-024",
+        "uuid_v5": "39b809e0-6ccd-5950-87a7-488df053c884",
+        "uuid_v7": "01a04291-b36e-7f8b-9f0c-8cdae20e4ad4",
+        "canonical_name": "reject-option",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-025",
+        "uuid_v5": "eeadcae2-16e9-528e-ac03-54068fb27d8c",
+        "uuid_v7": "01a04291-b36f-719e-b3fb-2cb39a4edc42",
+        "canonical_name": "architecture-inference",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-026",
+        "uuid_v5": "b2da523e-bb33-5ec8-a549-a4503c8c976e",
+        "uuid_v7": "01a04291-b370-7dfe-ba05-6b3767b38c8c",
+        "canonical_name": "ambiguous-reconcile",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CLM-027",
+        "uuid_v5": "d5659f3c-76db-5240-92c4-1973e7fa90a2",
+        "uuid_v7": "01a04291-b371-7d9c-b8da-a8a0d75e6178",
+        "canonical_name": "event-log-limits",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "formulas": [
+      {
+        "id": "F-001",
+        "uuid_v5": "7487b78b-95d4-58f8-a593-db5e1b5c8d60",
+        "uuid_v7": "01a04291-b372-773f-8f34-85ca343d6aa1",
+        "canonical_name": "system-composition",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-002",
+        "uuid_v5": "c757ab22-c64c-5b28-9d54-0e22bb664cdb",
+        "uuid_v7": "01a04291-b373-783c-869b-2fd646fdcbca",
+        "canonical_name": "constrained-pomdp",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-003",
+        "uuid_v5": "9c76ab05-e211-5857-9758-8cc205a0bcf5",
+        "uuid_v7": "01a04291-b374-7568-b56e-dcacd2b25916",
+        "canonical_name": "state-vector",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-004",
+        "uuid_v5": "cf571be3-c5f9-52c3-a875-15b2d57ddcf8",
+        "uuid_v7": "01a04291-b375-7c56-b746-1e0579be49cb",
+        "canonical_name": "progress",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-005",
+        "uuid_v5": "f612249c-4436-548d-949b-a8e02aacdfb9",
+        "uuid_v7": "01a04291-b376-71a0-bc78-b4accb3b09c7",
+        "canonical_name": "tool-feasibility",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-006",
+        "uuid_v5": "684e89b7-a1b1-5405-afc2-322cd5090fee",
+        "uuid_v7": "01a04291-b377-767e-9831-10a1495f3fa6",
+        "canonical_name": "feasible-action-set",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-007",
+        "uuid_v5": "be6e8ec5-7162-50c3-965b-9323908bf5d7",
+        "uuid_v7": "01a04291-b378-75d6-bcdb-3974a002d738",
+        "canonical_name": "webmcp-response-projection",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-008",
+        "uuid_v5": "9d37ea09-a0e6-5f43-bd43-cc95bee8606e",
+        "uuid_v7": "01a04291-b379-7019-9e05-9ebbb54b2386",
+        "canonical_name": "planner-utility",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-009",
+        "uuid_v5": "8283f144-6afd-5113-b67f-480df98bbc85",
+        "uuid_v7": "01a04291-b37a-7e3b-a096-680501efac4e",
+        "canonical_name": "planner-selection",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-010",
+        "uuid_v5": "a3777015-fad5-52e7-8c0b-1456a2b05fed",
+        "uuid_v7": "01a04291-b37b-780a-a854-7c768debe5b0",
+        "canonical_name": "remote-break-even",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-011",
+        "uuid_v5": "88985b94-0f93-5be4-9629-a798b1f5d13e",
+        "uuid_v7": "01a04291-b37c-76cc-83df-a50371112abe",
+        "canonical_name": "offline-hard-gate",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-012",
+        "uuid_v5": "e043ac95-90fb-5201-8f06-dd764a921557",
+        "uuid_v7": "01a04291-b37d-7f5f-a42a-4917f8dc8b80",
+        "canonical_name": "remote-latency",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-013",
+        "uuid_v5": "c968907e-8f44-5583-bf15-90fe00c4780d",
+        "uuid_v7": "01a04291-b37e-7e64-a77c-672fc27b4776",
+        "canonical_name": "api-cost",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-014",
+        "uuid_v5": "025d13aa-fef6-5558-b4b2-22732d28efae",
+        "uuid_v7": "01a04291-b37f-7c2c-88fb-43730e89b16c",
+        "canonical_name": "tool-reliability-beta",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-015",
+        "uuid_v5": "dda88f08-a6be-54a7-b6ec-59b6f89103bf",
+        "uuid_v7": "01a04291-b380-7f14-9dfe-12bb2441745f",
+        "canonical_name": "freshness",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-016",
+        "uuid_v5": "47e68ca2-7016-5e34-8b34-d44cfe8c23a0",
+        "uuid_v7": "01a04291-b381-7f20-9fa0-6517d2a6ec7a",
+        "canonical_name": "belief-update",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-017",
+        "uuid_v5": "1c8c60f0-2661-5df0-8c50-1e97fb290f37",
+        "uuid_v7": "01a04291-b382-7b9c-a644-4ef6f0e3ebeb",
+        "canonical_name": "expected-harm",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-018",
+        "uuid_v5": "ccc28003-0a1f-51cf-8992-1363ec62ba62",
+        "uuid_v7": "01a04291-b383-7897-ad31-377ed0d5989a",
+        "canonical_name": "privacy-cost",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-019",
+        "uuid_v5": "c4a3dd3a-9023-519f-af90-362fea9059af",
+        "uuid_v7": "01a04291-b384-74fc-8c52-710582b757e1",
+        "canonical_name": "dag-ready",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-020",
+        "uuid_v5": "adc5a4fa-892e-50ba-bb39-0d064b9cbfb1",
+        "uuid_v7": "01a04291-b385-771a-9037-d49dd5852573",
+        "canonical_name": "parallel-independence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-021",
+        "uuid_v5": "46d2a899-8ce8-547b-9012-eeb54c6b55da",
+        "uuid_v7": "01a04291-b386-73b4-a77f-b1378806e0d5",
+        "canonical_name": "queue-replay",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-022",
+        "uuid_v5": "fcf20725-c3c9-5b0d-9e33-33222104b1f2",
+        "uuid_v7": "01a04291-b387-769e-ba10-dae590d69486",
+        "canonical_name": "little-law",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-023",
+        "uuid_v5": "5e2d8a37-7893-5bc0-b563-019223dc68c5",
+        "uuid_v7": "01a04291-b388-748f-a2d9-8ae1eef9349d",
+        "canonical_name": "crdt-merge",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-024",
+        "uuid_v5": "d4e18488-7c1c-5a7b-b8ec-8c883d489ad5",
+        "uuid_v7": "01a04291-b389-7af7-bbd3-a5f13a3f03a1",
+        "canonical_name": "verification",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-025",
+        "uuid_v5": "709a3f7a-1ea7-5d32-bbf2-8ae812d2268d",
+        "uuid_v7": "01a04291-b38a-7102-a3c8-d993a5fd9191",
+        "canonical_name": "evi",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-026",
+        "uuid_v5": "7f901f2c-a7fd-57de-99ef-e8019046dbf8",
+        "uuid_v7": "01a04291-b38b-7da5-a824-790a4c8ed742",
+        "canonical_name": "abstention",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-027",
+        "uuid_v5": "ace1d5ea-a8d0-5027-9c32-9b8422888d07",
+        "uuid_v7": "01a04291-b38c-752b-830e-40a1614b0368",
+        "canonical_name": "done",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-028",
+        "uuid_v5": "406704b3-9c4c-5a17-b531-cedfd10723f8",
+        "uuid_v7": "01a04291-b38d-7998-ae7e-3625c0009220",
+        "canonical_name": "global-objective",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-101",
+        "uuid_v5": "d54eb8d1-5300-561c-a675-d7bed3b39769",
+        "uuid_v7": "01a04291-b38e-785b-9798-0a6354615ec4",
+        "canonical_name": "tool-contract-tuple",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-102",
+        "uuid_v5": "ed59f45c-414c-582a-a014-8dd145ee4799",
+        "uuid_v7": "01a04291-b38f-7e9f-a1c0-c15bb69693f0",
+        "canonical_name": "predicted-success",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-103",
+        "uuid_v5": "17bc13b0-4730-58c2-b049-3e971c2347ac",
+        "uuid_v7": "01a04291-b390-7d5c-816f-86277899d72b",
+        "canonical_name": "expected-utility-tool",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-104",
+        "uuid_v5": "63678539-d1d3-5418-9c52-1035f115418b",
+        "uuid_v7": "01a04291-b391-73cb-85fc-addee868c792",
+        "canonical_name": "call-threshold",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-105",
+        "uuid_v5": "25c5e414-3051-54dc-b3fd-441adfa46331",
+        "uuid_v7": "01a04291-b392-7a7c-bd1d-06a60a4d5eab",
+        "canonical_name": "likelihood-ratio",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-106",
+        "uuid_v5": "f435f3ba-b8a8-5849-8fdf-cfff7db96657",
+        "uuid_v7": "01a04291-b393-77e2-826c-50f41cc0d0e6",
+        "canonical_name": "posterior-confidence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-107",
+        "uuid_v5": "d72b94d7-6195-5962-ba70-da7e61c1807a",
+        "uuid_v7": "01a04291-b394-7448-a99f-c95ec9deba0e",
+        "canonical_name": "commit-threshold",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-108",
+        "uuid_v5": "684d956d-5f26-5e8a-aa39-cab7ac8c3917",
+        "uuid_v7": "01a04291-b395-76ab-a322-5d195a2ffd4f",
+        "canonical_name": "plan-success",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-109",
+        "uuid_v5": "c228e4da-b40c-55ee-9dfe-d927f782f3aa",
+        "uuid_v7": "01a04291-b396-75ec-8853-ccb197be63e2",
+        "canonical_name": "plan-optimization",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-201",
+        "uuid_v5": "e39d2a1e-6689-566b-aef7-104c09a91b20",
+        "uuid_v7": "01a04291-b397-74e9-8573-d68e1c2aec0b",
+        "canonical_name": "canonical-ir-decision-set",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-202",
+        "uuid_v5": "b172ac95-c8be-5825-9886-59cd2b8f99eb",
+        "uuid_v7": "01a04291-b398-778c-b76d-3258729baf94",
+        "canonical_name": "integer-pre-decision",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-203",
+        "uuid_v5": "85d2b658-e53f-5e01-bcbb-cb92a838fc0d",
+        "uuid_v7": "01a04291-b399-78c8-8650-a9a3311ad130",
+        "canonical_name": "integer-post-decision",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-301",
+        "uuid_v5": "925bc3fd-3644-54c6-a1b4-754b09c5d910",
+        "uuid_v7": "01a04291-b39a-7467-ba2f-835b14b7a794",
+        "canonical_name": "efsm",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-302",
+        "uuid_v5": "ef3128ab-c950-53d2-960f-26b24a62b54c",
+        "uuid_v7": "01a04291-b39b-7ff7-a651-ef5673495b97",
+        "canonical_name": "ranking-function",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-401",
+        "uuid_v5": "b49d10b9-5a78-51fc-810a-72d9ea287d2e",
+        "uuid_v7": "01a04291-b39c-7516-a47f-ba9821bfd024",
+        "canonical_name": "tla-spec",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-402",
+        "uuid_v5": "d751ac81-42b8-5faf-b08b-96d79ec831bb",
+        "uuid_v7": "01a04291-b39d-7e2a-8c94-67e7b2a66688",
+        "canonical_name": "at-most-once",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-501",
+        "uuid_v5": "708b3fb4-9379-596c-b127-b4dd11b11787",
+        "uuid_v7": "01a04291-b39e-7e2a-aaa9-c5799f693c96",
+        "canonical_name": "event-digest",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-502",
+        "uuid_v5": "7ab18bee-5133-5cab-87f0-27b924d6e3e2",
+        "uuid_v7": "01a04291-b39f-7754-927c-4e57ebbf36a7",
+        "canonical_name": "hash-chain",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-503",
+        "uuid_v5": "a0cd6402-bde7-5c07-8abe-e5fc1453ac20",
+        "uuid_v7": "01a04291-b3a0-7184-8d44-cb7ff122ab09",
+        "canonical_name": "signature",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-504",
+        "uuid_v5": "7e5c3c11-c3c8-55cc-b917-9c8fc43e5f31",
+        "uuid_v7": "01a04291-b3a1-76ab-b5d3-fded21710214",
+        "canonical_name": "merkle",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-601",
+        "uuid_v5": "845f6b87-47ee-5e49-9105-7271b12c2c3a",
+        "uuid_v7": "01a04291-b3a2-75e3-8860-16432c688fed",
+        "canonical_name": "outcome-partition",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-602",
+        "uuid_v5": "17f9794a-6aec-5989-b317-6d50fd8f11fe",
+        "uuid_v7": "01a04291-b3a3-7ef4-bc6d-eb192a1aefcc",
+        "canonical_name": "retry-geometric",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-603",
+        "uuid_v5": "e15536c9-7e19-5023-bb43-df58da80d2c5",
+        "uuid_v7": "01a04291-b3a4-7f08-8ca2-9e24d2ff8422",
+        "canonical_name": "good-commit",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-604",
+        "uuid_v5": "cb2d0862-38e0-53b0-ab04-5f649fd7486d",
+        "uuid_v7": "01a04291-b3a5-7c28-a30d-abdd54b6944e",
+        "canonical_name": "bad-commit",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-605",
+        "uuid_v5": "6b1bd420-6f96-52c4-abea-9a4ab3227658",
+        "uuid_v7": "01a04291-b3a6-7004-8ce0-2fa7930dd04c",
+        "canonical_name": "human-probability",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-606",
+        "uuid_v5": "50c98ea5-670f-5394-af5e-98599eb24a5e",
+        "uuid_v7": "01a04291-b3a7-795c-8c28-38915ef9744f",
+        "canonical_name": "duplicate-probability",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "F-607",
+        "uuid_v5": "1a356746-dc65-517f-8fb6-e794f84ff4c5",
+        "uuid_v7": "01a04291-b3a8-7f32-a429-f813b8f3445f",
+        "canonical_name": "slo-optimization",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "ADR-001",
+        "uuid_v5": "5f86f818-e517-53ea-82b4-f79006dbe408",
+        "uuid_v7": "01a04291-b3a9-7b1d-bbf5-3bb47bbdcae7",
+        "canonical_name": "webmcp-action-substrate",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-002",
+        "uuid_v5": "8940ba6c-64d5-5171-9569-64b415333d16",
+        "uuid_v7": "01a04291-b3aa-74ac-9fd4-e1d0d16906e7",
+        "canonical_name": "responses-optional-planner",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-003",
+        "uuid_v5": "c249a76e-39e6-5787-87da-8ea8c0908abb",
+        "uuid_v7": "01a04291-b3ab-7be5-a71a-a2a679d7e228",
+        "canonical_name": "policy-authority",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-004",
+        "uuid_v5": "003a04af-cfb1-5ee4-9c26-9e308e521f37",
+        "uuid_v7": "01a04291-b3ac-7a3e-a3be-a9cbe5ec9223",
+        "canonical_name": "canonical-ir",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-005",
+        "uuid_v5": "c9813073-a03e-578c-bd3c-e126ad3535ea",
+        "uuid_v7": "01a04291-b3ad-73c7-b06c-d02a9e316fe3",
+        "canonical_name": "uuid-strategy",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-006",
+        "uuid_v5": "5fd344e3-7eb1-5081-80c2-eecb47ee0b95",
+        "uuid_v7": "01a04291-b3ae-732a-aebe-9cbf1bfc2ec1",
+        "canonical_name": "ambiguous-reconcile-first",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-007",
+        "uuid_v5": "e0d4d877-a38f-5087-b3e6-51426a09bef9",
+        "uuid_v7": "01a04291-b3af-7472-9ddd-f978c02c446d",
+        "canonical_name": "event-sourcing",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-008",
+        "uuid_v5": "ff3c8cf3-97e5-5a6b-9ef7-40d639666fe6",
+        "uuid_v7": "01a04291-b3b0-76f4-91c1-97f6c8ec15c4",
+        "canonical_name": "tamper-evident-log",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-009",
+        "uuid_v5": "6a90e93c-ae60-5441-a057-99aa7dcbff61",
+        "uuid_v7": "01a04291-b3b1-7964-9760-0199fdb15697",
+        "canonical_name": "offline-per-device-chain",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-010",
+        "uuid_v5": "09f345d0-f5a9-54b1-acb6-90e13cddab07",
+        "uuid_v7": "01a04291-b3b2-7432-886e-c52197d779b9",
+        "canonical_name": "crdt-scope",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-011",
+        "uuid_v5": "df667551-a3b4-5140-a293-f6c41fc493c8",
+        "uuid_v7": "01a04291-b3b3-7493-979a-51788c43cff2",
+        "canonical_name": "open-knowledge-profile",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "ADR-012",
+        "uuid_v5": "0234e7db-e468-5003-b07d-90416dfb4fb4",
+        "uuid_v7": "01a04291-b3b4-7889-a1a2-028c330d9e0f",
+        "canonical_name": "bilingual-normative",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "REQ-ID-001",
+        "uuid_v5": "bf03aa47-8e39-54b5-afee-e45f47077ab7",
+        "uuid_v7": "01a04291-b3b5-7568-9dfc-8beeef1b8eb8",
+        "canonical_name": "stable-uuid-v5",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-ID-002",
+        "uuid_v5": "4a5015e0-76b6-57a7-80b8-380bd72c165c",
+        "uuid_v7": "01a04291-b3b6-7cab-af40-a186b3151b3d",
+        "canonical_name": "event-uuid-v7",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-ID-003",
+        "uuid_v5": "aeda8d6f-718d-50d7-9871-24d870cc51a5",
+        "uuid_v7": "01a04291-b3b7-7d73-af6a-bb13a512fd54",
+        "canonical_name": "uuid-not-authority",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-TIME-001",
+        "uuid_v5": "680ffb1f-d047-5a44-950e-f0260b063bfc",
+        "uuid_v7": "01a04291-b3b8-71b4-9584-e39da0ee82fc",
+        "canonical_name": "rfc3339-utc",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-TIME-002",
+        "uuid_v5": "39b278b2-8c41-5e43-a927-6e9149a9ed2a",
+        "uuid_v7": "01a04291-b3b9-7c6d-b1f2-62cbb61f24a2",
+        "canonical_name": "causal-over-wallclock",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-DATA-001",
+        "uuid_v5": "48085c9c-c1e1-5716-bc9b-9fd1faa70b52",
+        "uuid_v7": "01a04291-b3ba-7632-a34c-17bcaea4c061",
+        "canonical_name": "json-schema",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-DATA-002",
+        "uuid_v5": "cbe0f3e2-8226-5721-8294-4b5ec4c052c2",
+        "uuid_v7": "01a04291-b3bb-7c72-848a-3bc1b2f95683",
+        "canonical_name": "json-interoperable",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-DATA-003",
+        "uuid_v5": "93ebbae2-279e-54a0-b0f0-e28cca717104",
+        "uuid_v7": "01a04291-b3bc-79ed-ac67-d58e61c606dd",
+        "canonical_name": "integer-critical-values",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-KNOW-001",
+        "uuid_v5": "b9fd8efb-bdb1-5dfc-994e-f5dd07ae8447",
+        "uuid_v7": "01a04291-b3bd-76c6-8458-0f430860359f",
+        "canonical_name": "jsonld-graph",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-KNOW-002",
+        "uuid_v5": "d3a81a4e-8c75-5933-ac8f-8dac5126db04",
+        "uuid_v7": "01a04291-b3be-727b-a22c-bc99230531b8",
+        "canonical_name": "provenance",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-KNOW-003",
+        "uuid_v5": "238898c6-bfc8-59eb-80c1-53d98e630a6a",
+        "uuid_v7": "01a04291-b3bf-7bb7-b143-e2feab977c5b",
+        "canonical_name": "catalog",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-WEBMCP-001",
+        "uuid_v5": "7f3a824f-08c5-59de-ad8d-4e88d28355e2",
+        "uuid_v7": "01a04291-b3c0-7910-bb3e-59cbada496d5",
+        "canonical_name": "webmcp-adapter",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-WEBMCP-002",
+        "uuid_v5": "f4f7db8c-c9ce-5e3c-8300-2fa5ac0b620c",
+        "uuid_v7": "01a04291-b3c1-739d-9995-00f458dc7b9a",
+        "canonical_name": "discover-before-plan",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-WEBMCP-003",
+        "uuid_v5": "a629f2cd-de50-58db-8efe-19fdda073067",
+        "uuid_v7": "01a04291-b3c2-7010-a00d-bdbbcf6a5797",
+        "canonical_name": "capability-filter",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-MCP-001",
+        "uuid_v5": "bd72b9e2-33af-5678-8fbe-cd7a7d76e91c",
+        "uuid_v7": "01a04291-b3c3-7c30-817e-9438632026b2",
+        "canonical_name": "mcp-policy-host",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-PLAN-001",
+        "uuid_v5": "cf6475e2-d1a3-53aa-8f76-a4deddaee41e",
+        "uuid_v7": "01a04291-b3c4-7580-825b-b843513ad623",
+        "canonical_name": "responses-optional",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-PLAN-002",
+        "uuid_v5": "d2ad6445-26da-572e-b6b7-68a816e97a73",
+        "uuid_v7": "01a04291-b3c5-7e52-98b5-6d3bb13ddc2c",
+        "canonical_name": "remote-mcp-gated",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-PLAN-003",
+        "uuid_v5": "687f6076-94c1-561c-8c54-14d1c037d9c9",
+        "uuid_v7": "01a04291-b3c6-75d6-bbf7-f92b00f436dd",
+        "canonical_name": "planner-proposal-only",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-TOOL-001",
+        "uuid_v5": "8b7b9add-4954-55f0-9c5e-91cec57d08d2",
+        "uuid_v7": "01a04291-b3c7-7f52-a14b-0a4e7d24e253",
+        "canonical_name": "tool-contract",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-TOOL-002",
+        "uuid_v5": "a3a103a7-322f-5d42-ba54-3c247f254115",
+        "uuid_v7": "01a04291-b3c8-73e0-83ab-a86750544f06",
+        "canonical_name": "read-write-set",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-TOOL-003",
+        "uuid_v5": "8d089165-35cd-542d-a9a8-a4f19c97835e",
+        "uuid_v7": "01a04291-b3c9-783f-9300-f580843cc236",
+        "canonical_name": "readback",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-001",
+        "uuid_v5": "ff52874a-0dc7-5498-9170-ab5629ef1635",
+        "uuid_v7": "01a04291-b3ca-7f59-b849-2810dcdf1ba4",
+        "canonical_name": "decision-set",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-002",
+        "uuid_v5": "2e6510a4-88ee-57c0-b2bb-5afe2132dc64",
+        "uuid_v7": "01a04291-b3cb-773d-85fa-7246e99b2735",
+        "canonical_name": "precedence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-003",
+        "uuid_v5": "13ece2cc-283e-5e87-8163-c4c10727e516",
+        "uuid_v7": "01a04291-b3cc-77b8-854b-e2926a0141c8",
+        "canonical_name": "same-ir",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-004",
+        "uuid_v5": "53700c7f-654c-5f0e-a5ef-3c32dcec4f4a",
+        "uuid_v7": "01a04291-b3cd-71c0-a6d7-33655acf782d",
+        "canonical_name": "risk-class-floor",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-005",
+        "uuid_v5": "18f3f912-6a11-5af9-81fe-5a42f7f0beba",
+        "uuid_v7": "01a04291-b3ce-7912-ac29-d73ea69dd558",
+        "canonical_name": "privacy-minimize",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-006",
+        "uuid_v5": "3f76c524-c2ba-5355-8e3e-a912e5fcd7c4",
+        "uuid_v7": "01a04291-b3cf-7cc5-9e1b-8b326957accf",
+        "canonical_name": "financial-human",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-007",
+        "uuid_v5": "4c09d56e-113d-5360-97f9-eece170c3188",
+        "uuid_v7": "01a04291-b3d0-752e-be5a-597ed7f4ba9b",
+        "canonical_name": "approval-binding",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-008",
+        "uuid_v5": "d96922b0-3849-5196-bf45-0550be1dd998",
+        "uuid_v7": "01a04291-b3d1-7fe6-9449-df5a93d1b615",
+        "canonical_name": "no-privilege-amplification",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-POLICY-009",
+        "uuid_v5": "d2857255-a357-5a59-a264-c864dbadb98e",
+        "uuid_v7": "01a04291-b3d2-7080-a5ed-13c60f0b10e2",
+        "canonical_name": "abstain",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-EXEC-001",
+        "uuid_v5": "dd260fae-9d9d-58bb-8de8-51d059a90dab",
+        "uuid_v7": "01a04291-b3d3-7d05-a235-e4b3b83f1960",
+        "canonical_name": "authorized-execution",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-EXEC-002",
+        "uuid_v5": "09985d46-0cfc-5213-a0dc-100fa17e1e6d",
+        "uuid_v7": "01a04291-b3d4-795c-9c05-2bfc7db3de4a",
+        "canonical_name": "ambiguous-reconcile",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-EXEC-003",
+        "uuid_v5": "c5a6f165-1697-5341-8c02-dba657a42cfb",
+        "uuid_v7": "01a04291-b3d5-75f3-b00d-9fb5c825a3b6",
+        "canonical_name": "at-most-once",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-EXEC-004",
+        "uuid_v5": "0d9dabdf-8254-5fde-99ae-fc58e8de2839",
+        "uuid_v7": "01a04291-b3d6-7958-a3a6-90e9ac07574c",
+        "canonical_name": "verify-before-commit",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-EXEC-005",
+        "uuid_v5": "c8a31de2-7297-527a-8a1c-04192b5e70bb",
+        "uuid_v7": "01a04291-b3d7-73cc-aa28-5c4c47fa7f66",
+        "canonical_name": "bounded-autonomy",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-OFFLINE-001",
+        "uuid_v5": "6fd8e809-f768-5490-b369-818b5ac3364c",
+        "uuid_v7": "01a04291-b3d8-78ac-a1ff-0a9c84bb9322",
+        "canonical_name": "offline-local-core",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-OFFLINE-002",
+        "uuid_v5": "8fd53663-7b3a-56cc-8f14-295e48a36b82",
+        "uuid_v7": "01a04291-b3d9-7e57-90e3-381e8409a404",
+        "canonical_name": "queue-intent",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-OFFLINE-003",
+        "uuid_v5": "60b013c2-5918-5b69-a4fe-6c4adbcb325b",
+        "uuid_v7": "01a04291-b3da-7dda-bc87-2b244bb3e65c",
+        "canonical_name": "revalidate-replay",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-001",
+        "uuid_v5": "31e5c547-4072-51a5-a761-698b4464a2fa",
+        "uuid_v7": "01a04291-b3db-73fe-9e33-17c9ec1df1c9",
+        "canonical_name": "per-device-chain",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-002",
+        "uuid_v5": "bcbfcabb-9ac1-5156-b135-28b998095170",
+        "uuid_v7": "01a04291-b3dc-74dc-8ec9-e313d48278ae",
+        "canonical_name": "global-sequence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-003",
+        "uuid_v5": "a13087f5-3d0a-50ca-8b53-ad9a62bf1d79",
+        "uuid_v7": "01a04291-b3dd-7488-9ade-7e0c59c42095",
+        "canonical_name": "crdt-only-commutative",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-004",
+        "uuid_v5": "425df0e7-8f13-5d7a-9018-6f217f0bfec6",
+        "uuid_v7": "01a04291-b3de-7972-930d-462f2468e183",
+        "canonical_name": "no-crdt-side-effect",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-005",
+        "uuid_v5": "c794d09f-bfbc-58a0-ad49-4589d1006bee",
+        "uuid_v7": "01a04291-b3df-779d-a7bf-821eb6fa8638",
+        "canonical_name": "queue-stability",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SYNC-006",
+        "uuid_v5": "e58d4c17-b3bb-52b5-a39f-2870017fe4b7",
+        "uuid_v7": "01a04291-b3e0-73e7-9b1c-ad0822fe958d",
+        "canonical_name": "queue-metrics",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-001",
+        "uuid_v5": "415fc15e-2a55-5635-829c-ddaf3e73b97e",
+        "uuid_v7": "01a04291-b3e1-7cdc-aa1e-26ac3e10a319",
+        "canonical_name": "untrusted-tool-output",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-002",
+        "uuid_v5": "284af628-4234-5a6c-be4e-401fadbdd8f0",
+        "uuid_v7": "01a04291-b3e2-79eb-9acd-2073bf626d47",
+        "canonical_name": "secret-boundary",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-003",
+        "uuid_v5": "34a80811-f2c0-5a16-9799-e62c0a6a628e",
+        "uuid_v7": "01a04291-b3e3-77c6-8dd2-b78d81904ecb",
+        "canonical_name": "taint",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-004",
+        "uuid_v5": "c2c80cd3-7306-5317-b7a2-39ddfbc606c1",
+        "uuid_v7": "01a04291-b3e4-7037-8ebf-7652de8a3ffd",
+        "canonical_name": "least-capability",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-005",
+        "uuid_v5": "02baa276-bdd4-5dca-87e8-0996dbb6b6ef",
+        "uuid_v7": "01a04291-b3e5-7e86-af5a-532f99f3dd1a",
+        "canonical_name": "critical-commit-hidden",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-006",
+        "uuid_v5": "c5e6ad4a-30bc-54e4-a06a-4275def71f57",
+        "uuid_v7": "01a04291-b3e6-7857-8cc1-a1fbadd68c66",
+        "canonical_name": "audit-redaction",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-007",
+        "uuid_v5": "19264750-f89c-5898-979f-4a9b87094f2a",
+        "uuid_v7": "01a04291-b3e7-70c5-b7ef-fc808ed60869",
+        "canonical_name": "webmcp-draft-change",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SEC-008",
+        "uuid_v5": "53f729c3-5b53-5dc3-8f65-49a5f8cb9210",
+        "uuid_v7": "01a04291-b3e8-77b2-93e5-b3a04d3b186b",
+        "canonical_name": "prompt-injection",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-VERIFY-001",
+        "uuid_v5": "b09cdaf0-a0ad-5b98-9aae-d88c7f5b2ea3",
+        "uuid_v7": "01a04291-b3e9-7631-aecd-e8a8de590d27",
+        "canonical_name": "independent-evidence",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-VERIFY-002",
+        "uuid_v5": "c1a89274-7a5d-5e68-b1d2-808bb3149ce5",
+        "uuid_v7": "01a04291-b3ea-76e9-9acf-6a07ba3add82",
+        "canonical_name": "confidence-calibrated",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-001",
+        "uuid_v5": "39f764ec-9ae9-5dcf-9e9b-613bb5826082",
+        "uuid_v7": "01a04291-b3eb-7630-aa34-a7b7f60f90ca",
+        "canonical_name": "canonical-event",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-002",
+        "uuid_v5": "c5a922ff-c299-54a3-b0fd-0c7b185b5866",
+        "uuid_v7": "01a04291-b3ec-7da5-a837-5e7b398f5b07",
+        "canonical_name": "sha256-chain",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-003",
+        "uuid_v5": "63d72bae-472f-5d6f-a940-62148e13b927",
+        "uuid_v7": "01a04291-b3ed-731e-8b3d-d5cff9f6a8a0",
+        "canonical_name": "ed25519-sign",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-004",
+        "uuid_v5": "8508851d-f414-5cac-bbc2-e6e4f61cb706",
+        "uuid_v7": "01a04291-b3ee-708c-ae14-d0187605ddc3",
+        "canonical_name": "merkle-checkpoint",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-005",
+        "uuid_v5": "b717efb0-3270-5d0d-9546-7d8106377adb",
+        "uuid_v7": "01a04291-b3ef-78c1-a4d2-2fc8ab90ae66",
+        "canonical_name": "inclusion-proof",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-006",
+        "uuid_v5": "65dc2c80-363f-54bb-b502-edc09eeb323f",
+        "uuid_v7": "01a04291-b3f0-7142-b430-f9234979722a",
+        "canonical_name": "same-intent-digest",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-007",
+        "uuid_v5": "134a5d02-7aa1-53ea-93aa-b179cc70fc3f",
+        "uuid_v7": "01a04291-b3f1-7b10-a642-d0d263508da2",
+        "canonical_name": "policy-snapshot",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-008",
+        "uuid_v5": "33c903f3-47bc-5973-801d-b178c84b08c6",
+        "uuid_v7": "01a04291-b3f2-7156-846f-08c829feb91d",
+        "canonical_name": "replay-deterministic",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-009",
+        "uuid_v5": "3ce861da-9c0d-5108-a56e-2256a05e2996",
+        "uuid_v7": "01a04291-b3f3-7618-9efe-2f72139deb63",
+        "canonical_name": "snapshot-derived",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-AUDIT-010",
+        "uuid_v5": "a8eab8b6-dfa7-5e8a-a6d7-8255d5d3caf0",
+        "uuid_v7": "01a04291-b3f4-7db5-92d4-1e21236a468b",
+        "canonical_name": "claim-not-truth",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-FORMAL-001",
+        "uuid_v5": "9b62b0e4-3ee5-51df-b7bf-10ba11d6c4b2",
+        "uuid_v7": "01a04291-b3f5-790e-9749-747c6ed886b8",
+        "canonical_name": "tla-invariants",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-FORMAL-002",
+        "uuid_v5": "4a7c98bf-cc25-5097-b54e-f6616021c390",
+        "uuid_v7": "01a04291-b3f6-7d6c-bb0f-b118b80f5e21",
+        "canonical_name": "mutation-tests",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SLO-001",
+        "uuid_v5": "c1f0c7bf-b94b-5e09-8c2f-421ef46bd6d3",
+        "uuid_v7": "01a04291-b3f7-759b-891e-9bd460980b31",
+        "canonical_name": "outcome-partition",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SLO-002",
+        "uuid_v5": "3414520d-588c-5e99-9332-3ec9182bc198",
+        "uuid_v7": "01a04291-b3f8-7716-9772-fc593901bab4",
+        "canonical_name": "hard-chance-constraints",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "REQ-SLO-003",
+        "uuid_v5": "fff22f65-8060-5868-968c-ae0f6e2d0866",
+        "uuid_v7": "01a04291-b3f9-76fc-ad4c-762429cae74f",
+        "canonical_name": "synthetic-label",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "components": [
+      {
+        "id": "CMP-001",
+        "uuid_v5": "6162e001-9b82-5dbe-8d2b-fb68fb6e55e1",
+        "uuid_v7": "01a04291-b3fa-7ce5-8e92-8528f076ec4a",
+        "canonical_name": "mobile-ui",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-002",
+        "uuid_v5": "67e34c2e-4da8-51be-9e0a-830169e8cf04",
+        "uuid_v7": "01a04291-b3fb-739c-b9e6-1841a85801ef",
+        "canonical_name": "local-state-store",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-003",
+        "uuid_v5": "a5c40ead-983b-5d88-96ee-e8f353450646",
+        "uuid_v7": "01a04291-b3fc-7549-a12a-4ebedd2e9b79",
+        "canonical_name": "goal-graph",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-004",
+        "uuid_v5": "18be9a48-2373-51af-87b9-f77374a7f2a9",
+        "uuid_v7": "01a04291-b3fd-7ea0-9a82-e807cf6c213d",
+        "canonical_name": "tool-registry",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-005",
+        "uuid_v5": "729f9cca-9143-5c83-a7b0-ad91998044bb",
+        "uuid_v7": "01a04291-b3fe-7022-ad35-16b1fe5dbafe",
+        "canonical_name": "policy-engine",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-006",
+        "uuid_v5": "ca831003-90ae-5592-9016-5ed65e1799ca",
+        "uuid_v7": "01a04291-b3ff-758c-bc26-abdb97ba0ea6",
+        "canonical_name": "local-planner",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-007",
+        "uuid_v5": "6eea2d1e-dca7-5cd7-957a-f3b276c116c0",
+        "uuid_v7": "01a04291-b400-75eb-8cf5-68fe8468757b",
+        "canonical_name": "responses-bridge",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-008",
+        "uuid_v5": "6badd351-58ce-55bc-aece-26a9ab837149",
+        "uuid_v7": "01a04291-b401-7fd6-a55f-174e7e383645",
+        "canonical_name": "webmcp-executor",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-009",
+        "uuid_v5": "5a19ab00-42c7-51ad-909e-fbeba9285ba5",
+        "uuid_v7": "01a04291-b402-76b4-a84f-8dd0ba21f577",
+        "canonical_name": "evidence-engine",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-010",
+        "uuid_v5": "c9ce902c-e8a5-51d8-89e7-57b1f8ef87d2",
+        "uuid_v7": "01a04291-b403-78fa-b61c-597db992d70e",
+        "canonical_name": "offline-queue",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-011",
+        "uuid_v5": "81c73daf-aec7-5ded-8948-0d72ab69e7e4",
+        "uuid_v7": "01a04291-b404-7433-9068-d36552b8f60f",
+        "canonical_name": "sync-server",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-012",
+        "uuid_v5": "d9c09833-7e63-5ca6-8fd1-379e153a3450",
+        "uuid_v7": "01a04291-b405-70c5-916c-1bb69b06c50a",
+        "canonical_name": "audit-log",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-013",
+        "uuid_v5": "593b8be5-63e4-5764-ba93-9f9cafb8a8b7",
+        "uuid_v7": "01a04291-b406-72fe-9212-a1f924716d43",
+        "canonical_name": "checkpoint-service",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-014",
+        "uuid_v5": "7f809a7b-be41-5bdb-9fa6-f0fa0f051536",
+        "uuid_v7": "01a04291-b407-711c-b98b-ac257956ea21",
+        "canonical_name": "slo-optimizer",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "CMP-015",
+        "uuid_v5": "aec4097e-58c7-5f53-a442-2b6682c1dcbe",
+        "uuid_v7": "01a04291-b408-72a2-8384-37e14dc4eaa4",
+        "canonical_name": "key-store",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "risk_classes": [
+      {
+        "id": "RISK-READ",
+        "uuid_v5": "15621adb-653f-5f0e-952b-55f46c7ddbde",
+        "uuid_v7": "01a04291-b409-7f15-8d70-d47cebdbc3e5",
+        "canonical_name": "read",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "RISK-WRITE",
+        "uuid_v5": "6d832a5f-f26a-58db-adc5-25e764c2e576",
+        "uuid_v7": "01a04291-b40a-71a2-b289-b8515f63f997",
+        "canonical_name": "write",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "RISK-MESSAGING",
+        "uuid_v5": "f567a629-86d8-55ef-b5a5-bc24bff36265",
+        "uuid_v7": "01a04291-b40b-7633-b43f-0fbc55f6aa0b",
+        "canonical_name": "messaging",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "RISK-IDENTITY",
+        "uuid_v5": "9b8d55d5-b868-5106-8259-caa01ee35d50",
+        "uuid_v7": "01a04291-b40c-7c50-a214-8ac4f131c0c8",
+        "canonical_name": "identity",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "RISK-DESTRUCTIVE",
+        "uuid_v5": "bde4a262-d027-5e6c-b525-01e39568aecc",
+        "uuid_v7": "01a04291-b40d-7ef5-9198-fd72cd2fd4d0",
+        "canonical_name": "destructive",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "RISK-FINANCIAL",
+        "uuid_v5": "2fe2215f-1c96-5623-9671-891592bec3e0",
+        "uuid_v7": "01a04291-b40e-72c9-b169-ce8dae83587c",
+        "canonical_name": "financial",
+        "created_at": "2026-08-27T09:34:00Z"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "TL-001",
+        "uuid_v5": "60acba30-2740-55c1-8018-00f55843632f",
+        "uuid_v7": "01a04291-b340-7d06-8c6b-1b9ad038849a",
+        "canonical_name": "tl-001",
+        "created_at": "2026-08-27T09:34:00Z"
+      },
+      {
+        "id": "TL-002",
+        "uuid_v5": "5edb7154-bcd6-59cc-9ae0-a967d135e70a",
+        "uuid_v7": "01a04291-b341-7980-886b-a72f01af2763",
+        "canonical_name": "tl-002",
+        "created_at": "2026-08-27T09:34:00.001000Z"
+      },
+      {
+        "id": "TL-003",
+        "uuid_v5": "f90cb2ca-3098-557e-b26b-ed93ad575645",
+        "uuid_v7": "01a04291-b342-7260-b0e1-fe80093121df",
+        "canonical_name": "tl-003",
+        "created_at": "2026-08-27T09:34:00.002000Z"
+      },
+      {
+        "id": "TL-004",
+        "uuid_v5": "917160d1-8fe8-510c-a735-10f9cdeeba1d",
+        "uuid_v7": "01a04291-b343-71f5-9b68-2c106cc5b057",
+        "canonical_name": "tl-004",
+        "created_at": "2026-08-27T09:34:00.003000Z"
+      },
+      {
+        "id": "TL-005",
+        "uuid_v5": "662bdb53-f8b8-5417-946c-1dd1bfee11d9",
+        "uuid_v7": "01a04291-b344-753a-b18a-d7898ef903eb",
+        "canonical_name": "tl-005",
+        "created_at": "2026-08-27T09:34:00.004000Z"
+      },
+      {
+        "id": "TL-006",
+        "uuid_v5": "e6da6550-45a1-5ffd-bdb2-d6de5495107b",
+        "uuid_v7": "01a04291-b345-71b7-8685-c3a1ac03199a",
+        "canonical_name": "tl-006",
+        "created_at": "2026-08-27T09:34:00.005000Z"
+      },
+      {
+        "id": "TL-007",
+        "uuid_v5": "e3b9f9d9-6853-5a81-9c88-0c5f55ff6027",
+        "uuid_v7": "01a04291-b346-7e0b-b2e1-008685e37c33",
+        "canonical_name": "tl-007",
+        "created_at": "2026-08-27T09:34:00.006000Z"
+      },
+      {
+        "id": "TL-008",
+        "uuid_v5": "5cfc707d-2072-5665-be18-953b9b145b6d",
+        "uuid_v7": "01a04291-b347-7ada-81d9-342e5cf3a180",
+        "canonical_name": "tl-008",
+        "created_at": "2026-08-27T09:34:00.007000Z"
+      },
+      {
+        "id": "TL-009",
+        "uuid_v5": "23ea0b98-830b-5725-91a7-9d84ca89916e",
+        "uuid_v7": "01a04291-b348-746a-8920-a653f8d5e8b0",
+        "canonical_name": "tl-009",
+        "created_at": "2026-08-27T09:34:00.008000Z"
+      },
+      {
+        "id": "TL-010",
+        "uuid_v5": "0010fbb1-f955-5d6a-95e1-a41fd8822c9c",
+        "uuid_v7": "01a04291-b349-76aa-a311-2bda31d3b9a6",
+        "canonical_name": "tl-010",
+        "created_at": "2026-08-27T09:34:00.009000Z"
+      },
+      {
+        "id": "TL-011",
+        "uuid_v5": "b352389b-2b97-5b4a-a5c6-37117cc01d94",
+        "uuid_v7": "01a04291-b34a-72fc-9a36-aff6c904f201",
+        "canonical_name": "tl-011",
+        "created_at": "2026-08-27T09:34:00.010000Z"
+      },
+      {
+        "id": "TL-012",
+        "uuid_v5": "ef2a0883-bf33-5412-8790-b15d49a31b60",
+        "uuid_v7": "01a04291-b34b-7e34-8a91-8b30f43b6458",
+        "canonical_name": "tl-012",
+        "created_at": "2026-08-27T09:34:00.011000Z"
+      },
+      {
+        "id": "TL-013",
+        "uuid_v5": "0a1bf2ff-b9a4-5790-9563-0aa485bb5c29",
+        "uuid_v7": "01a04291-b34c-7e28-b5a3-0d90daa64af9",
+        "canonical_name": "tl-013",
+        "created_at": "2026-08-27T09:34:00.012000Z"
+      },
+      {
+        "id": "TL-014",
+        "uuid_v5": "fddf50f4-ef28-5a30-a744-779689bd1c1b",
+        "uuid_v7": "01a04291-b34d-747e-a136-3d43efd709d0",
+        "canonical_name": "tl-014",
+        "created_at": "2026-08-27T09:34:00.013000Z"
+      },
+      {
+        "id": "TL-015",
+        "uuid_v5": "a4b36662-2b36-58ba-a004-426b5c3af027",
+        "uuid_v7": "01a04291-b34e-71d6-9414-883cf0c56f88",
+        "canonical_name": "tl-015",
+        "created_at": "2026-08-27T09:34:00.014000Z"
+      },
+      {
+        "id": "TL-016",
+        "uuid_v5": "55b00b8d-17cc-5738-a8ac-ffa2139b1850",
+        "uuid_v7": "01a04291-b34f-709d-8642-6919d9e9b7e1",
+        "canonical_name": "tl-016",
+        "created_at": "2026-08-27T09:34:00.015000Z"
+      },
+      {
+        "id": "TL-017",
+        "uuid_v5": "4ec734c2-f6f4-578f-89a8-a045b82f5172",
+        "uuid_v7": "01a04291-b350-7be8-8152-ecadc164388c",
+        "canonical_name": "tl-017",
+        "created_at": "2026-08-27T09:34:00.016000Z"
+      },
+      {
+        "id": "TL-018",
+        "uuid_v5": "2c126ce0-da19-56ae-996c-b3e3b82c9e6c",
+        "uuid_v7": "01a04291-b351-76a1-a6ed-8630b5e1355b",
+        "canonical_name": "tl-018",
+        "created_at": "2026-08-27T09:34:00.017000Z"
+      },
+      {
+        "id": "TL-019",
+        "uuid_v5": "aabb641a-fe71-585b-a149-2d79a61fac86",
+        "uuid_v7": "01a04291-b352-7310-bcb6-31c663ace87e",
+        "canonical_name": "tl-019",
+        "created_at": "2026-08-27T09:34:00.018000Z"
+      }
+    ],
+    "tests": [
+      {
+        "id": "TEST-ARCH-001",
+        "uuid_v5": "f6062e47-f383-5a07-a1dc-e18167d2abd9",
+        "uuid_v7": "01a04291-bef8-7cfc-be09-f03ce1ba411e"
+      },
+      {
+        "id": "TEST-ARCH-002",
+        "uuid_v5": "2b495082-2ba2-55f7-b45f-148f9c8ff515",
+        "uuid_v7": "01a04291-bef9-764a-b5e0-021872c2fe2f"
+      },
+      {
+        "id": "TEST-ARCH-003",
+        "uuid_v5": "3a25756a-896f-54e5-b07d-ee5e87a53e0e",
+        "uuid_v7": "01a04291-befa-7339-ab4c-e70c8e4abbf4"
+      },
+      {
+        "id": "TEST-AUDIT-001",
+        "uuid_v5": "eeb3849a-49bc-5210-9654-13ec501b6295",
+        "uuid_v7": "01a04291-befb-7a5a-9e59-2e2a8f3b1af3"
+      },
+      {
+        "id": "TEST-AUDIT-002",
+        "uuid_v5": "6722676a-4797-5ee4-906f-5c615a6a6f8e",
+        "uuid_v7": "01a04291-befc-7a0f-9e0a-c52e29195296"
+      },
+      {
+        "id": "TEST-AUDIT-003",
+        "uuid_v5": "deb401a4-0ca2-50b4-b772-7a4012b97ee4",
+        "uuid_v7": "01a04291-befd-74cc-b3d1-58e9f51aa42b"
+      },
+      {
+        "id": "TEST-AUDIT-004",
+        "uuid_v5": "4716e954-addd-5542-b92d-70532f48d42d",
+        "uuid_v7": "01a04291-befe-762b-a25d-0e2e9d913ec7"
+      },
+      {
+        "id": "TEST-AUDIT-005",
+        "uuid_v5": "432e43e4-e257-5eba-92e4-08fa21e646ce",
+        "uuid_v7": "01a04291-beff-79eb-a3b3-d3dd894bd702"
+      },
+      {
+        "id": "TEST-AUDIT-006",
+        "uuid_v5": "65c1f134-1d30-5588-bc81-041d934bd186",
+        "uuid_v7": "01a04291-bf00-72a5-acd4-54385fad0b58"
+      },
+      {
+        "id": "TEST-AUDIT-007",
+        "uuid_v5": "05670273-faea-5486-a9e9-cfe8b3173247",
+        "uuid_v7": "01a04291-bf01-72bc-9b2d-8c2d8d3b9f7c"
+      },
+      {
+        "id": "TEST-AUDIT-008",
+        "uuid_v5": "1b74a3a1-3dd4-5b43-ab4f-c46ade460be0",
+        "uuid_v7": "01a04291-bf02-78ce-9b9e-ec859bffaa94"
+      },
+      {
+        "id": "TEST-AUDIT-009",
+        "uuid_v5": "24d20e2c-0b20-5dd3-bf48-19f450edfccb",
+        "uuid_v7": "01a04291-bf03-785a-becb-5be4a2f33d98"
+      },
+      {
+        "id": "TEST-AUTH-001",
+        "uuid_v5": "b1229d69-80b3-5778-bf90-1d8b8194a7f0",
+        "uuid_v7": "01a04291-bf04-7e3b-87ae-edd5b6db0d4e"
+      },
+      {
+        "id": "TEST-CONFORMANCE-001",
+        "uuid_v5": "bf1a2c4b-15fe-5647-ad91-bb01fef1d507",
+        "uuid_v7": "01a04291-bf05-7621-817c-786e929b3b09"
+      },
+      {
+        "id": "TEST-CONTRACT-001",
+        "uuid_v5": "0df1f453-af24-56cd-b631-0463e12ebee2",
+        "uuid_v7": "01a04291-bf06-7a94-9997-4e7cd7d156ec"
+      },
+      {
+        "id": "TEST-CONTRACT-002",
+        "uuid_v5": "15b03565-2e93-554a-a280-692c3d8249ea",
+        "uuid_v7": "01a04291-bf07-7b14-a751-c95451021a52"
+      },
+      {
+        "id": "TEST-CRITICAL-001",
+        "uuid_v5": "4ccd74eb-dd73-5dca-bf81-721680576be5",
+        "uuid_v7": "01a04291-bf08-7276-b931-c8a3ab3852bb"
+      },
+      {
+        "id": "TEST-CRITICAL-002",
+        "uuid_v5": "190dd40c-3574-5211-9b87-141b43a6d5a3",
+        "uuid_v7": "01a04291-bf09-7db4-949e-609b660c887c"
+      },
+      {
+        "id": "TEST-ID-001",
+        "uuid_v5": "9211ddec-9c74-5ae4-a066-365daaf286f5",
+        "uuid_v7": "01a04291-bf0a-7cf2-9b4c-cc073b014e73"
+      },
+      {
+        "id": "TEST-ID-002",
+        "uuid_v5": "f9b9ece5-c244-5b35-8ec0-bb32431bb8c6",
+        "uuid_v7": "01a04291-bf0b-7839-806e-bcedaf8d676c"
+      },
+      {
+        "id": "TEST-IR-001",
+        "uuid_v5": "b8314f98-61c0-58f4-9357-bcf4486cc026",
+        "uuid_v7": "01a04291-bf0c-7034-abb9-d5098bd6c94f"
+      },
+      {
+        "id": "TEST-IR-002",
+        "uuid_v5": "25c0c215-8fde-5aa9-8f61-e8bdaf017eb0",
+        "uuid_v7": "01a04291-bf0d-7661-8e8b-f5af2f2b388f"
+      },
+      {
+        "id": "TEST-KNOW-001",
+        "uuid_v5": "75b5e7e9-ec82-5dbd-9adc-1ea9457b89ab",
+        "uuid_v7": "01a04291-bf0e-7d3f-9b9d-0f66e12bd4ab"
+      },
+      {
+        "id": "TEST-KNOW-002",
+        "uuid_v5": "82a751e3-fbfe-51fc-a3b7-4991f4f1ea4d",
+        "uuid_v7": "01a04291-bf0f-7a5b-8752-ad6587c33a7e"
+      },
+      {
+        "id": "TEST-KNOW-003",
+        "uuid_v5": "a998b669-9d26-5efb-a7a7-6d7f4cf37a8a",
+        "uuid_v7": "01a04291-bf10-709d-a033-3763c2ce3fcf"
+      },
+      {
+        "id": "TEST-MODEL-001",
+        "uuid_v5": "ee0ba63e-c41c-5e82-9958-c7ea92054778",
+        "uuid_v7": "01a04291-bf11-7567-872b-c3a856187605"
+      },
+      {
+        "id": "TEST-MODEL-002",
+        "uuid_v5": "14e2d461-787a-5a91-be76-6c80187c29e1",
+        "uuid_v7": "01a04291-bf12-7c9d-98ef-3e17587b9456"
+      },
+      {
+        "id": "TEST-MODEL-003",
+        "uuid_v5": "34e83950-6f9a-5a11-90b1-a03d191666e2",
+        "uuid_v7": "01a04291-bf13-7088-b47d-172e967bb4ac"
+      },
+      {
+        "id": "TEST-MODEL-004",
+        "uuid_v5": "cb7ec7ac-f5d4-512f-b403-b8e26694a5c0",
+        "uuid_v7": "01a04291-bf14-738d-be45-3fb43bc7cada"
+      },
+      {
+        "id": "TEST-MODEL-005",
+        "uuid_v5": "86dd97d3-5662-5f91-98aa-45f8f0b4abab",
+        "uuid_v7": "01a04291-bf15-75d0-9363-a53546c2e5e1"
+      },
+      {
+        "id": "TEST-MODEL-ALL",
+        "uuid_v5": "7bc5f203-d845-5109-8bd2-439cc1837a15",
+        "uuid_v7": "01a04291-bf16-786e-9480-2a5940ccd155"
+      },
+      {
+        "id": "TEST-MODEL-MUTATION",
+        "uuid_v5": "2c3ef06d-7c01-522b-bd2b-a3ac0f273cec",
+        "uuid_v7": "01a04291-bf17-70f1-92a6-9c3e65899d24"
+      },
+      {
+        "id": "TEST-OFFLINE-001",
+        "uuid_v5": "063da8ed-3d83-5ab0-af25-7aa5ad88ec8e",
+        "uuid_v7": "01a04291-bf18-7073-a1cf-8fac681538b8"
+      },
+      {
+        "id": "TEST-OFFLINE-002",
+        "uuid_v5": "0acd35f5-8ee9-5fa0-b899-6ee5ef761db8",
+        "uuid_v7": "01a04291-bf19-7321-9504-0a750cf6f1fc"
+      },
+      {
+        "id": "TEST-OFFLINE-003",
+        "uuid_v5": "8d04c56b-4dc3-5cda-ac59-65fe98e900ba",
+        "uuid_v7": "01a04291-bf1a-7eb1-b8cc-716c13f2ad73"
+      },
+      {
+        "id": "TEST-POLICY-001",
+        "uuid_v5": "32317e0c-3173-5dfa-94cd-75dbdc991b58",
+        "uuid_v7": "01a04291-bf1b-7f65-8e8c-2c1f2c8f4f7d"
+      },
+      {
+        "id": "TEST-POLICY-002",
+        "uuid_v5": "a22d6aea-b573-5a2d-842c-eca199d438e1",
+        "uuid_v7": "01a04291-bf1c-7f1a-84cc-492894e60ea4"
+      },
+      {
+        "id": "TEST-POLICY-003",
+        "uuid_v5": "ad204375-e49d-52c9-8a3c-7aa7faef19e2",
+        "uuid_v7": "01a04291-bf1d-7115-8d7b-2319aadcbfc0"
+      },
+      {
+        "id": "TEST-POLICY-004",
+        "uuid_v5": "4c0731fe-75c8-521b-b5b7-2657c6cee53e",
+        "uuid_v7": "01a04291-bf1e-7c0f-a1bd-5c804f518d86"
+      },
+      {
+        "id": "TEST-POLICY-005",
+        "uuid_v5": "873fab9f-5cf2-5479-bf60-63034d1346f2",
+        "uuid_v7": "01a04291-bf1f-7318-87ae-e6201dab8fc6"
+      },
+      {
+        "id": "TEST-PRIVACY-001",
+        "uuid_v5": "e1410356-d9db-5b1d-a7f6-152c330eda3a",
+        "uuid_v7": "01a04291-bf20-7a14-960f-07a40c7511df"
+      },
+      {
+        "id": "TEST-PRIVACY-002",
+        "uuid_v5": "f10d11ad-fe0b-5fdb-bc49-ffd8c974eddb",
+        "uuid_v7": "01a04291-bf21-7fa4-99c6-287dfdc14c5a"
+      },
+      {
+        "id": "TEST-SCHEMA-001",
+        "uuid_v5": "b98e840c-ddba-5ac3-a6e3-3650f6b9906e",
+        "uuid_v7": "01a04291-bf22-7c8d-b9be-d842707b9933"
+      },
+      {
+        "id": "TEST-SCHEMA-002",
+        "uuid_v5": "898ee7f3-67d9-504d-948e-bf41dc5c4ad2",
+        "uuid_v7": "01a04291-bf23-7446-8ef3-8c6a3a7e8d21"
+      },
+      {
+        "id": "TEST-SEC-001",
+        "uuid_v5": "45363997-39ea-5370-ad78-94601e69f0bf",
+        "uuid_v7": "01a04291-bf24-7b85-a09a-04406a21f282"
+      },
+      {
+        "id": "TEST-SEC-002",
+        "uuid_v5": "b2639387-3b33-561e-b43b-798f599d6e78",
+        "uuid_v7": "01a04291-bf25-78f5-9c5d-91ba35247174"
+      },
+      {
+        "id": "TEST-SEC-003",
+        "uuid_v5": "2332eab2-e9b7-5d2f-be9d-2912e22ba3c5",
+        "uuid_v7": "01a04291-bf26-713c-b1f2-fb89fbe58fb0"
+      },
+      {
+        "id": "TEST-SEC-004",
+        "uuid_v5": "4d4cdca8-e278-5b6c-94e8-74b965ba9fe5",
+        "uuid_v7": "01a04291-bf27-7a41-847a-3d7e8fc86f93"
+      },
+      {
+        "id": "TEST-SEC-005",
+        "uuid_v5": "75449abf-affe-54be-aa8a-fa3bae4e17d8",
+        "uuid_v7": "01a04291-bf28-794c-87fa-b519193ae6c0"
+      },
+      {
+        "id": "TEST-SEC-006",
+        "uuid_v5": "0d44504a-0c30-5267-9a90-7b0b2a5d4da0",
+        "uuid_v7": "01a04291-bf29-722f-9380-173f070edd13"
+      },
+      {
+        "id": "TEST-SEC-007",
+        "uuid_v5": "ea1c684c-8d06-5df1-b9d7-62e5303470b7",
+        "uuid_v7": "01a04291-bf2a-79b1-8490-0bc4c57cca4a"
+      },
+      {
+        "id": "TEST-SEC-008",
+        "uuid_v5": "a4a0f038-4ddb-5568-9e17-9f6edf2e9e7b",
+        "uuid_v7": "01a04291-bf2b-767c-8e6a-1a661780adad"
+      },
+      {
+        "id": "TEST-SEC-009",
+        "uuid_v5": "1433acd7-fe2a-5d5e-9d40-0d2c5b7472e7",
+        "uuid_v7": "01a04291-bf2c-7e1a-a98d-bdd8849d3c83"
+      },
+      {
+        "id": "TEST-SLO-001",
+        "uuid_v5": "e20225f6-db67-5249-8cce-91653e2ad907",
+        "uuid_v7": "01a04291-bf2d-75f9-8670-0dbb098ab9fe"
+      },
+      {
+        "id": "TEST-SLO-002",
+        "uuid_v5": "2c612c31-2a88-5342-90c7-853971644d0a",
+        "uuid_v7": "01a04291-bf2e-7a41-8305-edfe462479a6"
+      },
+      {
+        "id": "TEST-SLO-003",
+        "uuid_v5": "3392c668-67be-593d-a3f5-fe7c9de8e2ef",
+        "uuid_v7": "01a04291-bf2f-71f8-9525-bca3a6195287"
+      },
+      {
+        "id": "TEST-SLO-004",
+        "uuid_v5": "7f0b48d8-18f0-5695-85cd-0efe03f3fa1a",
+        "uuid_v7": "01a04291-bf30-7e47-bd27-c32c016ac0e4"
+      },
+      {
+        "id": "TEST-SLO-005",
+        "uuid_v5": "08c075f8-3da0-5b6b-abc5-f4aef10a8ec5",
+        "uuid_v7": "01a04291-bf31-722e-95ca-e2a6cf3f244c"
+      },
+      {
+        "id": "TEST-SLO-006",
+        "uuid_v5": "6891e15d-9c19-52ab-987f-81ebca64281c",
+        "uuid_v7": "01a04291-bf32-7307-95e2-01452474e595"
+      },
+      {
+        "id": "TEST-SYNC-001",
+        "uuid_v5": "9925fdbd-3d2a-5107-9a25-44e524a79035",
+        "uuid_v7": "01a04291-bf33-79b0-a061-d70932676501"
+      },
+      {
+        "id": "TEST-SYNC-002",
+        "uuid_v5": "c8da4e2d-876b-5d9f-8869-f445227739ef",
+        "uuid_v7": "01a04291-bf34-7696-903b-96f45bff790e"
+      },
+      {
+        "id": "TEST-SYNC-003",
+        "uuid_v5": "afdd7d35-bcbf-51c4-af82-039cbf32cfd5",
+        "uuid_v7": "01a04291-bf35-7eb0-b97b-464f64a4d494"
+      },
+      {
+        "id": "TEST-SYNC-004",
+        "uuid_v5": "32e779b5-c957-50de-963e-79ba2291d957",
+        "uuid_v7": "01a04291-bf36-706f-8dbd-36f53c6a4bfc"
+      },
+      {
+        "id": "TEST-TIME-001",
+        "uuid_v5": "c6b118f9-2223-5b1d-ac0a-fa2f8f8767af",
+        "uuid_v7": "01a04291-bf37-746b-b57f-be582482b0ba"
+      },
+      {
+        "id": "TEST-VERIFY-001",
+        "uuid_v5": "88a7d267-da87-5fab-bce4-8629c0cbcd6b",
+        "uuid_v7": "01a04291-bf38-7dcb-927a-8d368b057bf5"
+      },
+      {
+        "id": "TEST-VERIFY-002",
+        "uuid_v5": "5aa3dd27-4204-54ed-af73-f222610511e4",
+        "uuid_v7": "01a04291-bf39-7ca6-98b5-0962f5bde01c"
+      },
+      {
+        "id": "TEST-VERIFY-003",
+        "uuid_v5": "88b0dc21-6483-59f0-9651-728cd198dd53",
+        "uuid_v7": "01a04291-bf3a-763f-a1ea-702fffb6de54"
+      }
+    ]
+  }
+}

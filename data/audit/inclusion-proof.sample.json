@@ -1,0 +1,10 @@
+{
+  "eventIndex": 2,
+  "eventDigest": "d2eb2347fbd2ceebd02bf91b0ce466c2c66cd2f776a4cc4ff7153192d247bb10",
+  "treeSize": 4,
+  "auditPath": [
+    "b7ee8fe2f610b567b6c6cbd04e60af02c34cfd4fe4bb79251abccf2dcbff5b00",
+    "08f13e91f15e1d447f9a090ad8da41bbb3cfbf82c95aeddc918b31f71b55e214"
+  ],
+  "expectedRoot": "560b877732054a8379908164dbdb510e1834b8ef107f4ddea816ecb227ccb58a"
+}

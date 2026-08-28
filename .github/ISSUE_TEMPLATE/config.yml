@@ -1,0 +1,7 @@
+# information_uuid_v5=d884e01e-d8e2-5e1a-b0a5-d88478e515a3
+# event_uuid_v7=01a04875-b599-7a58-be43-c91a8f178894
+blank_issues_enabled: false
+contact_links:
+  - name: セキュリティ上の非公開報告
+    url: https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/security/policy
+    about: 秘密情報や悪用可能な脆弱性は公開Issueへ書かないでください。

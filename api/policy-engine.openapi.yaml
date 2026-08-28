@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: Verifiable Tool Policy Engine API
+  version: 0.1.0
+  description: >-
+    Reference boundary for pre-execution policy, post-execution verification,
+    reconciliation, and append-only audit event ingestion.
+servers:
+  - url: https://policy.example.invalid
+paths:
+  /v1/evaluate/pre:
+    post:
+      operationId: evaluatePre
+      summary: Evaluate a normalized pre-execution Canonical IR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/canonical-ir.schema.json
+      responses:
+        '200':
+          description: Policy decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+  /v1/evaluate/post:
+    post:
+      operationId: evaluatePost
+      summary: Evaluate verification evidence summarized in Canonical IR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/canonical-ir.schema.json
+      responses:
+        '200':
+          description: Commit decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+  /v1/reconcile:
+    post:
+      operationId: requestReconciliation
+      summary: Request read-only reconciliation for an ambiguous effect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [intentId, toolId, observationPlan]
+              properties:
+                intentId: {type: string, format: uuid}
+                toolId: {type: string}
+                observationPlan: {type: array, items: {type: string}}
+      responses:
+        '202': {description: Reconciliation accepted}
+  /v1/audit/events:
+    post:
+      operationId: appendAuditEvent
+      summary: Append a signed audit event after schema and signature validation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/audit-event.schema.json
+      responses:
+        '201': {description: Event accepted}
+        '409': {description: Sequence, hash-chain, causal, or duplicate-effect conflict}
+components:
+  schemas:
+    DecisionResponse:
+      type: object
+      required: [decision, ruleVersion, reasons]
+      properties:
+        decision:
+          type: string
+          enum: [ALLOW, DENY, HUMAN, RECONCILE]
+        ruleVersion: {type: string}
+        reasons:
+          type: array
+          items: {type: string}
+        decisionEventId:
+          type: string
+          format: uuid

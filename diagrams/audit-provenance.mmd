@@ -1,0 +1,13 @@
+flowchart LR
+  A[AUTHORIZE] -->|authRef + intentDigest| X[EXECUTE]
+  X -->|executionRef| V[VERIFY]
+  V -->|verificationRef| C[COMMIT]
+  A -. hash chain .-> X
+  X -. hash chain .-> V
+  V -. hash chain .-> C
+  A --> M[Merkle Tree]
+  X --> M
+  V --> M
+  C --> M
+  M --> CP[Signed Checkpoint]
+  CP --> EXT[External witness/store]

@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant User
+  participant App
+  participant Planner
+  participant Policy
+  participant WebMCP
+  participant Evidence
+  participant Audit
+  User->>App: intent + mandate
+  App->>App: normalize + UUIDv5/v7
+  App->>Planner: goal + feasible tool projection
+  Planner-->>App: candidate plan
+  App->>Policy: Canonical IR (pre)
+  Policy-->>App: ALLOW / DENY / HUMAN / RECONCILE
+  App->>WebMCP: execute only on ALLOW
+  WebMCP-->>App: result claim
+  App->>Evidence: read-back / receipt / state diff
+  Evidence-->>Policy: Canonical IR (post)
+  Policy-->>App: ALLOW commit / DENY / HUMAN / RECONCILE
+  App->>Audit: signed AUTHORIZE/EXECUTE/VERIFY/COMMIT events

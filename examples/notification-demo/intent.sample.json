@@ -1,0 +1,14 @@
+{
+  "intentId": "581e7a64-359c-5bde-9c9c-7539f5050b4b",
+  "eventId": "01a0486c-46a0-7044-bb83-4fdf3f204175",
+  "logicalOperationId": "sample-mac-notification",
+  "title": "検証通知",
+  "body": "この通知は一度だけ表示されます。",
+  "target": "local-mac-notification",
+  "payloadDigest": "ca61f1a1a3804814cd689b574339bae89e5268a2d484440239c32c554fdbe451",
+  "controlState": "PROPOSED",
+  "effectState": "NOT_STARTED",
+  "approvalExpiresAt": null,
+  "createdAt": 1787921111000,
+  "updatedAt": 1787921111000
+}

@@ -1,0 +1,17 @@
+# information_uuid_v5=936025fe-90d9-5407-9fe3-7279094849ca
+# event_uuid_v7=01a04875-b4e8-77f0-b3e0-4e5a26879699
+# machine-contract: dependency updates remain proposals and must pass the same validate job before merge.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /src/typescript
+    schedule:
+      interval: monthly
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly

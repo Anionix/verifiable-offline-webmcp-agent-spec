@@ -1,0 +1,145 @@
+{
+  "contractVersion": "0.1.0",
+  "identity": {
+    "uuid_v5": "bfcc3853-add9-5cd9-aa31-9e5721ff8408",
+    "uuid_v7": "01a04291-b425-7157-8a6c-e748f97fdc22",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "messaging.send",
+    "category": "tool-contract"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "tool": {
+    "id": "messaging.send",
+    "name": "send_message",
+    "class": "messaging"
+  },
+  "interface": {
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipientIds",
+        "content",
+        "contentDigest",
+        "approvalDigest"
+      ],
+      "properties": {
+        "recipientIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "content": {
+          "type": "string"
+        },
+        "contentDigest": {
+          "type": "string"
+        },
+        "approvalDigest": {
+          "type": "string"
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "required": [
+        "messageId"
+      ],
+      "properties": {
+        "messageId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "semantics": {
+    "readSet": [
+      "draft.content",
+      "recipient.allowlist"
+    ],
+    "writeSet": [
+      "outbox.message"
+    ],
+    "preconditions": [
+      {
+        "id": "recipient",
+        "expression": "recipientIds == approvedRecipientIds"
+      },
+      {
+        "id": "content",
+        "expression": "digest(content) == approvedContentDigest"
+      }
+    ],
+    "postconditions": [
+      {
+        "id": "receipt",
+        "expression": "provider.messageId exists"
+      },
+      {
+        "id": "recipient",
+        "expression": "provider.recipientIds == approvedRecipientIds"
+      }
+    ]
+  },
+  "properties": {
+    "externalSideEffect": true,
+    "reversible": false,
+    "idempotent": false,
+    "commutative": false,
+    "networkRequired": true
+  },
+  "policy": {
+    "offline": "DRAFT",
+    "humanApproval": "MANDATE_OR_HUMAN",
+    "retry": "RECONCILE_THEN_RETRY"
+  },
+  "models": {
+    "success": {
+      "priorAlpha": 1,
+      "priorBeta": 1,
+      "calibrationDatasetRef": "dataset://tool-outcomes"
+    },
+    "cost": {
+      "unit": "micro-utility",
+      "latencyWeightPPM": 250000,
+      "energyWeightPPM": 150000,
+      "moneyWeightPPM": 200000
+    },
+    "risk": {
+      "classFloorPPM": 980000,
+      "damageMinorUnits": 50000,
+      "lossBudgetMinorUnits": 1000
+    },
+    "evidence": {
+      "required": [
+        "provider-message-id",
+        "sent-folder-read-back"
+      ],
+      "minimumIndependentSources": 1
+    }
+  },
+  "recovery": {
+    "reconcileTool": "messaging.get_send_status",
+    "rollbackTool": null
+  },
+  "audit": {
+    "logInputs": "redacted",
+    "logOutputs": "redacted",
+    "recordEvidence": true,
+    "canonicalization": "RFC8785-compatible-subset"
+  }
+}

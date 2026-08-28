@@ -1,0 +1,204 @@
+{
+  "baseline": {
+    "ambiguousRetryEdgeCount": 0,
+    "commitReachable": true,
+    "commitWithoutVerificationCount": 0,
+    "counterexamples": {
+      "ambiguousRetry": [],
+      "commitWithoutVerification": [],
+      "doubleEffect": [],
+      "unauthorizedExecute": []
+    },
+    "doubleEffectCount": 0,
+    "mutation": null,
+    "reachableStateCount": 38,
+    "transitionCount": 43,
+    "unauthorizedExecuteCount": 0
+  },
+  "maxRetry": 2,
+  "model": "finite EFSM abstraction",
+  "mutations": {
+    "ambiguous-retry": {
+      "ambiguousRetryEdgeCount": 10,
+      "commitReachable": true,
+      "commitWithoutVerificationCount": 0,
+      "counterexamples": {
+        "ambiguousRetry": [
+          {
+            "from": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 1,
+              "pc": "AMBIGUOUS",
+              "retry_left": 2,
+              "verified": false
+            },
+            "label": "BrokenAmbiguousRetry",
+            "to": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 1,
+              "pc": "EXECUTING",
+              "retry_left": 2,
+              "verified": false
+            }
+          },
+          {
+            "from": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 0,
+              "pc": "AMBIGUOUS",
+              "retry_left": 2,
+              "verified": false
+            },
+            "label": "BrokenAmbiguousRetry",
+            "to": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 0,
+              "pc": "EXECUTING",
+              "retry_left": 2,
+              "verified": false
+            }
+          },
+          {
+            "from": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 0,
+              "pc": "FAILED",
+              "retry_left": 2,
+              "verified": false
+            },
+            "label": "Retry",
+            "to": {
+              "ambiguous": true,
+              "auth": true,
+              "effect_count": 0,
+              "pc": "AUTHORIZED",
+              "retry_left": 1,
+              "verified": false
+            }
+          }
+        ],
+        "commitWithoutVerification": [],
+        "doubleEffect": [],
+        "unauthorizedExecute": []
+      },
+      "doubleEffectCount": 0,
+      "mutation": "ambiguous-retry",
+      "reachableStateCount": 54,
+      "transitionCount": 70,
+      "unauthorizedExecuteCount": 0
+    },
+    "commit-bypass": {
+      "ambiguousRetryEdgeCount": 0,
+      "commitReachable": true,
+      "commitWithoutVerificationCount": 3,
+      "counterexamples": {
+        "ambiguousRetry": [],
+        "commitWithoutVerification": [
+          {
+            "ambiguous": false,
+            "auth": true,
+            "effect_count": 1,
+            "pc": "COMMITTED",
+            "retry_left": 1,
+            "verified": false
+          },
+          {
+            "ambiguous": false,
+            "auth": true,
+            "effect_count": 1,
+            "pc": "COMMITTED",
+            "retry_left": 0,
+            "verified": false
+          },
+          {
+            "ambiguous": false,
+            "auth": true,
+            "effect_count": 1,
+            "pc": "COMMITTED",
+            "retry_left": 2,
+            "verified": false
+          }
+        ],
+        "doubleEffect": [],
+        "unauthorizedExecute": []
+      },
+      "doubleEffectCount": 0,
+      "mutation": "commit-bypass",
+      "reachableStateCount": 41,
+      "transitionCount": 46,
+      "unauthorizedExecuteCount": 0
+    },
+    "double": {
+      "ambiguousRetryEdgeCount": 0,
+      "commitReachable": true,
+      "commitWithoutVerificationCount": 0,
+      "counterexamples": {
+        "ambiguousRetry": [],
+        "commitWithoutVerification": [],
+        "doubleEffect": [
+          {
+            "ambiguous": true,
+            "auth": true,
+            "effect_count": 2,
+            "pc": "RECONCILING",
+            "retry_left": 0,
+            "verified": false
+          },
+          {
+            "ambiguous": true,
+            "auth": true,
+            "effect_count": 2,
+            "pc": "AMBIGUOUS",
+            "retry_left": 1,
+            "verified": false
+          },
+          {
+            "ambiguous": false,
+            "auth": true,
+            "effect_count": 2,
+            "pc": "SUCCEEDED",
+            "retry_left": 0,
+            "verified": false
+          }
+        ],
+        "unauthorizedExecute": []
+      },
+      "doubleEffectCount": 12,
+      "mutation": "double",
+      "reachableStateCount": 62,
+      "transitionCount": 69,
+      "unauthorizedExecuteCount": 0
+    },
+    "unauthorized": {
+      "ambiguousRetryEdgeCount": 0,
+      "commitReachable": true,
+      "commitWithoutVerificationCount": 0,
+      "counterexamples": {
+        "ambiguousRetry": [],
+        "commitWithoutVerification": [],
+        "doubleEffect": [],
+        "unauthorizedExecute": [
+          {
+            "ambiguous": false,
+            "auth": false,
+            "effect_count": 0,
+            "pc": "EXECUTING",
+            "retry_left": 2,
+            "verified": false
+          }
+        ]
+      },
+      "doubleEffectCount": 0,
+      "mutation": "unauthorized",
+      "reachableStateCount": 48,
+      "transitionCount": 55,
+      "unauthorizedExecuteCount": 1
+    }
+  },
+  "passed": true
+}

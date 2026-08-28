@@ -1,0 +1,63 @@
+{
+  "id": "PROJECT-001",
+  "identity": {
+    "uuid_v5": "93f29c90-928f-5378-9ea8-12d8d878722c",
+    "uuid_v7": "01a04291-b422-73a9-b478-dc94abbe7596",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "verifiable-offline-webmcp-agent-spec",
+    "category": "project"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "title": {
+    "ja": "検証可能なオフライン WebMCP エージェント設計",
+    "en": "Verifiable Offline WebMCP Agent Architecture"
+  },
+  "type": "Project",
+  "version": "0.1.0",
+  "description": {
+    "ja": "WebMCPを主要な行動基盤、Responses APIをoptional online plannerとする、オフライン優先で検証可能なエージェント設計。",
+    "en": "An offline-first, verifiable agent architecture using WebMCP as the primary action substrate and the Responses API as an optional online planner."
+  },
+  "status": "design-specification",
+  "normative_language": "English machine-readable JSON; Japanese and English documentation are provided.",
+  "open_knowledge_profile": "JSON-LD/PROV-O/DCAT-inspired; not a claim of conformance to a single official Open Knowledge Format.",
+  "source_refs": [
+    "SRC-CHOW-1970",
+    "SRC-CMDP-1999",
+    "SRC-CRDT-2011",
+    "SRC-DCAT3-2024",
+    "SRC-FIPS180-4",
+    "SRC-JSONLD-2020",
+    "SRC-JSONSCHEMA-2020-12",
+    "SRC-LITTLE-1961",
+    "SRC-MCP-2026",
+    "SRC-OPENAI-MCP-2025",
+    "SRC-OPENAI-RESPONSES-2025",
+    "SRC-OPENAI-RUNTIME-2026",
+    "SRC-POMDP-1998",
+    "SRC-PROVO-2013",
+    "SRC-RFC3339",
+    "SRC-RFC7493",
+    "SRC-RFC8032",
+    "SRC-RFC8259",
+    "SRC-RFC8785",
+    "SRC-RFC9162",
+    "SRC-RFC9562",
+    "SRC-TLA-LAMPORT",
+    "SRC-WEBMCP-2026"
+  ],
+  "repository_slug": "verifiable-offline-webmcp-agent-spec",
+  "license": "Apache-2.0"
+}

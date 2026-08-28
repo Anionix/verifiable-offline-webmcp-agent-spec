@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/runtime-metric.schema.json",
+  "title": "Runtime Metric Sample",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metricId",
+    "timestamp",
+    "epochMs",
+    "synthetic",
+    "toolClass",
+    "values"
+  ],
+  "properties": {
+    "metricId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "epochMs": {
+      "type": "integer"
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "toolClass": {
+      "type": "string"
+    },
+    "values": {
+      "type": "object",
+      "required": [
+        "latencyMs",
+        "energyMicroUnits",
+        "apiCostMicroUsd",
+        "confidencePPM",
+        "outcome"
+      ],
+      "properties": {
+        "latencyMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "energyMicroUnits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "apiCostMicroUsd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidencePPM": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        },
+        "outcome": {
+          "enum": [
+            "GOOD_COMMIT",
+            "BAD_COMMIT",
+            "HUMAN",
+            "DENY",
+            "RECONCILE"
+          ]
+        }
+      }
+    }
+  }
+}

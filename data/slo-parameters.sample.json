@@ -1,0 +1,61 @@
+{
+  "id": "SLO-SAMPLE-001",
+  "identity": {
+    "uuid_v5": "fc349d9b-3b4c-5683-aa5c-6f082905cc93",
+    "uuid_v7": "01a04291-b434-7b08-8a1a-e9dca39c4714",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "illustrative-v0.1",
+    "category": "slo-parameters"
+  },
+  "temporal": {
+    "created_at": "2026-08-27T09:34:00Z",
+    "updated_at": "2026-08-27T09:34:00Z",
+    "observed_at": "2026-08-27T09:34:00Z",
+    "valid_from": "2026-08-27T09:34:00Z",
+    "valid_to": null,
+    "epoch_ms": 1787823240000,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-27T18:34:00+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "synthetic": true,
+  "illustrative": true,
+  "outcomes": {
+    "qT": 929000,
+    "qB": 1000,
+    "qR": 60000,
+    "qH": 10000,
+    "scalePPM": 1000000
+  },
+  "residualDuplicateConditionalPPM": 10,
+  "decisionVariables": {
+    "thetaPPM": 916553,
+    "retryBudget": 3,
+    "verifyBudget": 2,
+    "remotePlannerProbabilityPPM": 350000
+  },
+  "constraints": {
+    "minimumGoodCommitPPM": 960000,
+    "maximumBadCommitPPB": 100,
+    "maximumDuplicatePPB": 1000,
+    "maximumMeanLatencyMs": 1200,
+    "maximumMeanApiCostMicroUsd": 5000
+  },
+  "illustrativeResult": {
+    "goodCommitPPM": 963587,
+    "badCommitPPB": 100,
+    "humanOrNonCommitPPM": 36413,
+    "duplicateEffectPPB": 638,
+    "meanLatencyMs": 863,
+    "meanApiCostMicroUsd": 3396
+  },
+  "note": {
+    "ja": "会話で使った説明用仮定。production値ではない。",
+    "en": "Illustrative assumptions used in the discussion; not production values."
+  },
+  "source_refs": [
+    "SRC-CMDP-1999"
+  ]
+}

@@ -1,0 +1,22 @@
+flowchart LR
+  U[User / Mandate] --> IC[Intent Capture]
+  IC --> N[Normalizer + UUID]
+  N --> P[Planner Router]
+  P --> R[Rules]
+  P --> L[Local Model]
+  P -. online only .-> O[Responses API]
+  R --> TC[Tool Contract Engine]
+  L --> TC
+  O --> TC
+  W[WebMCP Registry] --> A[WebMCP Adapter]
+  A --> TC
+  TC -->|ALLOW| E[WebMCP Executor]
+  TC -->|HUMAN| H[Human Gate]
+  TC -->|RECONCILE| V[Evidence / Reconcile]
+  E --> V
+  V --> F[EFSM]
+  F --> C[Commit]
+  F --> Q[Offline Queue]
+  C --> AL[Signed Audit Log]
+  Q --> S[Sync Server]
+  S --> AL

@@ -1,0 +1,1336 @@
+{
+  "dataset": {
+    "id": "DS-SOURCES",
+    "identity": {
+      "uuid_v5": "fa577775-5c7f-5972-82eb-ec59444e94b9",
+      "uuid_v7": "01a04291-b482-7361-ad76-f903ca7f4c06",
+      "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+      "canonical_name": "ds-sources",
+      "category": "dataset"
+    },
+    "temporal": {
+      "created_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-27T09:34:00Z",
+      "observed_at": "2026-08-27T09:34:00Z",
+      "valid_from": "2026-08-27T09:34:00Z",
+      "valid_to": null,
+      "epoch_ms": 1787823240000,
+      "time_zone": "UTC",
+      "local_time_zone": "Asia/Tokyo",
+      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "precision": "millisecond",
+      "standard": "RFC 3339 profile"
+    },
+    "title": {
+      "ja": "一次情報源",
+      "en": "Primary Sources"
+    },
+    "type": "Dataset",
+    "version": "0.1.0",
+    "record_count": 26,
+    "format": "application/json",
+    "license": "Apache-2.0"
+  },
+  "records": [
+    {
+      "id": "SRC-WEBMCP-2026",
+      "identity": {
+        "uuid_v5": "5512b64a-cffd-55db-a665-97f06b0754b3",
+        "uuid_v7": "01a04291-b340-79a1-ab18-e18e2715a156",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "webmcp-community-group-draft-2026-08-26",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-27T09:34:00Z",
+        "observed_at": "2026-08-27T09:34:00Z",
+        "valid_from": "2026-08-27T09:34:00Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240000,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP — Draft Community Group Report",
+        "en": "WebMCP — Draft Community Group Report"
+      },
+      "type": "PrimarySource",
+      "publisher": "W3C Web Machine Learning Community Group",
+      "authors": [
+        "Brandon Walderman",
+        "Khushal Sagar",
+        "Dominic Farolino"
+      ],
+      "published_at": "2026-08-26",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://webmachinelearning.github.io/webmcp/"
+      },
+      "status": "Draft Community Group Report; not a W3C Standard",
+      "primary_source": true,
+      "topics": [
+        "WebMCP",
+        "tool registration",
+        "tool execution",
+        "tool annotations",
+        "security",
+        "prompt injection"
+      ],
+      "supports": [
+        "CLM-001",
+        "CLM-002",
+        "CLM-003",
+        "CLM-020",
+        "REQ-WEBMCP-001",
+        "REQ-SEC-008"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-OPENAI-RESPONSES-2025",
+      "identity": {
+        "uuid_v5": "cc769e2e-dd5a-5e6c-9846-a6e255180914",
+        "uuid_v7": "01a04291-b341-7d24-90d7-837e775a15a3",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "openai-new-tools-for-building-agents-2025-03-11",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.001000Z",
+        "updated_at": "2026-08-27T09:34:00.001000Z",
+        "observed_at": "2026-08-27T09:34:00.001000Z",
+        "valid_from": "2026-08-27T09:34:00.001000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240001,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.001000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "New tools for building agents",
+        "en": "New tools for building agents"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI",
+      "authors": [
+        "OpenAI"
+      ],
+      "published_at": "2025-03-11",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://openai.com/index/new-tools-for-building-agents/"
+      },
+      "status": "Official product announcement",
+      "primary_source": true,
+      "topics": [
+        "Responses API",
+        "built-in tools",
+        "agent orchestration"
+      ],
+      "supports": [
+        "CLM-004",
+        "REQ-PLAN-001"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-OPENAI-MCP-2025",
+      "identity": {
+        "uuid_v5": "c3559101-59f2-508b-9f90-f095310c8865",
+        "uuid_v7": "01a04291-b342-7b48-9ad3-6ca6d9475561",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "openai-responses-api-remote-mcp-2025-05-21",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.002000Z",
+        "updated_at": "2026-08-27T09:34:00.002000Z",
+        "observed_at": "2026-08-27T09:34:00.002000Z",
+        "valid_from": "2026-08-27T09:34:00.002000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240002,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.002000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "New tools and features in the Responses API",
+        "en": "New tools and features in the Responses API"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI",
+      "authors": [
+        "OpenAI"
+      ],
+      "published_at": "2025-05-21",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://openai.com/index/new-tools-and-features-in-the-responses-api/"
+      },
+      "status": "Official product announcement",
+      "primary_source": true,
+      "topics": [
+        "Responses API",
+        "remote MCP",
+        "tool calling"
+      ],
+      "supports": [
+        "CLM-005",
+        "REQ-PLAN-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-OPENAI-RUNTIME-2026",
+      "identity": {
+        "uuid_v5": "695b8f5a-ed77-5c3c-b9a7-7d8573f622c5",
+        "uuid_v7": "01a04291-b343-72e2-b58e-b8723e7f9b6d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "openai-equipping-responses-api-computer-environment-2026-03-11",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.003000Z",
+        "updated_at": "2026-08-27T09:34:00.003000Z",
+        "observed_at": "2026-08-27T09:34:00.003000Z",
+        "valid_from": "2026-08-27T09:34:00.003000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240003,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.003000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "From model to agent: Equipping the Responses API with a computer environment",
+        "en": "From model to agent: Equipping the Responses API with a computer environment"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI",
+      "authors": [
+        "Bo Xu",
+        "Danny Zhang",
+        "Rohit Arunachalam"
+      ],
+      "published_at": "2026-03-11",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://openai.com/index/equip-responses-api-computer-environment/"
+      },
+      "status": "Official engineering article",
+      "primary_source": true,
+      "topics": [
+        "agent loop",
+        "model proposal",
+        "runtime execution",
+        "isolated environment"
+      ],
+      "supports": [
+        "CLM-006",
+        "REQ-PLAN-003",
+        "ADR-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-MCP-2026",
+      "identity": {
+        "uuid_v5": "0040f552-6e8a-555a-8d77-ff88cf190932",
+        "uuid_v7": "01a04291-b344-79ab-9484-041f613ef2b2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "model-context-protocol-specification-2026-07-28",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.004000Z",
+        "updated_at": "2026-08-27T09:34:00.004000Z",
+        "observed_at": "2026-08-27T09:34:00.004000Z",
+        "valid_from": "2026-08-27T09:34:00.004000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240004,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.004000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Model Context Protocol Specification — 2026-07-28",
+        "en": "Model Context Protocol Specification — 2026-07-28"
+      },
+      "type": "PrimarySource",
+      "publisher": "Model Context Protocol Project",
+      "authors": [
+        "Model Context Protocol contributors"
+      ],
+      "published_at": "2026-07-28",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://modelcontextprotocol.io/specification/2026-07-28"
+      },
+      "status": "Official protocol specification",
+      "primary_source": true,
+      "topics": [
+        "MCP",
+        "tools",
+        "authorization",
+        "host policy"
+      ],
+      "supports": [
+        "CLM-007",
+        "REQ-MCP-001",
+        "REQ-SEC-004"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-JSONLD-2020",
+      "identity": {
+        "uuid_v5": "6ea7c25d-7b9e-50b9-9b59-127cd124d5b7",
+        "uuid_v7": "01a04291-b345-73b3-ace6-8d3927af50b2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "w3c-json-ld-1-1",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.005000Z",
+        "updated_at": "2026-08-27T09:34:00.005000Z",
+        "observed_at": "2026-08-27T09:34:00.005000Z",
+        "valid_from": "2026-08-27T09:34:00.005000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240005,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.005000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSON-LD 1.1 — A JSON-based Serialization for Linked Data",
+        "en": "JSON-LD 1.1 — A JSON-based Serialization for Linked Data"
+      },
+      "type": "PrimarySource",
+      "publisher": "W3C",
+      "authors": [
+        "Gregg Kellogg",
+        "Pierre-Antoine Champin",
+        "Dave Longley",
+        "Manu Sporny",
+        "Markus Lanthaler",
+        "Niklas Lindström"
+      ],
+      "published_at": "2020-07-16",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.w3.org/TR/json-ld11/"
+      },
+      "status": "W3C Recommendation",
+      "primary_source": true,
+      "topics": [
+        "JSON-LD",
+        "Linked Data",
+        "machine-readable graph"
+      ],
+      "supports": [
+        "CLM-008",
+        "REQ-KNOW-001"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-PROVO-2013",
+      "identity": {
+        "uuid_v5": "a6ebf827-b311-50da-be6e-c0bbe61838f5",
+        "uuid_v7": "01a04291-b346-7331-b4e8-5e09bc780954",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "w3c-prov-o",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.006000Z",
+        "updated_at": "2026-08-27T09:34:00.006000Z",
+        "observed_at": "2026-08-27T09:34:00.006000Z",
+        "valid_from": "2026-08-27T09:34:00.006000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240006,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.006000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "PROV-O: The PROV Ontology",
+        "en": "PROV-O: The PROV Ontology"
+      },
+      "type": "PrimarySource",
+      "publisher": "W3C",
+      "authors": [
+        "Timothy Lebo",
+        "Satya Sahoo",
+        "Deborah McGuinness"
+      ],
+      "published_at": "2013-04-30",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.w3.org/TR/prov-o/"
+      },
+      "status": "W3C Recommendation",
+      "primary_source": true,
+      "topics": [
+        "provenance",
+        "entities",
+        "activities",
+        "agents"
+      ],
+      "supports": [
+        "CLM-009",
+        "REQ-KNOW-002",
+        "REQ-AUDIT-010"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-DCAT3-2024",
+      "identity": {
+        "uuid_v5": "7c4e7328-dbfe-55a6-8365-8783fc8f55c1",
+        "uuid_v7": "01a04291-b347-7a79-b861-6b258e6b9507",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "w3c-dcat-version-3",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.007000Z",
+        "updated_at": "2026-08-27T09:34:00.007000Z",
+        "observed_at": "2026-08-27T09:34:00.007000Z",
+        "valid_from": "2026-08-27T09:34:00.007000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240007,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.007000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Data Catalog Vocabulary (DCAT) — Version 3",
+        "en": "Data Catalog Vocabulary (DCAT) — Version 3"
+      },
+      "type": "PrimarySource",
+      "publisher": "W3C",
+      "authors": [
+        "Riccardo Albertoni",
+        "David Browning",
+        "Simon J D Cox",
+        "Alejandra Gonzalez Beltran",
+        "Andrea Perego",
+        "Peter Winstanley"
+      ],
+      "published_at": "2024-08-22",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.w3.org/TR/vocab-dcat-3/"
+      },
+      "status": "W3C Recommendation",
+      "primary_source": true,
+      "topics": [
+        "data catalog",
+        "datasets",
+        "distributions",
+        "checksums",
+        "versioning"
+      ],
+      "supports": [
+        "CLM-010",
+        "REQ-KNOW-003"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-JSONSCHEMA-2020-12",
+      "identity": {
+        "uuid_v5": "d0bc2765-2f7b-534d-a88e-09d1a42cc364",
+        "uuid_v7": "01a04291-b348-7740-9d11-bbbd00c96e96",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "json-schema-draft-2020-12-core",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.008000Z",
+        "updated_at": "2026-08-27T09:34:00.008000Z",
+        "observed_at": "2026-08-27T09:34:00.008000Z",
+        "valid_from": "2026-08-27T09:34:00.008000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240008,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.008000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "JSON Schema: A Media Type for Describing JSON Documents",
+        "en": "JSON Schema: A Media Type for Describing JSON Documents"
+      },
+      "type": "PrimarySource",
+      "publisher": "JSON Schema / IETF Internet-Draft archive",
+      "authors": [
+        "Austin Wright",
+        "Henry Andrews",
+        "Ben Hutton",
+        "Greg Dennis"
+      ],
+      "published_at": "2022-06-16",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://json-schema.org/draft/2020-12/json-schema-core.html"
+      },
+      "status": "JSON Schema Draft 2020-12 core specification",
+      "primary_source": true,
+      "topics": [
+        "JSON Schema",
+        "validation",
+        "machine-readable contracts"
+      ],
+      "supports": [
+        "CLM-011",
+        "REQ-DATA-001",
+        "REQ-TOOL-001"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC8259",
+      "identity": {
+        "uuid_v5": "2206143d-75e7-5f56-9fd3-7740940f85dc",
+        "uuid_v7": "01a04291-b349-71d0-b336-27a2ff871858",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-8259-json",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.009000Z",
+        "updated_at": "2026-08-27T09:34:00.009000Z",
+        "observed_at": "2026-08-27T09:34:00.009000Z",
+        "valid_from": "2026-08-27T09:34:00.009000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240009,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.009000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 8259 — The JavaScript Object Notation (JSON) Data Interchange Format",
+        "en": "RFC 8259 — The JavaScript Object Notation (JSON) Data Interchange Format"
+      },
+      "type": "PrimarySource",
+      "publisher": "IETF / RFC Editor",
+      "authors": [
+        "Tim Bray"
+      ],
+      "published_at": "2017-12",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc8259/"
+      },
+      "status": "Internet Standard",
+      "primary_source": true,
+      "topics": [
+        "JSON"
+      ],
+      "supports": [
+        "REQ-DATA-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC7493",
+      "identity": {
+        "uuid_v5": "e17022d8-a733-5fa9-a23b-e6d4ba08b9ec",
+        "uuid_v7": "01a04291-b34a-73ba-ae4c-eded234796e2",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-7493-i-json",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.010000Z",
+        "updated_at": "2026-08-27T09:34:00.010000Z",
+        "observed_at": "2026-08-27T09:34:00.010000Z",
+        "valid_from": "2026-08-27T09:34:00.010000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240010,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.010000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 7493 — The I-JSON Message Format",
+        "en": "RFC 7493 — The I-JSON Message Format"
+      },
+      "type": "PrimarySource",
+      "publisher": "IETF / RFC Editor",
+      "authors": [
+        "Tim Bray"
+      ],
+      "published_at": "2015-03",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc7493/"
+      },
+      "status": "Proposed Standard",
+      "primary_source": true,
+      "topics": [
+        "I-JSON",
+        "interoperability",
+        "timestamps"
+      ],
+      "supports": [
+        "REQ-DATA-003",
+        "REQ-TIME-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC8785",
+      "identity": {
+        "uuid_v5": "2f53445e-1dbd-5f35-954c-69af5e93690e",
+        "uuid_v7": "01a04291-b34b-7e17-9a69-fdd64d342d30",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-8785-jcs",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.011000Z",
+        "updated_at": "2026-08-27T09:34:00.011000Z",
+        "observed_at": "2026-08-27T09:34:00.011000Z",
+        "valid_from": "2026-08-27T09:34:00.011000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240011,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.011000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 8785 — JSON Canonicalization Scheme (JCS)",
+        "en": "RFC 8785 — JSON Canonicalization Scheme (JCS)"
+      },
+      "type": "PrimarySource",
+      "publisher": "RFC Editor",
+      "authors": [
+        "Anders Rundgren",
+        "Brayden Jordan",
+        "Samuel Erdtman"
+      ],
+      "published_at": "2020-06",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc8785/"
+      },
+      "status": "Informational RFC",
+      "primary_source": true,
+      "topics": [
+        "canonical JSON",
+        "hashable representation",
+        "cryptography"
+      ],
+      "supports": [
+        "CLM-012",
+        "REQ-AUDIT-001"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC9562",
+      "identity": {
+        "uuid_v5": "dc6a4a7e-d313-5725-8bf7-ef3001781a2e",
+        "uuid_v7": "01a04291-b34c-7b8a-9af9-692ebcbc65fc",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-9562-uuid",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.012000Z",
+        "updated_at": "2026-08-27T09:34:00.012000Z",
+        "observed_at": "2026-08-27T09:34:00.012000Z",
+        "valid_from": "2026-08-27T09:34:00.012000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240012,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.012000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 9562 — Universally Unique IDentifiers (UUIDs)",
+        "en": "RFC 9562 — Universally Unique IDentifiers (UUIDs)"
+      },
+      "type": "PrimarySource",
+      "publisher": "IETF / RFC Editor",
+      "authors": [
+        "K. Davis",
+        "B. Peabody",
+        "P. Leach"
+      ],
+      "published_at": "2024-05",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc9562/"
+      },
+      "status": "Proposed Standard; obsoletes RFC 4122",
+      "primary_source": true,
+      "topics": [
+        "UUIDv5",
+        "UUIDv7",
+        "identifier design"
+      ],
+      "supports": [
+        "CLM-013",
+        "CLM-014",
+        "REQ-ID-001",
+        "REQ-ID-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC3339",
+      "identity": {
+        "uuid_v5": "b50a5b84-01d7-5eed-9304-bb8de74d36fd",
+        "uuid_v7": "01a04291-b34d-7528-b02f-71fb20841f3d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-3339-timestamps",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.013000Z",
+        "updated_at": "2026-08-27T09:34:00.013000Z",
+        "observed_at": "2026-08-27T09:34:00.013000Z",
+        "valid_from": "2026-08-27T09:34:00.013000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240013,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.013000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 3339 — Date and Time on the Internet: Timestamps",
+        "en": "RFC 3339 — Date and Time on the Internet: Timestamps"
+      },
+      "type": "PrimarySource",
+      "publisher": "IETF / RFC Editor",
+      "authors": [
+        "G. Klyne",
+        "C. Newman"
+      ],
+      "published_at": "2002-07",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc3339/"
+      },
+      "status": "Standards Track RFC",
+      "primary_source": true,
+      "topics": [
+        "timestamps",
+        "UTC",
+        "ordering"
+      ],
+      "supports": [
+        "CLM-015",
+        "REQ-TIME-001"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-FIPS180-4",
+      "identity": {
+        "uuid_v5": "60f7c6da-80a1-59d2-98fb-39c76bd555de",
+        "uuid_v7": "01a04291-b34e-7cca-8348-3af9ef27f517",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "nist-fips-180-4-secure-hash-standard",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.014000Z",
+        "updated_at": "2026-08-27T09:34:00.014000Z",
+        "observed_at": "2026-08-27T09:34:00.014000Z",
+        "valid_from": "2026-08-27T09:34:00.014000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240014,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.014000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "FIPS PUB 180-4 — Secure Hash Standard (SHS)",
+        "en": "FIPS PUB 180-4 — Secure Hash Standard (SHS)"
+      },
+      "type": "PrimarySource",
+      "publisher": "NIST",
+      "authors": [
+        "National Institute of Standards and Technology"
+      ],
+      "published_at": "2015-08",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
+      },
+      "status": "Federal Information Processing Standard",
+      "primary_source": true,
+      "topics": [
+        "SHA-256",
+        "hash functions"
+      ],
+      "supports": [
+        "REQ-AUDIT-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC8032",
+      "identity": {
+        "uuid_v5": "2791987b-30bb-5a18-93c8-58f8c88aee80",
+        "uuid_v7": "01a04291-b34f-7e7e-961a-10fb8cea5ba0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-8032-eddsa",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.015000Z",
+        "updated_at": "2026-08-27T09:34:00.015000Z",
+        "observed_at": "2026-08-27T09:34:00.015000Z",
+        "valid_from": "2026-08-27T09:34:00.015000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240015,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.015000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 8032 — Edwards-Curve Digital Signature Algorithm (EdDSA)",
+        "en": "RFC 8032 — Edwards-Curve Digital Signature Algorithm (EdDSA)"
+      },
+      "type": "PrimarySource",
+      "publisher": "RFC Editor",
+      "authors": [
+        "Simon Josefsson",
+        "Ilari Liusvaara"
+      ],
+      "published_at": "2017-01",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc8032/"
+      },
+      "status": "Informational RFC",
+      "primary_source": true,
+      "topics": [
+        "Ed25519",
+        "digital signatures"
+      ],
+      "supports": [
+        "CLM-016",
+        "REQ-AUDIT-003"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-RFC9162",
+      "identity": {
+        "uuid_v5": "aa6e88e6-e003-5321-a9ea-689c5e330000",
+        "uuid_v7": "01a04291-b350-7997-a5ee-6b92deb71073",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "rfc-9162-certificate-transparency-v2",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.016000Z",
+        "updated_at": "2026-08-27T09:34:00.016000Z",
+        "observed_at": "2026-08-27T09:34:00.016000Z",
+        "valid_from": "2026-08-27T09:34:00.016000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240016,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.016000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "RFC 9162 — Certificate Transparency Version 2.0",
+        "en": "RFC 9162 — Certificate Transparency Version 2.0"
+      },
+      "type": "PrimarySource",
+      "publisher": "IETF / RFC Editor",
+      "authors": [
+        "Ben Laurie",
+        "Emilia Kasper",
+        "Erwann Messeri",
+        "Rob Stradling"
+      ],
+      "published_at": "2021-12",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.rfc-editor.org/info/rfc9162/"
+      },
+      "status": "Proposed Standard",
+      "primary_source": true,
+      "topics": [
+        "Merkle tree",
+        "inclusion proof",
+        "consistency proof"
+      ],
+      "supports": [
+        "CLM-017",
+        "REQ-AUDIT-004",
+        "REQ-AUDIT-005"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-TLA-LAMPORT",
+      "identity": {
+        "uuid_v5": "f5c97a48-75c1-5e0f-82e6-c989fdc2ea7d",
+        "uuid_v7": "01a04291-b351-7a43-9e6b-9bc0696a9015",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "lamport-specifying-and-verifying-systems",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.017000Z",
+        "updated_at": "2026-08-27T09:34:00.017000Z",
+        "observed_at": "2026-08-27T09:34:00.017000Z",
+        "valid_from": "2026-08-27T09:34:00.017000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240017,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.017000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Specifying Systems and Verifying Specifications",
+        "en": "Specifying Systems and Verifying Specifications"
+      },
+      "type": "PrimarySource",
+      "publisher": "Leslie Lamport / Microsoft Research",
+      "authors": [
+        "Leslie Lamport"
+      ],
+      "published_at": "2002",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://lamport.azurewebsites.net/pubs/spec-and-verifying.pdf"
+      },
+      "status": "Primary author publication",
+      "primary_source": true,
+      "topics": [
+        "TLA+",
+        "Init",
+        "Next",
+        "invariants",
+        "liveness"
+      ],
+      "supports": [
+        "CLM-018",
+        "REQ-FORMAL-001",
+        "REQ-FORMAL-002"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-POMDP-1998",
+      "identity": {
+        "uuid_v5": "52606e63-c0da-5134-b5c7-a8d4425ce4c2",
+        "uuid_v7": "01a04291-b352-7ebd-8b81-a4928f375e0d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "kaelbling-littman-cassandra-pomdp-1998",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.018000Z",
+        "updated_at": "2026-08-27T09:34:00.018000Z",
+        "observed_at": "2026-08-27T09:34:00.018000Z",
+        "valid_from": "2026-08-27T09:34:00.018000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240018,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.018000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Planning and Acting in Partially Observable Stochastic Domains",
+        "en": "Planning and Acting in Partially Observable Stochastic Domains"
+      },
+      "type": "PrimarySource",
+      "publisher": "Artificial Intelligence",
+      "authors": [
+        "Leslie Pack Kaelbling",
+        "Michael L. Littman",
+        "Anthony R. Cassandra"
+      ],
+      "published_at": "1998",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www.cassandra.org/arc/papers/aij98.pdf"
+      },
+      "status": "Peer-reviewed research paper",
+      "primary_source": true,
+      "topics": [
+        "POMDP",
+        "belief state",
+        "planning"
+      ],
+      "supports": [
+        "CLM-019",
+        "F-002",
+        "F-016"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-CMDP-1999",
+      "identity": {
+        "uuid_v5": "1dbda155-9584-5df2-bead-cd6aa3279b18",
+        "uuid_v7": "01a04291-b353-79df-a9da-a2dc0fe953fd",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "altman-constrained-markov-decision-processes",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.019000Z",
+        "updated_at": "2026-08-27T09:34:00.019000Z",
+        "observed_at": "2026-08-27T09:34:00.019000Z",
+        "valid_from": "2026-08-27T09:34:00.019000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240019,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.019000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Constrained Markov Decision Processes",
+        "en": "Constrained Markov Decision Processes"
+      },
+      "type": "PrimarySource",
+      "publisher": "CRC Press / INRIA author copy",
+      "authors": [
+        "Eitan Altman"
+      ],
+      "published_at": "1999",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://www-sop.inria.fr/members/Eitan.Altman/PAPERS/h.pdf"
+      },
+      "status": "Research monograph / author copy",
+      "primary_source": true,
+      "topics": [
+        "CMDP",
+        "constraints",
+        "occupancy measures"
+      ],
+      "supports": [
+        "CLM-021",
+        "F-028",
+        "F-607"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-CRDT-2011",
+      "identity": {
+        "uuid_v5": "46666d42-bcff-5bb9-82cc-0fb4f1f9adc4",
+        "uuid_v7": "01a04291-b354-7a6d-8a90-86c4c3b1801c",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "shapiro-crdt-2011",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.020000Z",
+        "updated_at": "2026-08-27T09:34:00.020000Z",
+        "observed_at": "2026-08-27T09:34:00.020000Z",
+        "valid_from": "2026-08-27T09:34:00.020000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240020,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.020000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Conflict-Free Replicated Data Types",
+        "en": "Conflict-Free Replicated Data Types"
+      },
+      "type": "PrimarySource",
+      "publisher": "SSS 2011 / Inria HAL",
+      "authors": [
+        "Marc Shapiro",
+        "Nuno Preguiça",
+        "Carlos Baquero",
+        "Marek Zawirski"
+      ],
+      "published_at": "2011",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://hal.inria.fr/hal-00932836/document"
+      },
+      "status": "Peer-reviewed research paper / open repository copy",
+      "primary_source": true,
+      "topics": [
+        "CRDT",
+        "convergence",
+        "commutative merge"
+      ],
+      "supports": [
+        "CLM-022",
+        "F-023",
+        "REQ-SYNC-003"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-LITTLE-1961",
+      "identity": {
+        "uuid_v5": "fcb67262-133c-58c1-89b0-b2630ce06ad7",
+        "uuid_v7": "01a04291-b355-7b3e-a255-def914f71aa0",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "little-proof-queueing-formula-1961",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.021000Z",
+        "updated_at": "2026-08-27T09:34:00.021000Z",
+        "observed_at": "2026-08-27T09:34:00.021000Z",
+        "valid_from": "2026-08-27T09:34:00.021000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240021,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.021000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "A Proof for the Queuing Formula: L = λW",
+        "en": "A Proof for the Queuing Formula: L = λW"
+      },
+      "type": "PrimarySource",
+      "publisher": "Operations Research",
+      "authors": [
+        "John D. C. Little"
+      ],
+      "published_at": "1961-06-01",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://pubsonline.informs.org/doi/10.1287/opre.9.3.383"
+      },
+      "status": "Peer-reviewed original paper",
+      "primary_source": true,
+      "topics": [
+        "queueing",
+        "Little's Law"
+      ],
+      "supports": [
+        "CLM-023",
+        "F-022",
+        "REQ-SYNC-006"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-CHOW-1970",
+      "identity": {
+        "uuid_v5": "0c619fd4-b636-5983-8e75-2a63d7688c45",
+        "uuid_v7": "01a04291-b356-7004-94cf-eb2251e32346",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "chow-reject-tradeoff-1970",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-27T09:34:00.022000Z",
+        "updated_at": "2026-08-27T09:34:00.022000Z",
+        "observed_at": "2026-08-27T09:34:00.022000Z",
+        "valid_from": "2026-08-27T09:34:00.022000Z",
+        "valid_to": null,
+        "epoch_ms": 1787823240022,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-27T18:34:00.022000+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "On Optimum Recognition Error and Reject Tradeoff",
+        "en": "On Optimum Recognition Error and Reject Tradeoff"
+      },
+      "type": "PrimarySource",
+      "publisher": "IEEE Transactions on Information Theory / IBM Research",
+      "authors": [
+        "C. K. Chow"
+      ],
+      "published_at": "1970",
+      "accessed_at": "2026-08-27T09:34:00Z",
+      "locator": {
+        "url": "https://research.ibm.com/publications/on-optimum-recognition-error-and-reject-tradeoff"
+      },
+      "status": "Peer-reviewed original paper",
+      "primary_source": true,
+      "topics": [
+        "reject option",
+        "abstention",
+        "classification risk"
+      ],
+      "supports": [
+        "CLM-024",
+        "F-026",
+        "REQ-POLICY-009"
+      ],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-NOTIFICATIONS",
+      "identity": {
+        "uuid_v5": "d98065fe-fe57-5619-b2e0-a85a62594ddd",
+        "uuid_v7": "01a0486e-e08c-7c9e-bb66-7bdbc9d71579",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "notifications-standard",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T12:53:41.132Z",
+        "updated_at": "2026-08-28T12:53:41.132Z",
+        "observed_at": "2026-08-28T12:53:41.132Z",
+        "valid_from": "2026-08-28T12:53:41.132Z",
+        "valid_to": null,
+        "epoch_ms": 1787921621132,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-28T21:53:41.132+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Notifications API Standard",
+        "en": "Notifications API Standard"
+      },
+      "type": "PrimarySource",
+      "publisher": "WHATWG",
+      "authors": ["WHATWG contributors"],
+      "published_at": "Living Standard",
+      "accessed_at": "2026-08-28T12:53:41.132Z",
+      "locator": {
+        "url": "https://notifications.spec.whatwg.org/"
+      },
+      "status": "WHATWG Living Standard",
+      "primary_source": true,
+      "topics": ["browser notifications", "showNotification", "getNotifications", "notification tags"],
+      "supports": ["REQ-TOOL-003", "REQ-VERIFY-001"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-NODE-SQLITE-24",
+      "identity": {
+        "uuid_v5": "d7bcffcc-011d-5604-a176-e3486b776cbf",
+        "uuid_v7": "01a0486e-e0c4-78f2-a7f0-892b337f158b",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "node-sqlite-24",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T12:53:41.188Z",
+        "updated_at": "2026-08-28T12:53:41.188Z",
+        "observed_at": "2026-08-28T12:53:41.188Z",
+        "valid_from": "2026-08-28T12:53:41.188Z",
+        "valid_to": null,
+        "epoch_ms": 1787921621188,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-28T21:53:41.188+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "Node.js 24 SQLite documentation",
+        "en": "Node.js 24 SQLite documentation"
+      },
+      "type": "PrimarySource",
+      "publisher": "Node.js Project",
+      "authors": ["Node.js contributors"],
+      "published_at": "2026",
+      "accessed_at": "2026-08-28T12:53:41.188Z",
+      "locator": {
+        "url": "https://nodejs.org/download/release/v24.16.0/docs/api/sqlite.html"
+      },
+      "status": "Official runtime documentation; node:sqlite is release-candidate stability in Node.js 24",
+      "primary_source": true,
+      "topics": ["Node.js", "SQLite", "DatabaseSync", "local persistence"],
+      "supports": ["REQ-OFFLINE-002", "REQ-EXEC-001"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-SQLITE-TRANSACTIONS",
+      "identity": {
+        "uuid_v5": "08ba5fb1-1a7d-5728-9ea0-79ef48acbce6",
+        "uuid_v7": "01a0486e-e103-7a50-9e83-bd0e1bcb5b09",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "sqlite-transactions",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T12:53:41.251Z",
+        "updated_at": "2026-08-28T12:53:41.251Z",
+        "observed_at": "2026-08-28T12:53:41.251Z",
+        "valid_from": "2026-08-28T12:53:41.251Z",
+        "valid_to": null,
+        "epoch_ms": 1787921621251,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-28T21:53:41.251+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "SQLite Transaction",
+        "en": "SQLite Transaction"
+      },
+      "type": "PrimarySource",
+      "publisher": "SQLite Project",
+      "authors": ["SQLite Project"],
+      "published_at": "Living documentation",
+      "accessed_at": "2026-08-28T12:53:41.251Z",
+      "locator": {
+        "url": "https://www.sqlite.org/lang_transaction.html"
+      },
+      "status": "Official SQLite documentation",
+      "primary_source": true,
+      "topics": ["transactions", "BEGIN IMMEDIATE", "write serialization", "WAL"],
+      "supports": ["REQ-EXEC-001", "REQ-EXEC-002", "REQ-OFFLINE-002"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    }
+  ]
+}

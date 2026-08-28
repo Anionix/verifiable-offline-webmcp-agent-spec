@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "checkpointId": "01a04291-da50-7062-9760-7a0ac84000f7",
+  "logId": "b1b27fc3-2e31-5d66-8d65-6251efa0d451",
+  "treeSize": 4,
+  "merkleRoot": "560b877732054a8379908164dbdb510e1834b8ef107f4ddea816ecb227ccb58a",
+  "chainHead": "b9f9bc8e3cb382668ab4bb428132c14f8f61526e9d6e9a5ef812be1e0e0a4c4d",
+  "createdAt": "2026-08-27T09:34:10Z",
+  "previousCheckpointHash": null,
+  "keyId": "d5b07ded-6a52-5f2c-8a49-30300777dbf7",
+  "digest": "aa912941af5221aa83c85b902a100f01f1c7e42106156d7b23d837bf98b8b970",
+  "signature": {
+    "algorithm": "Ed25519",
+    "keyId": "d5b07ded-6a52-5f2c-8a49-30300777dbf7",
+    "signatureBase64": "5V0Lr71eqfcxErkgUHLHgMfMRie3yXC9E9Pm7uGqA0mxD0JOWRgPlNMCKtNC7zGOADDHjFkCcWNNw1CpA7fGCw=="
+  }
+}

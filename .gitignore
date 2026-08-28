@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+.venv/
+.local/
+.jj/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+coverage/
+.tlc/
+states/

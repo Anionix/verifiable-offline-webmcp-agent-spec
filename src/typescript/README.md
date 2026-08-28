@@ -1,0 +1,20 @@
+# TypeScript reference
+
+The reference evaluator uses exact BigInt cross-products at decision boundaries and shares golden vectors with the Python and Wolfram references. The notification candidate uses the Node.js 24 built-in SQLite module and is therefore pinned separately in `.node-version` and `package-lock.json`.
+
+```bash
+npm ci
+npm test
+npm run typecheck
+```
+
+## Duplicate-safe notification candidate
+
+`notification/` separates control state from external-effect state, persists intent/attempt/effect rows in SQLite, and appends a SHA-256 hash-chained JSON Lines record for every transition. UUIDv5 identifies the logical notification intent and UUIDv7 identifies each attempt and transition.
+
+```bash
+npm run benchmark:notification
+npm run demo:notification
+```
+
+The simulated adapter never calls an external service. The browser demo is localhost-only and requests a real notification only after an explicit click. `AMBIGUOUS` blocks `execute` and permits `reconcile` only.

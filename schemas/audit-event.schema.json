@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/audit-event.schema.json",
+  "title": "Signed Audit Event v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "eventId",
+    "eventTime",
+    "eventEpochMs",
+    "logId",
+    "intentId",
+    "deviceId",
+    "sequence",
+    "eventType",
+    "actor",
+    "references",
+    "digests",
+    "payload",
+    "proof"
+  ],
+  "properties": {
+    "version": {
+      "const": "0.1.0"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "eventTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "eventEpochMs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "logId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "intentId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "deviceId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "eventType": {
+      "enum": [
+        "INTENT_CREATED",
+        "AUTHORIZED",
+        "QUEUED",
+        "EXECUTE_STARTED",
+        "EXECUTE_RESULT",
+        "RECONCILED",
+        "VERIFIED",
+        "COMMITTED",
+        "DENIED",
+        "ROLLED_BACK",
+        "CHECKPOINT"
+      ]
+    },
+    "actor": {
+      "type": "object"
+    },
+    "references": {
+      "type": "object"
+    },
+    "digests": {
+      "type": "object"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "proof": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "keyId",
+        "eventDigest",
+        "chainHash",
+        "signatureBase64"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "Ed25519"
+        },
+        "keyId": {
+          "type": "string"
+        },
+        "eventDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "chainHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signatureBase64": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

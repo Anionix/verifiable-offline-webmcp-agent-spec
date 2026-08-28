@@ -1,11 +1,15 @@
 # Changelog
 
-## 0.2.0-candidate — 2026-08-28
+<!-- information_uuid_v5=98e355d2-8469-5427-937c-a922fcf5ad50 event_uuid_v7=01a04896-44e4-74b6-803b-38cd809c1837 state_transition=REVIEW -> VERIFIED occurred_at=2026-08-28T13:36:42.724Z -->
+
+## 0.2.0 — 2026-08-28
 
 - Added a SQLite-backed notification intent, attempt, and effect ledger with a unique logical-operation constraint.
 - Added UUIDv5 intent identity, UUIDv7 transition identity, approval binding, ambiguous-effect reconciliation, and a hash-chained JSON Lines audit log.
 - Added simulated failure, response-loss, restart, duplicate-retry, approval-expiry, schema, type, and 100-sample latency checks.
-- Added a localhost browser notification demo. A real notification remains gated by immediate user approval, and native WebMCP support remains `INCONCLUSIVE` until observed.
+- Added a localhost browser notification demo. One real notification was displayed after immediate user approval; the same-operation retry was suppressed and the external-effect claim count remained one.
+- Published the six-event live audit chain and machine-readable verification summary, including Service Worker readback and the `ALREADY_VERIFIED` retry result.
+- Native WebMCP support remains `INCONCLUSIVE` because `document.modelContext` was absent in the tested browser.
 - Split artifact regeneration from read-only validation and pinned Python and Node.js dependencies.
 
 ## 0.1.0 — 2026-08-27

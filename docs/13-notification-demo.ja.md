@@ -3,16 +3,18 @@ title: "二重送信しないMac通知デモ"
 language: "ja"
 stable_uuid_v5: "4e376b00-450f-5799-a588-a7e3b0c41dd9"
 event_uuid_v7: "01a04867-0d48-7c05-8809-02be217e0c5a"
+updated_event_uuid_v7: "01a04896-44e0-7a6f-b602-573ad92db371"
 generated_at: "2026-08-28T12:23:50Z"
-version: "0.2.0-candidate"
-status: "dry-run-verified"
+updated_at: "2026-08-28T13:36:42.720Z"
+version: "0.2.0"
+status: "live-verified"
 ---
 
 # 二重送信しないMac通知デモ
 
 ## 目的
 
-通信切断、応答消失、処理再起動、同一要求の再試行があっても、同じ論理操作の通知を二度表示しないためのローカル参照実装です。模擬通知は検証済みです。実通知は、利用者が内容と対象を確認して直前承認するまで実行しません。
+通信切断、応答消失、処理再起動、同一要求の再試行があっても、同じ論理操作の通知を二度表示しないためのローカル参照実装です。模擬故障試験に加え、利用者の直前承認後にこのMacで実通知1件を表示し、同じ操作の再試行後も外部効果開始が1件のままであることを確認しました。
 
 English purpose: Prevent a second visible notification for the same logical operation across retry, lost responses, and process restarts.
 
@@ -63,10 +65,15 @@ make demo
 
 2026-08-28のこのMac上の模擬実行では、100標本の95百分位は`8.99 ms`で、上限`2,000 ms`を満たしました。環境と全標本は[`metadata/notification-demo-latency.json`](../metadata/notification-demo-latency.json)と[`data/timeseries/notification-demo-latency.ndjson`](../data/timeseries/notification-demo-latency.ndjson)に保存しています。これはブラウザー実通知の遅延ではありません。
 
-## 未確認
+## 実Mac通知の検証証拠
+
+2026-08-28にGoogle Chrome `152.0.7977.64`から、UUIDバージョン5予定識別子`03c9c953-71ea-5405-b1eb-3c0536e78ec1`を通知タグとして1件表示しました。サービスワーカーの読み戻し件数は1、SQLiteの外部効果開始件数は1でした。同じ論理操作の再試行は`ALREADY_VERIFIED`となり、二件目を開始しませんでした。最終状態は`VERIFIED / CONFIRMED_PRESENT`、6件のJSON Lines監査ハッシュ鎖は有効です。
+
+公開証拠は[`metadata/notification-demo-live-verification.json`](../metadata/notification-demo-live-verification.json)と[`data/audit/notification-demo-live-events.ndjson`](../data/audit/notification-demo-live-events.ndjson)です。外部サービス費用は0円です。この証拠はローカル観測とサービスワーカー読み戻しであり、遠隔証明ではありません。
+
+## 残る未確認
 
 - `document.modelContext`を提供するブラウザーでのネイティブWebMCP動作: `INCONCLUSIVE`
-- 実Mac通知1件と同一操作再試行後の表示件数: 利用者の直前承認待ち
 - Node.js 24の`node:sqlite`は公式文書上、安定化前の公開候補段階
 
 根拠は[WHATWG Notifications API](https://notifications.spec.whatwg.org/)、[Node.js 24 SQLite](https://nodejs.org/download/release/v24.16.0/docs/api/sqlite.html)、[SQLite Transaction](https://www.sqlite.org/lang_transaction.html)、[WebMCP Community Group草案](https://webmachinelearning.github.io/webmcp/)です。

@@ -1,6 +1,8 @@
 // information_uuid_v5=58f4a6aa-2439-5811-bb59-6ee84fb23a1e
 // event_uuid_v7=01a04872-05cd-7c54-89cc-29efcd16142c
 // machine-contract: duplicate-effect count must remain <= 1 across retry, ambiguity, and restart scenarios.
+// event_uuid_v7=01a04893-376c-7fc0-aabe-f56beef8ec7e
+// machine-contract: every suppressed retry is auditable even though it leaves control and effect state unchanged.
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -60,6 +62,7 @@ test("a duplicate request never starts a second visible effect", async () => {
     assert.equal(adapter.executionCount, 1);
     assert.equal(adapter.visible.size, 1);
     assert.equal(item.store.countEffectClaims(intent.intentId), 1);
+    assert.equal(item.audit.verify().count, 6);
   } finally {
     item.close();
   }

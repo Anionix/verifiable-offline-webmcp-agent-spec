@@ -1,0 +1,112 @@
+{
+  "id": "EVIDENCE-NOTIFICATION-LIVE-001",
+  "identity": {
+    "uuid_v5": "a8b596aa-5de6-5f5b-835d-11d0911d1f74",
+    "uuid_v7": "01a04894-8d6b-75e2-b086-e10fa3c1b73d",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "notification-demo/live-verification/2026-08-28",
+    "category": "verification-evidence"
+  },
+  "temporal": {
+    "observed_at": "2026-08-28T13:34:50.219Z",
+    "epoch_ms": 1787924090219,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-28T22:34:50.219+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "type": "LiveVerificationEvidence",
+  "version": "0.2.0",
+  "state": "VERIFIED",
+  "scope": {
+    "target": "local-mac-notification",
+    "origin": "http://127.0.0.1:4173",
+    "logical_operation_id": "mac-live-verification-2026-08-28-01a0488c-bada-72ef-9f79-6b15b5142fbd",
+    "intent_id": "03c9c953-71ea-5405-b1eb-3c0536e78ec1",
+    "payload_digest": "6538af7492b6b7bc52be5df66920ef0e66d81a6ca51dd5731111f11d7c2f2636"
+  },
+  "environment": {
+    "operating_system": "macOS 27.0 (26A5416b)",
+    "architecture": "arm64",
+    "browser": "Google Chrome 152.0.7977.64",
+    "runtime": "Node.js 24.15.0",
+    "external_service_cost_yen": 0
+  },
+  "approval": {
+    "event_id": "01a04891-a8b1-7aca-a8d4-f8727db605f9",
+    "approved_at": "2026-08-28T13:31:40.593Z",
+    "expires_at": "2026-08-28T13:33:40.593Z",
+    "target": "local-mac-notification",
+    "payload_digest": "6538af7492b6b7bc52be5df66920ef0e66d81a6ca51dd5731111f11d7c2f2636"
+  },
+  "observations": {
+    "control_state": "VERIFIED",
+    "effect_state": "CONFIRMED_PRESENT",
+    "notification_tag": "03c9c953-71ea-5405-b1eb-3c0536e78ec1",
+    "service_worker_active_count": 1,
+    "effect_start_count_after_retry": 1,
+    "same_operation_retry_status": "ALREADY_VERIFIED",
+    "retry_event_id": "01a04894-219c-7288-8118-be4e78689c19",
+    "audit_valid": true,
+    "audit_event_count": 6,
+    "audit_last_hash": "f1747be78d5646df96efb5ea7f2b2fc7f53b9d44535e9f233a9274139bce1c94",
+    "native_webmcp": "INCONCLUSIVE"
+  },
+  "effect_receipt": {
+    "effect_event_id": "01a04891-a8b4-7c9b-bafc-2c9348acb15c",
+    "started_at": "2026-08-28T13:31:40.596Z",
+    "confirmed_at": "2026-08-28T13:31:40.634Z",
+    "outcome": "CONFIRMED_PRESENT",
+    "source": "service-worker-readback",
+    "active_count": 1
+  },
+  "state_transitions": [
+    {
+      "event_id": "01a0488c-d2d4-7365-b1b4-67f7a15a0f1b",
+      "occurred_at": "2026-08-28T13:26:23.700Z",
+      "transition": "DISCOVERED -> PROPOSED",
+      "effect": "NOT_STARTED"
+    },
+    {
+      "event_id": "01a0488c-d2d6-7e1f-b150-552c19361a7c",
+      "occurred_at": "2026-08-28T13:26:23.702Z",
+      "transition": "PROPOSED -> DRY_RUN",
+      "effect": "NOT_STARTED"
+    },
+    {
+      "event_id": "01a04891-a8b1-7aca-a8d4-f8727db605f9",
+      "occurred_at": "2026-08-28T13:31:40.593Z",
+      "transition": "DRY_RUN -> USER_APPROVED",
+      "effect": "NOT_STARTED"
+    },
+    {
+      "event_id": "01a04891-a8b4-7c9b-bafc-2c9348acb15c",
+      "occurred_at": "2026-08-28T13:31:40.596Z",
+      "transition": "USER_APPROVED -> EXECUTING",
+      "effect": "NOT_STARTED -> AMBIGUOUS"
+    },
+    {
+      "event_id": "01a04891-a8da-7dad-9c75-56eb59662cb5",
+      "occurred_at": "2026-08-28T13:31:40.634Z",
+      "transition": "EXECUTING -> VERIFIED",
+      "effect": "AMBIGUOUS -> CONFIRMED_PRESENT"
+    },
+    {
+      "event_id": "01a04894-219c-7288-8118-be4e78689c19",
+      "occurred_at": "2026-08-28T13:34:22.620Z",
+      "transition": "VERIFIED -> VERIFIED",
+      "effect": "CONFIRMED_PRESENT -> CONFIRMED_PRESENT",
+      "result": "duplicate-execution-suppressed"
+    }
+  ],
+  "evidence_artifacts": [
+    "data/audit/notification-demo-live-events.ndjson",
+    "src/typescript/notification/store.ts",
+    "src/typescript/test/notification.test.ts"
+  ],
+  "limitations": [
+    "The visible effect was observed locally and independently read back through ServiceWorkerRegistration.getNotifications(); this is not remote attestation.",
+    "document.modelContext was absent in the tested browser, so native WebMCP support remains INCONCLUSIVE."
+  ]
+}

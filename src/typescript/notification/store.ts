@@ -1,6 +1,8 @@
 // information_uuid_v5=0930eb1a-bc57-5573-96f6-7b4942d43282
 // event_uuid_v7=01a04872-04c9-72d5-b80b-adb45c7105a7
 // machine-contract: one logical_operation_id owns one intent; state claims are serialized with BEGIN IMMEDIATE.
+// event_uuid_v7=01a04893-376b-7148-8c50-845366465b93
+// machine-contract: a suppressed duplicate or ambiguous retry is still persisted as a same-state attempt with its own UUIDv7.
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -181,10 +183,16 @@ export class NotificationStore {
     return this.transaction(() => {
       const before = this.requireIntent(intentId);
       if (before.controlState === "VERIFIED" || before.effectState === "CONFIRMED_PRESENT") {
-        return { status: "ALREADY_VERIFIED", intent: before };
+        const transition = this.recordAttempt(before, eventId, now, "duplicate-execution-suppressed", {
+          reason: "effect-already-confirmed-present",
+        });
+        return { status: "ALREADY_VERIFIED", intent: before, transition };
       }
       if (before.controlState === "EXECUTING" || before.effectState === "AMBIGUOUS" || before.effectState === "RECONCILING") {
-        return { status: "RECONCILE_REQUIRED", intent: before };
+        const transition = this.recordAttempt(before, eventId, now, "ambiguous-execution-suppressed", {
+          reason: "reconciliation-required-before-retry",
+        });
+        return { status: "RECONCILE_REQUIRED", intent: before, transition };
       }
       if (before.controlState !== "USER_APPROVED") {
         throw new StateConflictError(`execution requires USER_APPROVED, got ${before.controlState}`);
@@ -328,6 +336,26 @@ export class NotificationStore {
       toEffect: effect,
       details,
     };
+  }
+
+  private recordAttempt(
+    before: NotificationIntent,
+    eventId: string,
+    now: number,
+    kind: string,
+    details: Record<string, string | number | boolean | null>,
+  ): TransitionRecord {
+    const transition = this.makeTransition(
+      before,
+      eventId,
+      now,
+      kind,
+      before.controlState,
+      before.effectState,
+      details,
+    );
+    this.insertAttempt(transition);
+    return transition;
   }
 
   private insertAttempt(record: TransitionRecord): void {

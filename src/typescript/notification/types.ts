@@ -92,8 +92,8 @@ export interface TransitionRecord {
 
 export type ClaimResult =
   | { status: "CLAIMED"; intent: NotificationIntent; transition: TransitionRecord }
-  | { status: "ALREADY_VERIFIED"; intent: NotificationIntent }
-  | { status: "RECONCILE_REQUIRED"; intent: NotificationIntent }
+  | { status: "ALREADY_VERIFIED"; intent: NotificationIntent; transition: TransitionRecord }
+  | { status: "RECONCILE_REQUIRED"; intent: NotificationIntent; transition: TransitionRecord }
   | { status: "APPROVAL_EXPIRED"; intent: NotificationIntent; transition: TransitionRecord };
 
 export class ConfirmedAbsentError extends Error {

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "0.4.0",
+  "identity": {
+    "uuidV5": "c80d8b63-ac1e-5643-8e59-cb63ef271431",
+    "uuidV7": "01a04922-9bd7-73c5-8f9e-21b1467be171",
+    "uuidNamespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "observedAt": "2026-08-28T16:10:00.023Z",
+    "epochMs": 1787933400023,
+    "timeZone": "UTC"
+  },
+  "status": "VERIFIED",
+  "scope": {
+    "mode": "LOCAL_REFERENCE_SIMULATION",
+    "externalServices": false,
+    "actualNotifications": 0,
+    "externalSpendYen": 0,
+    "localHardwareAndDevelopmentCost": "UNMEASURED"
+  },
+  "devices": [
+    {
+      "label": "端末A",
+      "deviceId": "ed5bce84-bd66-5b45-a9af-a25a9d2cc9aa",
+      "logId": "7dd52110-d52a-5348-a8cb-6c7e0dcf05fb",
+      "keyId": "25dfa9d1-ac15-519f-91af-a656418b711d",
+      "publicKeyPath": "data/audit/keys/offline-device-a-public-key.pem",
+      "eventCount": 3,
+      "checkpoint": {
+        "version": "0.4.0",
+        "checkpointId": "01a04922-9bc3-7ab2-a6b7-0142b3f3d276",
+        "createdAt": "2026-08-28T16:10:00.003Z",
+        "createdAtEpochMs": 1787933400003,
+        "deviceId": "ed5bce84-bd66-5b45-a9af-a25a9d2cc9aa",
+        "logId": "7dd52110-d52a-5348-a8cb-6c7e0dcf05fb",
+        "keyId": "25dfa9d1-ac15-519f-91af-a656418b711d",
+        "treeSize": 3,
+        "merkleRoot": "9c1a002f896948c0b8df18b710c4694c0e7b72f105007c068de429bf41a8a872",
+        "chainHead": "75d0e8e4bba38fa8c633496aeabfcf24c4451d37a97ca3a9f4bc18e2d93deaf1",
+        "previousCheckpointHash": null,
+        "digest": "67ebadb0cf3b0c2d53358d1051e8c70583744d22ec27ae3b5b194ea78c9865ac",
+        "signature": {
+          "algorithm": "Ed25519",
+          "keyId": "25dfa9d1-ac15-519f-91af-a656418b711d",
+          "signatureBase64": "jk/3auw8q2Movp72g+vsTgHX9WceLb+3HnPDZdlP76GSIx6CmRgOkDNPv/mMfdOcsX+b3MYxih9zbWiQENeUBA=="
+        }
+      }
+    },
+    {
+      "label": "端末B",
+      "deviceId": "c053eeb8-22ff-509d-a92d-f807591087f7",
+      "logId": "0cc30b09-a74c-54a6-84a9-e690824bc912",
+      "keyId": "a36c8448-35ca-54c5-85c6-1520c6035bd8",
+      "publicKeyPath": "data/audit/keys/offline-device-b-public-key.pem",
+      "eventCount": 3,
+      "checkpoint": {
+        "version": "0.4.0",
+        "checkpointId": "01a04922-9bc7-788e-83b6-e893060093bf",
+        "createdAt": "2026-08-28T16:10:00.007Z",
+        "createdAtEpochMs": 1787933400007,
+        "deviceId": "c053eeb8-22ff-509d-a92d-f807591087f7",
+        "logId": "0cc30b09-a74c-54a6-84a9-e690824bc912",
+        "keyId": "a36c8448-35ca-54c5-85c6-1520c6035bd8",
+        "treeSize": 3,
+        "merkleRoot": "47380a89df27f4e1cf3b300824d771380a36b59f79cbbc8e351d9e36c6194ef7",
+        "chainHead": "68d718c484030a7a591bb10ddc2e5cbe1dabab5377260ef8a2ae13e6b35808ba",
+        "previousCheckpointHash": null,
+        "digest": "b4f3356e518572322c897845347353d64cdd8fc842606e2c24d9c9125eb2f076",
+        "signature": {
+          "algorithm": "Ed25519",
+          "keyId": "a36c8448-35ca-54c5-85c6-1520c6035bd8",
+          "signatureBase64": "qurfn50mIbWVwnbHjd5WagmGNsrWIOlNPeGQQEBTOvc8A4p6khyhgZB/MBVhiQnmXPbzNs8JnYH6AZaby0mZDA=="
+        }
+      }
+    }
+  ],
+  "observations": {
+    "offlineDivergenceReproduced": true,
+    "reconnectVerified": true,
+    "safeTags": [
+      "offline-first",
+      "shared",
+      "verifiable"
+    ],
+    "globalIngestionCount": 6,
+    "deviceSequencesPreserved": true,
+    "duplicateIngestionDidNotAdvance": true,
+    "dangerousIntentSourceCount": 2,
+    "dangerousReviewCount": 1,
+    "dangerousDecision": "HUMAN_REVIEW_REQUIRED",
+    "externalEffectStarts": 0,
+    "globalAuditValid": true,
+    "signatureTamperRejected": "INVALID_SIGNATURE",
+    "sequenceGapRejected": "SEQUENCE_GAP",
+    "forkRejected": "FORK_DETECTED",
+    "checkpointMismatchRejected": "CHECKPOINT_MISMATCH"
+  },
+  "artifacts": {
+    "deviceEvents": "data/audit/offline-sync-device-events.ndjson",
+    "ingestionLedger": "data/audit/offline-sync-ingestion.ndjson",
+    "quarantineLedger": "data/audit/offline-sync-quarantine.ndjson",
+    "sha256": {
+      "data/audit/offline-sync-device-events.ndjson": "3339607b7a0ddce758ab6b462338f03b38aba5afe3f955aeac2cfc2a698ad487",
+      "data/audit/offline-sync-ingestion.ndjson": "a512c7d0aeb377a3470503da82faa7316581fafaae7e886bb8f5933be6b435e4",
+      "data/audit/offline-sync-quarantine.ndjson": "2912f26c9f4be27db96dd01ae4e1941ac351923b3c673526d3eb7d21ad3e7979",
+      "data/audit/keys/offline-device-a-public-key.pem": "4089dfca734f8e1a752ce206584193eef2616f1c5650e5fcf514a93ed199462d",
+      "data/audit/keys/offline-device-b-public-key.pem": "55612cc942965515ec7c3eccb8fcfa4577b87f4ff542e93daa35de86bb582d1f"
+    }
+  },
+  "requirements": [
+    "REQ-SYNC-001",
+    "REQ-SYNC-002",
+    "REQ-SYNC-003",
+    "REQ-SYNC-004"
+  ],
+  "limitations": {
+    "remoteTransport": "UNIMPLEMENTED",
+    "productionMultiDeviceQuality": "UNMEASURED",
+    "nativeWebMcpConformance": "INCONCLUSIVE"
+  }
+}

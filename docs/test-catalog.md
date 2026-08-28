@@ -5,15 +5,16 @@ stable_uuid_v5: "aaa566c6-2347-563d-810f-75d5eac39489"
 event_uuid_v7: "01a04291-c2e0-7d98-bf15-0be303646458"
 updated_event_uuid_v7: "01a048e2-e264-7ed5-a64b-2f3ef202ffe7"
 provenance_event_uuid_v7: "01a04904-ca95-7468-9bd0-cb597093a64a"
+offline_sync_event_uuid_v7: "01a04927-4698-7f6a-b5e9-ef8bd558913c"
 generated_at: "2026-08-27T09:34:04.000Z"
-updated_at: "2026-08-28T15:37:25.909Z"
+updated_at: "2026-08-28T16:15:06.008Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 35 / partially implemented 13 / specified 19. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification reference raises only its bounded path; general native WebMCP conformance and unrelated tool classes remain unimplemented.
+**Total / 合計:** 67 tests — implemented 39 / partially implemented 13 / specified 15. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification and local two-device synchronization references raise only their bounded paths; remote transport, general native WebMCP conformance, and unrelated tool classes remain unimplemented.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
@@ -76,10 +77,10 @@ status: "design-specification"
 | `TEST-SLO-004` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-001 |
 | `TEST-SLO-005` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-002 |
 | `TEST-SLO-006` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-003 |
-| `TEST-SYNC-001` | offline-sync-scenario-test | specified | no | REQ-SYNC-001 |
-| `TEST-SYNC-002` | offline-sync-scenario-test | specified | no | REQ-SYNC-002 |
-| `TEST-SYNC-003` | offline-sync-scenario-test | specified | no | REQ-SYNC-003 |
-| `TEST-SYNC-004` | offline-sync-scenario-test | specified | no | REQ-SYNC-004 |
+| `TEST-SYNC-001` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-001 |
+| `TEST-SYNC-002` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-002 |
+| `TEST-SYNC-003` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-003 |
+| `TEST-SYNC-004` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-004 |
 | `TEST-TIME-001` | identifier-temporal-validation | implemented | yes | REQ-TIME-001 |
 | `TEST-VERIFY-001` | evidence-verification-test | partially-implemented | yes | REQ-TOOL-003 |
 | `TEST-VERIFY-002` | evidence-verification-test | partially-implemented | yes | REQ-VERIFY-001 |

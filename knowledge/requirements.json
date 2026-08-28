@@ -1716,21 +1716,21 @@
       "id": "REQ-SYNC-001",
       "identity": {
         "uuid_v5": "31e5c547-4072-51a5-a761-698b4464a2fa",
-        "uuid_v7": "01a04291-b3db-73fe-9e33-17c9ec1df1c9",
+        "uuid_v7": "01a04925-8681-7961-94d8-487f477023b7",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "per-device-chain",
         "category": "requirement"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:00Z",
-        "updated_at": "2026-08-27T09:34:00Z",
-        "observed_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-28T16:13:11.169Z",
+        "observed_at": "2026-08-28T16:13:11.169Z",
         "valid_from": "2026-08-27T09:34:00Z",
         "valid_to": null,
-        "epoch_ms": 1787823240000,
+        "epoch_ms": 1787933591169,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "local_rendering": "2026-08-29T01:13:11.169+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -1755,27 +1755,27 @@
       "verification_refs": [
         "TEST-SYNC-001"
       ],
-      "status": "proposed"
+      "status": "accepted"
     },
     {
       "id": "REQ-SYNC-002",
       "identity": {
         "uuid_v5": "bcbfcabb-9ac1-5156-b135-28b998095170",
-        "uuid_v7": "01a04291-b3dc-74dc-8ec9-e313d48278ae",
+        "uuid_v7": "01a04925-86b3-7f34-aa5f-3d7fa3b50b07",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "global-sequence",
         "category": "requirement"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:00Z",
-        "updated_at": "2026-08-27T09:34:00Z",
-        "observed_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-28T16:13:11.219Z",
+        "observed_at": "2026-08-28T16:13:11.219Z",
         "valid_from": "2026-08-27T09:34:00Z",
         "valid_to": null,
-        "epoch_ms": 1787823240000,
+        "epoch_ms": 1787933591219,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "local_rendering": "2026-08-29T01:13:11.219+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -1799,27 +1799,27 @@
       "verification_refs": [
         "TEST-SYNC-002"
       ],
-      "status": "proposed"
+      "status": "accepted"
     },
     {
       "id": "REQ-SYNC-003",
       "identity": {
         "uuid_v5": "a13087f5-3d0a-50ca-8b53-ad9a62bf1d79",
-        "uuid_v7": "01a04291-b3dd-7488-9ade-7e0c59c42095",
+        "uuid_v7": "01a04925-86e5-7e31-8684-f2438e87a6ce",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "crdt-only-commutative",
         "category": "requirement"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:00Z",
-        "updated_at": "2026-08-27T09:34:00Z",
-        "observed_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-28T16:13:11.269Z",
+        "observed_at": "2026-08-28T16:13:11.269Z",
         "valid_from": "2026-08-27T09:34:00Z",
         "valid_to": null,
-        "epoch_ms": 1787823240000,
+        "epoch_ms": 1787933591269,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "local_rendering": "2026-08-29T01:13:11.269+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -1843,27 +1843,27 @@
       "verification_refs": [
         "TEST-SYNC-003"
       ],
-      "status": "proposed"
+      "status": "accepted"
     },
     {
       "id": "REQ-SYNC-004",
       "identity": {
         "uuid_v5": "425df0e7-8f13-5d7a-9018-6f217f0bfec6",
-        "uuid_v7": "01a04291-b3de-7972-930d-462f2468e183",
+        "uuid_v7": "01a04925-8717-7586-9972-9a79572f7659",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "no-crdt-side-effect",
         "category": "requirement"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:00Z",
-        "updated_at": "2026-08-27T09:34:00Z",
-        "observed_at": "2026-08-27T09:34:00Z",
+        "updated_at": "2026-08-28T16:13:11.319Z",
+        "observed_at": "2026-08-28T16:13:11.319Z",
         "valid_from": "2026-08-27T09:34:00Z",
         "valid_to": null,
-        "epoch_ms": 1787823240000,
+        "epoch_ms": 1787933591319,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:00+09:00",
+        "local_rendering": "2026-08-29T01:13:11.319+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -1887,7 +1887,7 @@
       "verification_refs": [
         "TEST-SYNC-004"
       ],
-      "status": "proposed"
+      "status": "accepted"
     },
     {
       "id": "REQ-SYNC-005",

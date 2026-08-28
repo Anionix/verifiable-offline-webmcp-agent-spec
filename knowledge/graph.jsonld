@@ -3809,7 +3809,7 @@
       "@type": "spec:Requirement",
       "spec:shortId": "REQ-SYNC-001",
       "uuidV5": "31e5c547-4072-51a5-a761-698b4464a2fa",
-      "uuidV7": "01a04291-b3db-73fe-9e33-17c9ec1df1c9",
+      "uuidV7": "01a04925-8681-7961-94d8-487f477023b7",
       "title": [
         {
           "@value": "各deviceはoffline中に独立したsigned sequenceを維持しなければならない。",
@@ -3821,7 +3821,7 @@
         }
       ],
       "created": "2026-08-27T09:34:00Z",
-      "modified": "2026-08-27T09:34:00Z",
+      "modified": "2026-08-28T16:13:11.169Z",
       "sourceRefs": [
         {
           "@id": "urn:uuid:2791987b-30bb-5a18-93c8-58f8c88aee80"
@@ -3837,7 +3837,7 @@
       "@type": "spec:Requirement",
       "spec:shortId": "REQ-SYNC-002",
       "uuidV5": "bcbfcabb-9ac1-5156-b135-28b998095170",
-      "uuidV7": "01a04291-b3dc-74dc-8ec9-e313d48278ae",
+      "uuidV7": "01a04925-86b3-7f34-aa5f-3d7fa3b50b07",
       "title": [
         {
           "@value": "server取り込み時にdevice sequenceを保持したままglobal sequenceを追加しなければならない。",
@@ -3849,7 +3849,7 @@
         }
       ],
       "created": "2026-08-27T09:34:00Z",
-      "modified": "2026-08-27T09:34:00Z",
+      "modified": "2026-08-28T16:13:11.219Z",
       "sourceRefs": [
         {
           "@id": "urn:uuid:a6ebf827-b311-50da-be6e-c0bbe61838f5"
@@ -3862,7 +3862,7 @@
       "@type": "spec:Requirement",
       "spec:shortId": "REQ-SYNC-003",
       "uuidV5": "a13087f5-3d0a-50ca-8b53-ad9a62bf1d79",
-      "uuidV7": "01a04291-b3dd-7488-9ade-7e0c59c42095",
+      "uuidV7": "01a04925-86e5-7e31-8684-f2438e87a6ce",
       "title": [
         {
           "@value": "CRDT mergeは可換で冪等な状態へ限定しなければならない。",
@@ -3874,7 +3874,7 @@
         }
       ],
       "created": "2026-08-27T09:34:00Z",
-      "modified": "2026-08-27T09:34:00Z",
+      "modified": "2026-08-28T16:13:11.269Z",
       "sourceRefs": [
         {
           "@id": "urn:uuid:46666d42-bcff-5bb9-82cc-0fb4f1f9adc4"
@@ -3887,7 +3887,7 @@
       "@type": "spec:Requirement",
       "spec:shortId": "REQ-SYNC-004",
       "uuidV5": "425df0e7-8f13-5d7a-9018-6f217f0bfec6",
-      "uuidV7": "01a04291-b3de-7972-930d-462f2468e183",
+      "uuidV7": "01a04925-8717-7586-9972-9a79572f7659",
       "title": [
         {
           "@value": "支払い、送信、削除、予約など非可換副作用をCRDT mergeしてはならない。",
@@ -3899,7 +3899,7 @@
         }
       ],
       "created": "2026-08-27T09:34:00Z",
-      "modified": "2026-08-27T09:34:00Z",
+      "modified": "2026-08-28T16:13:11.319Z",
       "sourceRefs": [
         {
           "@id": "urn:uuid:46666d42-bcff-5bb9-82cc-0fb4f1f9adc4"
@@ -7381,7 +7381,7 @@
       "@type": "spec:VerificationTest",
       "spec:shortId": "TEST-SYNC-001",
       "uuidV5": "9925fdbd-3d2a-5107-9a25-44e524a79035",
-      "uuidV7": "01a04291-bf33-79b0-a061-d70932676501",
+      "uuidV7": "01a04925-5134-7fdb-9579-7bd52d8ed860",
       "title": [
         {
           "@value": "TEST-SYNC-001 検証",
@@ -7393,9 +7393,9 @@
         }
       ],
       "created": "2026-08-27T09:34:03.059Z",
-      "modified": "2026-08-27T09:34:03.059Z",
+      "modified": "2026-08-28T16:12:57.524Z",
       "testKind": "offline-sync-scenario-test",
-      "implementationStatus": "specified",
+      "implementationStatus": "implemented",
       "verifies": [
         {
           "@id": "urn:uuid:31e5c547-4072-51a5-a761-698b4464a2fa"
@@ -7415,7 +7415,7 @@
       "@type": "spec:VerificationTest",
       "spec:shortId": "TEST-SYNC-002",
       "uuidV5": "c8da4e2d-876b-5d9f-8869-f445227739ef",
-      "uuidV7": "01a04291-bf34-7696-903b-96f45bff790e",
+      "uuidV7": "01a04925-5164-72f8-9b6b-fe4d6ebaf746",
       "title": [
         {
           "@value": "TEST-SYNC-002 検証",
@@ -7427,9 +7427,9 @@
         }
       ],
       "created": "2026-08-27T09:34:03.060Z",
-      "modified": "2026-08-27T09:34:03.060Z",
+      "modified": "2026-08-28T16:12:57.572Z",
       "testKind": "offline-sync-scenario-test",
-      "implementationStatus": "specified",
+      "implementationStatus": "implemented",
       "verifies": [
         {
           "@id": "urn:uuid:bcbfcabb-9ac1-5156-b135-28b998095170"
@@ -7446,7 +7446,7 @@
       "@type": "spec:VerificationTest",
       "spec:shortId": "TEST-SYNC-003",
       "uuidV5": "afdd7d35-bcbf-51c4-af82-039cbf32cfd5",
-      "uuidV7": "01a04291-bf35-7eb0-b97b-464f64a4d494",
+      "uuidV7": "01a04925-5194-7ca5-97e3-3442ebc9cf9f",
       "title": [
         {
           "@value": "TEST-SYNC-003 検証",
@@ -7458,9 +7458,9 @@
         }
       ],
       "created": "2026-08-27T09:34:03.061Z",
-      "modified": "2026-08-27T09:34:03.061Z",
+      "modified": "2026-08-28T16:12:57.620Z",
       "testKind": "offline-sync-scenario-test",
-      "implementationStatus": "specified",
+      "implementationStatus": "implemented",
       "verifies": [
         {
           "@id": "urn:uuid:a13087f5-3d0a-50ca-8b53-ad9a62bf1d79"
@@ -7477,7 +7477,7 @@
       "@type": "spec:VerificationTest",
       "spec:shortId": "TEST-SYNC-004",
       "uuidV5": "32e779b5-c957-50de-963e-79ba2291d957",
-      "uuidV7": "01a04291-bf36-706f-8dbd-36f53c6a4bfc",
+      "uuidV7": "01a04925-51c4-71b7-b495-18d3c56bd11c",
       "title": [
         {
           "@value": "TEST-SYNC-004 検証",
@@ -7489,9 +7489,9 @@
         }
       ],
       "created": "2026-08-27T09:34:03.062Z",
-      "modified": "2026-08-27T09:34:03.062Z",
+      "modified": "2026-08-28T16:12:57.668Z",
       "testKind": "offline-sync-scenario-test",
-      "implementationStatus": "specified",
+      "implementationStatus": "implemented",
       "verifies": [
         {
           "@id": "urn:uuid:425df0e7-8f13-5d7a-9018-6f217f0bfec6"

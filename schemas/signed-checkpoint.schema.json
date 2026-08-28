@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/signed-checkpoint.schema.json",
+  "title": "Offline Sync Signed Checkpoint 0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "checkpointId", "createdAt", "createdAtEpochMs", "logId", "deviceId",
+    "keyId", "treeSize", "merkleRoot", "chainHead", "previousCheckpointHash", "digest", "signature"
+  ],
+  "properties": {
+    "version": { "const": "0.4.0" },
+    "checkpointId": { "$ref": "#/$defs/uuidV7" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "createdAtEpochMs": { "type": "integer", "minimum": 0 },
+    "logId": { "$ref": "#/$defs/uuidV5" },
+    "deviceId": { "$ref": "#/$defs/uuidV5" },
+    "keyId": { "$ref": "#/$defs/uuidV5" },
+    "treeSize": { "type": "integer", "minimum": 1 },
+    "merkleRoot": { "$ref": "#/$defs/digest" },
+    "chainHead": { "$ref": "#/$defs/digest" },
+    "previousCheckpointHash": { "oneOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] },
+    "digest": { "$ref": "#/$defs/digest" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "keyId", "signatureBase64"],
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "keyId": { "$ref": "#/$defs/uuidV5" },
+        "signatureBase64": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

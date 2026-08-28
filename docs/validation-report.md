@@ -3,12 +3,13 @@ title: "Validation Report / 検証報告"
 language: "ja-en"
 stable_uuid_v5: "a6b95fb5-3315-581f-8c52-faf489415b1e"
 event_uuid_v7: "01a04291-c4d4-729d-b9a2-d5cdbe2705b3"
-updated_event_uuid_v7: "01a048c7-747e-7be4-b140-f695551e713b"
+updated_event_uuid_v7: "01a04932-2df3-7b67-8676-2471c29a7da5"
 live_verification_event_uuid_v7: "01a04896-44e2-7ad8-9c68-587631dc4945"
 browser_visual_verification_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
+offline_sync_verification_event_uuid_v7: "01a04927-46cd-765b-912f-a63737578d9e"
 generated_at: "2026-08-27T09:34:04.500Z"
-updated_at: "2026-08-28T14:29:29.313110Z"
-version: "0.3.0-candidate"
+updated_at: "2026-08-28T16:27:00.467Z"
+version: "0.4.0-candidate"
 status: "validation-report"
 ---
 
@@ -19,7 +20,7 @@ status: "validation-report"
 
 ## Snapshot / 検証snapshot
 
-- Validator timestamp: `2026-08-28T14:29:29.313110Z`
+- Validator timestamp: `2026-08-28T16:27:26.974564Z`
 - Overall: **PASS**
 - Error count: `0`
 - Validation command: `make validate`
@@ -36,6 +37,7 @@ status: "validation-report"
 | `golden_vectors_python` | PASS |
 | `audit_chain_signatures` | PASS |
 | `merkle_checkpoint` | PASS |
+| `offline_sync_evidence` | PASS |
 | `no_private_keys` | PASS |
 | `reachability_and_mutation` | PASS |
 | `typescript_tests` | PASS |
@@ -60,9 +62,19 @@ status: "validation-report"
 
 ### TypeScript
 
-- 25 Node test cases passed: decision golden vectors, UUID checks, canonical JSON constraints, approval binding, duplicate retry, confirmed absence, ambiguous reconciliation, restart persistence, expiry, the 100-run simulated latency bound, visible deduplication states, zero-or-duplicate count violation disclosure, and accessibility contracts.
+- 54 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, and both visual state contracts.
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
-- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), and [`src/typescript/test/notification-visualization.test.js`](../src/typescript/test/notification-visualization.test.js).
+- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), and the two browser-state tests in [`src/typescript/test`](../src/typescript/test/).
+
+### Two-device offline synchronization candidate
+
+- Two logical devices created independent three-event Ed25519 chains and signed Merkle checkpoints while disconnected.
+- Reconnection preserved each device sequence and assigned six global ingestion positions. Re-ingesting the same device chain did not advance the global sequence.
+- The add-only tag set converged to `offline-first / shared / verifiable` independent of ingestion order and duplicates.
+- Two notification-intent sources became one `HUMAN_REVIEW_REQUIRED` case. External-effect starts and real notifications remained exactly `0`.
+- Independent Python verification checked public artifact digests, JSON Schemas, UUIDv7 time binding, both device signatures and hash chains, checkpoints, global ingestion links, and the four quarantine reasons.
+- Signature tampering, sequence gap, signed fork, and checkpoint mismatch all stopped before any effect. Evidence: [`metadata/offline-sync-verification.json`](../metadata/offline-sync-verification.json).
+- This is a bounded local simulation. Remote transport is unimplemented and production multi-device quality is `UNMEASURED`.
 
 ### Duplicate-safe visualization candidate
 

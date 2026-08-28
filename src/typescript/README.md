@@ -18,3 +18,14 @@ npm run demo:notification
 ```
 
 The simulated adapter never calls an external service. The browser demo is localhost-only and requests a real notification only after an explicit click. `AMBIGUOUS` blocks `execute` and permits `reconcile` only.
+
+## Signed offline synchronization candidate
+
+`sync/` creates per-device Ed25519 chains and signed Merkle checkpoints, then ingests them into a persistent SQLite ledger without changing device-local order. The synchronizer automatically materializes only an add-only tag set. Notification, payment, reservation, and deletion intents become `HUMAN_REVIEW_REQUIRED`; this module has no external-effect executor.
+
+```bash
+npm run evidence:sync
+npm run demo:sync
+```
+
+Evidence generation is an explicit write step. `npm test`, `npm run typecheck`, and repository `make validate` are read-only.

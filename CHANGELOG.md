@@ -2,6 +2,17 @@
 
 <!-- information_uuid_v5=06f137fc-6ca9-5499-b447-b9cd9df976b5 event_uuid_v7=01a048c2-e3c4-7c0c-9abb-21b175b0719a state_transition=IMPLEMENTING -> BROWSER_VERIFIED occurred_at=2026-08-28T14:25:32.776Z -->
 <!-- information_uuid_v5=34c13a76-73d8-5cf5-9fe1-fec1e071ba2f event_uuid_v7=01a04904-ca97-76f0-a4ed-56ea8c3ac507 state_transition=INPUT_PROJECTED -> PROVENANCE_READ_BACK occurred_at=2026-08-28T15:37:25.911Z -->
+<!-- information_uuid_v5=7f1288b1-5d73-52a3-8a2c-8c686b5f568f event_uuid_v7=01a04925-5225-765c-93f3-c2b51a62ed94 state_transition=OFFLINE_DIVERGENCE -> VERIFIED_RECONNECT occurred_at=2026-08-28T16:12:57.765Z -->
+
+## 0.4.0-candidate — 2026-08-29
+
+- Added independent Ed25519-signed device chains with UUIDv7 events, device-local sequences, previous-hash links, Merkle roots, and signed checkpoints.
+- Added a persistent SQLite synchronizer that keeps device order, assigns one global ingestion order, returns the same result for duplicate ingestion, and detects valid signed forks.
+- Restricted automatic convergence to an add-only tag set; notification, payment, reservation, and deletion intents are stored only as `HUMAN_REVIEW_REQUIRED` cases.
+- Added tampered-signature, missing-sequence, fork, checkpoint-mismatch, restart, duplicate, and order-independent convergence tests.
+- Published public-key-only two-device evidence and an independent Python verifier for schemas, signatures, both hash chains, checkpoints, source links, and zero external-effect starts.
+- Added a read-only responsive visualization showing two notification intents becoming zero notifications and one human-review case.
+- Remote transport remains unimplemented, production multi-device quality is `UNMEASURED`, and native WebMCP integration remains `INCONCLUSIVE`.
 
 ## 0.3.0-candidate — 2026-08-28
 

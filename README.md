@@ -5,8 +5,9 @@ stable_uuid_v5: "5c98b5f4-c536-532d-a8ac-e2d88397a006"
 event_uuid_v7: "01a04291-b452-750e-a9e5-19fbca156cb5"
 updated_event_uuid_v7: "01a048c2-e2b4-71da-a6c7-c5269c9b69d3"
 provenance_event_uuid_v7: "01a04904-ca9b-7c0b-8987-01c2078e6b4c"
+offline_sync_event_uuid_v7: "01a04927-4629-774e-a927-d87c66c1aa09"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T15:37:25.915Z"
+updated_at: "2026-08-28T16:15:05.929Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -53,7 +54,8 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 9. [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md) — two requests to one measured effect, visualized / 二要求を一効果へ収束する画面契約
 10. [`docs/15-webmcp-input-boundary.ja.md`](docs/15-webmcp-input-boundary.ja.md) — strict WebMCP input projection / WebMCP入力の厳格投影
 11. [`docs/16-webmcp-provenance-adapter.ja.md`](docs/16-webmcp-provenance-adapter.ja.md) — isolated draft adapter and durable provenance / 専用アダプターと来歴読み戻し
-12. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
+12. [`docs/17-offline-sync-reference.ja.md`](docs/17-offline-sync-reference.ja.md) — signed two-device reconciliation with dangerous-effect quarantine / 署名付き二端末同期と危険な外部効果の隔離
+13. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 
 ## Machine-readable assets / 機械可読asset
 
@@ -95,6 +97,17 @@ The `0.3.0` candidate screen makes that safety path visible: the first request a
 The draft WebMCP surface is isolated in one notification adapter. External input provenance is derived from the server route, persisted with the first intent-created event, and independently read back before the browser shows a match. A same-operation request from another channel keeps the first provenance and creates no external effect. See [`metadata/webmcp-provenance-verification.json`](metadata/webmcp-provenance-verification.json); this bounded browser observation does not claim general WebMCP conformance.
 
 The 2026-08-28 live run finished `VERIFIED / CONFIRMED_PRESENT`: Service Worker readback found one notification, the same-operation retry returned `ALREADY_VERIFIED`, the SQLite effect-start count remained one, and the six-event public audit chain validates. See [`metadata/notification-demo-live-verification.json`](metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](data/audit/notification-demo-live-events.ndjson).
+
+## Offline sync evidence demo / オフライン同期証拠デモ
+
+The `0.4.0` reference implementation creates two independent Ed25519-signed device chains, verifies signed Merkle checkpoints, preserves each device sequence while assigning a global ingestion sequence, and detects tampering, gaps, and forks. Only an add-only tag set is merged. Two notification intents become one `HUMAN_REVIEW_REQUIRED` case with **zero notification starts**; the synchronizer exposes no notification execution route.
+
+```bash
+make validate
+make demo-sync
+```
+
+Open `http://127.0.0.1:4174`. The screen is read-only and replays the public evidence as two offline lanes converging through a signature gate. The bounded local simulation is verified; remote transport is unimplemented, production multi-device quality is `UNMEASURED`, and native WebMCP integration remains `INCONCLUSIVE`. See [`metadata/offline-sync-verification.json`](metadata/offline-sync-verification.json) and [`docs/17-offline-sync-reference.ja.md`](docs/17-offline-sync-reference.ja.md).
 
 ## Primary-source posture / 一次情報源の扱い
 

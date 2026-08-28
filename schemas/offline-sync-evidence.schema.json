@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/offline-sync-evidence.schema.json",
+  "title": "Offline Sync Verification Evidence 0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "identity", "temporal", "status", "scope", "devices", "observations", "artifacts", "requirements", "limitations"],
+  "properties": {
+    "schemaVersion": { "const": "0.4.0" },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["uuidV5", "uuidV7", "uuidNamespace"],
+      "properties": {
+        "uuidV5": { "$ref": "#/$defs/uuidV5" },
+        "uuidV7": { "$ref": "#/$defs/uuidV7" },
+        "uuidNamespace": { "type": "string", "format": "uuid" }
+      }
+    },
+    "temporal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observedAt", "epochMs", "timeZone"],
+      "properties": {
+        "observedAt": { "type": "string", "format": "date-time" },
+        "epochMs": { "type": "integer", "minimum": 0 },
+        "timeZone": { "const": "UTC" }
+      }
+    },
+    "status": { "const": "VERIFIED" },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "externalServices", "actualNotifications", "externalSpendYen", "localHardwareAndDevelopmentCost"],
+      "properties": {
+        "mode": { "const": "LOCAL_REFERENCE_SIMULATION" },
+        "externalServices": { "const": false },
+        "actualNotifications": { "const": 0 },
+        "externalSpendYen": { "const": 0 },
+        "localHardwareAndDevelopmentCost": { "const": "UNMEASURED" }
+      }
+    },
+    "devices": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["label", "deviceId", "logId", "keyId", "publicKeyPath", "eventCount", "checkpoint"],
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "deviceId": { "$ref": "#/$defs/uuidV5" },
+          "logId": { "$ref": "#/$defs/uuidV5" },
+          "keyId": { "$ref": "#/$defs/uuidV5" },
+          "publicKeyPath": { "type": "string", "pattern": "^data/audit/keys/.+-public-key\\.pem$" },
+          "eventCount": { "type": "integer", "minimum": 1 },
+          "checkpoint": { "$ref": "signed-checkpoint.schema.json" }
+        }
+      }
+    },
+    "observations": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "offlineDivergenceReproduced", "reconnectVerified", "safeTags", "globalIngestionCount",
+        "deviceSequencesPreserved", "duplicateIngestionDidNotAdvance", "dangerousIntentSourceCount",
+        "dangerousReviewCount", "dangerousDecision", "externalEffectStarts", "globalAuditValid",
+        "signatureTamperRejected", "sequenceGapRejected", "forkRejected", "checkpointMismatchRejected"
+      ],
+      "properties": {
+        "offlineDivergenceReproduced": { "const": true },
+        "reconnectVerified": { "const": true },
+        "safeTags": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "globalIngestionCount": { "type": "integer", "minimum": 1 },
+        "deviceSequencesPreserved": { "const": true },
+        "duplicateIngestionDidNotAdvance": { "const": true },
+        "dangerousIntentSourceCount": { "type": "integer", "minimum": 2 },
+        "dangerousReviewCount": { "type": "integer", "minimum": 1 },
+        "dangerousDecision": { "const": "HUMAN_REVIEW_REQUIRED" },
+        "externalEffectStarts": { "const": 0 },
+        "globalAuditValid": { "const": true },
+        "signatureTamperRejected": { "const": "INVALID_SIGNATURE" },
+        "sequenceGapRejected": { "const": "SEQUENCE_GAP" },
+        "forkRejected": { "const": "FORK_DETECTED" },
+        "checkpointMismatchRejected": { "const": "CHECKPOINT_MISMATCH" }
+      }
+    },
+    "artifacts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["deviceEvents", "ingestionLedger", "quarantineLedger", "sha256"],
+      "properties": {
+        "deviceEvents": { "const": "data/audit/offline-sync-device-events.ndjson" },
+        "ingestionLedger": { "const": "data/audit/offline-sync-ingestion.ndjson" },
+        "quarantineLedger": { "const": "data/audit/offline-sync-quarantine.ndjson" },
+        "sha256": {
+          "type": "object", "minProperties": 5,
+          "additionalProperties": { "$ref": "#/$defs/digest" }
+        }
+      }
+    },
+    "requirements": {
+      "type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true,
+      "items": { "enum": ["REQ-SYNC-001", "REQ-SYNC-002", "REQ-SYNC-003", "REQ-SYNC-004"] }
+    },
+    "limitations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["remoteTransport", "productionMultiDeviceQuality", "nativeWebMcpConformance"],
+      "properties": {
+        "remoteTransport": { "const": "UNIMPLEMENTED" },
+        "productionMultiDeviceQuality": { "const": "UNMEASURED" },
+        "nativeWebMcpConformance": { "const": "INCONCLUSIVE" }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

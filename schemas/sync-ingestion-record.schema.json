@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/sync-ingestion-record.schema.json",
+  "title": "Offline Sync Global Ingestion Record 0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "ingestionEventId", "ingestedAt", "ingestedAtEpochMs", "globalSequence",
+    "previousGlobalHash", "deviceId", "deviceSequence", "sourceEventId", "sourceEventDigest",
+    "sourceChainHash", "operation", "decision", "globalHash"
+  ],
+  "properties": {
+    "version": { "const": "0.4.0" },
+    "ingestionEventId": { "$ref": "#/$defs/uuidV7" },
+    "ingestedAt": { "type": "string", "format": "date-time" },
+    "ingestedAtEpochMs": { "type": "integer", "minimum": 0 },
+    "globalSequence": { "type": "integer", "minimum": 1 },
+    "previousGlobalHash": { "$ref": "#/$defs/digest" },
+    "deviceId": { "$ref": "#/$defs/uuidV5" },
+    "deviceSequence": { "type": "integer", "minimum": 1 },
+    "sourceEventId": { "$ref": "#/$defs/uuidV7" },
+    "sourceEventDigest": { "$ref": "#/$defs/digest" },
+    "sourceChainHash": { "$ref": "#/$defs/digest" },
+    "operation": { "$ref": "signed-device-event.schema.json#/$defs/operation" },
+    "decision": { "enum": ["MERGED_SAFE_STATE", "HUMAN_REVIEW_REQUIRED"] },
+    "globalHash": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

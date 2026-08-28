@@ -1,4 +1,7 @@
 ------------------------------ MODULE ToolExecution ------------------------------
+\* information_uuid_v5=3db7326c-bd4a-52a1-abae-3a0bec14c980
+\* event_uuid_v7=01a049c4-fd4d-7cdc-bc6d-44f3d59b3efb
+\* machine-contract: ambiguous effects reconcile before retry; every reachable effect count is at most one.
 EXTENDS Naturals, TLC
 
 CONSTANT MaxRetry

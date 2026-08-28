@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: validate regenerate test-ts typecheck model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner evidence-slo
+.PHONY: validate regenerate test-ts typecheck model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner evidence-slo evidence-final verify-tla
 
 export UV_CACHE_DIR ?= $(CURDIR)/.local/uv-cache
 
@@ -41,3 +41,9 @@ evidence-planner:
 
 evidence-slo:
 	cd src/typescript && npm run evidence:slo
+
+evidence-final:
+	uv run --frozen python scripts/final_verification.py --write
+
+verify-tla:
+	uv run --frozen python scripts/final_verification.py --check --tla2tools-jar "$(TLA2TOOLS_JAR)"

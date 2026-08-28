@@ -1,0 +1,128 @@
+{
+  "$schema": "../schemas/final-verification.schema.json",
+  "identity": {
+    "uuidV5": "390538dd-cde3-50ce-b60e-b25dd12ff4cf",
+    "uuidV7": "01a049d1-b7e1-7443-a30b-4620165c8b17",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "verifiedAt": "2026-08-28T19:21:16.001Z",
+    "verifiedAtEpochMs": 1787944876001,
+    "timeZone": "UTC"
+  },
+  "version": "1.0.0",
+  "status": "READY_FOR_PUBLIC_READBACK",
+  "issue": {
+    "number": 45,
+    "url": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/45",
+    "informationUuidV5": "75ab0acd-973c-53d0-a889-8940c52a0ca4"
+  },
+  "stateTransition": {
+    "from": "EXECUTING",
+    "to": "READY_FOR_PUBLIC_READBACK",
+    "eventId": "01a049d1-b7e1-7443-a30b-4620165c8b17",
+    "occurredAt": "2026-08-28T19:21:16.001Z"
+  },
+  "webMcp": {
+    "conclusion": "INCONCLUSIVE",
+    "version": "INCONCLUSIVE",
+    "draftPublication": "Draft Community Group Report",
+    "draftPublishedOn": "2026-08-26",
+    "standardsTrack": false,
+    "boundedObservationCount": 3,
+    "standardDocumentSurfaceInObservedChrome": "CONFIRMED_ABSENT",
+    "inAppBrowserToolDiscovery": "CONFIRMED_PRESENT",
+    "discoveredToolNames": [
+      "notify_once"
+    ],
+    "toolCalls": 0
+  },
+  "formalVerification": {
+    "finiteExplorer": {
+      "status": "VERIFIED",
+      "reachableStates": 38,
+      "transitions": 43,
+      "commitReachable": true,
+      "baselineViolations": {
+        "unauthorizedExecution": 0,
+        "doubleEffect": 0,
+        "commitWithoutVerification": 0,
+        "ambiguousRetry": 0
+      },
+      "mutationDetections": {
+        "unauthorizedExecution": 1,
+        "doubleEffect": 12,
+        "commitWithoutVerification": 3,
+        "ambiguousRetry": 10
+      }
+    },
+    "tla": {
+      "status": "VERIFIED",
+      "toolsRelease": "v1.7.4",
+      "engineVersion": "2.19",
+      "statesGenerated": 44,
+      "distinctStates": 38,
+      "statesLeftOnQueue": 0,
+      "completeGraphDepth": 13,
+      "jarPublishedSha1Matched": true,
+      "binaryBundled": false
+    },
+    "wolfram": {
+      "runtimeAvailability": "UNAVAILABLE",
+      "currentExecution": "NOT_EXECUTED",
+      "capturedReport": "CONFIRMED",
+      "capturedReportSha256": "45bfb93ffa808a2bff8b325248de6491af726b196ada9239ca34548433f6817f",
+      "modelSha256": "08f5f72fdf7b7c05bb7229843e697dc7500840e871876ca2cf53b6b4cb82c7f9",
+      "independentExactArithmetic": "VERIFIED",
+      "probabilityMass": "1",
+      "geometricFactorExact": "132977/125000",
+      "expectedRetriesExact": "7977/125000",
+      "duplicateProbabilityExact": "79769949600027/125000000000000000000",
+      "duplicateProbabilityDecimal": "0.000000638159596800216000"
+    }
+  },
+  "testCatalog": {
+    "status": "VERIFIED",
+    "total": 67,
+    "implemented": 67,
+    "automated": 67,
+    "partial": 0,
+    "specificationOnly": 0,
+    "automationArtifactCount": 66,
+    "catalogSha256": "03bb3afa2159d4f52c61b79b9953d4d1cacb9ed14dd9f0607cd4bcc6525618df"
+  },
+  "effects": {
+    "actualWebMcpToolCalls": 0,
+    "actualNotificationPermissionRequests": 0,
+    "actualNotifications": 0,
+    "actualObservedPageExternalNetworkRequests": 0,
+    "intentRows": 0,
+    "attemptRows": 0,
+    "effectRows": 0,
+    "auditEvents": 0
+  },
+  "reviewBoundary": {
+    "postMergeMainReadback": "REQUIRED_EXTERNAL_RECORD",
+    "unresolvedCriticalDefects": "PENDING_EXTERNAL_RECORD",
+    "secretScan": "REQUIRED_BEFORE_PUSH",
+    "recordTarget": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/45"
+  },
+  "sources": [
+    "https://webmachinelearning.github.io/webmcp/",
+    "https://github.com/tlaplus/tlaplus/releases/tag/v1.7.4",
+    "formal/wolfram/ReferenceModel.wl",
+    "formal/wolfram/verification-report.json"
+  ],
+  "artifacts": {
+    "data/final-verification-observations.json": "0a2bc83dcae762e5471db9ac8acead875f03de6e468f3c1c03ac3bbf8d3ecfc5",
+    "formal/tla/ToolExecution.tla": "89b7d2b0ecacb17db706ad11416ec1e03a56241f9af80e7e5e08e264cce87d8f",
+    "formal/tla/ToolExecution.cfg": "a162d2dcca034c23cc4a5ee8eebdaeb4ce19062fbe92b5ffc1652d6d0b05e2f9",
+    "formal/tla/verification-report.json": "5f98091801be16950b4f31ecca75e5d8d97b59baab3b7ef82aa49ce28ec43995",
+    "formal/model-checker/reachability.py": "ffb21a6fe303a21f996133705044161b79de33b8a19c4f07687879bfadbb5480",
+    "formal/wolfram/ReferenceModel.wl": "08f5f72fdf7b7c05bb7229843e697dc7500840e871876ca2cf53b6b4cb82c7f9",
+    "formal/wolfram/verification-report.json": "45bfb93ffa808a2bff8b325248de6491af726b196ada9239ca34548433f6817f",
+    "knowledge/tests.json": "03bb3afa2159d4f52c61b79b9953d4d1cacb9ed14dd9f0607cd4bcc6525618df",
+    "schemas/final-verification.schema.json": "ce990fa897461b05f3b6f706dac23d0d5c03c92697c39c691dbf4bcdbbdc8a26",
+    "scripts/final_verification.py": "fa1dbdf76757e7545feca2e205ccee5cf56e122c989026e48f9f3619b8e9de29"
+  }
+}

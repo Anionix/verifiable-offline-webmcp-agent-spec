@@ -10,6 +10,7 @@ online_planner_event_uuid_v7: "01a04948-c160-7283-a380-4f7db4ccb041"
 security_boundary_event_uuid_v7: "01a04967-af58-7fee-af26-3701238950ec"
 replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
 slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
+final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 generated_at: "2026-08-27T09:34:04.000Z"
 updated_at: "2026-08-28T18:41:14.617Z"
 version: "0.1.0"
@@ -18,7 +19,7 @@ status: "design-specification"
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 67 / partially implemented 0 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, untrusted-data handling, six fresh replay checks, independent readback, claim-versus-truth separation, and six hard operational-quality gates. The six operational-quality records use deterministic synthetic evidence; production quality remains `UNMEASURED`.
+**Total / 合計:** 67 tests — implemented 67 / automated 67 / partially implemented 0 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, untrusted-data handling, six fresh replay checks, independent readback, claim-versus-truth separation, and six hard operational-quality gates. The final verifier also requires every declared automation artifact to exist and independently matches the Python and TLA+ state counts. The six operational-quality records use deterministic synthetic evidence; production quality remains `UNMEASURED`, while general native WebMCP conformance remains `INCONCLUSIVE`.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|

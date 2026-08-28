@@ -8,9 +8,11 @@ live_verification_event_uuid_v7: "01a04896-44e2-7ad8-9c68-587631dc4945"
 browser_visual_verification_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
 offline_sync_verification_event_uuid_v7: "01a04927-46cd-765b-912f-a63737578d9e"
 online_planner_verification_event_uuid_v7: "01a04948-c160-7499-9ba6-5e1dca93814a"
+final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
+final_validation_event_uuid_v7: "01a049e8-9210-7989-b9a4-d58448cf6925"
 generated_at: "2026-08-27T09:34:04.500Z"
-updated_at: "2026-08-28T16:51:40Z"
-version: "0.5.0-candidate"
+updated_at: "2026-08-28T19:46:13.648Z"
+version: "1.0.0-candidate"
 status: "validation-report"
 ---
 
@@ -21,7 +23,7 @@ status: "validation-report"
 
 ## Snapshot / 検証snapshot
 
-- Validator timestamp: `2026-08-28T17:01:26.362040Z`
+- Validator timestamp: `2026-08-28T19:46:13.648138Z`
 - Overall: **PASS**
 - Error count: `0`
 - Validation command: `make validate`
@@ -40,10 +42,12 @@ status: "validation-report"
 | `merkle_checkpoint` | PASS |
 | `offline_sync_evidence` | PASS |
 | `online_planner_evidence` | PASS |
+| `slo_gate_evidence` | PASS |
 | `no_private_keys` | PASS |
 | `reachability_and_mutation` | PASS |
 | `typescript_tests` | PASS |
 | `typescript_typecheck` | PASS |
+| `final_public_evidence` | PASS |
 | `wolfram_report` | PASS |
 
 ## Knowledge inventory / 知識台帳
@@ -64,7 +68,7 @@ status: "validation-report"
 
 ### TypeScript
 
-- 61 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, optional planner guardrails, and all three visual state contracts.
+- 89 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, optional planner guardrails, operational-quality gates, and all visual state contracts.
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
 - Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), [`src/typescript/test/online-planner.test.ts`](../src/typescript/test/online-planner.test.ts), and the three browser-state tests in [`src/typescript/test`](../src/typescript/test/).
 
@@ -93,7 +97,16 @@ status: "validation-report"
 - A dry run in the Codex in-app browser rendered `DRY_RUN / NOT_STARTED` with an SQLite external-effect start count of `0`; no real notification was requested during this check.
 - The desktop `1440 x 1000` view exposed the two paths, measured count, and state ledger. At width `390`, document width equaled viewport width and no horizontal overflow was detected.
 - Browser semantics exposed the main region, labeled subregions, headings, labeled inputs, buttons, and a status message. The stylesheet provides a reduced-motion path; browser warning and error logs were empty.
-- `document.modelContext` and `notify_once` registration were observed in the Codex in-app browser. Broader native WebMCP conformance remains `INCONCLUSIVE`.
+- The final bounded observation separated two surfaces: `document.modelContext` was absent in the observable in-app page scope, while the browser's tab capability discovered `notify_once`. The connected Chrome page scope also lacked `document.modelContext`. Broader native WebMCP conformance remains `INCONCLUSIVE`.
+
+### Final public-evidence candidate
+
+- The connected Chrome page scope and the Codex in-app page scope both reported `document.modelContext` absent. The in-app browser separately discovered the page-defined `notify_once` tool through its tab capability; the tool was not called.
+- The independent Python explorer and official TLA+ Tools v1.7.4 run agreed on 38 distinct reachable states. Both found zero unauthorized execution, double effect, unverified commit, or retry while ambiguous.
+- The current environment had no Wolfram runtime, so current Wolfram execution is `NOT_EXECUTED`. The captured report remains checked, and exact Python fraction arithmetic independently reproduced its sample.
+- The test catalog contains 67 implemented and automated records, with zero partial or specification-only records.
+- This final observation created zero tool calls, notification-permission requests, notifications, observed-page external requests, intent rows, attempt rows, effect rows, and audit events.
+- The tracked record intentionally remains `READY_FOR_PUBLIC_READBACK`; post-merge `main` readback, critical-review readback, and the final secret scan are external completion records. Evidence: [`metadata/final-verification.json`](../metadata/final-verification.json).
 
 ### Duplicate-safe notification candidate
 
@@ -139,14 +152,16 @@ The validator independently checks:
 
 ### Wolfram reference
 
-The package includes [`formal/wolfram/ReferenceModel.wl`](../formal/wolfram/ReferenceModel.wl) and a captured kernel result in [`verification-report.json`](../formal/wolfram/verification-report.json). The offline validator checks the captured probability-mass identity. It does **not** start a Wolfram kernel.
+The package includes [`formal/wolfram/ReferenceModel.wl`](../formal/wolfram/ReferenceModel.wl) and a captured kernel result in [`verification-report.json`](../formal/wolfram/verification-report.json). The offline validator checks the captured probability-mass identity and independently reproduces the sample with exact rational arithmetic. It does **not** start a Wolfram kernel, and the final record says `NOT_EXECUTED` for the current Wolfram run.
 
 ## Known verification boundary / 検証境界
 
-TLA+ source and TLC configuration are included, but TLC is not bundled or executed by `make validate`. Therefore:
+TLA+ source and TLC configuration are included, but the TLC binary is not bundled or executed by `make validate`. Therefore:
 
 - the independent Python finite abstraction **was executed**;
 - the TypeScript and cryptographic checks **were executed**;
-- the TLA+ model **is supplied for external TLC execution**, not claimed as executed in this package build.
+- an official TLA+ Tools v1.7.4 run **was executed and captured** for the final evidence;
+- `make validate` checks the captured engine identity, source hashes, settings, result, and agreement with the independent explorer;
+- `make verify-tla TLA2TOOLS_JAR=/absolute/path/to/tla2tools.jar` performs a fresh TLC reproduction.
 
 See [`formal/tla/README.md`](../formal/tla/README.md).

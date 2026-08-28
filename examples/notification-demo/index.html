@@ -4,6 +4,7 @@
 <!-- information_uuid_v5=96dea50d-2218-5b6d-86ce-6beaa00f5fe4 event_uuid_v7=01a048c4-45b3-7120-928e-b7ff8f03ae05 machine-contract=labels and changing effect counts expose explicit assistive-technology semantics -->
 <!-- information_uuid_v5=cbeb5a00-12c7-5557-a8ec-c50cd3765001 event_uuid_v7=01a048da-1888-7be0-9eef-3e1d0cadd1b1 machine-contract=WebMCP RECEIVED->STRICTLY_PROJECTED->DRY_RUN is visible and rejection stops before intent creation -->
 <!-- information_uuid_v5=a031493c-3143-5904-a218-bf47e8be4654 event_uuid_v7=01a048f8-3326-7ad0-a607-d9b64a598798 machine-contract=WEBMCP->UNTRUSTED_MARK->SAME_ORIGIN->SQLITE_AUDIT_READBACK is visible without enabling notification permission -->
+<!-- information_uuid_v5=d53907bf-96cd-56e5-be92-5c4f3576e477 event_uuid_v7=01a04972-c11c-74d1-8639-c71dded7b68a machine-contract=CONFIRMED_ABSENT->SIX_CHECKS->REPLAY_OR_STOP is visible; VERIFIED and AMBIGUOUS stop earlier -->
 <html lang="ja">
 <head>
   <meta charset="utf-8">
@@ -116,6 +117,21 @@
           </div>
           <span id="flow-phase" class="phase-text">実行前</span>
         </div>
+
+        <section class="replay-gate-panel" aria-labelledby="replay-gate-title">
+          <div class="replay-gate-heading">
+            <h3 id="replay-gate-title">再試行前の6項目</h3>
+            <p id="replay-gate-summary">再送が必要になった場合だけ、6項目をすべて再確認します。</p>
+          </div>
+          <ol class="replay-gates">
+            <li id="replay-authorization" data-state="idle"><span>1</span><strong>権限条件</strong><small id="replay-authorization-status">未確認</small></li>
+            <li id="replay-permission" data-state="idle"><span>2</span><strong>端末の許可</strong><small id="replay-permission-status">未確認</small></li>
+            <li id="replay-version" data-state="idle"><span>3</span><strong>処理の版</strong><small id="replay-version-status">未確認</small></li>
+            <li id="replay-consent" data-state="idle"><span>4</span><strong>利用者の同意</strong><small id="replay-consent-status">未確認</small></li>
+            <li id="replay-time-to-live" data-state="idle"><span>5</span><strong>有効期限</strong><small id="replay-time-to-live-status">未確認</small></li>
+            <li id="replay-precondition" data-state="idle"><span>6</span><strong>表示なしの確認</strong><small id="replay-precondition-status">未確認</small></li>
+          </ol>
+        </section>
 
         <div id="dedupe-flow" class="dedupe-flow" data-phase="idle" aria-describedby="flow-explanation">
           <p id="flow-explanation" class="sr-only">初回要求は通知へ進み、同じ操作の再試行は重複防止台帳で停止します。</p>

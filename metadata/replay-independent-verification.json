@@ -1,0 +1,130 @@
+{
+  "id": "EVID-REPLAY-INDEPENDENT-VERIFICATION-001",
+  "identity": {
+    "uuid_v5": "f94a3c3d-071f-5cec-8ea0-d1950410df2c",
+    "uuid_v7": "01a04987-5d7c-7291-83a4-f2fc4b8a4c40",
+    "post_review_event_uuid_v7": "01a0498b-5662-7094-9bef-88e9b2f13a10",
+    "effect_start_semantics_event_uuid_v7": "01a04993-3867-7e11-b120-01b3bab8ec62",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "replay-independent-verification-browser",
+    "category": "evidence"
+  },
+  "temporal": {
+    "observed_at": "2026-08-28T18:00:03.196Z",
+    "updated_at": "2026-08-28T18:13:00.135Z",
+    "updated_epoch_ms": 1787940780135,
+    "epoch_ms": 1787940003196,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-29T03:00:03.196+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "state": "BROWSER_AND_AUTOMATION_VERIFIED",
+  "evidence_state": {
+    "six_fresh_replay_checks": "CONFIRMED",
+    "readback_postcondition_binding": "CONFIRMED",
+    "tool_claim_alone_is_insufficient": "CONFIRMED",
+    "recorded_claim_separate_from_truth_estimate": "CONFIRMED",
+    "execution_claim_separate_from_effect_start_measurement": "CONFIRMED",
+    "current_absence_not_treated_as_historical_non_start": "CONFIRMED",
+    "six_check_visual_layout": "CONFIRMED",
+    "real_notification_during_this_verification": "CONFIRMED_ABSENT",
+    "native_webmcp_conformance_in_this_browser": "INCONCLUSIVE"
+  },
+  "environment": {
+    "browser": "Chrome 152.0.0.0 through Playwright",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "page_origin": "http://127.0.0.1:4183",
+    "viewports": [
+      { "width": 1440, "height": 1000, "document_width": 1440, "horizontal_overflow": false },
+      { "width": 390, "height": 844, "document_width": 390, "horizontal_overflow": false }
+    ],
+    "browser_error_log_count": 0,
+    "browser_warning_log_count": 0,
+    "network_origin_count": 1,
+    "external_network_request_count": 0
+  },
+  "dry_run_observation": {
+    "intent_id": "17bdf4db-178a-5450-84cc-74b9dcf39a64",
+    "payload_digest": "ca61f1a1a3804814cd689b574339bae89e5268a2d484440239c32c554fdbe451",
+    "control_state": "DRY_RUN",
+    "effect_state": "NOT_STARTED",
+    "effect_start_count": 0,
+    "audit_event_count": 2,
+    "audit_valid": true,
+    "audit_last_hash": "d8f8f2289a6f8d45dc4b879c25a003d12f353e7869fb4e1d3f08ae2d153ed65a",
+    "notification_permission": "default",
+    "approval_button_enabled_after_dry_run": true,
+    "retry_button_enabled": false,
+    "replay_gate_count": 6,
+    "replay_gate_labels": [
+      "権限条件",
+      "端末の許可",
+      "処理の版",
+      "利用者の同意",
+      "有効期限",
+      "表示なしの確認"
+    ],
+    "model_context_type": "undefined"
+  },
+  "external_effect_boundary": {
+    "notification_permission_requested": false,
+    "approval_endpoint_called": false,
+    "effect_claim_endpoint_called": false,
+    "service_worker_show_notification_called": false,
+    "receipt_endpoint_called": false,
+    "real_notification_displayed": false
+  },
+  "automation": {
+    "typecheck": "PASS",
+    "targeted_test_result": "PASS",
+    "targeted_test_count": 29,
+    "verification_test_ids": [
+      "TEST-OFFLINE-003",
+      "TEST-VERIFY-001",
+      "TEST-VERIFY-002",
+      "TEST-VERIFY-003"
+    ],
+    "safety_examples": [
+      "one failed replay gate keeps CONFIRMED_ABSENT and measured effect-start count zero",
+      "a confirmed pre-effect absence plus one successful replay records two execution claims but only one measured effect start",
+      "a later absent readback leaves an unknown historical start ambiguous and counted as one",
+      "a legacy SQLite effect ledger migrates confirmed presence to STARTED and keeps historical absence UNKNOWN",
+      "two active browser tags are rejected as a duplicate violation",
+      "a different browser tag is rejected as a binding mismatch",
+      "a tool claim without independent observation remains unmeasured"
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "notification-replay-six-checks-desktop.png",
+      "width": 1440,
+      "height": 1562,
+      "sha256": "42648e9b7d6c6f32b3e3f2527084adda51b69d29282d66d0625537760e34ca61"
+    },
+    {
+      "path": "notification-replay-six-checks-mobile.png",
+      "width": 390,
+      "height": 3530,
+      "sha256": "a0290bf06c4b56d50e1e3f41d201647399250663ba21ec930740ba4019027798"
+    }
+  ],
+  "limitations": [
+    "The browser run stopped at DRY_RUN and did not exercise the approval or notification side effect.",
+    "The duplicate-suppressed and six-gate decision states are covered by pure reducer and engine tests, not by a new real notification.",
+    "document.modelContext was absent in this Playwright browser, so native WebMCP conformance remains inconclusive."
+  ],
+  "artifacts": [
+    "src/typescript/governance/replay-verification.ts",
+    "src/typescript/test/replay-verification.test.ts",
+    "src/typescript/notification/engine.ts",
+    "src/typescript/notification/store.ts",
+    "src/typescript/test/notification.test.ts",
+    "examples/notification-demo/visual-state.js",
+    "src/typescript/test/notification-visualization.test.js",
+    "notification-replay-six-checks-desktop.png",
+    "notification-replay-six-checks-mobile.png"
+  ],
+  "source_refs": ["SRC-WEBMCP-2026", "SRC-NOTIFICATIONS"]
+}

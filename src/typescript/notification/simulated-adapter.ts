@@ -1,6 +1,9 @@
 // information_uuid_v5=20aeb769-0c90-581f-bc43-d05558148374
 // event_uuid_v7=01a04872-0531-7e8c-83d2-eabc3abda422
 // machine-contract: simulation modes reproduce pre-effect absence, post-effect ambiguity, and confirmed success without external services.
+// information_uuid_v5=5b3dd6c4-39fd-57b2-98bc-842b8d7f88bc
+// event_uuid_v7=01a0498b-5662-7094-9bef-88e9b2f13a10
+// machine-contract: executionCount measures adapter calls; effectStartCount increments only after the pre-effect failure boundary.
 import type {
   AdapterExecutionResult,
   ApprovalReceipt,
@@ -17,6 +20,7 @@ export class SimulatedNotificationAdapter implements NotificationAdapter {
   mode: SimulationMode;
   readonly visible = new Set<string>();
   executionCount = 0;
+  effectStartCount = 0;
 
   constructor(mode: SimulationMode = "success") {
     this.mode = mode;
@@ -42,6 +46,7 @@ export class SimulatedNotificationAdapter implements NotificationAdapter {
     ) throw new ConfirmedAbsentError("approval does not bind the requested effect");
     this.executionCount += 1;
     if (this.mode === "fail-before-effect") throw new ConfirmedAbsentError("simulated failure before effect");
+    if (this.mode !== "unknown") this.effectStartCount += 1;
     if (this.mode === "timeout-after-effect") {
       this.visible.add(intent.intentId);
       throw new AmbiguousEffectError("simulated response loss after effect");

@@ -8,15 +8,16 @@ provenance_event_uuid_v7: "01a04904-ca95-7468-9bd0-cb597093a64a"
 offline_sync_event_uuid_v7: "01a04927-4698-7f6a-b5e9-ef8bd558913c"
 online_planner_event_uuid_v7: "01a04948-c160-7283-a380-4f7db4ccb041"
 security_boundary_event_uuid_v7: "01a04967-af58-7fee-af26-3701238950ec"
+replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
 generated_at: "2026-08-27T09:34:04.000Z"
-updated_at: "2026-08-28T17:25:27.000Z"
+updated_at: "2026-08-28T17:50:53.255Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 57 / partially implemented 10 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, and untrusted-data handling. Replay revalidation, independent effect verification, and runtime service-level calibration remain partially implemented.
+**Total / 合計:** 67 tests — implemented 61 / partially implemented 6 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, untrusted-data handling, six fresh replay checks, independent readback, and claim-versus-truth separation. The remaining six tests cover runtime service-level calibration.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
@@ -54,7 +55,7 @@ status: "design-specification"
 | `TEST-MODEL-MUTATION` | finite-state-model-check | implemented | yes | REQ-FORMAL-002 |
 | `TEST-OFFLINE-001` | offline-sync-scenario-test | implemented | yes | REQ-PLAN-001, REQ-OFFLINE-001 |
 | `TEST-OFFLINE-002` | offline-sync-scenario-test | implemented | yes | REQ-OFFLINE-002 |
-| `TEST-OFFLINE-003` | offline-sync-scenario-test | partially-implemented | yes | REQ-OFFLINE-003 |
+| `TEST-OFFLINE-003` | offline-sync-scenario-test | implemented | yes | REQ-OFFLINE-003 |
 | `TEST-POLICY-001` | decision-conformance-test | implemented | yes | REQ-WEBMCP-003 |
 | `TEST-POLICY-002` | decision-conformance-test | implemented | yes | REQ-PLAN-002 |
 | `TEST-POLICY-003` | decision-conformance-test | implemented | yes | REQ-POLICY-002 |
@@ -84,6 +85,6 @@ status: "design-specification"
 | `TEST-SYNC-003` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-003 |
 | `TEST-SYNC-004` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-004 |
 | `TEST-TIME-001` | identifier-temporal-validation | implemented | yes | REQ-TIME-001 |
-| `TEST-VERIFY-001` | evidence-verification-test | partially-implemented | yes | REQ-TOOL-003 |
-| `TEST-VERIFY-002` | evidence-verification-test | partially-implemented | yes | REQ-VERIFY-001 |
-| `TEST-VERIFY-003` | evidence-verification-test | partially-implemented | yes | REQ-AUDIT-010 |
+| `TEST-VERIFY-001` | evidence-verification-test | implemented | yes | REQ-TOOL-003 |
+| `TEST-VERIFY-002` | evidence-verification-test | implemented | yes | REQ-VERIFY-001 |
+| `TEST-VERIFY-003` | evidence-verification-test | implemented | yes | REQ-AUDIT-010 |

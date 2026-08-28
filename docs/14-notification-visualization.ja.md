@@ -7,11 +7,16 @@ verified_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
 font_event_uuid_v7: "01a048d1-158c-7fc4-b3ca-da0ae9607f5b"
 provenance_event_uuid_v7: "01a04904-ca99-767a-8049-6ffa607f193e"
 provenance_verified_event_uuid_v7: "01a0490d-f64d-775f-aa28-f89a16ea3930"
+replay_gate_event_uuid_v7: "01a04972-c11c-74d1-8639-c71dded7b68a"
+browser_recheck_event_uuid_v7: "01a04987-5d7c-7ebe-9208-c468f5c24ebf"
+effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
+effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 generated_at: "2026-08-28T14:12:37.542Z"
 verified_at: "2026-08-28T14:25:32.776Z"
-updated_at: "2026-08-28T15:37:25.913Z"
+updated_at: "2026-08-28T18:13:00.135Z"
+replay_verified_at: "2026-08-28T18:00:03.196Z"
 provenance_verified_at: "2026-08-28T15:47:26.925Z"
-version: "0.3.0-candidate"
+version: "1.0.0-candidate"
 status: "browser-verified"
 ---
 
@@ -28,20 +33,28 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 ```text
 初回要求 ----------> 重複防止台帳 ----------> 通知を1件表示
 同じ操作の再試行 --> 同じ台帳で登録済み検出 --> 二件目を停止
+
+表示なしを確認 --> 権限条件・端末の許可・処理の版・利用者の同意・有効期限・前提条件 --> 全合格時だけ再提案
 ```
 
-画面の通知件数は固定表示にしません。`/api/status`がSQLiteから読み出した外部効果開始件数で更新し、2以上なら緑の成功表示へ丸めず「安全条件違反」として表示します。`CONFIRMED_PRESENT`または`ALREADY_VERIFIED`なのに実測件数が0の場合も、成功とはせず台帳不整合として停止します。
+画面の通知件数は固定表示にしません。`/api/status`がSQLiteから読み出した保守的な外部効果開始件数で更新し、2以上なら緑の成功表示へ丸めず「安全条件違反」として表示します。`STARTED`と`UNKNOWN`は各1回、明示的な実行前失敗である`NOT_STARTED`だけは0回です。`CONFIRMED_PRESENT`または`ALREADY_VERIFIED`なのに件数が0の場合も、成功とはせず台帳不整合として停止します。
+
+SQLiteは実行権取得の記録を消しません。ただし、実行前に開始していないことと現在の表示なしを別々に確認した`NOT_STARTED`は、画面の外部効果開始件数から除外します。単に後から表示が見つからないだけなら`UNKNOWN`を維持し、1回として数え、再送しません。これにより「実行前失敗1回、その後の成功1回」は、監査上の実行権取得2件と、保守的な外部効果開始1件として表示されます。
+
+再試行前6項目は、再送の抜け道ではありません。すでに実行済みなら台帳で即停止して「確認不要」、結果不明なら「照合が先」と表示します。実行前の`NOT_STARTED`と独立した表示なしの両方を確認した場合だけ6項目を評価し、一つでも不合格なら外部効果開始前に止めます。
 
 ## 表示状態の対応
 
-| 実行結果 | 初回経路 | 再試行経路 | 件数表示 |
-|---|---|---|---:|
-| `DRY_RUN` | 乾式確認済み | 待機 | 0 |
-| `EXECUTING / AMBIGUOUS` | 実行中 | 禁止 | 結果不明 |
-| `VERIFIED / CONFIRMED_PRESENT` | 1件目を確認 | 再試行可能 | 1 |
-| `ALREADY_VERIFIED` | 確認済み | 二件目を停止 | 1 |
-| 外部効果開始件数が2以上 | 安全条件違反 | 安全条件違反 | 実測値をそのまま表示 |
-| 確認済み状態なのに開始件数が0 | 台帳不整合 | 台帳不整合 | 0を隠さず表示 |
+| 実行結果 | 初回経路 | 再試行経路 | 再試行前6項目 | 件数表示 |
+|---|---|---|---|---:|
+| `DRY_RUN` | 乾式確認済み | 待機 | 未確認 | 0 |
+| `EXECUTING / AMBIGUOUS` | 実行中 | 禁止 | 照合が先 | 結果不明 |
+| `VERIFIED / CONFIRMED_PRESENT` | 1件目を確認 | 再試行可能 | 台帳確認が先 | 1 |
+| `ALREADY_VERIFIED` | 確認済み | 二件目を停止 | 確認不要 | 1 |
+| `CONFIRMED_ABSENT` | 表示なしを確認 | 再確認待ち | 6項目を個別表示 | 0 |
+| 6項目の一つ以上が不合格 | 表示なしを確認 | 再送停止 | 不合格項目を明示 | 実測値 |
+| 外部効果開始件数が2以上 | 安全条件違反 | 安全条件違反 | 停止 | 実測値をそのまま表示 |
+| 確認済み状態なのに開始件数が0 | 台帳不整合 | 台帳不整合 | 停止 | 0を隠さず表示 |
 
 ## 画面設計
 
@@ -51,6 +64,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - デスクトップは「通知内容」と「重複防止の動作」の二列です。
 - 狭い画面では、初回経路、再試行経路、件数、現在の状態の順に一列へ折りたたみます。
 - 技術ログは折りたたみ、主要な安全説明を先に見せます。
+- 重複防止図の直前へ6項目を一本の確認列として置き、番号、名前、文字状態で判別できるようにします。
 - 入力境界の直下へ、入力経路、信頼状態、生成元、永続証拠を開いた一本の証拠列として表示します。装飾的なカード群にはせず、文章だけでも状態を判別できます。
 - 状態変化は`aria-live`で読み上げ可能にします。WCAG 2.2のStatus Messagesは、フォーカスを移さず状態変化を支援技術へ提示できることを求めています。[W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/#status-messages)
 - 動きは状態の進行を補助する範囲に限定し、`prefers-reduced-motion: reduce`では実質的に停止します。[W3C Media Queries Level 5](https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion)
@@ -68,6 +82,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 | 狭い画面 | 実装済み | 幅820画素以下で経路を縦積みにし、幅390画素で横はみ出しなし |
 | 技術ログ | 一致 | 主要説明の後ろへ折りたたみ、必要な場合だけ展開 |
 | 入力来歴 | 意図的に追加 | 草案のWebMCP入力が未信頼のままSQLite・監査へ届いたかを画面から読み戻せる証拠列を追加 |
+| 再試行前6項目 | 意図的に追加 | 権限条件、端末の許可、処理の版、利用者の同意、有効期限、表示なしの確認を個別表示 |
 
 ## ブラウザー観測
 
@@ -79,11 +94,19 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - Codex内蔵ブラウザーでは`document.modelContext`と`notify_once`登録を観測しました。これはその環境での登録確認に限られ、対象ブラウザー全体のネイティブWebMCP適合は引き続き`INCONCLUSIVE`です。
 - 来歴表示を加えた画面を`1440 x 1000`と`390 x 844`で再確認しました。狭い画面では証拠列が二列へ折り返され、横方向のはみ出し、警告、エラーは0でした。
 - 乾式実行後は「ローカル画面」「未信頼の印を保持」「生成元」「SQLite・監査と一致」を表示しました。実通知件数は0で、承認ボタンは押していません。
+- 再試行前6項目を追加した画面をChrome `152.0.0.0`のPlaywright環境で再確認しました。`1440 x 1000`では文書幅`1440`、`390 x 844`では文書幅`390`で、横方向のはみ出しはありませんでした。
+- 6項目は番号、名前、文字状態を持つリストとして意味構造から読み取れます。狭い画面では二列へ折り返されます。
+- 乾式実行後も通知権限は`default`、制御状態は`DRY_RUN`、外部効果状態は`NOT_STARTED`、SQLite外部効果開始件数は0でした。承認ボタンは押していません。
+- WebMCP草案の`tools`機能は既定許可先が`self`のため、未対応ブラウザーへ冗長な`tools=(self)`ヘッダーを送らない構成へ直しました。再読み込み後の警告・エラーは0、通信先は`127.0.0.1:4183`だけでした。
+- このPlaywright環境では`document.modelContext`は未定義でした。したがって、この観測でのネイティブWebMCP対応は`INCONCLUSIVE`です。
+- 画面証拠は[`notification-replay-six-checks-desktop.png`](../notification-replay-six-checks-desktop.png)、[`notification-replay-six-checks-mobile.png`](../notification-replay-six-checks-mobile.png)、機械可読値は[`metadata/replay-independent-verification.json`](../metadata/replay-independent-verification.json)に保存します。
 
 ## 安全境界
 
 - 通知権限要求と`execute`は、乾式実行後の利用者クリックからだけ到達可能です。
 - `AMBIGUOUS`は再送せず、照合だけを許可します。
+- `VERIFIED`は6項目へ進まず台帳で即停止し、`CONFIRMED_ABSENT`だけが6項目の評価対象です。
+- 6項目の表示は実行権限を作りません。正本は型付き証拠と通知エンジンの判定です。
 - 通知タグはUUIDバージョン5の予定識別子です。
 - ネイティブWebMCPは`document.modelContext`を観測した場合だけ登録し、未観測時は`INCONCLUSIVE`を維持します。
 - WebMCPから通知予定へ入る前段は、[`15-webmcp-input-boundary.ja.md`](15-webmcp-input-boundary.ja.md)の「受信 → 厳格検査 → 乾式実行だけ」で可視化し、拒否時は入力欄・Intent・監査を変えません。
@@ -99,3 +122,4 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 3. デスクトップとモバイルで主要文言、操作、二つの経路、件数が欠けない。
 4. キーボード操作、読み上げ用状態通知、動きを減らす設定を確認する。
 5. 既存の通知エンジン試験、型検査、`make validate`、秘密情報検査を成功させる。
+6. 6項目をすべて表示し、一つだけ不合格の場合も再送停止になることを純粋状態更新の試験で確認する。

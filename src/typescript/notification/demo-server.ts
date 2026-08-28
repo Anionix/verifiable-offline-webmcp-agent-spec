@@ -6,6 +6,9 @@
 // information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
 // event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
 // machine-contract: same-origin JSON is strictly projected before createIntent; rejection leaves SQLite and the audit chain unchanged.
+// information_uuid_v5=43ec07f2-3321-504a-8481-6358beea3856
+// event_uuid_v7=01a04984-7ca1-717d-a8bb-4eceafaedc31
+// machine-contract: WebMCP tools use the draft specification's default self allowlist; unsupported browsers receive no unknown tools directive.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -16,7 +19,6 @@ import { NotificationInputError } from "./input-projection.js";
 import { assertExpectedOrigin, externalInputProvenance } from "./input-provenance.ts";
 import { prepareNotificationPreview } from "./preview-boundary.ts";
 import { NotificationStore } from "./store.ts";
-import type { Presence } from "./types.ts";
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(moduleDirectory, "../../..");
@@ -46,7 +48,7 @@ const staticFiles = new Map<string, readonly [string, string]>([
 function securityHeaders(response: ServerResponse): void {
   response.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; worker-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
   response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-  response.setHeader("Permissions-Policy", "tools=(self)");
+  response.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=()");
   response.setHeader("Referrer-Policy", "no-referrer");
   response.setHeader("X-Content-Type-Options", "nosniff");
 }
@@ -75,6 +77,14 @@ function stringField(input: Record<string, unknown>, name: string): string {
   const value = input[name];
   if (typeof value !== "string") throw new TypeError(`${name} must be a string`);
   return value;
+}
+
+function stringArrayField(input: Record<string, unknown>, name: string): readonly string[] {
+  const value = input[name];
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    throw new TypeError(`${name} must be an array of strings`);
+  }
+  return Object.freeze([...value]);
 }
 
 function requireSameOrigin(request: IncomingMessage): string {
@@ -111,19 +121,22 @@ async function api(request: IncomingMessage, response: ServerResponse, pathname:
     return;
   }
   if (pathname === "/api/receipt") {
-    const activeCount = input.activeCount;
-    if (!Number.isSafeInteger(activeCount) || Number(activeCount) < 1) throw new TypeError("activeCount must be a positive integer");
-    json(response, 200, engine.confirmBrowserReceipt(intentId, { activeCount: Number(activeCount), tag: intentId }));
+    const activeTags = stringArrayField(input, "activeTags");
+    if (activeTags.length !== 1) throw new TypeError("receipt requires exactly one active notification");
+    json(response, 200, engine.confirmBrowserReceipt(intentId, { activeTags }));
     return;
   }
   if (pathname === "/api/reconcile") {
-    const presence = stringField(input, "presence") as Presence;
-    if (!["PRESENT", "ABSENT", "UNKNOWN"].includes(presence)) throw new TypeError("invalid presence");
-    json(response, 200, engine.reconcileBrowser(intentId, presence));
+    const activeTags = stringArrayField(input, "activeTags");
+    json(response, 200, engine.reconcileBrowser(intentId, { activeTags }));
     return;
   }
   if (pathname === "/api/reset-confirmed-absent") {
-    json(response, 200, { intent: engine.resetAfterConfirmedAbsent(intentId) });
+    json(response, 409, {
+      code: "TRUSTED_REPLAY_EVIDENCE_REQUIRED",
+      error: "この画面だけでは権限・版・同意・期限・前提条件を独立確認できないため、再送を停止しました",
+      intentId,
+    });
     return;
   }
   json(response, 404, { error: "not-found" });

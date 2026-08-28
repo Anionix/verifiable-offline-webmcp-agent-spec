@@ -1,6 +1,9 @@
 // information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
 // event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
 // machine-contract: rejected WebMCP input cannot cross the projection boundary; accepted input is a frozen three-field copy.
+// information_uuid_v5=43ec07f2-3321-504a-8481-6358beea3856
+// event_uuid_v7=01a04984-7ca1-717d-a8bb-4eceafaedc31
+// machine-contract: same-origin tools rely on the draft default self allowlist without sending an unsupported policy token.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -118,5 +121,6 @@ test("the browser and localhost API use the same projector and keep permission o
   const webMcpSection = app.slice(app.indexOf("async function registerWebMcp"));
   assert.doesNotMatch(webMcpSection, /Notification\.requestPermission/);
   assert.match(server, /prepareNotificationPreview\(engine, input, provenance\)/);
-  assert.match(server, /Permissions-Policy", "tools=\(self\)"/);
+  assert.match(server, /Permissions-Policy", "camera=\(\), geolocation=\(\), microphone=\(\)"/);
+  assert.doesNotMatch(server, /tools=\(self\)/);
 });

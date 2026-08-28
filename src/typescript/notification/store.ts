@@ -3,9 +3,17 @@
 // machine-contract: one logical_operation_id owns one intent; state claims are serialized with BEGIN IMMEDIATE.
 // event_uuid_v7=01a04893-376b-7148-8c50-845366465b93
 // machine-contract: a suppressed duplicate or ambiguous retry is still persisted as a same-state attempt with its own UUIDv7.
+// information_uuid_v5=5b3dd6c4-39fd-57b2-98bc-842b8d7f88bc
+// event_uuid_v7=01a0498b-5662-7094-9bef-88e9b2f13a10
+// machine-contract: execution claims remain auditable; only explicit NOT_STARTED assessments contribute zero to the conservative count.
+// information_uuid_v5=9ca3a8c3-2305-534c-a98f-8127cae34c23
+// event_uuid_v7=01a04993-3867-7e11-b120-01b3bab8ec62
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T18:13:00.135Z
+// machine-contract: STARTED and UNKNOWN each consume one external-effect-start budget slot.
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import type { EffectStartStatus } from "../governance/replay-verification.ts";
 import {
   provenanceDetails,
   provenanceFromDetails,
@@ -56,6 +64,12 @@ export interface StoredInputProvenanceEvidence {
   provenance: Readonly<InputProvenance>;
 }
 
+export interface StoredEffectClaimEvidence {
+  eventId: string;
+  startedAt: number;
+  startStatus: EffectStartStatus;
+}
+
 export class NotificationStore {
   readonly database: DatabaseSync;
 
@@ -96,12 +110,18 @@ export class NotificationStore {
         effect_event_id TEXT PRIMARY KEY,
         intent_id TEXT NOT NULL REFERENCES intents(intent_id),
         started_at INTEGER NOT NULL,
+        start_status TEXT NOT NULL DEFAULT 'UNKNOWN' CHECK (start_status IN ('STARTED', 'NOT_STARTED', 'UNKNOWN')),
         outcome TEXT NOT NULL,
         receipt_json TEXT
       );
       CREATE INDEX IF NOT EXISTS attempts_intent_time ON attempts(intent_id, occurred_at);
       CREATE INDEX IF NOT EXISTS effects_intent_time ON effects(intent_id, started_at);
     `);
+    const effectColumns = this.database.prepare("PRAGMA table_info(effects)").all() as Array<{ name: string }>;
+    if (!effectColumns.some((column) => column.name === "start_status")) {
+      this.database.exec("ALTER TABLE effects ADD COLUMN start_status TEXT NOT NULL DEFAULT 'UNKNOWN' CHECK (start_status IN ('STARTED', 'NOT_STARTED', 'UNKNOWN'))");
+    }
+    this.database.exec("UPDATE effects SET start_status = 'STARTED' WHERE outcome = 'CONFIRMED_PRESENT' AND start_status = 'UNKNOWN'");
   }
 
   close(): void {
@@ -179,6 +199,14 @@ export class NotificationStore {
     });
   }
 
+  getLatestEffectClaimEvidence(intentId: string): StoredEffectClaimEvidence | null {
+    const row = this.database.prepare(`
+      SELECT effect_event_id, started_at, start_status FROM effects
+      WHERE intent_id = ? ORDER BY started_at DESC, rowid DESC LIMIT 1
+    `).get(intentId) as { effect_event_id: string; started_at: number; start_status: EffectStartStatus } | undefined;
+    return row ? Object.freeze({ eventId: row.effect_event_id, startedAt: row.started_at, startStatus: row.start_status }) : null;
+  }
+
   markDryRun(intentId: string, eventId: string, now: number): { intent: NotificationIntent; transition: TransitionRecord | null } {
     return this.transaction(() => {
       const before = this.requireIntent(intentId);
@@ -243,8 +271,8 @@ export class NotificationStore {
         WHERE intent_id = ?
       `).run(now, intentId);
       this.database.prepare(`
-        INSERT INTO effects (effect_event_id, intent_id, started_at, outcome, receipt_json)
-        VALUES (?, ?, ?, 'AMBIGUOUS', NULL)
+        INSERT INTO effects (effect_event_id, intent_id, started_at, start_status, outcome, receipt_json)
+        VALUES (?, ?, ?, 'UNKNOWN', 'AMBIGUOUS', NULL)
       `).run(eventId, intentId, now);
       const transition = this.makeTransition(before, eventId, now, "execution-claimed", "EXECUTING", "AMBIGUOUS", {
         approvalEventId: before.approvalEventId,
@@ -282,7 +310,57 @@ export class NotificationStore {
     });
   }
 
-  resetAfterAbsent(intentId: string, eventId: string, now: number): { intent: NotificationIntent; transition: TransitionRecord } {
+  assessEffectStart(
+    intentId: string,
+    eventId: string,
+    now: number,
+    startStatus: Exclude<EffectStartStatus, "UNKNOWN">,
+    reason: string,
+  ): { intent: NotificationIntent; transition: TransitionRecord | null } {
+    return this.transaction(() => {
+      const before = this.requireIntent(intentId);
+      if (before.controlState !== "EXECUTING" || !["AMBIGUOUS", "RECONCILING"].includes(before.effectState)) {
+        throw new StateConflictError("effect-start assessment requires an executing intent");
+      }
+      const latest = this.getLatestEffectClaimEvidence(intentId);
+      if (!latest) throw new StateConflictError("effect claim is missing");
+      if (latest.startStatus === "STARTED" && startStatus === "NOT_STARTED") {
+        throw new StateConflictError("a started effect cannot be downgraded to not started");
+      }
+      if (latest.startStatus === startStatus) return { intent: before, transition: null };
+      this.database.prepare("UPDATE effects SET start_status = ? WHERE effect_event_id = ?")
+        .run(startStatus, latest.eventId);
+      const transition = this.recordAttempt(before, eventId, now, "effect-start-assessed", {
+        fromStartStatus: latest.startStatus,
+        toStartStatus: startStatus,
+        reason,
+      });
+      return { intent: before, transition };
+    });
+  }
+
+  recordReplayStopped(
+    intentId: string,
+    eventId: string,
+    now: number,
+    details: Record<string, string | number | boolean | null>,
+  ): { intent: NotificationIntent; transition: TransitionRecord } {
+    return this.transaction(() => {
+      const before = this.requireIntent(intentId);
+      if (before.controlState !== "ABORTED" || before.effectState !== "CONFIRMED_ABSENT") {
+        throw new StateConflictError("replay evaluation requires ABORTED/CONFIRMED_ABSENT");
+      }
+      const transition = this.recordAttempt(before, eventId, now, "confirmed-absent-replay-stopped", details);
+      return { intent: before, transition };
+    });
+  }
+
+  resetAfterAbsent(
+    intentId: string,
+    eventId: string,
+    now: number,
+    details: Record<string, string | number | boolean | null>,
+  ): { intent: NotificationIntent; transition: TransitionRecord } {
     return this.transaction(() => {
       const before = this.requireIntent(intentId);
       if (before.controlState !== "ABORTED" || before.effectState !== "CONFIRMED_ABSENT") {
@@ -294,7 +372,15 @@ export class NotificationStore {
           approval_expires_at = NULL, updated_at = ?, revision = revision + 1
         WHERE intent_id = ?
       `).run(now, intentId);
-      const transition = this.makeTransition(before, eventId, now, "confirmed-absent-reproposed", "PROPOSED", "NOT_STARTED", {});
+      const transition = this.makeTransition(
+        before,
+        eventId,
+        now,
+        "confirmed-absent-reproposed-after-six-checks",
+        "PROPOSED",
+        "NOT_STARTED",
+        details,
+      );
       this.insertAttempt(transition);
       return { intent: this.requireIntent(intentId), transition };
     });
@@ -302,6 +388,14 @@ export class NotificationStore {
 
   countEffectClaims(intentId: string): number {
     const row = this.database.prepare("SELECT count(*) AS count FROM effects WHERE intent_id = ?").get(intentId) as { count: number };
+    return Number(row.count);
+  }
+
+  countEffectStarts(intentId: string): number {
+    const row = this.database.prepare(`
+      SELECT count(*) AS count FROM effects
+      WHERE intent_id = ? AND start_status != 'NOT_STARTED'
+    `).get(intentId) as { count: number };
     return Number(row.count);
   }
 

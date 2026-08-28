@@ -1,7 +1,6 @@
 {
   "artifact": "verifiable-offline-webmcp-agent-spec",
-  "validatedAt": "2026-08-28T14:29:29.313110Z",
-  "snapshotEventId": "01a048c7-747e-7be4-b140-f695551e713b",
+  "validatedAt": "2026-08-28T16:27:26.974564Z",
   "checks": {
     "structured_parse": true,
     "live_notification_evidence": true,
@@ -12,6 +11,7 @@
     "golden_vectors_python": true,
     "audit_chain_signatures": true,
     "merkle_checkpoint": true,
+    "offline_sync_evidence": true,
     "no_private_keys": true,
     "reachability_and_mutation": true,
     "typescript_tests": true,

@@ -36,8 +36,9 @@ status: "design-specification"
 
 ## Phase 4 — sync/audit
 
-- signed checkpoints、Merkle inclusion、fork detection。
-- conflict workflow。
+- ローカル参照実装: signed checkpoints、端末別鎖、global ingestion sequence、fork detectionを実装済み。
+- ローカル参照実装: 可換・冪等なタグ集合だけを統合し、外部効果を人の確認待ちへ隔離済み。
+- 遠隔transport、実機二台、長期運用測定は未実装または`UNMEASURED`。
 
 ## Phase 5 — calibration
 

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/signed-device-event.schema.json",
+  "title": "Offline Sync Signed Device Event 0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version", "eventId", "occurredAt", "occurredAtEpochMs", "logId", "deviceId",
+    "keyId", "sequence", "previousChainHash", "operation", "proof"
+  ],
+  "properties": {
+    "version": { "const": "0.4.0" },
+    "eventId": { "$ref": "#/$defs/uuidV7" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "occurredAtEpochMs": { "type": "integer", "minimum": 0 },
+    "logId": { "$ref": "#/$defs/uuidV5" },
+    "deviceId": { "$ref": "#/$defs/uuidV5" },
+    "keyId": { "$ref": "#/$defs/uuidV5" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "previousChainHash": { "$ref": "#/$defs/digest" },
+    "operation": { "$ref": "#/$defs/operation" },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "keyId", "eventDigest", "chainHash", "signatureBase64"],
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "keyId": { "$ref": "#/$defs/uuidV5" },
+        "eventDigest": { "$ref": "#/$defs/digest" },
+        "chainHash": { "$ref": "#/$defs/digest" },
+        "signatureBase64": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "operation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "setId", "tag"],
+          "properties": {
+            "type": { "const": "SAFE_TAG_ADD" },
+            "setId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+            "tag": { "type": "string", "minLength": 1, "maxLength": 120 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "intentId", "effectKind", "payloadDigest"],
+          "properties": {
+            "type": { "const": "DANGEROUS_EFFECT" },
+            "intentId": { "$ref": "#/$defs/uuidV5" },
+            "effectKind": { "enum": ["NOTIFICATION", "PAYMENT", "RESERVATION", "DELETION"] },
+            "payloadDigest": { "$ref": "#/$defs/digest" }
+          }
+        }
+      ]
+    }
+  }
+}

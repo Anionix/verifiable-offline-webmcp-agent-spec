@@ -18,6 +18,7 @@ from pathlib import Path
 import yaml
 from cryptography.hazmat.primitives import serialization
 from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
@@ -195,6 +196,9 @@ def main():
 
     # JSON Schema validation.
     schemas = {p.stem.replace(".schema", ""): load_json(p) for p in (ROOT / "schemas").glob("*.schema.json")}
+    schema_registry = Registry().with_resources(
+        (schema["$id"], Resource.from_contents(schema)) for schema in schemas.values()
+    )
     format_checker = FormatChecker()
     datasets = {
         "source": load_json(ROOT / "knowledge/sources.json")["records"],
@@ -233,6 +237,33 @@ def main():
         if line.strip():
             for e in timeline_validator.iter_errors(json.loads(line)):
                 errors.append(f"schema data/timeseries/design-events.ndjson:{n}: {e.message}")
+
+    sync_evidence = load_json(ROOT / "metadata/offline-sync-verification.json")
+    sync_evidence_validator = Draft202012Validator(
+        schemas["offline-sync-evidence"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in sync_evidence_validator.iter_errors(sync_evidence):
+        errors.append(f"schema metadata/offline-sync-verification.json: {e.message}")
+    signed_event_validator = Draft202012Validator(
+        schemas["signed-device-event"], registry=schema_registry, format_checker=format_checker
+    )
+    for n, line in enumerate((ROOT / sync_evidence["artifacts"]["deviceEvents"]).read_text(encoding="utf-8").splitlines(), 1):
+        if line.strip():
+            for e in signed_event_validator.iter_errors(json.loads(line)):
+                errors.append(f"schema {sync_evidence['artifacts']['deviceEvents']}:{n}: {e.message}")
+    ingestion_validator = Draft202012Validator(
+        schemas["sync-ingestion-record"], registry=schema_registry, format_checker=format_checker
+    )
+    for n, line in enumerate((ROOT / sync_evidence["artifacts"]["ingestionLedger"]).read_text(encoding="utf-8").splitlines(), 1):
+        if line.strip():
+            for e in ingestion_validator.iter_errors(json.loads(line)):
+                errors.append(f"schema {sync_evidence['artifacts']['ingestionLedger']}:{n}: {e.message}")
+    checkpoint_validator = Draft202012Validator(
+        schemas["signed-checkpoint"], registry=schema_registry, format_checker=format_checker
+    )
+    for device in sync_evidence["devices"]:
+        for e in checkpoint_validator.iter_errors(device["checkpoint"]):
+            errors.append(f"schema checkpoint/{device['deviceId']}: {e.message}")
     checks["json_schema"] = not errors
 
     # Source graph and cross-reference integrity.
@@ -324,6 +355,123 @@ def main():
     try: cp_pub.verify(base64.b64decode(checkpoint["signature"]["signatureBase64"]), b"TOOL-AUDIT-CHECKPOINT-v0.1\x00" + bytes.fromhex(cp_digest))
     except Exception as e: errors.append(f"checkpoint signature: {e}")
     checks["merkle_checkpoint"] = not errors
+
+    # Two-device offline sync evidence, independently verified in Python.
+    sync_start = len(errors)
+    sync_events_path = ROOT / sync_evidence["artifacts"]["deviceEvents"]
+    sync_ingestion_path = ROOT / sync_evidence["artifacts"]["ingestionLedger"]
+    sync_quarantine_path = ROOT / sync_evidence["artifacts"]["quarantineLedger"]
+    sync_events = [json.loads(line) for line in sync_events_path.read_text(encoding="utf-8").splitlines() if line]
+    sync_ingestion = [json.loads(line) for line in sync_ingestion_path.read_text(encoding="utf-8").splitlines() if line]
+    sync_quarantine = [json.loads(line) for line in sync_quarantine_path.read_text(encoding="utf-8").splitlines() if line]
+
+    for relative, expected in sync_evidence["artifacts"]["sha256"].items():
+        path = ROOT / relative
+        if not path.is_file() or sha256(path.read_bytes()) != expected:
+            errors.append(f"offline sync artifact digest mismatch: {relative}")
+
+    event_by_id = {}
+    safe_tags = set()
+    dangerous_sources = []
+    for device in sync_evidence["devices"]:
+        device_events = [event for event in sync_events if event["deviceId"] == device["deviceId"]]
+        if len(device_events) != device["eventCount"]:
+            errors.append(f"offline sync event count mismatch for {device['deviceId']}")
+            continue
+        public_key = serialization.load_pem_public_key((ROOT / device["publicKeyPath"]).read_bytes())
+        previous = sha256(
+            b"OFFLINE-SYNC-GENESIS-v0.4\x00"
+            + uuid.UUID(device["logId"]).bytes
+            + uuid.UUID(device["deviceId"]).bytes
+        )
+        digests = []
+        for expected_sequence, event in enumerate(device_events, 1):
+            if event["sequence"] != expected_sequence:
+                errors.append(f"offline sync device sequence mismatch for {device['deviceId']}")
+            if event["previousChainHash"] != previous:
+                errors.append(f"offline sync previous chain hash mismatch for {event['eventId']}")
+            if uuid7_ms(event["eventId"]) != event["occurredAtEpochMs"]:
+                errors.append(f"offline sync UUIDv7 time mismatch for {event['eventId']}")
+            core = {key: value for key, value in event.items() if key != "proof"}
+            digest = sha256(b"\x00" + canonical_bytes(core))
+            chain_hash = sha256(
+                b"\x01" + bytes.fromhex(previous) + bytes.fromhex(digest) + expected_sequence.to_bytes(8, "big")
+            )
+            if digest != event["proof"]["eventDigest"] or chain_hash != event["proof"]["chainHash"]:
+                errors.append(f"offline sync event digest or chain mismatch for {event['eventId']}")
+            message = (
+                b"OFFLINE-SYNC-EVENT-v0.4\x00"
+                + uuid.UUID(event["logId"]).bytes
+                + uuid.UUID(event["deviceId"]).bytes
+                + expected_sequence.to_bytes(8, "big")
+                + bytes.fromhex(chain_hash)
+            )
+            try: public_key.verify(base64.b64decode(event["proof"]["signatureBase64"]), message)
+            except Exception as exc: errors.append(f"offline sync event signature {event['eventId']}: {exc}")
+            operation = event["operation"]
+            if operation["type"] == "SAFE_TAG_ADD": safe_tags.add(operation["tag"])
+            else: dangerous_sources.append(event)
+            previous = chain_hash
+            digests.append(digest)
+            event_by_id[event["eventId"]] = event
+
+        sync_checkpoint = device["checkpoint"]
+        checkpoint_core = {key: value for key, value in sync_checkpoint.items() if key not in {"digest", "signature"}}
+        checkpoint_digest = sha256(b"\x00" + canonical_bytes(checkpoint_core))
+        if (
+            sync_checkpoint["treeSize"] != len(device_events)
+            or sync_checkpoint["chainHead"] != previous
+            or sync_checkpoint["merkleRoot"] != merkle_root(digests).hex()
+            or sync_checkpoint["digest"] != checkpoint_digest
+        ):
+            errors.append(f"offline sync checkpoint content mismatch for {device['deviceId']}")
+        try:
+            public_key.verify(
+                base64.b64decode(sync_checkpoint["signature"]["signatureBase64"]),
+                b"OFFLINE-SYNC-CHECKPOINT-v0.4\x00" + bytes.fromhex(checkpoint_digest),
+            )
+        except Exception as exc: errors.append(f"offline sync checkpoint signature {device['deviceId']}: {exc}")
+
+    previous_global = sha256(b"OFFLINE-SYNC-GLOBAL-v0.4\x00")
+    for expected_global, record in enumerate(sync_ingestion, 1):
+        source = event_by_id.get(record["sourceEventId"])
+        if (
+            record["globalSequence"] != expected_global
+            or record["previousGlobalHash"] != previous_global
+            or source is None
+            or source["proof"]["eventDigest"] != record["sourceEventDigest"]
+            or source["proof"]["chainHash"] != record["sourceChainHash"]
+            or source["sequence"] != record["deviceSequence"]
+        ):
+            errors.append(f"offline sync ingestion source/order mismatch at {expected_global}")
+        core = {key: value for key, value in record.items() if key != "globalHash"}
+        record_hash = sha256(b"\x02" + bytes.fromhex(previous_global) + canonical_bytes(core))
+        if record_hash != record["globalHash"]:
+            errors.append(f"offline sync global hash mismatch at {expected_global}")
+        expected_decision = "MERGED_SAFE_STATE" if record["operation"]["type"] == "SAFE_TAG_ADD" else "HUMAN_REVIEW_REQUIRED"
+        if record["decision"] != expected_decision:
+            errors.append(f"offline sync unsafe decision at {expected_global}")
+        previous_global = record_hash
+
+    observations = sync_evidence["observations"]
+    codes = {record["code"] for record in sync_quarantine}
+    required_codes = {"INVALID_SIGNATURE", "SEQUENCE_GAP", "FORK_DETECTED", "CHECKPOINT_MISMATCH"}
+    if codes != required_codes or any(record.get("externalEffectStarts") != 0 for record in sync_quarantine):
+        errors.append("offline sync quarantine evidence is incomplete or claims an external effect")
+    if sorted(safe_tags) != observations["safeTags"]:
+        errors.append("offline sync safe-state projection mismatch")
+    if len(sync_ingestion) != observations["globalIngestionCount"] or len(dangerous_sources) != observations["dangerousIntentSourceCount"]:
+        errors.append("offline sync ingestion or dangerous-source count mismatch")
+    if len({event["operation"]["intentId"] for event in dangerous_sources}) != observations["dangerousReviewCount"]:
+        errors.append("offline sync dangerous review grouping mismatch")
+    if observations["externalEffectStarts"] != 0 or sync_evidence["scope"]["actualNotifications"] != 0:
+        errors.append("offline sync evidence must prove zero external effect starts")
+    try:
+        evidence_event = uuid.UUID(sync_evidence["identity"]["uuidV7"])
+        if evidence_event.version != 7 or uuid7_ms(str(evidence_event)) != sync_evidence["temporal"]["epochMs"]:
+            raise ValueError("evidence UUIDv7 timestamp mismatch")
+    except Exception as exc: errors.append(f"offline sync evidence identity: {exc}")
+    checks["offline_sync_evidence"] = len(errors) == sync_start
 
     # No private key material.
     private_markers = ["BEGIN " + "PRIVATE KEY", "BEGIN OPENSSH " + "PRIVATE KEY", "PRIVATE " + "KEY-----"]

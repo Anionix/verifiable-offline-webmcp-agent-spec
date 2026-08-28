@@ -1,8 +1,23 @@
 import { createHash, randomBytes } from "node:crypto";
 
+const CANONICAL_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+function canonicalUuidBytes(value: string): Buffer {
+  if (!CANONICAL_UUID_PATTERN.test(value)) throw new TypeError("UUID must use canonical lowercase text");
+  return Buffer.from(value.replaceAll("-", ""), "hex");
+}
+
+export function isUuidVersion(value: string, version: 5 | 7): boolean {
+  try {
+    const bytes = canonicalUuidBytes(value);
+    return (bytes[6]! >> 4) === version && (bytes[8]! & 0xc0) === 0x80;
+  } catch {
+    return false;
+  }
+}
+
 export function uuidV5(namespace: string, name: string): string {
-  const ns = Buffer.from(namespace.replaceAll("-", ""), "hex");
-  if (ns.length !== 16) throw new TypeError("namespace must be UUID");
+  const ns = canonicalUuidBytes(namespace);
   const digest = createHash("sha1").update(ns).update(Buffer.from(name, "utf8")).digest();
   const bytes = digest.subarray(0, 16);
   bytes[6] = (bytes[6]! & 0x0f) | 0x50;
@@ -23,8 +38,8 @@ export function uuidV7(epochMs = Date.now()): string {
 }
 
 export function uuidV7EpochMs(value: string): number {
-  const b = Buffer.from(value.replaceAll("-", ""), "hex");
-  if (b.length !== 16 || (b[6]! >> 4) !== 7) throw new TypeError("not UUIDv7");
+  if (!isUuidVersion(value, 7)) throw new TypeError("not canonical UUIDv7");
+  const b = canonicalUuidBytes(value);
   let t = 0n;
   for (let i = 0; i < 6; i++) t = (t << 8n) | BigInt(b[i]!);
   return Number(t);

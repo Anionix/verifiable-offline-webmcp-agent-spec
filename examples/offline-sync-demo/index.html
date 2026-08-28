@@ -1,0 +1,110 @@
+<!doctype html>
+<!-- information_uuid_v5=57704908-5bd2-5d43-b3b8-bb51ba2f9502 event_uuid_v7=01a04921-8710-77b8-8fd1-1e0231245a76 machine-contract=OFFLINE_DIVERGENCE->SIGNATURE_VERIFIED->SAFE_UNION|HUMAN_REVIEW_REQUIRED -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>二端末オフライン同期 — 外部効果を勝手に統合しない</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23081422'/%3E%3Cpath d='M15 20h13v13H15zm21 11h13v13H36zM28 26h8m-4-4v13' fill='none' stroke='%235de0b2' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-device" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 17h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="icon-signature" viewBox="0 0 24 24"><path d="M4 16c3-5 5-8 6-8 2 0-1 8 2 8 1.4 0 2.2-3 3.4-3 1 0 .7 3 2 3 .8 0 1.6-.5 2.6-1.4M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-sync" viewBox="0 0 24 24"><path d="M5 8a8 8 0 0 1 13.5-2L21 8.5M19 16a8 8 0 0 1-13.5 2L3 15.5M21 4v4.5h-4.5M3 20v-4.5h4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-union" viewBox="0 0 24 24"><circle cx="9" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="icon-stop" viewBox="0 0 24 24"><path d="m12 3 8 4.5v6c0 4.1-3.3 6.7-8 8-4.7-1.3-8-3.9-8-8v-6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.5 15.5 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.2 12.2 2.5 2.5 5.4-5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow"><span class="live-dot"></span> 0.4.0 ・ ローカル参照実装</div>
+      <h1>オフラインで分かれても、<br><span>通知は勝手に二度走らない。</span></h1>
+      <p class="lead">二台の署名付き記録を再接続。安全なタグだけを合わせ、通知の意図は実行せず人の確認待ちに止めます。</p>
+      <div id="hero-proof" class="hero-proof" data-state="loading" role="status" aria-live="polite">
+        <div><strong id="intent-source-count">—</strong><span>通知の意図</span></div>
+        <span class="proof-arrow" aria-hidden="true">→</span>
+        <div class="zero-proof"><strong id="notification-count">—</strong><span>実通知</span></div>
+        <span class="proof-arrow" aria-hidden="true">→</span>
+        <div><strong id="review-count">—</strong><span>確認待ち</span></div>
+      </div>
+    </header>
+
+    <section class="panel flow-panel" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">再接続の流れ</p>
+          <h2 id="flow-title">署名を確かめてから、扱いを二つに分ける</h2>
+        </div>
+        <button id="replay" type="button" disabled>流れを再生</button>
+      </div>
+
+      <div id="sync-flow" class="sync-flow" data-step="0" data-state="loading">
+        <article id="device-a" class="flow-card device-card" data-state="idle">
+          <svg><use href="#icon-device"/></svg>
+          <div><span class="card-kicker">通信切断中</span><h3>端末A</h3><p><strong id="device-a-events">—</strong>件を端末内で署名</p></div>
+          <span class="status-badge" id="device-a-status">読込中</span>
+        </article>
+        <article id="device-b" class="flow-card device-card" data-state="idle">
+          <svg><use href="#icon-device"/></svg>
+          <div><span class="card-kicker">通信切断中</span><h3>端末B</h3><p><strong id="device-b-events">—</strong>件を端末内で署名</p></div>
+          <span class="status-badge" id="device-b-status">読込中</span>
+        </article>
+
+        <div class="connector connector-a" aria-hidden="true"><span></span></div>
+        <div class="connector connector-b" aria-hidden="true"><span></span></div>
+
+        <article id="verification-gate" class="flow-card verification-card" data-state="idle">
+          <svg><use href="#icon-signature"/></svg>
+          <div><span class="card-kicker">同期境界</span><h3>署名・連番・鎖を検証</h3><p><span id="ingestion-count">—</span>件へ全体取込順序を付与</p></div>
+          <span class="status-badge" id="verification-status">待機</span>
+        </article>
+
+        <div class="splitter" aria-hidden="true"><span>型で分岐</span></div>
+
+        <article id="safe-result" class="flow-card result-card safe-card" data-state="idle">
+          <svg><use href="#icon-union"/></svg>
+          <div><span class="card-kicker">安全な状態</span><h3>追加だけできる集合</h3><p id="safe-tags">まだ統合していません</p></div>
+          <span class="status-badge" id="safe-status">待機</span>
+        </article>
+        <article id="danger-result" class="flow-card result-card danger-card" data-state="idle">
+          <svg><use href="#icon-stop"/></svg>
+          <div><span class="card-kicker">外部効果</span><h3>通知は自動統合しない</h3><p>同じ論理操作を人の確認待ちへ隔離</p></div>
+          <span class="status-badge" id="danger-status">待機</span>
+        </article>
+      </div>
+      <p id="flow-announcer" class="sr-only" aria-live="polite">公開証拠を読み込んでいます。</p>
+    </section>
+
+    <section class="evidence-grid" aria-label="同期の検証証拠">
+      <article class="panel checkpoint-panel">
+        <div class="section-heading compact">
+          <div><p class="section-kicker">署名の読み戻し</p><h2>端末別チェックポイント</h2></div>
+          <svg class="heading-icon"><use href="#icon-signature"/></svg>
+        </div>
+        <div id="device-checkpoints" class="checkpoint-list"><p class="loading-copy">公開証拠を読込中…</p></div>
+      </article>
+
+      <article class="panel fault-panel">
+        <div class="section-heading compact">
+          <div><p class="section-kicker">停止できた異常</p><h2>四つの故障試験</h2></div>
+          <svg class="heading-icon"><use href="#icon-check"/></svg>
+        </div>
+        <ul id="fault-list" class="fault-list"><li>公開証拠を読込中…</li></ul>
+      </article>
+    </section>
+
+    <details class="panel technical-panel">
+      <summary>機械が照合した時系列記録</summary>
+      <pre id="technical-log">公開証拠を読込中…</pre>
+    </details>
+
+    <footer>
+      <p>この画面に通知を実行する操作はありません。遠隔通信は未実装、実端末の品質は <strong>UNMEASURED</strong>、ネイティブWebMCP適合は <strong>INCONCLUSIVE</strong> です。</p>
+    </footer>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

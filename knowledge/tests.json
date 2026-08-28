@@ -2997,21 +2997,21 @@
       "id": "TEST-SYNC-001",
       "identity": {
         "uuid_v5": "9925fdbd-3d2a-5107-9a25-44e524a79035",
-        "uuid_v7": "01a04291-bf33-79b0-a061-d70932676501",
+        "uuid_v7": "01a04925-5134-7fdb-9579-7bd52d8ed860",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "test-sync-001",
         "category": "test"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:03.059Z",
-        "updated_at": "2026-08-27T09:34:03.059Z",
-        "observed_at": "2026-08-27T09:34:03.059Z",
+        "updated_at": "2026-08-28T16:12:57.524Z",
+        "observed_at": "2026-08-28T16:12:57.524Z",
         "valid_from": "2026-08-27T09:34:03.059Z",
         "valid_to": null,
-        "epoch_ms": 1787823243059,
+        "epoch_ms": 1787933577524,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:03.059+09:00",
+        "local_rendering": "2026-08-29T01:12:57.524+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -3021,8 +3021,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: 各deviceはoffline中に独立したsigned sequenceを維持しなければならない。",
         "en": "Verifies the following requirement(s): Each device MUST maintain an independent signed sequence while offline."
@@ -3038,27 +3038,33 @@
         "SRC-RFC8032",
         "SRC-RFC9562"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/sync/device-log.ts",
+        "src/typescript/test/offline-sync.test.ts",
+        "schemas/signed-device-event.schema.json",
+        "schemas/signed-checkpoint.schema.json",
+        "metadata/offline-sync-verification.json"
+      ]
     },
     {
       "id": "TEST-SYNC-002",
       "identity": {
         "uuid_v5": "c8da4e2d-876b-5d9f-8869-f445227739ef",
-        "uuid_v7": "01a04291-bf34-7696-903b-96f45bff790e",
+        "uuid_v7": "01a04925-5164-72f8-9b6b-fe4d6ebaf746",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "test-sync-002",
         "category": "test"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:03.060Z",
-        "updated_at": "2026-08-27T09:34:03.060Z",
-        "observed_at": "2026-08-27T09:34:03.060Z",
+        "updated_at": "2026-08-28T16:12:57.572Z",
+        "observed_at": "2026-08-28T16:12:57.572Z",
         "valid_from": "2026-08-27T09:34:03.060Z",
         "valid_to": null,
-        "epoch_ms": 1787823243060,
+        "epoch_ms": 1787933577572,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:03.060+09:00",
+        "local_rendering": "2026-08-29T01:12:57.572+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -3068,8 +3074,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: server取り込み時にdevice sequenceを保持したままglobal sequenceを追加しなければならない。",
         "en": "Verifies the following requirement(s): Server ingestion MUST preserve device sequence while adding a global sequence."
@@ -3084,27 +3090,33 @@
       "source_refs": [
         "SRC-PROVO-2013"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/sync/synchronizer.ts",
+        "src/typescript/test/offline-sync.test.ts",
+        "schemas/sync-ingestion-record.schema.json",
+        "data/audit/offline-sync-ingestion.ndjson",
+        "metadata/offline-sync-verification.json"
+      ]
     },
     {
       "id": "TEST-SYNC-003",
       "identity": {
         "uuid_v5": "afdd7d35-bcbf-51c4-af82-039cbf32cfd5",
-        "uuid_v7": "01a04291-bf35-7eb0-b97b-464f64a4d494",
+        "uuid_v7": "01a04925-5194-7ca5-97e3-3442ebc9cf9f",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "test-sync-003",
         "category": "test"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:03.061Z",
-        "updated_at": "2026-08-27T09:34:03.061Z",
-        "observed_at": "2026-08-27T09:34:03.061Z",
+        "updated_at": "2026-08-28T16:12:57.620Z",
+        "observed_at": "2026-08-28T16:12:57.620Z",
         "valid_from": "2026-08-27T09:34:03.061Z",
         "valid_to": null,
-        "epoch_ms": 1787823243061,
+        "epoch_ms": 1787933577620,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:03.061+09:00",
+        "local_rendering": "2026-08-29T01:12:57.620+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -3114,8 +3126,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: CRDT mergeは可換で冪等な状態へ限定しなければならない。",
         "en": "Verifies the following requirement(s): CRDT merge MUST be limited to commutative, idempotent state."
@@ -3130,27 +3142,32 @@
       "source_refs": [
         "SRC-CRDT-2011"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/sync/synchronizer.ts",
+        "src/typescript/sync/simulation.ts",
+        "src/typescript/test/offline-sync.test.ts",
+        "metadata/offline-sync-verification.json"
+      ]
     },
     {
       "id": "TEST-SYNC-004",
       "identity": {
         "uuid_v5": "32e779b5-c957-50de-963e-79ba2291d957",
-        "uuid_v7": "01a04291-bf36-706f-8dbd-36f53c6a4bfc",
+        "uuid_v7": "01a04925-51c4-71b7-b495-18d3c56bd11c",
         "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
         "canonical_name": "test-sync-004",
         "category": "test"
       },
       "temporal": {
         "created_at": "2026-08-27T09:34:03.062Z",
-        "updated_at": "2026-08-27T09:34:03.062Z",
-        "observed_at": "2026-08-27T09:34:03.062Z",
+        "updated_at": "2026-08-28T16:12:57.668Z",
+        "observed_at": "2026-08-28T16:12:57.668Z",
         "valid_from": "2026-08-27T09:34:03.062Z",
         "valid_to": null,
-        "epoch_ms": 1787823243062,
+        "epoch_ms": 1787933577668,
         "time_zone": "UTC",
         "local_time_zone": "Asia/Tokyo",
-        "local_rendering": "2026-08-27T18:34:03.062+09:00",
+        "local_rendering": "2026-08-29T01:12:57.668+09:00",
         "precision": "millisecond",
         "standard": "RFC 3339 profile"
       },
@@ -3160,8 +3177,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: 支払い、送信、削除、予約など非可換副作用をCRDT mergeしてはならない。",
         "en": "Verifies the following requirement(s): Payments, sends, deletions, reservations, and other non-commutative effects MUST NOT be CRDT-merged."
@@ -3176,7 +3193,14 @@
       "source_refs": [
         "SRC-CRDT-2011"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/sync/synchronizer.ts",
+        "src/typescript/sync/simulation.ts",
+        "src/typescript/test/offline-sync.test.ts",
+        "src/typescript/test/offline-sync-visualization.test.js",
+        "data/audit/offline-sync-quarantine.ndjson",
+        "metadata/offline-sync-verification.json"
+      ]
     },
     {
       "id": "TEST-TIME-001",

@@ -8,6 +8,8 @@
     "check": "node --experimental-strip-types --test test/*.test.ts test/*.test.js",
     "typecheck": "tsc --noEmit",
     "demo:notification": "node --experimental-strip-types notification/demo-server.ts",
+    "demo:sync": "node --experimental-strip-types sync/demo-server.ts",
+    "evidence:sync": "node --experimental-strip-types sync/generate-evidence.ts",
     "benchmark:notification": "node --experimental-strip-types notification/benchmark.ts"
   },
   "engines": {

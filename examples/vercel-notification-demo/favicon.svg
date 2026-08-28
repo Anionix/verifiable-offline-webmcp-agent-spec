@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <!-- information_uuid_v5=2646e607-dced-5953-aad2-c8fc543389ca -->
+  <!-- event_uuid_v7=01a04a6d-4a8b-7e28-b53a-ad96ab11f8e9 state_transition=INLINE_ICON -> CACHEABLE_ICON occurred_at=2026-08-28T22:06:43Z -->
+  <!-- machine-contract: the icon is same-origin, cacheable, script-free, and carries no user data. -->
+  <title id="title">Verifiable notification bell</title>
+  <rect width="64" height="64" rx="15" fill="#07111f"/>
+  <path d="M18 45h28M22 27a10 10 0 0 1 20 0c0 11 5 13 5 13H17s5-2 5-13Z" fill="none" stroke="#47e0aa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

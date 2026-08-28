@@ -1,0 +1,156 @@
+<!doctype html>
+<!-- information_uuid_v5=e1b1806f-887a-521d-9e34-24f55036c447 -->
+<!-- event_uuid_v7=01a04a5f-5108-7da5-85b0-0edde298b712 -->
+<!-- event_uuid_v7=01a04a69-2b08-7b2d-b2f4-bf025dad5af7 state_transition=RESOURCE_REVIEWED -> JUDGE_GUIDE_PUBLISHED occurred_at=2026-08-28T22:06:43Z -->
+<!-- state_transition=DISCOVERED -> DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED occurred_at=2026-08-28T22:05:45.736Z -->
+<!-- machine-contract=WebMCP prepares a dry run; only the visible approval button can request permission and start at most one browser notification. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A WebMCP notification demo where agent input stops at a dry run, human approval starts at most one effect, and IndexedDB preserves auditable state offline.">
+  <meta name="theme-color" content="#07111f">
+  <title>Verifiable Offline WebMCP Notification Demo</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <nav class="topbar" aria-label="Project links">
+      <a class="brand" href="#top" aria-label="Verifiable Offline WebMCP Agent Architecture">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <span>Verifiable Offline WebMCP</span>
+      </a>
+      <a class="repo-link" href="https://github.com/Anionix/verifiable-offline-webmcp-agent-spec" target="_blank" rel="noreferrer">Source repository <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <header id="top" class="hero">
+      <div class="eyebrow">HUMAN + AGENT · LOCAL-FIRST · FAIL-CLOSED</div>
+      <h1>Ask an agent to prepare it.<br><span>You decide whether it happens.</span></h1>
+      <p class="hero-copy">WebMCP can prepare a duplicate-safe browser notification, but it cannot request permission or display anything. The person on this page owns the final click.</p>
+      <p class="hero-copy ja" lang="ja">エージェントは重複しない通知を準備できます。ただし、許可要求も表示もできません。最後に実行する権限は、この画面の人が持ちます。</p>
+      <div class="hero-proof" aria-label="Safety claim">
+        <strong>2 requests</strong><span aria-hidden="true">→</span><strong>1 intent</strong><span aria-hidden="true">→</span><strong>≤ 1 effect</strong>
+      </div>
+    </header>
+
+    <section class="runtime-strip" aria-label="Runtime verification status">
+      <div><span>WebMCP tool</span><strong id="tool-status" data-state="checking">CHECKING</strong></div>
+      <div><span>Local ledger</span><strong id="storage-status" data-state="checking">CHECKING</strong></div>
+      <div><span>Offline shell</span><strong id="offline-status" data-state="checking">CHECKING</strong></div>
+    </section>
+
+    <section class="agent-callout" aria-labelledby="agent-callout-title">
+      <div>
+        <span class="section-index">01</span>
+        <h2 id="agent-callout-title">Try it with an agent <small lang="ja">エージェントで試す</small></h2>
+      </div>
+      <p>Ask: <q>Prepare one notification for operation <code>judge-demo-001</code>, titled <code>Review ready</code>, saying <code>The evidence is ready to inspect.</code></q></p>
+      <p class="boundary-note">The <code>notify_once</code> tool writes only a dry run. The visible form below updates, then waits for you.</p>
+    </section>
+
+    <section class="workspace" aria-label="Notification preparation workspace">
+      <section class="panel composer" aria-labelledby="composer-title">
+        <div class="panel-heading">
+          <span class="section-index">02</span>
+          <div><h2 id="composer-title">Prepare a notification</h2><p lang="ja">通知内容を乾式確認する</p></div>
+        </div>
+
+        <label for="logical-operation">Logical operation ID <span lang="ja">論理操作識別子</span></label>
+        <input id="logical-operation" value="judge-demo-001" maxlength="128" autocomplete="off" spellcheck="false">
+
+        <label for="title">Notification title <span lang="ja">通知タイトル</span></label>
+        <input id="title" value="Review ready" maxlength="120" autocomplete="off">
+
+        <label for="body">Notification body <span lang="ja">通知本文</span></label>
+        <textarea id="body" maxlength="1000" rows="4">The evidence is ready to inspect.</textarea>
+
+        <div class="actions" aria-label="Notification controls">
+          <button id="preview" class="secondary" type="button"><span>1</span> Store dry run <small>乾式実行</small></button>
+          <button id="approve" type="button" disabled><span>2</span> Approve one notification <small>1件を承認</small></button>
+          <button id="retry" class="secondary" type="button" disabled><span>3</span> Retry same operation <small>同じ操作を再試行</small></button>
+          <button id="reconcile" class="secondary" type="button" disabled>Check without retry <small>再送せず照合</small></button>
+        </div>
+      </section>
+
+      <section class="panel ledger" aria-labelledby="ledger-title">
+        <div class="panel-heading">
+          <span class="section-index">03</span>
+          <div><h2 id="ledger-title">Machine-readable state</h2><p lang="ja">機械が追える現在状態</p></div>
+        </div>
+
+        <div id="result-card" class="result-card" data-state="idle" role="status" aria-live="polite">
+          <span>Effect-start ledger <small lang="ja">外部効果開始台帳</small></span>
+          <strong id="effect-count">0</strong>
+          <p id="result-label">No intent yet / Intent未作成</p>
+        </div>
+
+        <dl class="state-grid">
+          <div><dt>Intent ID</dt><dd id="intent-id">—</dd></div>
+          <div><dt>Control state <small lang="ja">制御状態</small></dt><dd id="control-state">DISCOVERED</dd></div>
+          <div><dt>Effect state <small lang="ja">外部効果状態</small></dt><dd id="effect-state">NOT_STARTED</dd></div>
+          <div><dt>Input evidence <small lang="ja">入力証拠</small></dt><dd id="provenance">—</dd></div>
+          <div><dt>Audit head <small lang="ja">監査末尾</small></dt><dd id="audit-head">—</dd></div>
+        </dl>
+      </section>
+    </section>
+
+    <section class="flow-section" aria-labelledby="flow-title">
+      <div class="section-heading-wide">
+        <span class="section-index">04</span>
+        <div><h2 id="flow-title">The authority boundary is visible</h2><p lang="ja">誰がどこまで進めるかを画面に出す</p></div>
+      </div>
+      <ol class="flow">
+        <li id="step-input" data-state="idle"><span>1</span><div><strong>Strict input</strong><small>Waiting / 待機</small></div></li>
+        <li id="step-dry-run" data-state="idle"><span>2</span><div><strong>Local dry run</strong><small>Waiting / 待機</small></div></li>
+        <li id="step-approval" data-state="idle"><span>3</span><div><strong>Human approval</strong><small>Human only / 人だけ</small></div></li>
+        <li id="step-effect" data-state="idle"><span>4</span><div><strong>One effect</strong><small>Not started / 未開始</small></div></li>
+      </ol>
+      <p id="message" class="message" data-state="info" role="status" aria-live="polite">Use the agent tool or store a dry run. No permission has been requested. / エージェント経路または乾式実行を使ってください。通知許可はまだ求めていません。</p>
+    </section>
+
+    <section class="evidence-section" aria-labelledby="evidence-title">
+      <div class="section-heading-wide">
+        <span class="section-index">05</span>
+        <div><h2 id="evidence-title">What is actually verified</h2><p lang="ja">確認できたことだけを表示する</p></div>
+      </div>
+      <div class="evidence-grid">
+        <article><strong>Deterministic identity</strong><p>The logical operation derives a UUIDv5 intent ID.</p><small lang="ja">同じ論理操作は同じIntentになります。</small></article>
+        <article><strong>Time-ordered evidence</strong><p>Every state change receives a UUIDv7 event and hash-chain link.</p><small lang="ja">状態変化を時系列で追えます。</small></article>
+        <article><strong>Offline after first visit</strong><p>The shell is cached; intent and audit state stay in IndexedDB.</p><small lang="ja">初回表示後は端末内で動作します。</small></article>
+        <article><strong>Fail closed</strong><p>An unknown result consumes the one-effect budget and blocks retry.</p><small lang="ja">結果不明なら1件として数え、再送を止めます。</small></article>
+      </div>
+    </section>
+
+    <section class="judge-section" aria-labelledby="judge-title">
+      <div class="section-heading-wide">
+        <span class="section-index">06</span>
+        <div><h2 id="judge-title">Verify it in three checks</h2><p lang="ja">審査時は3項目だけ確認</p></div>
+      </div>
+      <ol class="judge-checks">
+        <li><strong>Find one tool.</strong><span>Open this page in ChatGPT’s in-app browser, or Chrome with WebMCP testing enabled. The available tool must be <code>notify_once</code>.</span></li>
+        <li><strong>Run the shown prompt.</strong><span>The page must reach <code>DRY_RUN / NOT_STARTED</code>, show effect count <code>0</code>, and enable the human approval button.</span></li>
+        <li><strong>Repeat the operation.</strong><span>The UUIDv5 intent stays the same. No automatic notification is allowed; the effect-start count can never exceed <code>1</code>.</span></li>
+      </ol>
+      <p class="evaluation-note"><strong>Evidence boundary:</strong> deterministic build checks pass locally. Model-choice accuracy is <code>UNMEASURED</code>; the repeatable cases are published in <a href="/webmcp-evals.json">webmcp-evals.json</a>.</p>
+      <div class="resource-links" aria-label="Primary verification resources">
+        <a href="https://developer.chrome.com/docs/devtools/application/webmcp" target="_blank" rel="noreferrer">Chrome WebMCP panel <span aria-hidden="true">↗</span></a>
+        <a href="https://developer.chrome.com/docs/ai/webmcp/evals" target="_blank" rel="noreferrer">Evaluation guidance <span aria-hidden="true">↗</span></a>
+        <a href="https://webmachinelearning.github.io/webmcp/" target="_blank" rel="noreferrer">Draft specification <span aria-hidden="true">↗</span></a>
+        <a href="https://webmcp.devpost.com/resources" target="_blank" rel="noreferrer">Challenge resources <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <details class="technical-log">
+      <summary>Inspect UUIDv7 events and hash chain <span lang="ja">時系列イベントとハッシュ鎖を見る</span></summary>
+      <pre id="event-log">No local events yet. / 端末内イベントはまだありません。</pre>
+    </details>
+
+    <footer>
+      <p><strong>Boundary:</strong> this deployed demo uses browser IndexedDB, not the repository’s SQLite reference server. It makes no claim about production availability, cross-device synchronization, or universal browser support.</p>
+      <p lang="ja"><strong>境界:</strong> 公開デモはブラウザーのIndexedDBを使い、リポジトリのSQLite参照サーバーとは分離しています。本番品質、端末間同期、全ブラウザー対応は主張しません。</p>
+    </footer>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

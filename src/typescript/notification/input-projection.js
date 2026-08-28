@@ -1,6 +1,7 @@
 // @ts-check
 // information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
 // event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
+// event_uuid_v7=01a04a69-2b03-7076-9df4-0d14afb3349a state_transition=STRICT_SCHEMA -> EVALUATION_READY occurred_at=2026-08-28T22:06:43Z
 // machine-contract: RECEIVED -> STRICTLY_PROJECTED -> DRY_RUN; rejection happens before form, SQLite, audit, permission, or notification mutation.
 
 const FIELD_NAMES = Object.freeze(["logicalOperationId", "title", "body"]);
@@ -19,18 +20,21 @@ export const NOTIFICATION_TOOL_INPUT_SCHEMA = Object.freeze({
       minLength: 1,
       maxLength: 128,
       pattern: "^[A-Za-z0-9._:@/-]+$",
+      description: "Stable caller-chosen ID for one desired notification. Reuse it only when retrying that same logical operation; choose a new ID for a different notification.",
     }),
     title: Object.freeze({
       type: "string",
       minLength: 1,
       maxLength: 120,
       pattern: "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$",
+      description: "Human-visible notification title. It is stored as untrusted literal text and does not grant permission or approval.",
     }),
     body: Object.freeze({
       type: "string",
       minLength: 1,
       maxLength: 1000,
       pattern: "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$",
+      description: "Human-visible notification body. It is stored as untrusted literal text and cannot instruct the page to start an effect.",
     }),
   }),
 });

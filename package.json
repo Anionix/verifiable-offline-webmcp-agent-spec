@@ -5,6 +5,8 @@
   "type": "module",
   "description": "Verifiable Offline WebMCP Agent Architecture",
   "scripts": {
+    "build:vercel": "node scripts/build_vercel_site.mjs",
+    "validate:vercel": "npm run build:vercel && node scripts/validate_vercel_site.mjs",
     "validate": "make validate",
     "test": "make validate"
   }

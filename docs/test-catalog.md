@@ -9,15 +9,16 @@ offline_sync_event_uuid_v7: "01a04927-4698-7f6a-b5e9-ef8bd558913c"
 online_planner_event_uuid_v7: "01a04948-c160-7283-a380-4f7db4ccb041"
 security_boundary_event_uuid_v7: "01a04967-af58-7fee-af26-3701238950ec"
 replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
+slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
 generated_at: "2026-08-27T09:34:04.000Z"
-updated_at: "2026-08-28T17:50:53.255Z"
+updated_at: "2026-08-28T18:41:14.617Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 61 / partially implemented 6 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, untrusted-data handling, six fresh replay checks, independent readback, and claim-versus-truth separation. The remaining six tests cover runtime service-level calibration.
+**Total / 合計:** 67 tests — implemented 67 / partially implemented 0 / specified 0. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The governance boundary now covers discovery, contract lookup, approval binding, signed mandates, host policy, consent, secret rejection, capability narrowing, untrusted-data handling, six fresh replay checks, independent readback, claim-versus-truth separation, and six hard operational-quality gates. The six operational-quality records use deterministic synthetic evidence; production quality remains `UNMEASURED`.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
@@ -74,12 +75,12 @@ status: "design-specification"
 | `TEST-SEC-007` | security-policy-test | implemented | yes | REQ-SEC-003 |
 | `TEST-SEC-008` | security-policy-test | implemented | yes | REQ-SEC-004 |
 | `TEST-SEC-009` | security-policy-test | implemented | yes | REQ-SEC-008 |
-| `TEST-SLO-001` | stochastic-mathematical-check | partially-implemented | yes | REQ-SYNC-005 |
-| `TEST-SLO-002` | stochastic-mathematical-check | partially-implemented | yes | REQ-SYNC-006 |
-| `TEST-SLO-003` | stochastic-mathematical-check | partially-implemented | yes | REQ-VERIFY-002 |
-| `TEST-SLO-004` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-001 |
-| `TEST-SLO-005` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-002 |
-| `TEST-SLO-006` | stochastic-mathematical-check | partially-implemented | yes | REQ-SLO-003 |
+| `TEST-SLO-001` | stochastic-mathematical-check | implemented | yes | REQ-SYNC-005 |
+| `TEST-SLO-002` | stochastic-mathematical-check | implemented | yes | REQ-SYNC-006 |
+| `TEST-SLO-003` | stochastic-mathematical-check | implemented | yes | REQ-VERIFY-002 |
+| `TEST-SLO-004` | stochastic-mathematical-check | implemented | yes | REQ-SLO-001 |
+| `TEST-SLO-005` | stochastic-mathematical-check | implemented | yes | REQ-SLO-002 |
+| `TEST-SLO-006` | stochastic-mathematical-check | implemented | yes | REQ-SLO-003 |
 | `TEST-SYNC-001` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-001 |
 | `TEST-SYNC-002` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-002 |
 | `TEST-SYNC-003` | offline-sync-scenario-test | implemented | yes | REQ-SYNC-003 |

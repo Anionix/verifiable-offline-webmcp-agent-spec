@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: validate regenerate test-ts typecheck model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner
+.PHONY: validate regenerate test-ts typecheck model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner evidence-slo
 
 export UV_CACHE_DIR ?= $(CURDIR)/.local/uv-cache
 
@@ -38,3 +38,6 @@ demo-planner:
 
 evidence-planner:
 	cd src/typescript && npm run evidence:planner
+
+evidence-slo:
+	cd src/typescript && npm run evidence:slo

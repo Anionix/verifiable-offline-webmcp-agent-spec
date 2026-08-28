@@ -12,8 +12,9 @@ replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
 replay_browser_event_uuid_v7: "01a04987-5d7c-7ebe-9208-c468f5c24ebf"
 effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
 effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
+slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T18:13:00.135Z"
+updated_at: "2026-08-28T18:41:14.617Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -62,7 +63,8 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 11. [`docs/16-webmcp-provenance-adapter.ja.md`](docs/16-webmcp-provenance-adapter.ja.md) — isolated draft adapter and durable provenance / 専用アダプターと来歴読み戻し
 12. [`docs/17-offline-sync-reference.ja.md`](docs/17-offline-sync-reference.ja.md) — signed two-device reconciliation with dangerous-effect quarantine / 署名付き二端末同期と危険な外部効果の隔離
 13. [`docs/18-online-planner-reference.ja.md`](docs/18-online-planner-reference.ja.md) — optional candidate planner with tool, privacy, cost, latency, and authority boundaries / 道具・情報・費用・遅延・権限を制限した任意計画器
-14. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
+14. [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md) — six hard operational-quality gates with deterministic counterexamples / 6つの運用品質判定と固定した反例
+15. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 
 ## Machine-readable assets / 機械可読asset
 
@@ -75,7 +77,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
 - `MANIFEST.sha256` — artifact integrity manifest
 
-The first two 1.0.0 governance slices have promoted 17 security, contract, replay, and verification records. The catalog currently contains **61 implemented and 6 partially implemented tests**. Critical commit tools remain inside policy control; replay requires six fresh checks; and an external effect needs independent readback rather than a tool claim alone. The remaining six records concern measured service-level calibration. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), and [`docs/test-catalog.md`](docs/test-catalog.md).
+The first three 1.0.0 governance slices have promoted 23 security, contract, replay, verification, and operational-quality records. The catalog now contains **67 implemented tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), and [`docs/test-catalog.md`](docs/test-catalog.md).
 
 ## Validation / 検証
 
@@ -129,6 +131,17 @@ make demo-planner
 ```
 
 Open `http://127.0.0.1:4175`. The read-only screen shows one simulated candidate ending at a hard boundary before approval and external effect. Thirteen deterministic scenarios produced actual network requests `0`, actual spend `0`, authorization `0`, external effects `0`, and automatic retries `0`. Live Responses API conformance remains `INCONCLUSIVE`; current production pricing and quality are `UNMEASURED`. See [`metadata/online-planner-verification.json`](metadata/online-planner-verification.json) and [`docs/18-online-planner-reference.ja.md`](docs/18-online-planner-reference.ja.md).
+
+## Operational-quality gate evidence / 運用品質判定の証拠
+
+Six hard gates check service capacity, Little's queueing relation, validation-data calibration, probability-mass conservation, bad-commit and duplicate-effect limits, and synthetic-versus-measured provenance separation. Any failed gate returns `STOP`; a high objective score cannot override either probability limit, and model self-reported confidence is never used.
+
+```bash
+make evidence-slo
+make validate
+```
+
+The public evidence is a deterministic synthetic fixture with six passing gates and fixed failing counterexamples. It generated no runtime measurement, external effect, or external spend. Production availability, latency, calibration, bad-commit probability, and duplicate-effect probability remain `UNMEASURED`. See [`metadata/slo-gate-verification.json`](metadata/slo-gate-verification.json) and [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md).
 
 ## Primary-source posture / 一次情報源の扱い
 

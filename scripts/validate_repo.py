@@ -597,6 +597,86 @@ def main():
         errors.append(f"online planner evidence identity: {exc}")
     checks["online_planner_evidence"] = len(errors) == planner_start
 
+    # information_uuid_v5=c91d4db5-468a-5f4d-8a54-710c0f5c5177
+    # event_uuid_v7=01a049ad-1379-780b-9344-3df2682e855c
+    # state_transition=EXECUTING -> VERIFIED_SYNTHETIC occurred_at=2026-08-28T18:41:14.617Z
+    # machine-contract: six synthetic PASS records prove gate behavior only; they cannot become a measured-production claim.
+    slo_start = len(errors)
+    slo_evidence = load_json(ROOT / "metadata/slo-gate-verification.json")
+    expected_slo_tests = [f"TEST-SLO-{number:03d}" for number in range(1, 7)]
+    try:
+        slo_input_path = ROOT / slo_evidence["artifacts"]["input"]
+        if not slo_input_path.is_file() or sha256(slo_input_path.read_bytes()) != slo_evidence["artifacts"]["inputSha256"]:
+            errors.append("SLO gate input digest mismatch")
+
+        slo_event = uuid.UUID(slo_evidence["identity"]["uuidV7"])
+        slo_information = uuid.UUID(slo_evidence["identity"]["uuidV5"])
+        evaluated_at = int(datetime.fromisoformat(
+            slo_evidence["temporal"]["evaluatedAt"].replace("Z", "+00:00")
+        ).timestamp() * 1000)
+        if (
+            slo_event.version != 7
+            or slo_information.version != 5
+            or uuid7_ms(str(slo_event)) != slo_evidence["temporal"]["evaluatedAtEpochMs"]
+            or evaluated_at != slo_evidence["temporal"]["evaluatedAtEpochMs"]
+        ):
+            errors.append("SLO gate evidence identity or RFC 3339 time mismatch")
+
+        evaluation = slo_evidence["evaluation"]
+        gates = evaluation["gates"]
+        if (
+            slo_evidence["status"] != "VERIFIED_SYNTHETIC"
+            or evaluation["decision"] != "PASS"
+            or evaluation["evidenceClass"] != "SYNTHETIC"
+            or evaluation["selfReportedConfidenceUsed"] is not False
+            or [item["testId"] for item in gates] != expected_slo_tests
+            or any(item["status"] != "PASS" or item["reasons"] for item in gates)
+            or slo_evidence["testIds"] != expected_slo_tests
+            or evaluation["identity"] != slo_evidence["identity"]
+            or evaluation["temporal"] != slo_evidence["temporal"]
+            or set(evaluation["sourceRefs"]) != set(slo_evidence["sourceRefs"])
+            or not set(evaluation["sourceRefs"]).issubset(sources)
+        ):
+            errors.append("SLO gate evidence does not contain exactly six bound synthetic PASS results")
+
+        evidence_state = slo_evidence["evidenceState"]
+        scope = slo_evidence["scope"]
+        if (
+            evidence_state["deterministicSyntheticFixture"] != "CONFIRMED"
+            or evidence_state["productionRuntimeQuality"] != "UNMEASURED"
+            or evidence_state["modelSelfReportedConfidenceUsed"] is not False
+            or evidence_state["syntheticMeasuredMixing"] != "CONFIRMED_ABSENT"
+            or scope["actualRuntimeMeasurements"] != 0
+            or scope["actualExternalEffects"] != 0
+            or scope["actualExternalSpendYen"] != 0
+        ):
+            errors.append("SLO synthetic evidence overclaims measurements, effects, spend, or confidence use")
+
+        slo_records = {
+            record["id"]: record
+            for record in datasets["test"]
+            if record["id"] in expected_slo_tests
+        }
+        required_artifacts = {
+            "data/slo-gate-input.synthetic.json",
+            "metadata/slo-gate-verification.json",
+            "src/typescript/governance/slo-gates.ts",
+            "src/typescript/slo/generate-evidence.ts",
+            "src/typescript/test/slo-gates.test.ts",
+            "docs/19-slo-gate-reference.ja.md",
+            "formal/wolfram/ReferenceModel.wl",
+        }
+        if (
+            set(slo_records) != set(expected_slo_tests)
+            or any(record["implementation_status"] != "implemented" for record in slo_records.values())
+            or any(record["automated"] is not True for record in slo_records.values())
+            or any(not required_artifacts.issubset(record["automation_artifacts"]) for record in slo_records.values())
+        ):
+            errors.append("SLO test catalog is not fully implemented or lacks required automation artifacts")
+    except Exception as exc:
+        errors.append(f"SLO gate evidence structure: {exc}")
+    checks["slo_gate_evidence"] = len(errors) == slo_start
+
     # No private key material.
     private_markers = ["BEGIN " + "PRIVATE KEY", "BEGIN OPENSSH " + "PRIVATE KEY", "PRIVATE " + "KEY-----"]
     for p in ROOT.rglob("*"):

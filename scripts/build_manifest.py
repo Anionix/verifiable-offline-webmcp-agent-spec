@@ -13,6 +13,7 @@ NAMESPACE = uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb")
 MANIFEST_NAME = "MANIFEST.sha256"
 CATALOG_PATH = "metadata/file-catalog.json"
 EXCLUDED_PARTS = {".git", ".jj", ".local", ".venv", "node_modules", "__pycache__"}
+EXCLUDED_FILES = {".DS_Store", "results.sarif"}
 MEDIA_TYPES = {
     ".css": "text/css",
     ".html": "text/html",
@@ -86,7 +87,7 @@ def source_paths() -> list[Path]:
         if not path.is_file() or any(part in EXCLUDED_PARTS for part in path.parts):
             continue
         relative = path.relative_to(ROOT).as_posix()
-        if relative in {MANIFEST_NAME, CATALOG_PATH} or path.name == ".DS_Store":
+        if relative in {MANIFEST_NAME, CATALOG_PATH} or path.name in EXCLUDED_FILES:
             continue
         paths.append(path)
     return sorted(paths, key=lambda item: item.relative_to(ROOT).as_posix())

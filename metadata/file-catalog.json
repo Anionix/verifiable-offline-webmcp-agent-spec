@@ -129,8 +129,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "6dfe47381811e7bd107a26057e2fde5216484c305ecea0c11ed277b72eec523f",
-      "bytes": 2168,
+      "sha256": "215ba7a1695bdfd9267ef0222ba3836af84dba3b3fb9a2600949c4f99208862a",
+      "bytes": 2193,
       "mediaType": "application/yaml",
       "category": ".github",
       "identity": {
@@ -2886,8 +2886,8 @@
     },
     {
       "path": "scripts/build_manifest.py",
-      "sha256": "d0ffbcbb4eb56d3a4e208a5c6bf7f3dfd9bdde0faa7aa796005463d70e1f270c",
-      "bytes": 8221,
+      "sha256": "be79b964246058d50e8c523c9feea557f598b81a7394abd0766fc02eef5cac0f",
+      "bytes": 8272,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

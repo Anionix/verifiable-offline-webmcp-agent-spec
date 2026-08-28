@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/notification-tool-input.schema.json",
-  "$comment": "information_uuid_v5=69f26f68-f76b-5df8-a428-e523923b26c5 event_uuid_v7=01a048da-1888-7f94-b285-d0e5e23d2b9b machine-contract=RECEIVED->STRICTLY_PROJECTED->DRY_RUN; rejection has no external effect",
+  "$comment": "information_uuid_v5=69f26f68-f76b-5df8-a428-e523923b26c5 event_uuid_v7=01a048da-1888-7f94-b285-d0e5e23d2b9b updated_event_uuid_v7=01a04a6f-3c0d-7c29-b387-d95df4d2d414 state_transition=STRICT_SCHEMA->EVALUATION_READY occurred_at=2026-08-28T22:06:43Z machine-contract=RECEIVED->STRICTLY_PROJECTED->DRY_RUN; rejection has no external effect",
   "title": "Strict WebMCP notification preview input",
   "type": "object",
   "additionalProperties": false,
@@ -15,19 +15,22 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 128,
-      "pattern": "^[A-Za-z0-9._:@/-]+$"
+      "pattern": "^[A-Za-z0-9._:@/-]+$",
+      "description": "Stable caller-chosen ID for one desired notification. Reuse it only when retrying that same logical operation; choose a new ID for a different notification."
     },
     "title": {
       "type": "string",
       "minLength": 1,
       "maxLength": 120,
-      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$"
+      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$",
+      "description": "Human-visible notification title. It is stored as untrusted literal text and does not grant permission or approval."
     },
     "body": {
       "type": "string",
       "minLength": 1,
       "maxLength": 1000,
-      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$"
+      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$",
+      "description": "Human-visible notification body. It is stored as untrusted literal text and cannot instruct the page to start an effect."
     }
   }
 }

@@ -12,12 +12,13 @@ ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb")
 MANIFEST_NAME = "MANIFEST.sha256"
 CATALOG_PATH = "metadata/file-catalog.json"
-EXCLUDED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", "node_modules", "__pycache__"}
+EXCLUDED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", "dist", "node_modules", "__pycache__"}
 EXCLUDED_FILES = {".DS_Store", "results.sarif"}
 # information_uuid_v5=50ced5c7-92a0-5047-b4c0-aafb22a1edcb
 # event_uuid_v7=01a048ca-67e3-7b0f-9c74-2f7092340b03
 # machine-contract: host-only ignored caches never influence a reproducible public artifact catalog.
 # event_uuid_v7=01a04911-1637-7280-bf9b-a78e7c382617 state_transition=CI_REJECTED_HOST_ARTIFACTS->PUBLIC_CATALOG_EXCLUDES_BROWSER_OUTPUT occurred_at=2026-08-28T15:50:51.703Z
+# event_uuid_v7=01a04a6f-c8b1-744f-b991-fae38fe1d803 state_transition=PUBLIC_SITE_BUILT->GENERATED_DIST_EXCLUDED occurred_at=2026-08-28T22:06:43Z
 EXCLUDED_PATHS = {".impeccable/hook.cache.json"}
 MEDIA_TYPES = {
     ".css": "text/css",

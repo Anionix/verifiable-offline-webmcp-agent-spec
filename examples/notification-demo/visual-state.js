@@ -4,6 +4,9 @@
 // information_uuid_v5=3e9850eb-3a15-5818-9be6-b4e275a02073
 // event_uuid_v7=01a048c5-b3e2-7c15-9299-e9d55ac1a8c0
 // machine-contract: a confirmed-present or already-verified state requires exactly one measured effect claim.
+// information_uuid_v5=cbeb5a00-12c7-5557-a8ec-c50cd3765001
+// event_uuid_v7=01a048da-1888-7be0-9eef-3e1d0cadd1b1
+// machine-contract: WebMCP input visibly advances RECEIVED -> STRICTLY_PROJECTED -> DRY_RUN, while rejection stops before intent creation.
 
 const DEFAULT_STATE = Object.freeze({
   phase: "idle",
@@ -26,8 +29,97 @@ const DEFAULT_STATE = Object.freeze({
   announcement: "乾式実行を開始してください。",
 });
 
+const INPUT_BOUNDARY_DEFAULT_STATE = Object.freeze({
+  phase: "idle",
+  phaseText: "待機",
+  receivedState: "idle",
+  receivedText: "WebMCP呼び出しを待機",
+  validationState: "idle",
+  validationText: "未検査",
+  dryRunState: "idle",
+  dryRunText: "通知権限には進みません",
+  announcement: "WebMCP入力を待っています。",
+});
+
 export function createVisualState() {
   return { ...DEFAULT_STATE };
+}
+
+export function createInputBoundaryState() {
+  return { ...INPUT_BOUNDARY_DEFAULT_STATE };
+}
+
+export function reduceInputBoundaryState(previous, event) {
+  const state = previous ?? createInputBoundaryState();
+  switch (event.type) {
+    case "RESET_INPUT_BOUNDARY":
+      return createInputBoundaryState();
+    case "INPUT_RECEIVED":
+      return {
+        ...state,
+        phase: "received",
+        phaseText: "受信",
+        receivedState: "active",
+        receivedText: "値を受信しました",
+        validationState: "idle",
+        validationText: "厳格検査を開始",
+        dryRunState: "idle",
+        dryRunText: "まだ通していません",
+        announcement: "WebMCP入力を受信し、厳格検査を開始しました。",
+      };
+    case "INPUT_ACCEPTED":
+      return {
+        ...state,
+        phase: "accepted",
+        phaseText: "検査合格",
+        receivedState: "success",
+        receivedText: "3項目だけを受信",
+        validationState: "success",
+        validationText: "型・文字・長さを確認",
+        dryRunState: "active",
+        dryRunText: "乾式実行へ送信中",
+        announcement: "入力は厳格検査に合格し、乾式実行へ進みました。",
+      };
+    case "DRY_RUN_COMPLETED":
+      return {
+        ...state,
+        phase: "dry-run",
+        phaseText: "乾式実行済み",
+        receivedState: "success",
+        receivedText: "3項目だけを受信",
+        validationState: "success",
+        validationText: "型・文字・長さを確認",
+        dryRunState: "success",
+        dryRunText: "DRY_RUN / NOT_STARTED",
+        announcement: "WebMCP入力は乾式実行だけへ到達しました。通知はまだありません。",
+      };
+    case "DRY_RUN_FAILED":
+      return {
+        ...state,
+        phase: "failed",
+        phaseText: "停止",
+        receivedState: "success",
+        validationState: "success",
+        dryRunState: "error",
+        dryRunText: "結果を確認できません",
+        announcement: "入力検査後の乾式実行を停止しました。実通知は開始していません。",
+      };
+    case "INPUT_REJECTED":
+      return {
+        ...state,
+        phase: "rejected",
+        phaseText: "拒否",
+        receivedState: "success",
+        receivedText: "値を受信しました",
+        validationState: "error",
+        validationText: event.message,
+        dryRunState: "blocked",
+        dryRunText: "Intentを作らず停止",
+        announcement: `WebMCP入力を拒否しました。${event.message}。Intentと通知は作成していません。`,
+      };
+    default:
+      throw new TypeError(`unknown input-boundary event: ${event.type}`);
+  }
 }
 
 function measuredCount(value) {

@@ -1,0 +1,96 @@
+{
+  "id": "EVID-WEBMCP-INPUT-BOUNDARY-001",
+  "identity": {
+    "uuid_v5": "b47f35a1-96f8-5c1e-9fbb-33ce7233b175",
+    "uuid_v7": "01a048e8-9b29-7f4c-af71-32eaff3519be",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "webmcp-input-boundary",
+    "category": "browser-verification"
+  },
+  "temporal": {
+    "observed_at": "2026-08-28T15:06:38.761Z",
+    "epoch_ms": 1787929598761,
+    "time_zone": "UTC",
+    "local_time_zone": "Asia/Tokyo",
+    "local_rendering": "2026-08-29T00:06:38.761+09:00",
+    "precision": "millisecond",
+    "standard": "RFC 3339 profile"
+  },
+  "state": "BROWSER_VERIFIED",
+  "evidence_state": {
+    "strict_input_projection": "CONFIRMED",
+    "rejection_without_intent_or_audit_mutation": "CONFIRMED",
+    "dry_run_only_result": "CONFIRMED",
+    "same_origin_registration": "CONFIRMED_SCOPED",
+    "target_browser_native_webmcp_conformance": "INCONCLUSIVE",
+    "real_notification_during_this_verification": "CONFIRMED_ABSENT"
+  },
+  "environment": {
+    "browser": "Codex in-app browser",
+    "page_origin": "http://127.0.0.1:4174",
+    "viewports": [
+      { "width": 1440, "height": 1000, "horizontal_overflow": false },
+      { "width": 390, "height": 844, "horizontal_overflow": false }
+    ],
+    "screenshot_method": "Browser/IAB tab screenshot plus local view_image comparison",
+    "browser_error_log_count": 0,
+    "browser_warning_log_count": 0
+  },
+  "registration": {
+    "tool_name": "notify_once",
+    "origin": "http://127.0.0.1:4174",
+    "input_schema_additional_properties": false,
+    "required_fields": ["logicalOperationId", "title", "body"],
+    "exposed_to": [],
+    "permissions_policy": "tools=(self)"
+  },
+  "accepted_observation": {
+    "logical_operation_id": "webmcp-boundary-browser-001",
+    "intent_id": "bdb94700-a62b-59fa-b718-ea5d5dad7ec9",
+    "normalized_title": "Café verification",
+    "control_state": "DRY_RUN",
+    "effect_state": "NOT_STARTED",
+    "effect_start_count": 0,
+    "audit_event_count": 2,
+    "audit_valid": true,
+    "audit_last_hash": "2471906cc23cccf9088614b6f81ec00b8c6a5d2ff1ef629fb0267f3c0f9bcfee",
+    "webmcp_output_fields": [
+      "controlState",
+      "effectState",
+      "humanApprovalRequired",
+      "intentId",
+      "payloadDigest",
+      "target"
+    ],
+    "title_or_body_reflected_in_output": false
+  },
+  "rejected_observation": {
+    "reason_code": "UNKNOWN_FIELD",
+    "extra_field": "execute",
+    "rejected_intent_id": "9db265d3-5f6d-5a33-a687-cd452d5e89ed",
+    "input_fields_unchanged": true,
+    "current_intent_unchanged": true,
+    "rejected_intent_found": false,
+    "effect_start_count": 0,
+    "audit_event_count_after_rejection": 2,
+    "visible_phase": "拒否",
+    "visible_stop_text": "Intentを作らず停止"
+  },
+  "external_effect": {
+    "notification_permission_requested": false,
+    "approval_endpoint_called": false,
+    "notification_adapter_called": false,
+    "real_notification_displayed": false
+  },
+  "artifacts": [
+    "schemas/notification-tool-input.schema.json",
+    "src/typescript/notification/input-projection.js",
+    "src/typescript/notification/preview-boundary.ts",
+    "src/typescript/test/notification-input-projection.test.ts",
+    "src/typescript/test/notification-demo-api.test.ts",
+    "src/typescript/test/notification-visualization.test.js",
+    "data/audit/webmcp-input-boundary-events.ndjson",
+    "docs/15-webmcp-input-boundary.ja.md"
+  ],
+  "source_refs": ["SRC-WEBMCP-2026"]
+}

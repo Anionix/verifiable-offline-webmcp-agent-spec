@@ -2,6 +2,7 @@
 <!-- information_uuid_v5=e434d3fa-6b55-5904-99ee-c9d8155aed3e event_uuid_v7=01a04872-0602-7927-b9a2-0772b1df3f4f machine-contract=DRY_RUN->USER_APPROVED->EXECUTING->VERIFIED -->
 <!-- information_uuid_v5=29700bcc-2f12-5cf7-8330-580bc700c0f3 event_uuid_v7=01a048b7-2627-7587-9745-a7b5e28e024f machine-contract=two visible request lanes converge through the measured ledger to at most one effect -->
 <!-- information_uuid_v5=96dea50d-2218-5b6d-86ce-6beaa00f5fe4 event_uuid_v7=01a048c4-45b3-7120-928e-b7ff8f03ae05 machine-contract=labels and changing effect counts expose explicit assistive-technology semantics -->
+<!-- information_uuid_v5=cbeb5a00-12c7-5557-a8ec-c50cd3765001 event_uuid_v7=01a048da-1888-7be0-9eef-3e1d0cadd1b1 machine-contract=WebMCP RECEIVED->STRICTLY_PROJECTED->DRY_RUN is visible and rejection stops before intent creation -->
 <html lang="ja">
 <head>
   <meta charset="utf-8">
@@ -27,6 +28,15 @@
       <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/>
       <path d="m7.8 16.2 8.4-8.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </symbol>
+    <symbol id="icon-shield-check" viewBox="0 0 24 24">
+      <path d="M12 3.5 19 6v5.2c0 4.4-2.8 7.7-7 9.3-4.2-1.6-7-4.9-7-9.3V6l7-2.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="m8.7 11.9 2.1 2.1 4.5-4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-preview" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M7.5 12s1.7-3 4.5-3 4.5 3 4.5 3-1.7 3-4.5 3-4.5-3-4.5-3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="1.35" fill="currentColor"/>
+    </symbol>
   </svg>
   <main>
     <header class="demo-header">
@@ -36,6 +46,33 @@
       </div>
       <p class="hero-proof">2回要求しても、通知は1件。</p>
     </header>
+
+    <section class="panel input-boundary" aria-labelledby="input-boundary-title">
+      <div class="section-heading boundary-heading">
+        <div>
+          <h2 id="input-boundary-title">WebMCP入力境界</h2>
+          <p>外から来た値は通知内容へ入る前に検査し、実通知ではなく乾式実行だけへ通します。</p>
+        </div>
+        <span id="input-boundary-phase" class="phase-text">待機</span>
+      </div>
+      <div id="input-boundary-flow" class="input-boundary-flow" data-phase="idle">
+        <article id="input-received-node" class="boundary-node" data-state="idle">
+          <svg class="node-icon"><use href="#icon-request"/></svg>
+          <div><h3>受信</h3><p id="input-received-status">WebMCP呼び出しを待機</p></div>
+        </article>
+        <div class="boundary-arrow" aria-hidden="true"><span>3項目だけ</span></div>
+        <article id="input-validation-node" class="boundary-node" data-state="idle">
+          <svg class="node-icon"><use href="#icon-shield-check"/></svg>
+          <div><h3>厳格検査</h3><p id="input-validation-status">未検査</p></div>
+        </article>
+        <div class="boundary-arrow" aria-hidden="true"><span>合格時のみ</span></div>
+        <article id="input-dry-run-node" class="boundary-node" data-state="idle">
+          <svg class="node-icon"><use href="#icon-preview"/></svg>
+          <div><h3>乾式実行だけ</h3><p id="input-dry-run-status">通知権限には進みません</p></div>
+        </article>
+        <p id="input-boundary-announcer" class="sr-only" aria-live="polite">WebMCP入力を待っています。</p>
+      </div>
+    </section>
 
     <div class="workspace">
       <section class="panel configuration" aria-labelledby="configuration-title">

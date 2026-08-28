@@ -34,4 +34,6 @@ Online\land EU_{remote}>\max(EU_{local},EU_{rule})
 
 WebMCPはdraftなのでadapterへ隔離し、仕様変更時のblast radiusを狭めます。 [SRC-WEBMCP-2026](source-map.md#src-webmcp-2026)
 
+ローカル通知デモの入力境界は、[`15-webmcp-input-boundary.ja.md`](15-webmcp-input-boundary.ja.md)で具体化します。`inputSchema`だけを信用せず、WebMCP callbackとlocalhost APIが同じ厳格な投影器を使い、乾式実行までで止めます。
+
 Responses APIとremote MCPの位置づけはOpenAIの一次資料に紐づけます。 [SRC-OPENAI-RESPONSES-2025](source-map.md#src-openai-responses-2025) [SRC-OPENAI-MCP-2025](source-map.md#src-openai-mcp-2025)

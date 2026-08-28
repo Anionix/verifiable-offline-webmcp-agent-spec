@@ -3,12 +3,17 @@
 // machine-contract: localhost and same-origin only; approval and execution remain separate HTTP requests.
 // event_uuid_v7=01a048b7-262a-7dc0-a907-cce53d32aa5b
 // machine-contract: the visualization reads the SQLite effect-start count; it never substitutes a decorative fixed value.
+// information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
+// event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
+// machine-contract: same-origin JSON is strictly projected before createIntent; rejection leaves SQLite and the audit chain unchanged.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AuditLog } from "./audit-log.ts";
 import { NotificationEngine } from "./engine.ts";
+import { NotificationInputError } from "./input-projection.js";
+import { prepareNotificationPreview } from "./preview-boundary.ts";
 import { NotificationStore } from "./store.ts";
 import type { Presence } from "./types.ts";
 
@@ -26,16 +31,18 @@ if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new TypeError(
 const store = new NotificationStore(databasePath);
 const engine = new NotificationEngine({ store, audit: new AuditLog(auditPath) });
 const staticFiles = new Map<string, readonly [string, string]>([
-  ["/", ["index.html", "text/html; charset=utf-8"]],
-  ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
-  ["/visual-state.js", ["visual-state.js", "text/javascript; charset=utf-8"]],
-  ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
-  ["/service-worker.js", ["service-worker.js", "text/javascript; charset=utf-8"]],
+  ["/", [join(publicDirectory, "index.html"), "text/html; charset=utf-8"]],
+  ["/app.js", [join(publicDirectory, "app.js"), "text/javascript; charset=utf-8"]],
+  ["/visual-state.js", [join(publicDirectory, "visual-state.js"), "text/javascript; charset=utf-8"]],
+  ["/input-projection.js", [join(moduleDirectory, "input-projection.js"), "text/javascript; charset=utf-8"]],
+  ["/styles.css", [join(publicDirectory, "styles.css"), "text/css; charset=utf-8"]],
+  ["/service-worker.js", [join(publicDirectory, "service-worker.js"), "text/javascript; charset=utf-8"]],
 ] as const);
 
 function securityHeaders(response: ServerResponse): void {
   response.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; worker-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
   response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  response.setHeader("Permissions-Policy", "tools=(self)");
   response.setHeader("Referrer-Policy", "no-referrer");
   response.setHeader("X-Content-Type-Options", "nosniff");
 }
@@ -90,13 +97,7 @@ async function api(request: IncomingMessage, response: ServerResponse, pathname:
   requireSameOrigin(request);
   const input = await body(request);
   if (pathname === "/api/preview") {
-    const intent = engine.createIntent({
-      logicalOperationId: stringField(input, "logicalOperationId"),
-      title: stringField(input, "title"),
-      body: stringField(input, "body"),
-    });
-    const preview = await engine.preview(intent.intentId);
-    json(response, 200, { preview, intent: engine.getIntent(intent.intentId) });
+    json(response, 200, await prepareNotificationPreview(engine, input));
     return;
   }
   const intentId = stringField(input, "intentId");
@@ -136,14 +137,16 @@ const server = createServer(async (request, response) => {
       json(response, 404, { error: "not-found" });
       return;
     }
-    const [file, contentType] = item;
-    const contents = await readFile(join(publicDirectory, file));
+    const [filePath, contentType] = item;
+    const contents = await readFile(filePath);
     securityHeaders(response);
     response.writeHead(200, { "Content-Type": contentType, "Cache-Control": "no-store" });
     response.end(contents);
   } catch (error) {
     const message = error instanceof Error ? error.message : "unexpected error";
-    json(response, 400, { error: message });
+    const code = error instanceof NotificationInputError ? error.code : "REQUEST_REJECTED";
+    const field = error instanceof NotificationInputError ? error.field ?? null : null;
+    json(response, 400, { error: message, code, field });
   }
 });
 

@@ -7,7 +7,20 @@
 // information_uuid_v5=66186252-51bf-5758-9526-c97fcf2c664c
 // event_uuid_v7=01a048c2-e245-73bb-8b32-bcd1ab64e00d
 // machine-contract: an unknown count is announced as unknown, never as a numeric number of effects.
-import { createVisualState, reduceVisualState } from "/visual-state.js";
+// information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
+// event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
+// machine-contract: WebMCP input is projected before UI mutation and can call preview only; permission and notification remain click-only.
+import {
+  NOTIFICATION_TOOL_INPUT_SCHEMA,
+  NotificationInputError,
+  projectNotificationToolInput,
+} from "/input-projection.js";
+import {
+  createInputBoundaryState,
+  createVisualState,
+  reduceInputBoundaryState,
+  reduceVisualState,
+} from "/visual-state.js";
 
 const elements = {
   logicalOperation: document.querySelector("#logical-operation"),
@@ -41,10 +54,20 @@ const elements = {
   countLabel: document.querySelector("#count-label"),
   count: document.querySelector("#notification-count"),
   countCaption: document.querySelector("#count-caption"),
+  inputBoundary: document.querySelector("#input-boundary-flow"),
+  inputBoundaryPhase: document.querySelector("#input-boundary-phase"),
+  inputBoundaryAnnouncer: document.querySelector("#input-boundary-announcer"),
+  inputReceivedNode: document.querySelector("#input-received-node"),
+  inputReceivedStatus: document.querySelector("#input-received-status"),
+  inputValidationNode: document.querySelector("#input-validation-node"),
+  inputValidationStatus: document.querySelector("#input-validation-status"),
+  inputDryRunNode: document.querySelector("#input-dry-run-node"),
+  inputDryRunStatus: document.querySelector("#input-dry-run-status"),
 };
 
 let currentIntentId = null;
 let visualState = createVisualState();
+let inputBoundaryState = createInputBoundaryState();
 const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
 
 const phaseLabels = {
@@ -94,11 +117,28 @@ function updateVisual(event) {
 
 renderVisualState(visualState);
 
-async function request(path, value) {
+function renderInputBoundary(state) {
+  elements.inputBoundary.dataset.phase = state.phase;
+  elements.inputBoundaryPhase.textContent = state.phaseText;
+  syncNode(elements.inputReceivedNode, elements.inputReceivedStatus, state.receivedState, state.receivedText);
+  syncNode(elements.inputValidationNode, elements.inputValidationStatus, state.validationState, state.validationText);
+  syncNode(elements.inputDryRunNode, elements.inputDryRunStatus, state.dryRunState, state.dryRunText);
+  elements.inputBoundaryAnnouncer.textContent = state.announcement;
+}
+
+function updateInputBoundary(event) {
+  inputBoundaryState = reduceInputBoundaryState(inputBoundaryState, event);
+  renderInputBoundary(inputBoundaryState);
+}
+
+renderInputBoundary(inputBoundaryState);
+
+async function request(path, value, signal) {
   const response = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(value),
+    signal,
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error ?? `request failed: ${response.status}`);
@@ -138,9 +178,9 @@ function render(result, message) {
   elements.log.textContent = message + "\n\n" + JSON.stringify(result, null, 2);
 }
 
-async function preview(values = formValue()) {
+async function preview(values = formValue(), signal) {
   updateVisual({ type: "RESET" });
-  const result = await request("/api/preview", values);
+  const result = await request("/api/preview", values, signal);
   render(result.intent, "乾式実行が完了しました。内容を確認してから承認してください。");
   updateVisual({ type: "PREVIEWED" });
   return result;
@@ -226,29 +266,88 @@ async function registerWebMcp() {
     elements.webmcp.textContent = "INCONCLUSIVE — このブラウザーにdocument.modelContextがありません";
     return;
   }
-  await context.registerTool({
-    name: "notify_once",
-    title: "Prepare one duplicate-safe local notification",
-    description: "Prepares a local Mac notification. A visible human approval in the page is still required before the effect.",
-    inputSchema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["logicalOperationId", "title", "body"],
-      properties: {
-        logicalOperationId: { type: "string", minLength: 1, maxLength: 128 },
-        title: { type: "string", minLength: 1, maxLength: 120 },
-        body: { type: "string", minLength: 1, maxLength: 1000 },
+  try {
+    await context.registerTool({
+      name: "notify_once",
+      title: "Prepare one duplicate-safe local notification",
+      description: "Strictly validates three literal notification fields and prepares a dry run. It cannot request notification permission or create a visible notification.",
+      inputSchema: NOTIFICATION_TOOL_INPUT_SCHEMA,
+      execute: async (input, options = {}) => {
+        updateInputBoundary({ type: "INPUT_RECEIVED" });
+        let projected;
+        try {
+          options.signal?.throwIfAborted();
+          projected = projectNotificationToolInput(input);
+        } catch (error) {
+          const message = inputRejectionMessage(error);
+          updateInputBoundary({ type: "INPUT_REJECTED", message });
+          elements.log.textContent = `WebMCP入力を拒否: ${message}`;
+          throw error;
+        }
+        updateInputBoundary({ type: "INPUT_ACCEPTED" });
+        let result;
+        try {
+          result = await preview(projected, options.signal);
+          assertDryRunReadback(result);
+        } catch (error) {
+          updateInputBoundary({ type: "DRY_RUN_FAILED" });
+          elements.log.textContent = "WebMCP乾式実行を停止: 結果を確認できません。実通知は開始していません。";
+          throw error;
+        }
+        elements.logicalOperation.value = projected.logicalOperationId;
+        elements.title.value = projected.title;
+        elements.body.value = projected.body;
+        updateInputBoundary({ type: "DRY_RUN_COMPLETED" });
+        return {
+          intentId: result.intent.intentId,
+          target: result.intent.target,
+          payloadDigest: result.intent.payloadDigest,
+          controlState: result.intent.controlState,
+          effectState: result.intent.effectState,
+          humanApprovalRequired: true,
+        };
       },
-    },
-    execute: async (input) => {
-      elements.logicalOperation.value = input.logicalOperationId;
-      elements.title.value = input.title;
-      elements.body.value = input.body;
-      const result = await preview(input);
-      return { ...result.preview, state: "DRY_RUN", humanApprovalRequired: true };
-    },
-  });
-  elements.webmcp.textContent = "CONFIRMED — notify_onceを登録済み";
+    }, { exposedTo: [] });
+    elements.webmcp.textContent = "CONFIRMED — same-origin notify_onceを登録済み";
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "UnknownError";
+    elements.webmcp.textContent = `INCONCLUSIVE — notify_onceを登録できません (${name})`;
+  }
+}
+
+function inputRejectionMessage(error) {
+  if (!(error instanceof NotificationInputError)) return "入力形式を確認できません";
+  const messages = {
+    INPUT_OBJECT_REQUIRED: "物体形式ではありません",
+    PLAIN_OBJECT_REQUIRED: "単純な物体ではありません",
+    UNKNOWN_FIELD: "許可されていない項目があります",
+    MISSING_FIELD: "必要な項目がありません",
+    DATA_PROPERTY_REQUIRED: "通常の入力項目ではありません",
+    STRING_REQUIRED: "文字列ではありません",
+    INVALID_UNICODE: "正しいUnicodeではありません",
+    CONTROL_CHARACTER: "制御文字が含まれています",
+    DIRECTIONAL_CONTROL: "方向制御文字が含まれています",
+    NONCHARACTER: "予約済みUnicode文字が含まれています",
+    INVALID_LENGTH: "文字数が範囲外です",
+    UNSUPPORTED_CHARACTER: "論理操作識別子に未対応文字があります",
+  };
+  return messages[error.code] ?? "入力検査で拒否しました";
+}
+
+function assertDryRunReadback(result) {
+  const intent = result?.intent;
+  const previewResult = result?.preview;
+  if (
+    !intent
+    || !previewResult
+    || intent.controlState !== "DRY_RUN"
+    || intent.effectState !== "NOT_STARTED"
+    || previewResult.intentId !== intent.intentId
+    || previewResult.payloadDigest !== intent.payloadDigest
+    || previewResult.approvalRequired !== true
+  ) {
+    throw new Error("dry-run readback mismatch");
+  }
 }
 
 await registerWebMcp();

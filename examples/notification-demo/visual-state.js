@@ -10,6 +10,18 @@
 // information_uuid_v5=d53907bf-96cd-56e5-be92-5c4f3576e477
 // event_uuid_v7=01a04972-c11c-74d1-8639-c71dded7b68a
 // machine-contract: CONFIRMED_ABSENT permits replay only after six visible checks pass; VERIFIED and AMBIGUOUS never enter the replay gate.
+// information_uuid_v5=3093ad26-25f3-5912-b015-70a04c93fe08
+// event_uuid_v7=01a04a3b-7a18-76a0-b150-b1aacc95e727
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:16:47.000Z
+// machine-contract: a restored WebMCP state is rendered consistently in both panels and is never relabeled as a new zero-effect dry run.
+// information_uuid_v5=4cb035a8-f737-514f-90c6-da6c0672f814
+// event_uuid_v7=01a04a4c-1be8-727c-9b05-be91397708b3
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: RESTORE_PERSISTED always reduces from the default state, so a new intent cannot inherit the prior intent's visual fields.
+// information_uuid_v5=22f6663a-2651-58fe-aab8-f213212c6562
+// event_uuid_v7=01a04a4c-1be8-7a58-a3c1-5c4e0474d59f
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: NOT_STARTED and CONFIRMED_ABSENT require zero measured starts, while AMBIGUOUS and CONFIRMED_PRESENT require exactly one.
 
 export const REPLAY_GATE_KEYS = Object.freeze([
   "authorization",
@@ -98,19 +110,31 @@ export function reduceInputBoundaryState(previous, event) {
         dryRunText: "乾式実行へ送信中",
         announcement: "入力は厳格検査に合格し、乾式実行へ進みました。",
       };
-    case "DRY_RUN_COMPLETED":
+    case "DRY_RUN_COMPLETED": {
+      const controlState = event.controlState ?? "DRY_RUN";
+      const effectState = event.effectState ?? "NOT_STARTED";
+      const effectStartCount = event.effectStartCount ?? 0;
+      const persistedEvent = visualEventFromPersistedStatus({ controlState, effectState }, effectStartCount);
+      const persistedVisual = reduceVisualState(createVisualState(), persistedEvent);
+      const violation = persistedVisual.phase === "violation";
+      const restored = controlState !== "DRY_RUN" || effectState !== "NOT_STARTED";
       return {
         ...state,
-        phase: "dry-run",
-        phaseText: "乾式実行済み",
+        phase: violation ? "violation" : restored ? "restored" : "dry-run",
+        phaseText: violation ? "安全条件違反" : restored ? "既存状態を復元" : "乾式実行済み",
         receivedState: "success",
         receivedText: "3項目だけを受信",
         validationState: "success",
         validationText: "型・文字・長さを確認",
-        dryRunState: "success",
-        dryRunText: "DRY_RUN / NOT_STARTED",
-        announcement: "WebMCP入力は乾式実行だけへ到達しました。通知はまだありません。",
+        dryRunState: violation ? "error" : "success",
+        dryRunText: `${controlState} / ${effectState}`,
+        announcement: violation
+          ? persistedVisual.announcement
+          : restored
+          ? `WebMCP入力は乾式実行経路で既存状態 ${controlState} / ${effectState} を読み戻しました。外部効果開始台帳は${effectStartCount}回です。`
+          : "WebMCP入力は乾式実行だけへ到達しました。通知はまだありません。",
       };
+    }
     case "DRY_RUN_FAILED":
       return {
         ...state,
@@ -147,6 +171,43 @@ function measuredCount(value) {
   return value;
 }
 
+// information_uuid_v5=0a6e95b1-f829-5429-9caa-bd142f018915
+// event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:42:18.694Z
+// machine-contract: a status readback may advance mutable state, but it must preserve every immutable intent field from the preview response.
+export function assertPersistedIntentMatchesPreview(persisted, preview) {
+  const immutableFields = ["intentId", "logicalOperationId", "payloadDigest", "target", "title", "body"];
+  if (
+    !persisted
+    || !preview
+    || immutableFields.some((field) => persisted[field] !== preview[field])
+  ) throw new TypeError("immutable intent readback mismatch");
+}
+
+// information_uuid_v5=97ce90b3-983b-56e7-9381-c8c2df3068e2
+// event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
+// state_transition=DRY_RUN -> VERIFIED occurred_at=2026-08-28T20:10:43.523Z
+// machine-contract: persisted control/effect state plus the measured ledger count determines the restored visualization; preview never overwrites observed truth.
+export function visualEventFromPersistedStatus(intent, effectStartCount) {
+  const count = measuredCount(effectStartCount);
+  if (intent?.controlState === "VERIFIED" && intent.effectState === "CONFIRMED_PRESENT") {
+    return { type: "PRESENT_CONFIRMED", effectStartCount: count };
+  }
+  if (intent?.controlState === "EXECUTING" && ["AMBIGUOUS", "RECONCILING"].includes(intent.effectState)) {
+    return { type: "AMBIGUOUS", effectStartCount: count };
+  }
+  if (intent?.controlState === "ABORTED" && intent.effectState === "CONFIRMED_ABSENT") {
+    return { type: "ABSENT_CONFIRMED", effectStartCount: count };
+  }
+  if (["DRY_RUN", "USER_APPROVED"].includes(intent?.controlState) && intent.effectState === "NOT_STARTED") {
+    return { type: "PREVIEWED", effectStartCount: count };
+  }
+  if (intent?.controlState === "ABORTED" && intent.effectState === "NOT_STARTED") {
+    return { type: "FAILED", message: "既存の操作は実行前に停止済みです", effectStartCount: count };
+  }
+  throw new TypeError(`unsupported persisted notification state: ${intent?.controlState}/${intent?.effectState}`);
+}
+
 function violationState(state, count, message) {
   return {
     ...state,
@@ -167,10 +228,10 @@ function violationState(state, count, message) {
   };
 }
 
-function withInvariant(state, effectStartCount) {
+function withNoEffectInvariant(state, effectStartCount) {
   const count = measuredCount(effectStartCount);
-  if (count <= 1) return { ...state, effectStartCount: count };
-  return violationState(state, count, `外部効果が${count}件あります`);
+  if (count === 0) return { ...state, effectStartCount: count };
+  return violationState(state, count, `外部効果未開始の状態なのに開始台帳が${count}件あります`);
 }
 
 function withConfirmedEffectInvariant(state, effectStartCount) {
@@ -182,13 +243,27 @@ function withConfirmedEffectInvariant(state, effectStartCount) {
   return violationState(state, count, message);
 }
 
+function withAmbiguousEffectInvariant(state, effectStartCount) {
+  const count = measuredCount(effectStartCount);
+  if (count === 1) return { ...state, effectStartCount: count };
+  const message = count === 0
+    ? "結果不明の状態なのに保守的な外部効果開始が0件です"
+    : `外部効果が${count}件あります`;
+  return violationState(state, count, message);
+}
+
 export function reduceVisualState(previous, event) {
   const state = previous ?? createVisualState();
   switch (event.type) {
     case "RESET":
       return createVisualState();
+    case "RESTORE_PERSISTED":
+      return reduceVisualState(
+        createVisualState(),
+        visualEventFromPersistedStatus(event.intent, event.effectStartCount),
+      );
     case "PREVIEWED":
-      return {
+      return withNoEffectInvariant({
         ...createVisualState(),
         phase: "previewed",
         initialState: "ready",
@@ -196,7 +271,7 @@ export function reduceVisualState(previous, event) {
         ledgerInitialState: "ready",
         ledgerInitialText: "新しい操作として待機",
         announcement: "乾式実行が完了しました。通知はまだ0件です。",
-      };
+      }, event.effectStartCount ?? 0);
     case "EXECUTION_CLAIMED":
       return {
         ...state,
@@ -261,7 +336,7 @@ export function reduceVisualState(previous, event) {
         announcement: "同じ操作の再試行を停止しました。通知は1件のままです。",
       }, event.effectStartCount);
     case "AMBIGUOUS":
-      return withInvariant({
+      return withAmbiguousEffectInvariant({
         ...state,
         phase: "ambiguous",
         initialState: "warning",
@@ -278,7 +353,7 @@ export function reduceVisualState(previous, event) {
         announcement: "通知結果が不明です。再送せず、結果を照合してください。",
       }, event.effectStartCount);
     case "ABSENT_CONFIRMED":
-      return withInvariant({
+      return withNoEffectInvariant({
         ...state,
         phase: "absent",
         initialState: "warning",
@@ -333,6 +408,15 @@ export function reduceVisualState(previous, event) {
       };
     }
     case "FAILED":
+      if (event.effectStartCount !== undefined) return withNoEffectInvariant({
+        ...state,
+        phase: "error",
+        initialState: state.initialState === "active" ? "error" : state.initialState,
+        retryState: state.retryState === "active" ? "error" : state.retryState,
+        countLabel: "停止",
+        countText: event.message,
+        announcement: `処理を停止しました。${event.message}`,
+      }, event.effectStartCount);
       return {
         ...state,
         phase: "error",

@@ -4,6 +4,10 @@
 // information_uuid_v5=43ec07f2-3321-504a-8481-6358beea3856
 // event_uuid_v7=01a04984-7ca1-717d-a8bb-4eceafaedc31
 // machine-contract: same-origin tools rely on the draft default self allowlist without sending an unsupported policy token.
+// information_uuid_v5=7a79c189-d065-5783-9e6b-b096312036f5
+// event_uuid_v7=01a04a78-c198-785c-8260-cbcaa840927f
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T22:23:43.000Z
+// machine-contract: overlapping local previews bind their status readback to the intent returned by their own request.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -123,4 +127,14 @@ test("the browser and localhost API use the same projector and keep permission o
   assert.match(server, /prepareNotificationPreview\(engine, input, provenance\)/);
   assert.match(server, /Permissions-Policy", "camera=\(\), geolocation=\(\), microphone=\(\)"/);
   assert.doesNotMatch(server, /tools=\(self\)/);
+});
+
+test("each local preview reads status for its own returned intent", async () => {
+  const app = await readFile(new URL("../../../examples/notification-demo/app.js", import.meta.url), "utf8");
+  const localPreview = app.slice(
+    app.indexOf("async function preview("),
+    app.indexOf("async function approveAndNotify("),
+  );
+  assert.match(localPreview, /readStatus\(result\.intent\.intentId\)/);
+  assert.doesNotMatch(localPreview, /readStatus\(\)/);
 });

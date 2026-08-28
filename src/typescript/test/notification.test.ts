@@ -23,6 +23,11 @@ import { NotificationStore } from "../notification/store.ts";
 import type { NotificationIntent } from "../notification/types.ts";
 import { uuidV7 } from "../uuid.ts";
 
+// information_uuid_v5=97ce90b3-983b-56e7-9381-c8c2df3068e2
+// event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
+// state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T20:10:43.523Z
+// machine-contract: notification title and body limits count Unicode code points consistently at projection and engine boundaries.
+
 interface Fixture {
   directory: string;
   store: NotificationStore;
@@ -50,6 +55,24 @@ function fixture(name: string): Fixture {
     },
   };
 }
+
+test("engine length limits count astral Unicode characters like the input projector", () => {
+  const item = fixture("unicode-length");
+  try {
+    assert.doesNotThrow(() => item.engine.createIntent({
+      logicalOperationId: "unicode-length-valid",
+      title: "😀".repeat(120),
+      body: "本文",
+    }));
+    assert.throws(() => item.engine.createIntent({
+      logicalOperationId: "unicode-length-invalid",
+      title: "😀".repeat(121),
+      body: "本文",
+    }), /1-120 Unicode characters/);
+  } finally {
+    item.close();
+  }
+});
 
 async function prepare(engine: NotificationEngine, logicalOperationId: string) {
   const intent = engine.createIntent({
@@ -238,6 +261,7 @@ test("a confirmed pre-effect failure can be reproposed with a new approval", asy
     assert.equal(adapter.visible.size, 0);
     assert.equal(item.store.getLatestEffectClaimEvidence(intent.intentId)?.startStatus, "NOT_STARTED");
     const confirmedAbsent = item.engine.getIntent(intent.intentId)!;
+    item.now.value += 1;
     item.engine.resetAfterConfirmedAbsent(
       intent.intentId,
       validReplayEvidence(item.engine, confirmedAbsent, item.now.value),

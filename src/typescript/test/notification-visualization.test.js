@@ -5,11 +5,34 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  assertPersistedIntentMatchesPreview,
   createInputBoundaryState,
   createVisualState,
   reduceInputBoundaryState,
   reduceVisualState,
+  visualEventFromPersistedStatus,
 } from "../../../examples/notification-demo/visual-state.js";
+
+// information_uuid_v5=97ce90b3-983b-56e7-9381-c8c2df3068e2
+// event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
+// state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T20:10:43.523Z
+// machine-contract: a repeated preview restores the persisted control/effect pair and measured effect count instead of inventing a new PREVIEWED state.
+// information_uuid_v5=0a6e95b1-f829-5429-9caa-bd142f018915
+// event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:42:18.694Z
+// machine-contract: readback accepts a newer control/effect state for the same immutable intent identity while rejecting payload substitution.
+// information_uuid_v5=3093ad26-25f3-5912-b015-70a04c93fe08
+// event_uuid_v7=01a04a3b-7a18-76a0-b150-b1aacc95e727
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T21:16:47.000Z
+// machine-contract: the WebMCP boundary panel renders the same restored control state, effect state, and measured count as the primary visualization.
+// information_uuid_v5=4cb035a8-f737-514f-90c6-da6c0672f814
+// event_uuid_v7=01a04a4c-1be8-727c-9b05-be91397708b3
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: restoring another intent starts from the default visual state and cannot inherit retry or delivery text from the prior intent.
+// information_uuid_v5=22f6663a-2651-58fe-aab8-f213212c6562
+// event_uuid_v7=01a04a4c-1be8-7a58-a3c1-5c4e0474d59f
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: every pre-effect or confirmed-absent state requires a measured effect count of zero; a mismatch renders a safety violation.
 
 // information_uuid_v5=233068fa-1846-5b44-94fe-2479cdc8796d
 // event_uuid_v7=01a048c2-e27e-721b-8f08-3bdadbfc683f
@@ -52,6 +75,53 @@ test("the input boundary exposes rejection before intent creation", () => {
   assert.match(state.announcement, /通知は作成していません/);
 });
 
+test("the input boundary preserves a restored WebMCP state", () => {
+  let state = reduceInputBoundaryState(createInputBoundaryState(), { type: "INPUT_RECEIVED" });
+  state = reduceInputBoundaryState(state, { type: "INPUT_ACCEPTED" });
+  state = reduceInputBoundaryState(state, {
+    type: "DRY_RUN_COMPLETED",
+    controlState: "VERIFIED",
+    effectState: "CONFIRMED_PRESENT",
+    effectStartCount: 1,
+  });
+  assert.equal(state.phase, "restored");
+  assert.equal(state.dryRunText, "VERIFIED / CONFIRMED_PRESENT");
+  assert.match(state.announcement, /外部効果開始台帳は1回/);
+  assert.doesNotMatch(state.announcement, /通知はまだありません/);
+
+  state = reduceInputBoundaryState(state, {
+    type: "DRY_RUN_COMPLETED",
+    controlState: "EXECUTING",
+    effectState: "AMBIGUOUS",
+    effectStartCount: 1,
+  });
+  assert.equal(state.phase, "restored");
+  assert.equal(state.dryRunText, "EXECUTING / AMBIGUOUS");
+  assert.doesNotMatch(state.announcement, /DRY_RUN \/ NOT_STARTED|通知はまだありません/);
+});
+
+test("restoring another intent clears the previous intent visualization", () => {
+  let state = reduceVisualState(createVisualState(), { type: "PREVIEWED" });
+  state = reduceVisualState(state, { type: "PRESENT_CONFIRMED", effectStartCount: 1 });
+  assert.equal(state.retryState, "ready");
+  state = reduceVisualState(state, {
+    type: "RESTORE_PERSISTED",
+    intent: { controlState: "EXECUTING", effectState: "AMBIGUOUS" },
+    effectStartCount: 1,
+  });
+  assert.equal(state.phase, "ambiguous");
+  assert.equal(state.retryState, "idle");
+  assert.equal(state.retryText, "初回通知後に試せます");
+});
+
+test("a pre-effect state with a measured effect is a violation", () => {
+  const event = visualEventFromPersistedStatus({ controlState: "DRY_RUN", effectState: "NOT_STARTED" }, 1);
+  const state = reduceVisualState(createVisualState(), event);
+  assert.equal(state.phase, "violation");
+  assert.equal(state.effectStartCount, 1);
+  assert.match(state.announcement, /安全条件違反/);
+});
+
 test("the visible flow converges two requests to one notification", () => {
   let state = reduceVisualState(createVisualState(), { type: "PREVIEWED" });
   state = reduceVisualState(state, { type: "EXECUTION_CLAIMED" });
@@ -65,6 +135,43 @@ test("the visible flow converges two requests to one notification", () => {
   assert.equal(state.blockedText, "二件目を停止");
   assert.equal(Object.values(state.replayGates).every((gate) => gate.state === "skipped"), true);
   assert.match(state.replayGateSummary, /6項目は確認不要/);
+});
+
+test("a repeated preview restores verified and ambiguous persisted states", () => {
+  assert.deepEqual(
+    visualEventFromPersistedStatus({ controlState: "VERIFIED", effectState: "CONFIRMED_PRESENT" }, 1),
+    { type: "PRESENT_CONFIRMED", effectStartCount: 1 },
+  );
+  assert.deepEqual(
+    visualEventFromPersistedStatus({ controlState: "EXECUTING", effectState: "AMBIGUOUS" }, 1),
+    { type: "AMBIGUOUS", effectStartCount: 1 },
+  );
+  assert.throws(
+    () => visualEventFromPersistedStatus({ controlState: "VERIFIED", effectState: "NOT_STARTED" }, 0),
+    /unsupported persisted notification state/,
+  );
+});
+
+test("a status readback accepts a newer state for the same immutable intent", () => {
+  const preview = {
+    intentId: "intent-1",
+    logicalOperationId: "operation-1",
+    payloadDigest: "digest-1",
+    target: "local-mac-notification",
+    title: "title",
+    body: "body",
+    controlState: "DRY_RUN",
+    effectState: "NOT_STARTED",
+  };
+  assert.doesNotThrow(() => assertPersistedIntentMatchesPreview({
+    ...preview,
+    controlState: "VERIFIED",
+    effectState: "CONFIRMED_PRESENT",
+  }, preview));
+  assert.throws(() => assertPersistedIntentMatchesPreview({
+    ...preview,
+    payloadDigest: "substituted",
+  }, preview), /immutable intent readback mismatch/);
 });
 
 test("the visualization never hides a duplicate-effect violation", () => {

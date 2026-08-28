@@ -99,6 +99,7 @@ export type DeviceChainVerification =
 export type QuarantineCode =
   | Exclude<VerificationCode, "VERIFIED">
   | "UNKNOWN_KEY"
+  | "TRUST_ANCHOR_MISMATCH"
   | "FORK_DETECTED";
 
 export type IngestionDecision = "MERGED_SAFE_STATE" | "HUMAN_REVIEW_REQUIRED";

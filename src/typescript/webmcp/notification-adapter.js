@@ -2,6 +2,15 @@
 // information_uuid_v5=60dd0f0c-e4aa-522d-ae06-7d7c316de6db
 // event_uuid_v7=01a048f8-3326-7d54-adbd-0cfb99718a56
 // machine-contract: DISCOVER -> REGISTER_SAME_ORIGIN -> PROJECT_UNTRUSTED_INPUT -> SERVER_DERIVED_PROVENANCE -> DRY_RUN_READBACK; no permission request or visible notification is reachable here.
+// information_uuid_v5=a49f40c5-65fa-5363-b64f-be5d86766914
+// event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:56:11.012Z
+// machine-contract: WebMCP preview restores a newer supported persisted state only when immutable intent fields and the measured effect count agree.
+// information_uuid_v5=d2cbf4dc-f6a8-53df-ae82-e3e84f51ee7f
+// information_uuid_v5=4eeca0e8-026c-559e-9496-885453aa6f30
+// event_uuid_v7=01a04a5a-ece0-7715-a44c-3fe4200880af
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:51:08.000Z
+// machine-contract: each completion event carries the sanitized result for that exact projected input; non-negative measured counts reach the UI even when they prove a safety-state mismatch.
 
 import {
   NOTIFICATION_TOOL_INPUT_SCHEMA,
@@ -20,6 +29,14 @@ const PROVENANCE_FIELDS = Object.freeze([
   "untrustedContent",
   "annotation",
   "derivation",
+]);
+const IMMUTABLE_INTENT_FIELDS = Object.freeze([
+  "intentId",
+  "logicalOperationId",
+  "payloadDigest",
+  "target",
+  "title",
+  "body",
 ]);
 
 /** @typedef {{ logicalOperationId: string, title: string, body: string }} NotificationToolInput */
@@ -100,12 +117,41 @@ function readPersistedProvenance(value) {
   }
 }
 
-/** @param {unknown} result @param {string} origin */
-function sanitizeDryRunResult(result, origin) {
+/** @param {Record<string, any>} persisted @param {Record<string, any>} previewed */
+function sameImmutableIntent(persisted, previewed) {
+  return IMMUTABLE_INTENT_FIELDS.every((field) => persisted[field] === previewed[field]);
+}
+
+/** @param {Record<string, any>} intent */
+function supportedPersistedState(intent) {
+  const state = `${intent.controlState}/${intent.effectState}`;
+  return [
+    "DRY_RUN/NOT_STARTED",
+    "USER_APPROVED/NOT_STARTED",
+    "ABORTED/NOT_STARTED",
+    "ABORTED/CONFIRMED_ABSENT",
+    "EXECUTING/AMBIGUOUS",
+    "EXECUTING/RECONCILING",
+    "VERIFIED/CONFIRMED_PRESENT",
+  ].includes(state);
+}
+
+/** @param {Record<string, any>} intent @param {Readonly<NotificationToolInput>} input */
+function sameProjectedInput(intent, input) {
+  return intent.logicalOperationId === input.logicalOperationId
+    && intent.title === input.title
+    && intent.body === input.body;
+}
+
+/** @param {unknown} result @param {string} origin @param {Readonly<NotificationToolInput>} input */
+function sanitizeDryRunResult(result, origin, input) {
   if (result === null || typeof result !== "object") throw new TypeError("dry-run response must be an object");
   const envelope = /** @type {Record<string, any>} */ (result);
   const intent = envelope.intent;
   const preview = envelope.preview;
+  const status = envelope.status;
+  const persistedIntent = status?.intent;
+  const effectStartCount = status?.effectStartCount;
   const inputEvidence = envelope.inputEvidence;
   const invocation = readPersistedProvenance(inputEvidence?.invocation);
   const persisted = readPersistedProvenance(inputEvidence?.persisted);
@@ -115,17 +161,22 @@ function sanitizeDryRunResult(result, origin) {
   if (
     !intent
     || !preview
+    || !persistedIntent
     || !invocation
     || !persisted
     || !auditPersisted
     || !UUID_V5.test(intent.intentId)
     || intent.target !== "local-mac-notification"
     || !SHA_256.test(intent.payloadDigest)
-    || intent.controlState !== "DRY_RUN"
-    || intent.effectState !== "NOT_STARTED"
     || preview.intentId !== intent.intentId
     || preview.payloadDigest !== intent.payloadDigest
     || preview.approvalRequired !== true
+    || !sameImmutableIntent(persistedIntent, intent)
+    || !sameProjectedInput(intent, input)
+    || !supportedPersistedState(persistedIntent)
+    || typeof effectStartCount !== "number"
+    || !Number.isSafeInteger(effectStartCount)
+    || effectStartCount < 0
     || invocation.channel !== "WEBMCP"
     || invocation.sourceTrust !== "UNTRUSTED"
     || invocation.sourceOrigin !== origin
@@ -140,11 +191,13 @@ function sanitizeDryRunResult(result, origin) {
   ) throw new TypeError("dry-run provenance readback mismatch");
 
   return immutable({
-    intentId: intent.intentId,
-    target: intent.target,
-    payloadDigest: intent.payloadDigest,
-    controlState: intent.controlState,
-    effectState: intent.effectState,
+    intentId: persistedIntent.intentId,
+    target: persistedIntent.target,
+    payloadDigest: persistedIntent.payloadDigest,
+    controlState: persistedIntent.controlState,
+    effectState: persistedIntent.effectState,
+    effectStartCount,
+    restored: persistedIntent.controlState !== "DRY_RUN",
     humanApprovalRequired: true,
     inputEvidence: immutable({
       channel: invocation.channel,
@@ -216,7 +269,7 @@ export async function registerNotificationWebMcpTool(options) {
             signal: toolOptions.signal,
           });
           toolOptions.signal?.throwIfAborted();
-          const sanitized = sanitizeDryRunResult(result, origin);
+          const sanitized = sanitizeDryRunResult(result, origin, projected);
           onLifecycle({ type: "DRY_RUN_COMPLETED", observation, input: projected, result: sanitized });
           return sanitized;
         } catch (error) {

@@ -1,0 +1,447 @@
+{
+  "$schema": "../schemas/review-thread-reconciliation.schema.json",
+  "identity": {
+    "uuidV5": "639e8139-1107-51f4-9949-333119ddb0be",
+    "uuidV7": "01a04a0b-578f-7ab8-8be3-9ea9f2d7a6c6",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "observedAt": "2026-08-28T20:24:12.431Z",
+    "epochMs": 1787948652431,
+    "timeZone": "UTC"
+  },
+  "status": "VERIFIED",
+  "scope": {
+    "repository": "Anionix/verifiable-offline-webmcp-agent-spec",
+    "inspectedClosedPullRequests": 50,
+    "currentPullRequest": 51,
+    "newExternalReviewActivityAfterFinalMerge": 18,
+    "actualNotifications": 0,
+    "notificationPermissionRequests": 0,
+    "externalEffects": 0
+  },
+  "findings": [
+    {
+      "informationUuidV5": "8eaae828-350e-5d0c-9230-ab7239c6ff9c",
+      "sourcePullRequest": 23,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/23#discussion_r3881069522",
+      "severity": "P1",
+      "title": "実通知の全監査イベントを対象Intentへ結び付ける",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["scripts/validate_repo.py"],
+      "testEvidence": ["scripts/validate_repo.py#live-notification-mutation-probe"]
+    },
+    {
+      "informationUuidV5": "582c16cc-3508-50fb-8d03-fda185f0cc31",
+      "sourcePullRequest": 25,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/25#discussion_r3881453910",
+      "severity": "P1",
+      "title": "追跡外のImpeccableキャッシュを整合性生成物から除外する",
+      "disposition": "FIXED_BEFORE_PATCH",
+      "fixEvidence": ["scripts/build_manifest.py"],
+      "testEvidence": ["scripts/build_manifest.py#EXCLUDED_PATHS"]
+    },
+    {
+      "informationUuidV5": "1a0d3251-9d1e-5cf5-b7c1-3730c225a55e",
+      "sourcePullRequest": 25,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/25#discussion_r3881453919",
+      "severity": "P2",
+      "title": "再表示時に永続Intent状態と実測効果数を復元する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "examples/notification-demo/visual-state.js"],
+      "testEvidence": ["src/typescript/test/notification-visualization.test.js"]
+    },
+    {
+      "informationUuidV5": "8794ae83-d0d5-553a-a48c-0ca34cddc860",
+      "sourcePullRequest": 29,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/29#discussion_r3881745433",
+      "severity": "P2",
+      "title": "入力投影とEngineでUnicode文字数の単位を一致させる",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/notification/engine.ts"],
+      "testEvidence": ["src/typescript/test/notification.test.ts#astral-Unicode"]
+    },
+    {
+      "informationUuidV5": "d0cbd2d7-4641-5341-8ecd-6c3ec70ecb50",
+      "sourcePullRequest": 31,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/31#discussion_r3882005648",
+      "severity": "P1",
+      "title": "追跡外のPlaywright生成物を整合性生成物から除外する",
+      "disposition": "FIXED_BEFORE_PATCH",
+      "fixEvidence": ["scripts/build_manifest.py"],
+      "testEvidence": ["scripts/build_manifest.py#EXCLUDED_PARTS"]
+    },
+    {
+      "informationUuidV5": "5eb768bd-d625-54bd-ac1e-7344f214c629",
+      "sourcePullRequest": 36,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/36#discussion_r3882287954",
+      "severity": "P1",
+      "title": "取込操作を署名済み元イベントへ結び付ける",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/device-log.ts", "src/typescript/sync/synchronizer.ts", "scripts/validate_repo.py"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#signed-source-binding"]
+    },
+    {
+      "informationUuidV5": "7de0ffb0-07d0-57d5-ab26-18a0fc3bb5fa",
+      "sourcePullRequest": 41,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/41#discussion_r3882524151",
+      "severity": "P2",
+      "title": "不正なfunction_callを捨てず応答全体を停止する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/planner/responses-adapter.ts"],
+      "testEvidence": ["src/typescript/test/online-planner.test.ts#malformed-function-call"]
+    },
+    {
+      "informationUuidV5": "50c742e0-9680-5e81-aba8-10d16e668220",
+      "sourcePullRequest": 41,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/41#discussion_r3882524159",
+      "severity": "P2",
+      "title": "直列化済みPlanner入力の4096文字上限を守る",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/planner/policy.ts"],
+      "testEvidence": ["src/typescript/test/online-planner.test.ts#serialized-input-limit"]
+    },
+    {
+      "informationUuidV5": "bb100684-f2fc-50a3-ad9b-4be3516a9a10",
+      "sourcePullRequest": 41,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/41#discussion_r3882524168",
+      "severity": "P2",
+      "title": "入れ子の道具引数Schemaを再帰的に閉じる",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["schemas/responses-planner-request.schema.json"],
+      "testEvidence": ["scripts/validate_repo.py#nested-parameter-schema-mutation"]
+    },
+    {
+      "informationUuidV5": "22dd0cf8-3860-58c7-a151-18ac5cc50ac4",
+      "sourcePullRequest": 46,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/46#discussion_r3882696229",
+      "severity": "P1",
+      "title": "契約レジストリのキーと道具識別子を一致させる",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/security-boundary.ts"],
+      "testEvidence": ["src/typescript/test/security-boundary.test.ts#registry-identity"]
+    },
+    {
+      "informationUuidV5": "2f782c09-ee7e-525f-8468-9c7c8f3e0d6d",
+      "sourcePullRequest": 46,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/46#discussion_r3882696235",
+      "severity": "P1",
+      "title": "項目名に依存せず秘密らしい値を拒否する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/security-boundary.ts"],
+      "testEvidence": ["src/typescript/test/security-boundary.test.ts#secret-shaped-values"]
+    },
+    {
+      "informationUuidV5": "a815615d-759f-5bd1-a9c5-6a60ef788058",
+      "sourcePullRequest": 46,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/46#discussion_r3882696241",
+      "severity": "P1",
+      "title": "権限判断前に評価時刻を安全な整数として検査する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/security-boundary.ts"],
+      "testEvidence": ["src/typescript/test/security-boundary.test.ts#invalid-clock"]
+    },
+    {
+      "informationUuidV5": "a78e5edb-4249-5009-a310-cc0131da6759",
+      "sourcePullRequest": 46,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/46#discussion_r3882696250",
+      "severity": "P2",
+      "title": "変更契約に空でない読取対象と書込対象を要求する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/security-boundary.ts"],
+      "testEvidence": ["src/typescript/test/security-boundary.test.ts#mutation-read-write-sets"]
+    },
+    {
+      "informationUuidV5": "f3a07aea-ce60-5dff-9b0d-7140f057fe76",
+      "sourcePullRequest": 47,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/47#discussion_r3883049431",
+      "severity": "P1",
+      "title": "鮮度境界と同じミリ秒の証拠を古いものとして拒否する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/replay-verification.ts"],
+      "testEvidence": ["src/typescript/test/replay-verification.test.ts#freshness-boundary"]
+    },
+    {
+      "informationUuidV5": "4d52b526-114b-5826-8d53-ab6e4dadc476",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883895232",
+      "severity": "P2",
+      "title": "旧同期台帳を署名済み元イベントの再取込で修復可能にする",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#legacy-source-migration"]
+    },
+    {
+      "informationUuidV5": "0a6e95b1-f829-5429-9caa-bd142f018915",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883895237",
+      "severity": "P2",
+      "title": "別処理が先に進めた最新の永続状態を受け入れる",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "examples/notification-demo/visual-state.js"],
+      "testEvidence": ["src/typescript/test/notification-visualization.test.js#newer-status-readback"]
+    },
+    {
+      "informationUuidV5": "bcad8087-6a22-59b1-99f9-cb3ce9179242",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883895242",
+      "severity": "P2",
+      "title": "入れ子Schemaの宣言項目と必須項目を完全一致させる",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["scripts/validate_repo.py"],
+      "testEvidence": ["scripts/validate_repo.py#strict-parameter-contract-errors"]
+    },
+    {
+      "informationUuidV5": "a49f40c5-65fa-5363-b64f-be5d86766914",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883919859",
+      "severity": "P2",
+      "title": "WebMCPの再表示でも永続済みIntent状態を復元する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "src/typescript/webmcp/notification-adapter.js"],
+      "testEvidence": ["src/typescript/test/webmcp-notification-adapter.test.js#persisted-intent-restoration"]
+    },
+    {
+      "informationUuidV5": "634d296a-aa05-536e-9874-70c499eee377",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883919868",
+      "severity": "P2",
+      "title": "厳格Schemaの最小値と最大値の逆転を拒否する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["scripts/validate_repo.py"],
+      "testEvidence": ["scripts/validate_repo.py#inverted-scalar-bounds-mutation"]
+    },
+    {
+      "informationUuidV5": "1f1b52fb-d801-5f64-97a1-dfd275841146",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883919879",
+      "severity": "P2",
+      "title": "秘密項目の判定を項目名の境界へ限定する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/governance/security-boundary.ts"],
+      "testEvidence": ["src/typescript/test/security-boundary.test.ts#secret-field-name-boundaries"]
+    },
+    {
+      "informationUuidV5": "e7c27b84-7f90-5d05-b838-d5467ac7ee41",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883994468",
+      "severity": "P1",
+      "title": "取込判断を署名済み操作から導出する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#signed-decision-binding"]
+    },
+    {
+      "informationUuidV5": "b7c65009-e07f-5668-8618-1b8cff72fa1a",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3883994475",
+      "severity": "P2",
+      "title": "SQLiteの重複識別列を監査記録へ結び付ける",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#sqlite-row-identity-binding"]
+    },
+    {
+      "informationUuidV5": "62165297-6dec-5f97-a77b-3eb1892678eb",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884100007",
+      "severity": "P1",
+      "title": "元イベントを端末の署名鎖とチェックポイントへ結び付ける",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#signed-device-chain-binding"]
+    },
+    {
+      "informationUuidV5": "3093ad26-25f3-5912-b015-70a04c93fe08",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884100021",
+      "severity": "P2",
+      "title": "WebMCP入力境界にも復元済み状態を表示する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "examples/notification-demo/visual-state.js"],
+      "testEvidence": ["src/typescript/test/notification-visualization.test.js#restored-input-boundary"]
+    },
+    {
+      "informationUuidV5": "6bf6cd1e-2220-5770-a630-6bb7eeb0c1ee",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884199393",
+      "severity": "P1",
+      "title": "保存済みの各区間チェックポイントと連結関係を検証する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#retained-prefix-checkpoints"]
+    },
+    {
+      "informationUuidV5": "4cb035a8-f737-514f-90c6-da6c0672f814",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884199397",
+      "severity": "P2",
+      "title": "別の通知予定を復元する前に画面状態を初期化する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "examples/notification-demo/visual-state.js"],
+      "testEvidence": ["src/typescript/test/notification-visualization.test.js#restore-resets-prior-intent"]
+    },
+    {
+      "informationUuidV5": "22f6663a-2651-58fe-aab8-f213212c6562",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884199399",
+      "severity": "P2",
+      "title": "実行前状態でも実測効果数を失わず不整合を表示する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/visual-state.js"],
+      "testEvidence": ["src/typescript/test/notification-visualization.test.js#pre-effect-count-mismatch"]
+    },
+    {
+      "informationUuidV5": "d2cbf4dc-f6a8-53df-ae82-e3e84f51ee7f",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884278221",
+      "severity": "P1",
+      "title": "同時WebMCP呼び出しごとに入力と結果を結び付ける",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js", "src/typescript/webmcp/notification-adapter.js"],
+      "testEvidence": ["src/typescript/test/webmcp-notification-adapter.test.js#overlapping-executions"]
+    },
+    {
+      "informationUuidV5": "4eeca0e8-026c-559e-9496-885453aa6f30",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884278228",
+      "severity": "P2",
+      "title": "実測件数の矛盾をWebMCP画面の安全違反表示へ渡す",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/webmcp/notification-adapter.js", "examples/notification-demo/app.js"],
+      "testEvidence": ["src/typescript/test/webmcp-notification-adapter.test.js#measured-count-inconsistencies"]
+    },
+    {
+      "informationUuidV5": "c2e27d1a-220f-5c4a-b6f6-7075bf2c5733",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884278232",
+      "severity": "P2",
+      "title": "親が欠けた非nullチェックポイント連結を拒否する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#missing-checkpoint-parent"]
+    },
+    {
+      "informationUuidV5": "133e9b91-5738-5e1c-8bcd-567a65bba243",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884301859",
+      "severity": "P1",
+      "title": "端末公開鍵の要約値をSQLite外へ固定する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["src/typescript/sync/synchronizer.ts", "src/typescript/sync/types.ts", "docs/17-offline-sync-reference.ja.md"],
+      "testEvidence": ["src/typescript/test/offline-sync.test.ts#substituted-database-key"]
+    },
+    {
+      "informationUuidV5": "7a79c189-d065-5783-9e6b-b096312036f5",
+      "sourcePullRequest": 51,
+      "reviewUrl": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/51#discussion_r3884425035",
+      "severity": "P2",
+      "title": "ローカル乾式実行の状態読戻しを呼出元の通知予定へ固定する",
+      "disposition": "FIXED_IN_PATCH",
+      "fixEvidence": ["examples/notification-demo/app.js"],
+      "testEvidence": ["src/typescript/test/notification-input-projection.test.ts#local-preview-status-binding"]
+    }
+  ],
+  "summary": {
+    "total": 32,
+    "fixedInPatch": 30,
+    "fixedBeforePatch": 2,
+    "remaining": 0
+  },
+  "verification": {
+    "eventUuidV7": "01a04a11-70f3-7dd6-8a87-97401a43b74e",
+    "verifiedAt": "2026-08-28T20:30:52.147Z",
+    "epochMs": 1787949052147,
+    "stateTransition": "REVIEW -> VERIFIED",
+    "browserDryRunRequests": 2,
+    "persistedControlState": "DRY_RUN",
+    "persistedEffectState": "NOT_STARTED",
+    "effectStartCount": 0,
+    "notificationPermission": "default",
+    "consoleErrors": 0,
+    "externalNetworkRequests": 0
+  },
+  "reviewUpdates": [
+    {
+      "eventUuidV7": "01a04a1b-eac6-7c5c-aa43-c19d4a593bfb",
+      "observedAt": "2026-08-28T20:42:18.694Z",
+      "epochMs": 1787949738694,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 3
+    },
+    {
+      "eventUuidV7": "01a04a28-9e04-7709-9ce3-49b9331fd953",
+      "observedAt": "2026-08-28T20:56:11.012Z",
+      "epochMs": 1787950571012,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 3
+    },
+    {
+      "eventUuidV7": "01a04a2c-246b-7e0e-bc66-2a7ff653aef0",
+      "observedAt": "2026-08-28T21:00:02.027Z",
+      "epochMs": 1787950802027,
+      "stateTransition": "REVIEW -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 2
+    },
+    {
+      "eventUuidV7": "01a04a3b-7a18-7745-9b09-d8e5a2a74866",
+      "observedAt": "2026-08-28T21:16:47.000Z",
+      "epochMs": 1787951807000,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 2
+    },
+    {
+      "eventUuidV7": "01a04a4c-1be8-7fcc-a67f-5eaff2cc8030",
+      "observedAt": "2026-08-28T21:34:57.000Z",
+      "epochMs": 1787952897000,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 3
+    },
+    {
+      "eventUuidV7": "01a04a5a-ece0-7715-a44c-3fe4200880af",
+      "observedAt": "2026-08-28T21:51:08.000Z",
+      "epochMs": 1787953868000,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 3
+    },
+    {
+      "eventUuidV7": "01a04a5f-6d38-7fc8-89b3-1e7daabc661d",
+      "observedAt": "2026-08-28T21:56:03.000Z",
+      "epochMs": 1787954163000,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 1
+    },
+    {
+      "eventUuidV7": "01a04a78-c198-785c-8260-cbcaa840927f",
+      "observedAt": "2026-08-28T22:23:43.000Z",
+      "epochMs": 1787955823000,
+      "stateTransition": "VERIFIED -> REVIEW",
+      "sourcePullRequest": 51,
+      "newFindings": 1
+    }
+  ],
+  "finalVerification": {
+    "eventUuidV7": "01a04a7f-03b3-7ea3-b221-d6f3f9048e5e",
+    "verifiedAt": "2026-08-28T22:30:33.139Z",
+    "epochMs": 1787956233139,
+    "stateTransition": "REVIEW -> VERIFIED",
+    "reviewFindings": 32,
+    "nodeTests": 112,
+    "repositoryChecks": 18,
+    "browserDryRunRequests": 4,
+    "persistedControlState": "DRY_RUN",
+    "persistedEffectState": "NOT_STARTED",
+    "effectStartCount": 0,
+    "notificationPermissionRequests": 0,
+    "actualNotifications": 0,
+    "consoleErrors": 0,
+    "externalNetworkRequests": 0
+  }
+}

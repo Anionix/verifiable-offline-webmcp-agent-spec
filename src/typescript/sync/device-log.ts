@@ -1,6 +1,10 @@
 // information_uuid_v5=4c46a65c-66c0-5243-a754-8616768cdb94
 // event_uuid_v7=01a0491b-3d80-7f35-aefd-389ffa4d29bc
 // machine-contract: OFFLINE_APPEND -> SIGNED_CHECKPOINT -> VERIFIED; invalid time, identity, sequence, hash, or signature fails closed.
+// information_uuid_v5=3a0187cc-7497-5325-a2ad-3df91330e778
+// event_uuid_v7=01a049ff-0159-7193-b343-dc803d80f4e0
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.929Z
+// machine-contract: a stored source event is independently bound to its canonical operation, digest, chain hash, and Ed25519 signature.
 import { createPublicKey, generateKeyPairSync, type KeyObject } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion, uuidV5, uuidV7, uuidV7EpochMs } from "../uuid.ts";
@@ -243,6 +247,34 @@ export function verifyDeviceChain(
     chainHead: previousHash,
     merkleRoot: checkpoint.merkleRoot,
   };
+}
+
+export function verifySignedDeviceEvent(event: SignedDeviceEvent, publicKey: KeyObject | string): boolean {
+  try {
+    if (
+      event.version !== SYNC_VERSION
+      || !isUuidVersion(event.eventId, 7)
+      || !isUuidVersion(event.deviceId, 5)
+      || !isUuidVersion(event.logId, 5)
+      || !isUuidVersion(event.keyId, 5)
+      || event.proof.algorithm !== "Ed25519"
+      || event.proof.keyId !== event.keyId
+      || uuidV7EpochMs(event.eventId) !== event.occurredAtEpochMs
+      || Date.parse(event.occurredAt) !== event.occurredAtEpochMs
+    ) return false;
+    assertOperation(event.operation);
+    const digest = canonicalDigest(eventCore(event) as unknown as CanonicalValue);
+    if (event.proof.eventDigest !== digest) return false;
+    const chainHash = chainedDigest(event.previousChainHash, digest, event.sequence);
+    return event.proof.chainHash === chainHash
+      && verifyBase64(
+        publicKey,
+        eventSignatureMessage(event.logId, event.deviceId, event.sequence, chainHash),
+        event.proof.signatureBase64,
+      );
+  } catch {
+    return false;
+  }
 }
 
 export function canonicalEventJson(event: SignedDeviceEvent): string {

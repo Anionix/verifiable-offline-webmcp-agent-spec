@@ -3,6 +3,17 @@
 <!-- information_uuid_v5=06f137fc-6ca9-5499-b447-b9cd9df976b5 event_uuid_v7=01a048c2-e3c4-7c0c-9abb-21b175b0719a state_transition=IMPLEMENTING -> BROWSER_VERIFIED occurred_at=2026-08-28T14:25:32.776Z -->
 <!-- information_uuid_v5=34c13a76-73d8-5cf5-9fe1-fec1e071ba2f event_uuid_v7=01a04904-ca97-76f0-a4ed-56ea8c3ac507 state_transition=INPUT_PROJECTED -> PROVENANCE_READ_BACK occurred_at=2026-08-28T15:37:25.911Z -->
 <!-- information_uuid_v5=7f1288b1-5d73-52a3-8a2c-8c686b5f568f event_uuid_v7=01a04925-5225-765c-93f3-c2b51a62ed94 state_transition=OFFLINE_DIVERGENCE -> VERIFIED_RECONNECT occurred_at=2026-08-28T16:12:57.765Z -->
+<!-- information_uuid_v5=dd800038-c07b-50a5-822b-0431b060f12f event_uuid_v7=01a04948-c160-784b-8599-9381b80a7666 state_transition=LOCAL_READY -> UNTRUSTED_PROPOSAL occurred_at=2026-08-28T16:51:40Z -->
+
+## 0.5.0-candidate — 2026-08-29
+
+- Added an optional transport-neutral Responses planner boundary; remote planning is disabled by default and the local path remains available when disabled or offline.
+- Limited exposure to feasible, allowlisted, proposal-only tools with strict closed input shapes and one function call per response.
+- Added minimum-public-data projection, secret-like value detection, digest-only audit records, trusted rate-card checks, worst-case cost bounds, and latency limits.
+- Treated every model result as `UNTRUSTED_PROPOSAL` with authorization and external-effect counters fixed at zero.
+- Stopped without automatic retry on timeout, response loss, incomplete output, unknown tools, invalid arguments, and multiple function calls.
+- Added 13 reproducible scripted scenarios, a hash-chained public audit record, an independently validated request sample, and a read-only responsive visualization.
+- Actual network requests and external spend are zero. Live Responses API conformance is `INCONCLUSIVE`; current production pricing and quality are `UNMEASURED`.
 
 ## 0.4.0-candidate — 2026-08-29
 

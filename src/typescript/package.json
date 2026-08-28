@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "demo:notification": "node --experimental-strip-types notification/demo-server.ts",
     "demo:sync": "node --experimental-strip-types sync/demo-server.ts",
+    "demo:planner": "node --experimental-strip-types planner/demo-server.ts",
     "evidence:sync": "node --experimental-strip-types sync/generate-evidence.ts",
+    "evidence:planner": "node --experimental-strip-types planner/generate-evidence.ts",
     "benchmark:notification": "node --experimental-strip-types notification/benchmark.ts"
   },
   "engines": {

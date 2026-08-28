@@ -6,6 +6,7 @@ event_uuid_v7: "01a04291-c2e0-7d98-bf15-0be303646458"
 updated_event_uuid_v7: "01a048e2-e264-7ed5-a64b-2f3ef202ffe7"
 provenance_event_uuid_v7: "01a04904-ca95-7468-9bd0-cb597093a64a"
 offline_sync_event_uuid_v7: "01a04927-4698-7f6a-b5e9-ef8bd558913c"
+online_planner_event_uuid_v7: "01a04948-c160-7283-a380-4f7db4ccb041"
 generated_at: "2026-08-27T09:34:04.000Z"
 updated_at: "2026-08-28T16:15:06.008Z"
 version: "0.1.0"
@@ -14,7 +15,7 @@ status: "design-specification"
 
 # Verification Test Catalog / 検証テスト台帳
 
-**Total / 合計:** 67 tests — implemented 39 / partially implemented 13 / specified 15. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification and local two-device synchronization references raise only their bounded paths; remote transport, general native WebMCP conformance, and unrelated tool classes remain unimplemented.
+**Total / 合計:** 67 tests — implemented 44 / partially implemented 11 / specified 12. Machine-readable authority: [`knowledge/tests.json`](../knowledge/tests.json). The notification, local two-device synchronization, and optional planner references raise only their bounded paths; real Responses API transport, general native WebMCP conformance, and unrelated tool classes remain unimplemented.
 
 | Test ID | Kind | Status | Automated | Requirements |
 |---|---|---|---:|---|
@@ -32,7 +33,7 @@ status: "design-specification"
 | `TEST-AUDIT-009` | cryptographic-audit-verification | implemented | yes | REQ-AUDIT-009 |
 | `TEST-AUTH-001` | security-policy-test | partially-implemented | yes | REQ-POLICY-007 |
 | `TEST-CONFORMANCE-001` | decision-conformance-test | implemented | yes | REQ-POLICY-003 |
-| `TEST-CONTRACT-001` | tool-contract-test | partially-implemented | yes | REQ-TOOL-001 |
+| `TEST-CONTRACT-001` | tool-contract-test | implemented | yes | REQ-TOOL-001 |
 | `TEST-CONTRACT-002` | tool-contract-test | specified | no | REQ-TOOL-002 |
 | `TEST-CRITICAL-001` | security-policy-test | specified | no | REQ-POLICY-006 |
 | `TEST-CRITICAL-002` | security-policy-test | specified | no | REQ-SEC-005 |
@@ -50,7 +51,7 @@ status: "design-specification"
 | `TEST-MODEL-005` | finite-state-model-check | implemented | yes | REQ-EXEC-005 |
 | `TEST-MODEL-ALL` | finite-state-model-check | implemented | yes | REQ-FORMAL-001 |
 | `TEST-MODEL-MUTATION` | finite-state-model-check | implemented | yes | REQ-FORMAL-002 |
-| `TEST-OFFLINE-001` | offline-sync-scenario-test | partially-implemented | yes | REQ-PLAN-001, REQ-OFFLINE-001 |
+| `TEST-OFFLINE-001` | offline-sync-scenario-test | implemented | yes | REQ-PLAN-001, REQ-OFFLINE-001 |
 | `TEST-OFFLINE-002` | offline-sync-scenario-test | implemented | yes | REQ-OFFLINE-002 |
 | `TEST-OFFLINE-003` | offline-sync-scenario-test | partially-implemented | yes | REQ-OFFLINE-003 |
 | `TEST-POLICY-001` | decision-conformance-test | implemented | yes | REQ-WEBMCP-003 |
@@ -58,13 +59,13 @@ status: "design-specification"
 | `TEST-POLICY-003` | decision-conformance-test | implemented | yes | REQ-POLICY-002 |
 | `TEST-POLICY-004` | decision-conformance-test | implemented | yes | REQ-POLICY-004 |
 | `TEST-POLICY-005` | decision-conformance-test | implemented | yes | REQ-POLICY-009 |
-| `TEST-PRIVACY-001` | security-policy-test | specified | no | REQ-POLICY-005 |
-| `TEST-PRIVACY-002` | security-policy-test | specified | no | REQ-SEC-006 |
+| `TEST-PRIVACY-001` | security-policy-test | implemented | yes | REQ-POLICY-005 |
+| `TEST-PRIVACY-002` | security-policy-test | implemented | yes | REQ-SEC-006 |
 | `TEST-SCHEMA-001` | json-schema-validation | implemented | yes | REQ-DATA-001 |
 | `TEST-SCHEMA-002` | json-schema-validation | implemented | yes | REQ-DATA-002 |
 | `TEST-SEC-001` | security-policy-test | specified | no | REQ-ID-003 |
 | `TEST-SEC-002` | security-policy-test | specified | no | REQ-MCP-001 |
-| `TEST-SEC-003` | security-policy-test | specified | no | REQ-PLAN-003 |
+| `TEST-SEC-003` | security-policy-test | implemented | yes | REQ-PLAN-003 |
 | `TEST-SEC-004` | security-policy-test | specified | no | REQ-POLICY-008 |
 | `TEST-SEC-005` | security-policy-test | specified | no | REQ-SEC-001 |
 | `TEST-SEC-006` | security-policy-test | specified | no | REQ-SEC-002 |

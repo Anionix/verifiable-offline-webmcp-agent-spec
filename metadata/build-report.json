@@ -1,6 +1,6 @@
 {
   "artifact": "verifiable-offline-webmcp-agent-spec",
-  "validatedAt": "2026-08-28T16:27:26.974564Z",
+  "validatedAt": "2026-08-28T17:01:26.362040Z",
   "checks": {
     "structured_parse": true,
     "live_notification_evidence": true,
@@ -12,6 +12,7 @@
     "audit_chain_signatures": true,
     "merkle_checkpoint": true,
     "offline_sync_evidence": true,
+    "online_planner_evidence": true,
     "no_private_keys": true,
     "reachability_and_mutation": true,
     "typescript_tests": true,

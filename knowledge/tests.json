@@ -3,21 +3,21 @@
     "id": "DS-TESTS",
     "identity": {
       "uuid_v5": "0bb912e5-bdab-55d1-8dbd-70d304ce3555",
-      "uuid_v7": "01a04291-bef7-72b0-91d2-cea19f3c20bc",
+      "uuid_v7": "01a04948-c160-7d2a-a48e-5fbf37521b99",
       "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
       "canonical_name": "ds-tests",
       "category": "dataset"
     },
     "temporal": {
       "created_at": "2026-08-27T09:34:02.999Z",
-      "updated_at": "2026-08-27T09:34:02.999Z",
-      "observed_at": "2026-08-27T09:34:02.999Z",
+      "updated_at": "2026-08-28T16:51:40Z",
+      "observed_at": "2026-08-28T16:51:40Z",
       "valid_from": "2026-08-27T09:34:02.999Z",
       "valid_to": null,
-      "epoch_ms": 1787823242999,
+      "epoch_ms": 1787935900000,
       "time_zone": "UTC",
       "local_time_zone": "Asia/Tokyo",
-      "local_rendering": "2026-08-27T18:34:02.999+09:00",
+      "local_rendering": "2026-08-29T01:51:40+09:00",
       "precision": "millisecond",
       "standard": "RFC 3339 profile"
     },
@@ -775,7 +775,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "tool-contract-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: 各toolはinput、precondition、transition、postcondition、cost、risk、evidenceのcontractを持たなければならない。",
@@ -790,20 +790,25 @@
       ],
       "source_refs": [
         "SRC-JSONSCHEMA-2020-12",
-        "SRC-WEBMCP-2026"
+        "SRC-WEBMCP-2026",
+        "SRC-OPENAI-FUNCTION-CALLING-2026"
       ],
       "automation_artifacts": [
         "schemas/notification-intent.schema.json",
+        "schemas/responses-planner-request.schema.json",
         "src/typescript/notification/types.ts",
         "src/typescript/notification/engine.ts",
-        "src/typescript/test/notification.test.ts"
+        "src/typescript/planner/types.ts",
+        "src/typescript/planner/policy.ts",
+        "src/typescript/test/notification.test.ts",
+        "src/typescript/test/online-planner.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-313b-726f-87dd-b9d1d2422a39",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "duplicate-safe local notification adapter"
+        "event_uuid_v7": "01a04948-c160-7bf8-8081-74dfe7b2d787",
+        "occurred_at": "2026-08-28T16:51:40Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "strict proposal-only planner contract with explicit cost, risk, evidence, and authority boundaries"
       }
     },
     {
@@ -1670,7 +1675,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: Responses APIはoptional plannerであり、system availabilityの単一障害点にしてはならない。 / network unavailable時にResponsesを候補から除外し、core local workflowを維持しなければならない。",
@@ -1686,18 +1691,24 @@
       ],
       "source_refs": [
         "SRC-OPENAI-RESPONSES-2025",
-        "SRC-OPENAI-RUNTIME-2026"
+        "SRC-OPENAI-RUNTIME-2026",
+        "SRC-OPENAI-RESPONSES-CREATE-2026"
       ],
       "automation_artifacts": [
         "src/typescript/notification/demo-server.ts",
-        "src/typescript/test/notification.test.ts"
+        "src/typescript/planner/policy.ts",
+        "src/typescript/planner/responses-adapter.ts",
+        "src/typescript/planner/simulation.ts",
+        "src/typescript/test/notification.test.ts",
+        "src/typescript/test/online-planner.test.ts",
+        "metadata/online-planner-verification.json"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-317e-7e77-a24f-2a06534e68ea",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "local notification workflow without an online planner"
+        "event_uuid_v7": "01a04948-c160-74e5-95ad-f71ef5f40144",
+        "occurred_at": "2026-08-28T16:51:40Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "online planning disabled and network-unavailable scenarios both preserve the local core path"
       }
     },
     {
@@ -1909,10 +1920,16 @@
       ],
       "source_refs": [
         "SRC-MCP-2026",
-        "SRC-OPENAI-MCP-2025"
+        "SRC-OPENAI-MCP-2025",
+        "SRC-OPENAI-RESPONSES-CREATE-2026",
+        "SRC-OPENAI-FUNCTION-CALLING-2026"
       ],
       "automation_artifacts": [
         "data/golden-vectors.json",
+        "schemas/responses-planner-request.schema.json",
+        "src/typescript/planner/policy.ts",
+        "src/typescript/planner/responses-adapter.ts",
+        "src/typescript/test/online-planner.test.ts",
         "src/typescript/test/evaluator.test.ts",
         "scripts/validate_repo.py"
       ]
@@ -2095,8 +2112,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: remote plannerへ送るデータは必要品質を満たす最小十分集合にしなければならない。",
         "en": "Verifies the following requirement(s): Data sent to a remote planner MUST be the minimum sufficient set that meets required quality."
@@ -2111,7 +2128,20 @@
       "source_refs": [
         "SRC-WEBMCP-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/planner/policy.ts",
+        "src/typescript/planner/simulation.ts",
+        "src/typescript/test/online-planner.test.ts",
+        "examples/online-planner-demo/request.sample.json",
+        "scripts/validate_repo.py"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04948-c160-7c93-b781-b9c4bdcae17f",
+        "occurred_at": "2026-08-28T16:51:40Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "minimum public-field projection and required non-public field rejection"
+      }
     },
     {
       "id": "TEST-PRIVACY-002",
@@ -2141,8 +2171,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: audit logにsecretまたは不要なpersonal dataを直接保存してはならない。",
         "en": "Verifies the following requirement(s): The audit log MUST NOT directly store secrets or unnecessary personal data."
@@ -2157,7 +2187,20 @@
       "source_refs": [
         "SRC-PROVO-2013"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/planner/audit-log.ts",
+        "src/typescript/planner/simulation.ts",
+        "src/typescript/test/online-planner.test.ts",
+        "data/audit/online-planner-events.ndjson",
+        "scripts/validate_repo.py"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04948-c160-72c8-8dd5-a4edaee48410",
+        "occurred_at": "2026-08-28T16:51:40Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "digest-only planner audit with privacy sentinels excluded from public artifacts"
+      }
     },
     {
       "id": "TEST-SCHEMA-001",
@@ -2378,8 +2421,8 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "specified",
-      "automated": false,
+      "implementation_status": "implemented",
+      "automated": true,
       "description": {
         "ja": "次の要件を検証する: planner出力はcandidate proposalであり、authorizationを生成してはならない。",
         "en": "Verifies the following requirement(s): Planner output MUST be treated as a candidate proposal and MUST NOT create authorization."
@@ -2392,9 +2435,25 @@
         "REQ-PLAN-003"
       ],
       "source_refs": [
-        "SRC-OPENAI-RUNTIME-2026"
+        "SRC-OPENAI-RUNTIME-2026",
+        "SRC-OPENAI-RESPONSES-CREATE-2026",
+        "SRC-OPENAI-FUNCTION-CALLING-2026"
       ],
-      "automation_artifacts": []
+      "automation_artifacts": [
+        "src/typescript/planner/types.ts",
+        "src/typescript/planner/responses-adapter.ts",
+        "src/typescript/planner/simulation.ts",
+        "src/typescript/test/online-planner.test.ts",
+        "metadata/online-planner-verification.json",
+        "scripts/validate_repo.py"
+      ],
+      "status_transition": {
+        "event_uuid_v7": "01a04948-c160-7106-876a-dd5229e922f7",
+        "occurred_at": "2026-08-28T16:51:40Z",
+        "from": "specified",
+        "to": "implemented",
+        "scope": "planner output fixed to UNTRUSTED_PROPOSAL with authorization and external effects at zero"
+      }
     },
     {
       "id": "TEST-SEC-004",

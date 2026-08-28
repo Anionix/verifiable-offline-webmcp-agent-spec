@@ -3,13 +3,14 @@ title: "Validation Report / 検証報告"
 language: "ja-en"
 stable_uuid_v5: "a6b95fb5-3315-581f-8c52-faf489415b1e"
 event_uuid_v7: "01a04291-c4d4-729d-b9a2-d5cdbe2705b3"
-updated_event_uuid_v7: "01a04932-2df3-7b67-8676-2471c29a7da5"
+updated_event_uuid_v7: "01a04948-c160-7499-9ba6-5e1dca93814a"
 live_verification_event_uuid_v7: "01a04896-44e2-7ad8-9c68-587631dc4945"
 browser_visual_verification_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
 offline_sync_verification_event_uuid_v7: "01a04927-46cd-765b-912f-a63737578d9e"
+online_planner_verification_event_uuid_v7: "01a04948-c160-7499-9ba6-5e1dca93814a"
 generated_at: "2026-08-27T09:34:04.500Z"
-updated_at: "2026-08-28T16:27:00.467Z"
-version: "0.4.0-candidate"
+updated_at: "2026-08-28T16:51:40Z"
+version: "0.5.0-candidate"
 status: "validation-report"
 ---
 
@@ -20,7 +21,7 @@ status: "validation-report"
 
 ## Snapshot / 検証snapshot
 
-- Validator timestamp: `2026-08-28T16:27:26.974564Z`
+- Validator timestamp: `2026-08-28T17:01:26.362040Z`
 - Overall: **PASS**
 - Error count: `0`
 - Validation command: `make validate`
@@ -38,6 +39,7 @@ status: "validation-report"
 | `audit_chain_signatures` | PASS |
 | `merkle_checkpoint` | PASS |
 | `offline_sync_evidence` | PASS |
+| `online_planner_evidence` | PASS |
 | `no_private_keys` | PASS |
 | `reachability_and_mutation` | PASS |
 | `typescript_tests` | PASS |
@@ -48,7 +50,7 @@ status: "validation-report"
 
 | Category | Records |
 |---|---:|
-| Primary sources / 一次情報源 | 26 |
+| Primary sources / 一次情報源 | 28 |
 | Claims / 主張 | 27 |
 | Requirements / 要件 | 69 |
 | Formulas / 数式 | 55 |
@@ -62,9 +64,19 @@ status: "validation-report"
 
 ### TypeScript
 
-- 54 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, and both visual state contracts.
+- 61 Node test cases passed: decision golden vectors, strict UUID checks, canonical JSON constraints, notification approval and duplicate protection, WebMCP input provenance, signed device chains, linked repeated checkpoints, persistent global ingestion, fork and gap rejection, safe-state convergence, dangerous-effect quarantine, optional planner guardrails, and all three visual state contracts.
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
-- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), and the two browser-state tests in [`src/typescript/test`](../src/typescript/test/).
+- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), [`src/typescript/test/online-planner.test.ts`](../src/typescript/test/online-planner.test.ts), and the three browser-state tests in [`src/typescript/test`](../src/typescript/test/).
+
+### Optional online planner candidate
+
+- Thirteen deterministic scripted paths covered disabled, offline, required-private-field, secret-looking public value, unknown cost, over-budget cost, healthy candidate, unknown tool, invalid arguments, timeout, response loss, incomplete response, and multiple calls.
+- Exactly one healthy response became `UNTRUSTED_PROPOSAL`. Actual network requests, actual external spend, authorization creation, external-effect starts, and automatic retries all remained `0`.
+- The public request uses one allowlisted strict function tool, `store=false`, `background=false`, and `parallel_tool_calls=false`. Its context contains only the allowed public `goal` and `channel` fields.
+- The evidence generator produced byte-identical evidence, request, and audit files on consecutive runs.
+- Independent Python verification checked both JSON Schemas, artifact hashes, UUIDv5/v7 identities and time binding, the 33-event audit hash chain, minimum disclosure, strict tool parameters, seven simulated transport starts, one candidate, and all stop reasons.
+- Browser checks at `1440 x 1000` and `390 x 844` found no horizontal overflow. Replaying the visible flow added no resource requests and preserved candidate `1`, authorization `0`, and external effects `0`; console warnings and errors were empty.
+- Live Responses API conformance is `INCONCLUSIVE`; current production pricing and production quality are `UNMEASURED`. Evidence: [`metadata/online-planner-verification.json`](../metadata/online-planner-verification.json).
 
 ### Two-device offline synchronization candidate
 

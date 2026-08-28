@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "0.5.0",
+  "identity": {
+    "uuidV5": "7a97591a-7cea-5064-993f-8701a0be2ef8",
+    "uuidV7": "01a0493d-49e1-74db-a71b-e349dde94743",
+    "uuidNamespace": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+  },
+  "temporal": {
+    "observedAt": "2026-08-28T16:39:08.513Z",
+    "epochMs": 1787935148513,
+    "timeZone": "UTC"
+  },
+  "status": "VERIFIED",
+  "scope": {
+    "mode": "LOCAL_SCRIPTED_SIMULATION",
+    "actualNetworkRequests": 0,
+    "actualExternalSpendMicroUsd": 0,
+    "authorizationCreated": 0,
+    "externalEffectStarts": 0,
+    "localHardwareAndDevelopmentCost": "UNMEASURED"
+  },
+  "observations": {
+    "scenarioCount": 13,
+    "expectedOutcomesMatched": true,
+    "localPathAvailableWhenDisabled": true,
+    "localPathAvailableWhenOffline": true,
+    "privacyValuesExposed": false,
+    "acceptedCandidateCount": 1,
+    "acceptedCandidateStatus": "UNTRUSTED_PROPOSAL",
+    "automaticRetries": 0,
+    "auditChainValid": true,
+    "stopReasons": [
+      "COST_LIMIT_EXCEEDED",
+      "COST_UNMEASURED",
+      "INCOMPLETE_RESPONSE",
+      "INVALID_ARGUMENTS",
+      "MULTIPLE_TOOL_CALLS",
+      "PRIVACY_REQUIRED_FIELD",
+      "RESPONSE_LOST",
+      "SENSITIVE_VALUE_DETECTED",
+      "TIMEOUT",
+      "UNKNOWN_TOOL"
+    ]
+  },
+  "requestContract": {
+    "store": false,
+    "background": false,
+    "parallelToolCalls": false,
+    "strictTools": true,
+    "allowlistApplied": true
+  },
+  "artifacts": {
+    "auditLedger": "data/audit/online-planner-events.ndjson",
+    "requestSample": "examples/online-planner-demo/request.sample.json",
+    "sha256": {
+      "data/audit/online-planner-events.ndjson": "b62cac6f23945f05b637a159035cbb7ee24c5f3c8363cc306564f907e1f2fc25",
+      "examples/online-planner-demo/request.sample.json": "e3308330dbc11ae46595994ae27a7197a6f848605096918c3399107a4f04fc7f"
+    }
+  },
+  "requirements": [
+    "REQ-PLAN-001",
+    "REQ-PLAN-002",
+    "REQ-PLAN-003",
+    "REQ-OFFLINE-001",
+    "REQ-POLICY-005",
+    "REQ-SEC-006"
+  ],
+  "limitations": {
+    "liveResponsesApiConformance": "INCONCLUSIVE",
+    "currentProductionPricing": "UNMEASURED",
+    "productionQuality": "UNMEASURED"
+  }
+}

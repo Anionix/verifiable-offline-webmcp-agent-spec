@@ -1,0 +1,60 @@
+{
+  "model": "simulated-planner-v1",
+  "input": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "{\"context\":{\"channel\":\"mac-local\",\"goal\":\"通知候補を一件だけ作る\"},\"taskKind\":\"notification-preview\"}"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "draft_notification_preview",
+      "description": "Create an untrusted preview candidate without approval or notification delivery.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ]
+          }
+        },
+        "required": [
+          "summary",
+          "urgency"
+        ]
+      },
+      "strict": true
+    }
+  ],
+  "tool_choice": {
+    "type": "allowed_tools",
+    "mode": "required",
+    "tools": [
+      {
+        "type": "function",
+        "name": "draft_notification_preview"
+      }
+    ]
+  },
+  "parallel_tool_calls": false,
+  "max_output_tokens": 64,
+  "store": false,
+  "background": false,
+  "safety_identifier": "caa20c7b-5afe-5c96-a324-a1b6bba18eb2"
+}

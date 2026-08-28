@@ -6,6 +6,7 @@ event_uuid_v7: "01a04291-b452-750e-a9e5-19fbca156cb5"
 updated_event_uuid_v7: "01a048c2-e2b4-71da-a6c7-c5269c9b69d3"
 provenance_event_uuid_v7: "01a04904-ca9b-7c0b-8987-01c2078e6b4c"
 offline_sync_event_uuid_v7: "01a04927-4629-774e-a927-d87c66c1aa09"
+online_planner_event_uuid_v7: "01a04948-c160-716f-ba38-d5125fd214b6"
 generated_at: "2026-08-27T09:34:00Z"
 updated_at: "2026-08-28T16:15:05.929Z"
 version: "0.1.0"
@@ -55,7 +56,8 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 10. [`docs/15-webmcp-input-boundary.ja.md`](docs/15-webmcp-input-boundary.ja.md) — strict WebMCP input projection / WebMCP入力の厳格投影
 11. [`docs/16-webmcp-provenance-adapter.ja.md`](docs/16-webmcp-provenance-adapter.ja.md) — isolated draft adapter and durable provenance / 専用アダプターと来歴読み戻し
 12. [`docs/17-offline-sync-reference.ja.md`](docs/17-offline-sync-reference.ja.md) — signed two-device reconciliation with dangerous-effect quarantine / 署名付き二端末同期と危険な外部効果の隔離
-13. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
+13. [`docs/18-online-planner-reference.ja.md`](docs/18-online-planner-reference.ja.md) — optional candidate planner with tool, privacy, cost, latency, and authority boundaries / 道具・情報・費用・遅延・権限を制限した任意計画器
+14. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 
 ## Machine-readable assets / 機械可読asset
 
@@ -108,6 +110,18 @@ make demo-sync
 ```
 
 Open `http://127.0.0.1:4174`. The screen is read-only and replays the public evidence as two offline lanes converging through a signature gate. The bounded local simulation is verified; remote transport is unimplemented, production multi-device quality is `UNMEASURED`, and native WebMCP integration remains `INCONCLUSIVE`. See [`metadata/offline-sync-verification.json`](metadata/offline-sync-verification.json) and [`docs/17-offline-sync-reference.ja.md`](docs/17-offline-sync-reference.ja.md).
+
+## Optional online planner evidence demo / 任意オンライン計画器の証拠デモ
+
+The `0.5.0` reference boundary keeps the local path available, exposes only feasible proposal-only tools, removes personal and secret fields, rejects secret-looking public values, and requires a trusted operator-supplied rate card before transport. A completed response becomes only an `UNTRUSTED_PROPOSAL`; it cannot create approval or start an external effect. Timeout and response loss stop without an automatic retry.
+
+```bash
+make evidence-planner
+make validate
+make demo-planner
+```
+
+Open `http://127.0.0.1:4175`. The read-only screen shows one simulated candidate ending at a hard boundary before approval and external effect. Thirteen deterministic scenarios produced actual network requests `0`, actual spend `0`, authorization `0`, external effects `0`, and automatic retries `0`. Live Responses API conformance remains `INCONCLUSIVE`; current production pricing and quality are `UNMEASURED`. See [`metadata/online-planner-verification.json`](metadata/online-planner-verification.json) and [`docs/18-online-planner-reference.ja.md`](docs/18-online-planner-reference.ja.md).
 
 ## Primary-source posture / 一次情報源の扱い
 

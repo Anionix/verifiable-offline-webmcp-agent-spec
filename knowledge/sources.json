@@ -3,21 +3,21 @@
     "id": "DS-SOURCES",
     "identity": {
       "uuid_v5": "fa577775-5c7f-5972-82eb-ec59444e94b9",
-      "uuid_v7": "01a04291-b482-7361-ad76-f903ca7f4c06",
+      "uuid_v7": "01a04948-c160-7acb-85ba-782a438891b0",
       "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
       "canonical_name": "ds-sources",
       "category": "dataset"
     },
     "temporal": {
       "created_at": "2026-08-27T09:34:00Z",
-      "updated_at": "2026-08-27T09:34:00Z",
-      "observed_at": "2026-08-27T09:34:00Z",
+      "updated_at": "2026-08-28T16:51:40Z",
+      "observed_at": "2026-08-28T16:51:40Z",
       "valid_from": "2026-08-27T09:34:00Z",
       "valid_to": null,
-      "epoch_ms": 1787823240000,
+      "epoch_ms": 1787935900000,
       "time_zone": "UTC",
       "local_time_zone": "Asia/Tokyo",
-      "local_rendering": "2026-08-27T18:34:00+09:00",
+      "local_rendering": "2026-08-29T01:51:40+09:00",
       "precision": "millisecond",
       "standard": "RFC 3339 profile"
     },
@@ -27,7 +27,7 @@
     },
     "type": "Dataset",
     "version": "0.1.0",
-    "record_count": 26,
+    "record_count": 28,
     "format": "application/json",
     "license": "Apache-2.0"
   },
@@ -1330,6 +1330,86 @@
       "primary_source": true,
       "topics": ["transactions", "BEGIN IMMEDIATE", "write serialization", "WAL"],
       "supports": ["REQ-EXEC-001", "REQ-EXEC-002", "REQ-OFFLINE-002"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-OPENAI-RESPONSES-CREATE-2026",
+      "identity": {
+        "uuid_v5": "15ddbe8e-247d-57f3-bf21-3cba7a26c517",
+        "uuid_v7": "01a04948-c161-7234-8dc0-8db2fd23a98d",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "openai-responses-create-api-2026",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T16:51:40.001Z",
+        "updated_at": "2026-08-28T16:51:40.001Z",
+        "observed_at": "2026-08-28T16:51:40.001Z",
+        "valid_from": "2026-08-28T16:51:40.001Z",
+        "valid_to": null,
+        "epoch_ms": 1787935900001,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-29T01:51:40.001+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "OpenAI Responses API 応答作成仕様",
+        "en": "OpenAI Responses API Create Response reference"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI",
+      "authors": ["OpenAI"],
+      "published_at": "Living documentation",
+      "accessed_at": "2026-08-28T16:51:40.001Z",
+      "locator": {
+        "url": "https://developers.openai.com/api/reference/cli/resources/responses/methods/create"
+      },
+      "status": "Official API reference observed during 0.5.0 implementation",
+      "primary_source": true,
+      "topics": ["Responses API", "tool choice", "parallel tool calls", "storage", "output token limit", "usage"],
+      "supports": ["REQ-PLAN-001", "REQ-PLAN-002", "REQ-PLAN-003"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-OPENAI-FUNCTION-CALLING-2026",
+      "identity": {
+        "uuid_v5": "d7b737e5-ff59-53b9-b964-15eb58981fc5",
+        "uuid_v7": "01a04948-c162-7f71-b2fa-8df79f106838",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "openai-function-calling-guide-2026",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-28T16:51:40.002Z",
+        "updated_at": "2026-08-28T16:51:40.002Z",
+        "observed_at": "2026-08-28T16:51:40.002Z",
+        "valid_from": "2026-08-28T16:51:40.002Z",
+        "valid_to": null,
+        "epoch_ms": 1787935900002,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-29T01:51:40.002+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "OpenAI 関数呼び出しガイド",
+        "en": "OpenAI Function Calling guide"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI",
+      "authors": ["OpenAI"],
+      "published_at": "Living documentation",
+      "accessed_at": "2026-08-28T16:51:40.002Z",
+      "locator": {
+        "url": "https://developers.openai.com/api/docs/guides/function-calling"
+      },
+      "status": "Official developer guide observed during 0.5.0 implementation",
+      "primary_source": true,
+      "topics": ["function calling", "strict mode", "allowed tools", "parallel tool calls", "call identifiers"],
+      "supports": ["REQ-PLAN-002", "REQ-PLAN-003", "REQ-TOOL-001"],
       "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
     }
   ]

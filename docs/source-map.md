@@ -14,6 +14,30 @@ status: "design-specification"
 
 Each source record also exists in [`knowledge/sources.json`](../knowledge/sources.json).
 
+## SRC-OPENAI-RESPONSES-CREATE-2026
+
+- **Title:** OpenAI Responses API Create Response reference
+- **Publisher:** OpenAI
+- **Publication:** Living documentation; observed 2026-08-28
+- **Status:** Official API reference
+- **URL:** https://developers.openai.com/api/reference/cli/resources/responses/methods/create
+- **UUIDv5:** `15ddbe8e-247d-57f3-bf21-3cba7a26c517`
+- **UUIDv7:** `01a04948-c161-7234-8dc0-8db2fd23a98d`
+- **Supports:** REQ-PLAN-001, REQ-PLAN-002, REQ-PLAN-003
+- **Topics:** Responses API, tool choice, parallel tool calls, storage, output token limit, usage
+
+## SRC-OPENAI-FUNCTION-CALLING-2026
+
+- **Title:** OpenAI Function Calling guide
+- **Publisher:** OpenAI
+- **Publication:** Living documentation; observed 2026-08-28
+- **Status:** Official developer guide
+- **URL:** https://developers.openai.com/api/docs/guides/function-calling
+- **UUIDv5:** `d7b737e5-ff59-53b9-b964-15eb58981fc5`
+- **UUIDv7:** `01a04948-c162-7f71-b2fa-8df79f106838`
+- **Supports:** REQ-PLAN-002, REQ-PLAN-003, REQ-TOOL-001
+- **Topics:** function calling, strict mode, allowed tools, parallel tool calls, call identifiers
+
 ## SRC-WEBMCP-2026
 
 - **Title:** WebMCP — Draft Community Group Report

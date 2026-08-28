@@ -29,3 +29,14 @@ npm run demo:sync
 ```
 
 Evidence generation is an explicit write step. `npm test`, `npm run typecheck`, and repository `make validate` are read-only.
+
+## Optional online planner candidate
+
+`planner/` separates local availability, preflight disclosure, one bounded transport attempt, and an untrusted candidate. The production transport is only an interface; the checked-in evidence uses a scripted local transport and makes no network request. Tool exposure is allowlisted and proposal-only, private fields are removed, unknown pricing stops before transport, and timeout or response loss never retries automatically.
+
+```bash
+npm run evidence:planner
+npm run demo:planner
+```
+
+The demo server is read-only. It serves public evidence, a sanitized request sample, and a hash-chained audit record; it has no model, approval, notification, or mutation route.

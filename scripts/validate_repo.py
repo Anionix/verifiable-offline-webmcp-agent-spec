@@ -264,6 +264,18 @@ def main():
     for device in sync_evidence["devices"]:
         for e in checkpoint_validator.iter_errors(device["checkpoint"]):
             errors.append(f"schema checkpoint/{device['deviceId']}: {e.message}")
+    planner_evidence = load_json(ROOT / "metadata/online-planner-verification.json")
+    planner_evidence_validator = Draft202012Validator(
+        schemas["planner-evidence"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in planner_evidence_validator.iter_errors(planner_evidence):
+        errors.append(f"schema metadata/online-planner-verification.json: {e.message}")
+    planner_request = load_json(ROOT / planner_evidence["artifacts"]["requestSample"])
+    planner_request_validator = Draft202012Validator(
+        schemas["responses-planner-request"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in planner_request_validator.iter_errors(planner_request):
+        errors.append(f"schema {planner_evidence['artifacts']['requestSample']}: {e.message}")
     checks["json_schema"] = not errors
 
     # Source graph and cross-reference integrity.
@@ -472,6 +484,118 @@ def main():
             raise ValueError("evidence UUIDv7 timestamp mismatch")
     except Exception as exc: errors.append(f"offline sync evidence identity: {exc}")
     checks["offline_sync_evidence"] = len(errors) == sync_start
+
+    # Optional online planner evidence. This independently verifies that the
+    # public record proves a candidate-only boundary, not a live API execution.
+    planner_start = len(errors)
+    planner_audit_path = ROOT / planner_evidence["artifacts"]["auditLedger"]
+    planner_request_path = ROOT / planner_evidence["artifacts"]["requestSample"]
+    planner_events = [json.loads(line) for line in planner_audit_path.read_text(encoding="utf-8").splitlines() if line]
+    for relative, expected in planner_evidence["artifacts"]["sha256"].items():
+        path = ROOT / relative
+        if not path.is_file() or sha256(path.read_bytes()) != expected:
+            errors.append(f"online planner artifact digest mismatch: {relative}")
+
+    planner_previous = sha256(b"ONLINE-PLANNER-AUDIT-v0.5\x00")
+    candidate_count = 0
+    request_start_count = 0
+    recorded_stop_reasons = set()
+    for expected_sequence, event in enumerate(planner_events, 1):
+        core = {key: value for key, value in event.items() if key != "recordHash"}
+        if (
+            event.get("sequence") != expected_sequence
+            or event.get("previousHash") != planner_previous
+            or sha256(canonical_bytes(core)) != event.get("recordHash")
+        ):
+            errors.append(f"online planner audit chain mismatch at {expected_sequence}")
+        try:
+            event_id = uuid.UUID(event["eventId"])
+            run_id = uuid.UUID(event["runId"])
+            task_id = uuid.UUID(event["taskId"])
+            if event_id.version != 7 or uuid7_ms(str(event_id)) != event["occurredAtEpochMs"]:
+                raise ValueError("event UUIDv7 timestamp mismatch")
+            if run_id.version != 7 or task_id.version != 5:
+                raise ValueError("run/task UUID version mismatch")
+            occurred_ms = int(datetime.fromisoformat(event["occurredAt"].replace("Z", "+00:00")).timestamp() * 1000)
+            if occurred_ms != event["occurredAtEpochMs"]:
+                raise ValueError("RFC3339 timestamp mismatch")
+        except Exception as exc:
+            errors.append(f"online planner audit identity at {expected_sequence}: {exc}")
+        if (
+            event.get("automaticRetries") != 0
+            or event.get("authorizationCreated") != 0
+            or event.get("externalEffectStarts") != 0
+            or event.get("transportAttempts") not in {0, 1}
+        ):
+            errors.append(f"online planner audit unsafe counter at {expected_sequence}")
+        if event.get("kind") == "candidate-recorded": candidate_count += 1
+        if event.get("kind") == "request-started": request_start_count += 1
+        if event.get("toState") == "STOPPED" and isinstance(event.get("reason"), str):
+            recorded_stop_reasons.add(event["reason"])
+        planner_previous = event.get("recordHash", "")
+
+    def strict_parameter_shape(schema):
+        if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
+            return False
+        properties = schema.get("properties")
+        required = schema.get("required")
+        if not isinstance(properties, dict) or not isinstance(required, list) or set(properties) != set(required):
+            return False
+        return all(
+            strict_parameter_shape(child) if child.get("type") == "object" else child.get("type") in {"string", "integer", "boolean"}
+            for child in properties.values()
+            if isinstance(child, dict)
+        ) and all(isinstance(child, dict) for child in properties.values())
+
+    request_tool_names = [tool["name"] for tool in planner_request["tools"]]
+    allowed_tool_names = [tool["name"] for tool in planner_request["tool_choice"]["tools"]]
+    try:
+        minimized_input = json.loads(planner_request["input"][0]["content"][0]["text"])
+    except Exception as exc:
+        errors.append(f"online planner minimized input is not JSON: {exc}")
+        minimized_input = {}
+    if (
+        planner_request.get("store") is not False
+        or planner_request.get("background") is not False
+        or planner_request.get("parallel_tool_calls") is not False
+        or request_tool_names != allowed_tool_names
+        or not all(tool.get("strict") is True and strict_parameter_shape(tool.get("parameters", {})) for tool in planner_request["tools"])
+        or set(minimized_input) != {"context", "taskKind"}
+        or set(minimized_input.get("context", {})) != {"goal", "channel"}
+    ):
+        errors.append("online planner request is not minimal, strict, and allowlisted")
+    serialized_public_planner = planner_audit_path.read_text(encoding="utf-8") + planner_request_path.read_text(encoding="utf-8")
+    forbidden_markers = ["private-customer-note-should-never-cross", "sk-secret-sentinel-should-never-cross"]
+    if any(marker in serialized_public_planner for marker in forbidden_markers):
+        errors.append("online planner public artifacts contain a privacy sentinel")
+
+    planner_scope = planner_evidence["scope"]
+    planner_observations = planner_evidence["observations"]
+    if (
+        planner_scope["actualNetworkRequests"] != 0
+        or planner_scope["actualExternalSpendMicroUsd"] != 0
+        or planner_scope["authorizationCreated"] != 0
+        or planner_scope["externalEffectStarts"] != 0
+        or planner_observations["automaticRetries"] != 0
+        or planner_observations["privacyValuesExposed"] is not False
+        or planner_observations["acceptedCandidateCount"] != candidate_count
+        or candidate_count != 1
+        or request_start_count != 7
+        or set(planner_observations["stopReasons"]) != recorded_stop_reasons
+    ):
+        errors.append("online planner summary does not match candidate-only audit evidence")
+    try:
+        planner_evidence_event = uuid.UUID(planner_evidence["identity"]["uuidV7"])
+        planner_evidence_info = uuid.UUID(planner_evidence["identity"]["uuidV5"])
+        if (
+            planner_evidence_event.version != 7
+            or planner_evidence_info.version != 5
+            or uuid7_ms(str(planner_evidence_event)) != planner_evidence["temporal"]["epochMs"]
+        ):
+            raise ValueError("evidence UUID version or timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"online planner evidence identity: {exc}")
+    checks["online_planner_evidence"] = len(errors) == planner_start
 
     # No private key material.
     private_markers = ["BEGIN " + "PRIVATE KEY", "BEGIN OPENSSH " + "PRIVATE KEY", "PRIVATE " + "KEY-----"]

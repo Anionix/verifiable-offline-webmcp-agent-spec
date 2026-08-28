@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/planner-evidence.schema.json",
+  "$comment": "information_uuid_v5=6c8f08e3-03e1-5479-a50c-6bdd60592936 event_uuid_v7=01a0493d-49c0-79fe-9b93-333cd46cd170 machine-contract=LOCAL_SCRIPTED_SIMULATION -> VERIFIED_PUBLIC_EVIDENCE",
+  "title": "Online Planner Verification Evidence 0.5.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "identity", "temporal", "status", "scope", "observations", "requestContract", "artifacts", "requirements", "limitations"],
+  "properties": {
+    "schemaVersion": { "const": "0.5.0" },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["uuidV5", "uuidV7", "uuidNamespace"],
+      "properties": {
+        "uuidV5": { "$ref": "#/$defs/uuidV5" },
+        "uuidV7": { "$ref": "#/$defs/uuidV7" },
+        "uuidNamespace": { "type": "string", "format": "uuid" }
+      }
+    },
+    "temporal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observedAt", "epochMs", "timeZone"],
+      "properties": {
+        "observedAt": { "type": "string", "format": "date-time" },
+        "epochMs": { "type": "integer", "minimum": 0 },
+        "timeZone": { "const": "UTC" }
+      }
+    },
+    "status": { "const": "VERIFIED" },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "actualNetworkRequests", "actualExternalSpendMicroUsd", "authorizationCreated", "externalEffectStarts", "localHardwareAndDevelopmentCost"],
+      "properties": {
+        "mode": { "const": "LOCAL_SCRIPTED_SIMULATION" },
+        "actualNetworkRequests": { "const": 0 },
+        "actualExternalSpendMicroUsd": { "const": 0 },
+        "authorizationCreated": { "const": 0 },
+        "externalEffectStarts": { "const": 0 },
+        "localHardwareAndDevelopmentCost": { "const": "UNMEASURED" }
+      }
+    },
+    "observations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scenarioCount", "expectedOutcomesMatched", "localPathAvailableWhenDisabled", "localPathAvailableWhenOffline", "privacyValuesExposed", "acceptedCandidateCount", "acceptedCandidateStatus", "automaticRetries", "auditChainValid", "stopReasons"],
+      "properties": {
+        "scenarioCount": { "type": "integer", "minimum": 12 },
+        "expectedOutcomesMatched": { "const": true },
+        "localPathAvailableWhenDisabled": { "const": true },
+        "localPathAvailableWhenOffline": { "const": true },
+        "privacyValuesExposed": { "const": false },
+        "acceptedCandidateCount": { "const": 1 },
+        "acceptedCandidateStatus": { "const": "UNTRUSTED_PROPOSAL" },
+        "automaticRetries": { "const": 0 },
+        "auditChainValid": { "const": true },
+        "stopReasons": {
+          "type": "array", "minItems": 8, "uniqueItems": true,
+          "items": { "enum": ["ONLINE_PLANNING_DISABLED", "NETWORK_UNAVAILABLE", "INVALID_TASK", "NO_FEASIBLE_TOOLS", "PRIVACY_REQUIRED_FIELD", "SENSITIVE_VALUE_DETECTED", "COST_UNMEASURED", "COST_LIMIT_EXCEEDED", "TIMEOUT", "RESPONSE_LOST", "TRANSPORT_FAILED", "INCOMPLETE_RESPONSE", "NO_TOOL_CALL", "MULTIPLE_TOOL_CALLS", "UNKNOWN_TOOL", "INVALID_CALL_ID", "INVALID_ARGUMENTS"] }
+        }
+      }
+    },
+    "requestContract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["store", "background", "parallelToolCalls", "strictTools", "allowlistApplied"],
+      "properties": {
+        "store": { "const": false },
+        "background": { "const": false },
+        "parallelToolCalls": { "const": false },
+        "strictTools": { "const": true },
+        "allowlistApplied": { "const": true }
+      }
+    },
+    "artifacts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["auditLedger", "requestSample", "sha256"],
+      "properties": {
+        "auditLedger": { "const": "data/audit/online-planner-events.ndjson" },
+        "requestSample": { "const": "examples/online-planner-demo/request.sample.json" },
+        "sha256": { "type": "object", "minProperties": 2, "additionalProperties": { "$ref": "#/$defs/digest" } }
+      }
+    },
+    "requirements": {
+      "type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true,
+      "items": { "enum": ["REQ-PLAN-001", "REQ-PLAN-002", "REQ-PLAN-003", "REQ-OFFLINE-001", "REQ-POLICY-005", "REQ-SEC-006"] }
+    },
+    "limitations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["liveResponsesApiConformance", "currentProductionPricing", "productionQuality"],
+      "properties": {
+        "liveResponsesApiConformance": { "const": "INCONCLUSIVE" },
+        "currentProductionPricing": { "const": "UNMEASURED" },
+        "productionQuality": { "const": "UNMEASURED" }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- information_uuid_v5=72bd5313-18a7-530c-a466-6604d46a385d event_uuid_v7=01a0493d-49bc-7ce8-a3c6-297e7b21dd2f machine-contract=LOCAL_CORE -> BOUNDED_OPTIONAL_PLANNER -> UNTRUSTED_CANDIDATE; no browser control creates approval or effect -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:,◆">
+  <title>任意の計画器 — 権限を渡さない可視化</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span aria-hidden="true">◆</span> OPTIONAL PLANNER / 0.5.0</p>
+        <h1>候補は作る。<br><span>権限は渡さない。</span></h1>
+        <p class="lead">オンライン計画器は、許可済みの公開情報から一つの候補を返すだけ。通信できなくてもローカル機能は残り、候補から承認や通知へは自動で進みません。</p>
+      </div>
+      <aside id="proof-board" class="proof-board" data-state="loading" aria-label="主要な検証値">
+        <div><strong id="candidate-count">—</strong><span>未承認の候補</span></div>
+        <div><strong id="authorization-count">—</strong><span>作られた承認</span></div>
+        <div><strong id="effect-count">—</strong><span>外部効果</span></div>
+      </aside>
+    </header>
+
+    <section class="panel flow-panel" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div><p class="section-kicker">AUTHORITY BOUNDARY</p><h2 id="flow-title">一方向の候補生成レーン</h2></div>
+        <button id="replay" type="button" disabled>流れを再生</button>
+      </div>
+      <div id="planner-flow" class="planner-flow" data-state="loading">
+        <article id="step-local" class="flow-step" data-state="idle"><span class="step-number">01</span><div><h3>ローカル機能</h3><p>常に利用可能</p></div><span class="step-status" id="status-local">待機</span></article>
+        <span class="rail" aria-hidden="true">→</span>
+        <article id="step-preflight" class="flow-step" data-state="idle"><span class="step-number">02</span><div><h3>事前制御</h3><p>道具・情報・費用</p></div><span class="step-status" id="status-preflight">待機</span></article>
+        <span class="rail" aria-hidden="true">→</span>
+        <article id="step-request" class="flow-step" data-state="idle"><span class="step-number">03</span><div><h3>一回の模擬要求</h3><p>時間上限つき</p></div><span class="step-status" id="status-request">待機</span></article>
+        <span class="rail" aria-hidden="true">→</span>
+        <article id="step-candidate" class="flow-step candidate-step" data-state="idle"><span class="step-number">04</span><div><h3>未承認の候補</h3><p>実行命令ではない</p></div><span class="step-status" id="status-candidate">待機</span></article>
+        <span class="rail stop-rail" aria-hidden="true">⊣</span>
+        <article id="step-effect" class="flow-step stop-step" data-state="idle"><span class="step-number">05</span><div><h3>承認・外部効果</h3><p>この境界で停止</p></div><span class="step-status" id="status-effect">待機</span></article>
+      </div>
+      <p id="flow-announcer" class="sr-only" aria-live="polite">公開証拠を読み込んでいます。</p>
+    </section>
+
+    <section class="control-grid" aria-label="事前制御の結果">
+      <article class="panel control-card"><span class="control-index">A</span><p class="section-kicker">道具</p><h2>許可した候補作成だけ</h2><p><code>allowed_tools</code> と厳格な入力形で、実行系の道具を見せません。</p><strong>1 道具</strong></article>
+      <article class="panel control-card"><span class="control-index">B</span><p class="section-kicker">情報</p><h2>公開情報だけ</h2><p>個人情報と秘密は要求本文にも監査記録にも入りません。</p><strong>漏えい 0</strong></article>
+      <article class="panel control-card"><span class="control-index">C</span><p class="section-kicker">費用</p><h2>未計測なら止める</h2><p>信頼できる料金表がない場合は、通信開始前に停止します。</p><strong>実費 0</strong></article>
+      <article class="panel control-card"><span class="control-index">D</span><p class="section-kicker">失敗</p><h2>再試行しない</h2><p>時間切れや応答消失を曖昧なまま再送しません。</p><strong id="retry-count">— 回</strong></article>
+    </section>
+
+    <section class="evidence-grid">
+      <article class="panel scenario-panel">
+        <div class="section-heading compact"><div><p class="section-kicker">FAIL-CLOSED MATRIX</p><h2><span id="scenario-count">—</span>経路を模擬</h2></div><span class="seal" id="matrix-seal">読込中</span></div>
+        <ul id="reason-list" class="reason-list"><li>公開証拠を読み込んでいます…</li></ul>
+      </article>
+      <article class="panel scope-panel">
+        <p class="section-kicker">MEASURED SCOPE</p><h2>言えること / まだ言えないこと</h2>
+        <dl>
+          <div><dt>実ネットワーク要求</dt><dd id="network-count">—</dd></div>
+          <div><dt>実際のAPI適合</dt><dd id="live-limit">INCONCLUSIVE</dd></div>
+          <div><dt>現在の本番料金</dt><dd id="pricing-limit">UNMEASURED</dd></div>
+          <div><dt>本番品質</dt><dd id="quality-limit">UNMEASURED</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <details class="panel technical-panel">
+      <summary>ハッシュで連結した時系列記録</summary>
+      <pre id="technical-log">公開証拠を読み込んでいます…</pre>
+    </details>
+    <footer>このページは読み取り専用です。実際のResponses API、通知、承認、課金を開始する操作はありません。</footer>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

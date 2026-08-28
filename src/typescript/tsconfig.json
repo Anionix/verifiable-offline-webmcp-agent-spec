@@ -16,6 +16,7 @@
     "**/*.ts",
     "notification/input-projection.js",
     "webmcp/notification-adapter.js",
-    "../../examples/offline-sync-demo/visual-state.js"
+    "../../examples/offline-sync-demo/visual-state.js",
+    "../../examples/online-planner-demo/visual-state.js"
   ]
 }

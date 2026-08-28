@@ -4,6 +4,7 @@ language: "ja"
 stable_uuid_v5: "e2d66eda-4eda-5fc4-b6f0-7d3e858ffad4"
 event_uuid_v7: "01a04291-b467-7723-8055-9ee6a6c7c0f3"
 updated_event_uuid_v7: "01a04904-ca98-7443-8568-48507dc9a6cd"
+online_planner_event_uuid_v7: "01a04948-c160-7c48-85c1-9bb5b8270e16"
 generated_at: "2026-08-27T09:34:00Z"
 updated_at: "2026-08-28T15:37:25.912Z"
 version: "0.1.0"
@@ -41,3 +42,16 @@ WebMCPは草案なので専用アダプターへ隔離し、仕様変更の影�
 入力の経路、信頼状態、生成元、未信頼内容の印は、呼び出し側の値ではなくサーバー経路から生成し、SQLiteと監査記録から読み戻します。専用アダプターと来歴契約は[`16-webmcp-provenance-adapter.ja.md`](16-webmcp-provenance-adapter.ja.md)を正本とします。
 
 Responses APIとremote MCPの位置づけはOpenAIの一次資料に紐づけます。 [SRC-OPENAI-RESPONSES-2025](source-map.md#src-openai-responses-2025) [SRC-OPENAI-MCP-2025](source-map.md#src-openai-mcp-2025)
+
+## 0.5.0の実装境界
+
+[`planner/responses-adapter.ts`](../src/typescript/planner/responses-adapter.ts)は、通信実装を注入できる境界と、ローカル模擬通信だけを提供します。認証情報、実際のHTTP通信、道具の実行処理は含みません。
+
+```text
+WebMCP: ブラウザー内の道具発見と実行面
+Responses: 任意の候補生成面
+Policy: 送信前の道具・情報・費用・遅延制御
+Local executor: 承認と外部効果の唯一の責任者
+```
+
+要求は`store=false`、`background=false`、`parallel_tool_calls=false`、許可道具限定、厳格な入力形です。返答は1件の関数呼び出しだけを受け付け、`UNTRUSTED_PROPOSAL`から先へ自動遷移しません。詳細と公開証拠は[`18-online-planner-reference.ja.md`](18-online-planner-reference.ja.md)を正本とします。OpenAIの現在の一次資料は[Responses作成仕様](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)と[関数呼び出しガイド](https://developers.openai.com/api/docs/guides/function-calling)です。

@@ -3,15 +3,25 @@
 // machine-contract: duplicate-effect count must remain <= 1 across retry, ambiguity, and restart scenarios.
 // event_uuid_v7=01a04893-376c-7fc0-aabe-f56beef8ec7e
 // machine-contract: every suppressed retry is auditable even though it leaves control and effect state unchanged.
+// information_uuid_v5=e0ed63ea-430a-5598-8dff-436a4c5fa6ca
+// event_uuid_v7=01a04972-c1fd-7e7e-b547-e2cba731d317
+// machine-contract: browser show claims remain AMBIGUOUS until exactly one matching Service Worker tag is independently read back.
+// information_uuid_v5=5b3dd6c4-39fd-57b2-98bc-842b8d7f88bc
+// event_uuid_v7=01a0498b-5662-7094-9bef-88e9b2f13a10
+// machine-contract: confirmed pre-effect absence keeps measured effect starts at zero; a later successful replay raises it to one, never two.
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
+import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-verification.ts";
 import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
 import { NotificationStore } from "../notification/store.ts";
+import type { NotificationIntent } from "../notification/types.ts";
+import { uuidV7 } from "../uuid.ts";
 
 interface Fixture {
   directory: string;
@@ -52,6 +62,67 @@ async function prepare(engine: NotificationEngine, logicalOperationId: string) {
   return intent;
 }
 
+function validReplayEvidence(engine: NotificationEngine, intent: NotificationIntent, now: number): ReplayEvidence {
+  const bound = () => ({
+    intentId: intent.intentId,
+    payloadDigest: intent.payloadDigest,
+    evidenceEventId: uuidV7(now),
+    observedAtEpochMs: now,
+  });
+  const preconditionDigest = engine.replayPreconditionDigest(intent);
+  return {
+    authorization: { ...bound(), source: "AUTHORIZATION_POLICY", decision: "ALLOW" },
+    permission: { ...bound(), source: "HOST_PERMISSION_READBACK", state: "GRANTED" },
+    version: { ...bound(), source: "VERSION_REGISTRY", requiredVersion: "0.1.0", observedVersion: "0.1.0" },
+    consent: { ...bound(), source: "USER_CONSENT_RECEIPT", expiresAtEpochMs: now + 60_000 },
+    timeToLive: { ...bound(), source: "TRUSTED_CLOCK", queuedAtEpochMs: now, expiresAtEpochMs: now + 60_000 },
+    precondition: {
+      ...bound(),
+      source: "INDEPENDENT_READ_BACK",
+      priorEffectState: "CONFIRMED_ABSENT",
+      priorEffectStartStatus: "NOT_STARTED",
+      expectedDigest: preconditionDigest,
+      observedDigest: preconditionDigest,
+    },
+  };
+}
+
+test("an existing effect ledger migrates to conservative start assessment", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-ledger-migration-"));
+  const databasePath = join(directory, "queue.sqlite");
+  const legacy = new DatabaseSync(databasePath);
+  try {
+    legacy.exec(`
+      CREATE TABLE effects (
+        effect_event_id TEXT PRIMARY KEY,
+        intent_id TEXT NOT NULL,
+        started_at INTEGER NOT NULL,
+        outcome TEXT NOT NULL,
+        receipt_json TEXT
+      );
+      INSERT INTO effects VALUES ('present-event', 'legacy-intent', 1, 'CONFIRMED_PRESENT', NULL);
+      INSERT INTO effects VALUES ('absent-event', 'legacy-intent', 2, 'CONFIRMED_ABSENT', NULL);
+    `);
+  } finally {
+    legacy.close();
+  }
+  const migrated = new NotificationStore(databasePath);
+  try {
+    const rows = (migrated.database.prepare(`
+      SELECT effect_event_id, start_status FROM effects ORDER BY started_at
+    `).all() as Array<{ effect_event_id: string; start_status: string }>)
+      .map((row) => ({ ...row }));
+    assert.deepEqual(rows, [
+      { effect_event_id: "present-event", start_status: "STARTED" },
+      { effect_event_id: "absent-event", start_status: "UNKNOWN" },
+    ]);
+    assert.equal(migrated.countEffectStarts("legacy-intent"), 2);
+  } finally {
+    migrated.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 test("a duplicate request never starts a second visible effect", async () => {
   const item = fixture("dedupe");
   try {
@@ -60,10 +131,51 @@ test("a duplicate request never starts a second visible effect", async () => {
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "VERIFIED");
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "ALREADY_VERIFIED");
     assert.equal(adapter.executionCount, 1);
+    assert.equal(adapter.effectStartCount, 1);
     assert.equal(adapter.visible.size, 1);
     assert.equal(item.store.countEffectClaims(intent.intentId), 1);
+    assert.equal(item.store.getLatestEffectClaimEvidence(intent.intentId)?.startStatus, "STARTED");
     assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
-    assert.equal(item.audit.verify().count, 6);
+    assert.equal(item.audit.verify().count, 8);
+  } finally {
+    item.close();
+  }
+});
+
+test("browser confirmation rejects fabricated counts and persists claim separately from truth", async () => {
+  const item = fixture("browser-independent-readback");
+  try {
+    const intent = await prepare(item.engine, "browser-independent-readback-case");
+    const claim = item.engine.claimBrowserExecution(intent.intentId);
+    assert.equal(claim.status, "COMMAND");
+    assert.throws(
+      () => item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: [intent.intentId, intent.intentId] }),
+      /duplicate notification readback detected/,
+    );
+    assert.throws(
+      () => item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: ["different-intent"] }),
+      /different intent tag/,
+    );
+    assert.equal(item.engine.getIntent(intent.intentId)?.effectState, "AMBIGUOUS");
+    const verified = item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: [intent.intentId] });
+    assert.equal(verified.status, "VERIFIED");
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
+
+    const row = item.store.database.prepare(`
+      SELECT receipt_json FROM effects WHERE intent_id = ? ORDER BY started_at DESC, rowid DESC LIMIT 1
+    `).get(intent.intentId) as { receipt_json: string };
+    const receipt = JSON.parse(row.receipt_json) as {
+      verification: {
+        recordedClaim: { source: string; claimedPresence: string };
+        independentObservation: { method: string; observedPresence: string };
+        truthEstimate: { presence: string };
+      };
+    };
+    assert.equal(receipt.verification.recordedClaim.source, "BROWSER_SHOW_NOTIFICATION");
+    assert.equal(receipt.verification.recordedClaim.claimedPresence, "PRESENT");
+    assert.equal(receipt.verification.independentObservation.method, "SERVICE_WORKER_GET_NOTIFICATIONS");
+    assert.equal(receipt.verification.independentObservation.observedPresence, "PRESENT");
+    assert.equal(receipt.verification.truthEstimate.presence, "CONFIRMED_PRESENT");
   } finally {
     item.close();
   }
@@ -89,9 +201,29 @@ test("a timeout after the effect forces reconciliation and blocks retry", async 
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "AMBIGUOUS");
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "RECONCILE_REQUIRED");
     assert.equal(adapter.executionCount, 1);
+    assert.equal(adapter.effectStartCount, 1);
     assert.equal((await item.engine.reconcile(intent.intentId, adapter)).status, "VERIFIED");
     assert.equal(adapter.visible.size, 1);
     assert.equal(item.audit.verify().valid, true);
+  } finally {
+    item.close();
+  }
+});
+
+test("a later absent readback cannot erase an unknown historical effect start", async () => {
+  const item = fixture("historical-effect-unknown");
+  try {
+    const adapter = new SimulatedNotificationAdapter("timeout-after-effect");
+    const intent = await prepare(item.engine, "historical-effect-unknown-case");
+    assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "AMBIGUOUS");
+    adapter.visible.clear();
+    assert.equal((await item.engine.reconcile(intent.intentId, adapter)).status, "AMBIGUOUS");
+    assert.equal(item.engine.getIntent(intent.intentId)?.effectState, "AMBIGUOUS");
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
+    assert.throws(
+      () => item.engine.resetAfterConfirmedAbsent(intent.intentId, validReplayEvidence(item.engine, item.engine.getIntent(intent.intentId)!, item.now.value)),
+      /replay evaluation requires ABORTED\/CONFIRMED_ABSENT|reset requires|requires ABORTED/,
+    );
   } finally {
     item.close();
   }
@@ -104,12 +236,46 @@ test("a confirmed pre-effect failure can be reproposed with a new approval", asy
     const intent = await prepare(item.engine, "retry-case");
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "ABORTED_CONFIRMED_ABSENT");
     assert.equal(adapter.visible.size, 0);
-    item.engine.resetAfterConfirmedAbsent(intent.intentId);
+    assert.equal(item.store.getLatestEffectClaimEvidence(intent.intentId)?.startStatus, "NOT_STARTED");
+    const confirmedAbsent = item.engine.getIntent(intent.intentId)!;
+    item.engine.resetAfterConfirmedAbsent(
+      intent.intentId,
+      validReplayEvidence(item.engine, confirmedAbsent, item.now.value),
+    );
     await item.engine.preview(intent.intentId);
     item.engine.approve(intent.intentId);
     adapter.mode = "success";
     assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "VERIFIED");
     assert.equal(adapter.visible.size, 1);
+    assert.equal(adapter.executionCount, 2);
+    assert.equal(adapter.effectStartCount, 1);
+    assert.equal(item.store.countEffectClaims(intent.intentId), 2);
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
+  } finally {
+    item.close();
+  }
+});
+
+test("a failed replay gate remains stopped before a second effect claim", async () => {
+  const item = fixture("replay-gate-stop");
+  try {
+    const adapter = new SimulatedNotificationAdapter("fail-before-effect");
+    const intent = await prepare(item.engine, "replay-gate-stop-case");
+    assert.equal((await item.engine.execute(intent.intentId, adapter)).status, "ABORTED_CONFIRMED_ABSENT");
+    const confirmedAbsent = item.engine.getIntent(intent.intentId)!;
+    const evidence = validReplayEvidence(item.engine, confirmedAbsent, item.now.value);
+    evidence.permission.state = "DENIED";
+    assert.throws(
+      () => item.engine.resetAfterConfirmedAbsent(intent.intentId, evidence),
+      (error: unknown) => error instanceof ReplayBlockedError
+        && error.evaluation.decision === "STOP"
+        && error.evaluation.gates.find((gate) => gate.gate === "PERMISSION")?.status === "BLOCKED",
+    );
+    assert.equal(item.engine.getIntent(intent.intentId)?.effectState, "CONFIRMED_ABSENT");
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 0);
+    assert.equal(item.store.countEffectClaims(intent.intentId), 1);
+    assert.equal(adapter.executionCount, 1);
+    assert.equal(adapter.effectStartCount, 0);
   } finally {
     item.close();
   }

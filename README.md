@@ -8,8 +8,12 @@ provenance_event_uuid_v7: "01a04904-ca9b-7c0b-8987-01c2078e6b4c"
 offline_sync_event_uuid_v7: "01a04927-4629-774e-a927-d87c66c1aa09"
 online_planner_event_uuid_v7: "01a04948-c160-716f-ba38-d5125fd214b6"
 security_boundary_event_uuid_v7: "01a04967-af58-747f-852e-830783019817"
+replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
+replay_browser_event_uuid_v7: "01a04987-5d7c-7ebe-9208-c468f5c24ebf"
+effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
+effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T17:25:27.000Z"
+updated_at: "2026-08-28T18:13:00.135Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -71,7 +75,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
 - `MANIFEST.sha256` — artifact integrity manifest
 
-The 1.0.0 pre-execution governance slice has promoted 13 security and contract records. The catalog currently contains **57 implemented and 10 partially implemented tests**. Critical commit tools remain inside policy control; the planner sees proposal-only capabilities, and a UUID alone never grants authority. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts) and [`docs/test-catalog.md`](docs/test-catalog.md).
+The first two 1.0.0 governance slices have promoted 17 security, contract, replay, and verification records. The catalog currently contains **61 implemented and 6 partially implemented tests**. Critical commit tools remain inside policy control; replay requires six fresh checks; and an external effect needs independent readback rather than a tool claim alone. The remaining six records concern measured service-level calibration. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), and [`docs/test-catalog.md`](docs/test-catalog.md).
 
 ## Validation / 検証
 
@@ -85,7 +89,7 @@ The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-re
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 
-The `0.2.0` reference demo stores notification intent, attempts, and effect state in SQLite. A UUIDv5 intent ID is derived from the logical operation, every state change or suppressed retry gets a UUIDv7 event ID, and a hash-chained JSON Lines audit record is appended before an external adapter call. `AMBIGUOUS` never retries directly; only reconciliation is allowed.
+The `0.2.0` reference demo stores notification intent, attempts, and effect state in SQLite. A UUIDv5 intent ID is derived from the logical operation, every state change or suppressed retry gets a UUIDv7 event ID, and a hash-chained JSON Lines audit record is appended before an external adapter call. `AMBIGUOUS` never retries directly; only reconciliation is allowed. A retry after `CONFIRMED_ABSENT` now requires fresh authorization, host permission, implementation version, bound consent, lifetime, and precondition evidence. The recorded execution claim remains separate from both the truth estimate and the conservative effect-start count. `STARTED` and `UNKNOWN` each count as one; only an explicit pre-effect `NOT_STARTED` assessment plus independent absence counts as zero. A later current-absence readback cannot erase a possibly earlier display.
 
 ```bash
 uv sync --frozen
@@ -97,11 +101,11 @@ make demo
 
 Open `http://127.0.0.1:4173`. The page first shows a dry run. A real Mac browser notification is requested only after an explicit click, and the same logical operation is then retried to prove that a second effect is blocked. If `document.modelContext` is absent, native WebMCP support remains `INCONCLUSIVE`; the same typed local path stays usable.
 
-The `0.3.0` candidate screen makes that safety path visible: the first request and retry converge on the same intent ledger, while the count card reads the SQLite external-effect claim count and exposes any value above one as a safety violation. Desktop and 390-pixel-wide browser checks are documented in [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md). Codex's in-app browser exposed `document.modelContext` and registered `notify_once` during this check; broader native WebMCP conformance remains `INCONCLUSIVE`.
+The candidate screen makes that safety path visible: the first request and retry converge on the same intent ledger, while the count card reads the conservative SQLite effect-start ledger and exposes any value above one as a safety violation. A compact six-check rail also shows why a replay is allowed, stopped, unnecessary, or waiting for reconciliation. Desktop and 390-pixel-wide browser checks are documented in [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md), with machine-readable dry-run evidence in [`metadata/replay-independent-verification.json`](metadata/replay-independent-verification.json). One earlier Codex in-app browser exposed `document.modelContext`; the current Playwright browser did not. Broader native WebMCP conformance remains `INCONCLUSIVE`.
 
 The draft WebMCP surface is isolated in one notification adapter. External input provenance is derived from the server route, persisted with the first intent-created event, and independently read back before the browser shows a match. A same-operation request from another channel keeps the first provenance and creates no external effect. See [`metadata/webmcp-provenance-verification.json`](metadata/webmcp-provenance-verification.json); this bounded browser observation does not claim general WebMCP conformance.
 
-The 2026-08-28 live run finished `VERIFIED / CONFIRMED_PRESENT`: Service Worker readback found one notification, the same-operation retry returned `ALREADY_VERIFIED`, the SQLite effect-start count remained one, and the six-event public audit chain validates. See [`metadata/notification-demo-live-verification.json`](metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](data/audit/notification-demo-live-events.ndjson).
+The 2026-08-28 live run finished `VERIFIED / CONFIRMED_PRESENT`: Service Worker readback found one notification, the same-operation retry returned `ALREADY_VERIFIED`, the SQLite effect-start count remained one, and the six-event public audit chain validates. See [`metadata/notification-demo-live-verification.json`](metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](data/audit/notification-demo-live-events.ndjson). That immutable evidence belongs to the `0.2.0` implementation. The newer independent-verification path adds an explicit reconciliation transition and is currently covered by simulation; this change did not emit another real notification.
 
 ## Offline sync evidence demo / オフライン同期証拠デモ
 

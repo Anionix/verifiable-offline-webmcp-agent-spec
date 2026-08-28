@@ -10,6 +10,9 @@
 // information_uuid_v5=51b1b201-3e72-55c9-91bd-6478d3a79507
 // event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
 // machine-contract: WebMCP input is projected before UI mutation and can call preview only; permission and notification remain click-only.
+// information_uuid_v5=d53907bf-96cd-56e5-be92-5c4f3576e477
+// event_uuid_v7=01a04972-c11c-74d1-8639-c71dded7b68a
+// machine-contract: the six replay checks are rendered from reducer state; no visual PASS can grant execution authority.
 import {
   NotificationInputError,
   registerNotificationWebMcpTool,
@@ -17,6 +20,7 @@ import {
 import {
   createInputBoundaryState,
   createVisualState,
+  REPLAY_GATE_KEYS,
   reduceInputBoundaryState,
   reduceVisualState,
 } from "/visual-state.js";
@@ -66,6 +70,15 @@ const elements = {
   provenanceTrust: document.querySelector("#provenance-trust"),
   provenanceOrigin: document.querySelector("#provenance-origin"),
   provenanceReadback: document.querySelector("#provenance-readback"),
+  replayGateSummary: document.querySelector("#replay-gate-summary"),
+  replayGates: {
+    authorization: [document.querySelector("#replay-authorization"), document.querySelector("#replay-authorization-status")],
+    permission: [document.querySelector("#replay-permission"), document.querySelector("#replay-permission-status")],
+    version: [document.querySelector("#replay-version"), document.querySelector("#replay-version-status")],
+    consent: [document.querySelector("#replay-consent"), document.querySelector("#replay-consent-status")],
+    timeToLive: [document.querySelector("#replay-time-to-live"), document.querySelector("#replay-time-to-live-status")],
+    precondition: [document.querySelector("#replay-precondition"), document.querySelector("#replay-precondition-status")],
+  },
 };
 
 let currentIntentId = null;
@@ -82,6 +95,8 @@ const phaseLabels = {
   "duplicate-suppressed": "二件目を停止済み",
   ambiguous: "結果を照合してください",
   absent: "表示なしを確認済み",
+  "replay-ready": "6項目を確認済み",
+  "replay-blocked": "再送を停止済み",
   violation: "安全条件違反",
   error: "停止",
 };
@@ -100,6 +115,11 @@ function renderVisualState(state) {
   syncNode(elements.ledgerRetryNode, elements.ledgerRetryStatus, state.ledgerRetryState, state.ledgerRetryText);
   syncNode(elements.deliveryNode, elements.deliveryStatus, state.deliveryState, state.deliveryText);
   syncNode(elements.blockedNode, elements.blockedStatus, state.blockedState, state.blockedText);
+  elements.replayGateSummary.textContent = state.replayGateSummary;
+  for (const key of REPLAY_GATE_KEYS) {
+    const [node, status] = elements.replayGates[key];
+    syncNode(node, status, state.replayGates[key].state, state.replayGates[key].text);
+  }
   elements.countLabel.textContent = state.countLabel;
   elements.count.textContent = state.notificationCount === null ? "—" : String(state.notificationCount);
   elements.countCaption.textContent = state.countText;
@@ -269,7 +289,10 @@ async function approveAndNotify(mode = "initial") {
     elements.reconcile.disabled = false;
     return claim;
   }
-  const receipt = await request("/api/receipt", { intentId: currentIntentId, activeCount: active.length });
+  const receipt = await request("/api/receipt", {
+    intentId: currentIntentId,
+    activeTags: active.map((notification) => notification.tag),
+  });
   const status = await readStatus();
   updateVisual({ type: "PRESENT_CONFIRMED", effectStartCount: status.effectStartCount });
   render(receipt.intent, "通知を1件表示し、サービスワーカーから読み戻してVERIFIEDになりました。");
@@ -282,7 +305,7 @@ async function reconcile() {
   const active = await ready.getNotifications({ tag: currentIntentId });
   const result = await request("/api/reconcile", {
     intentId: currentIntentId,
-    presence: active.length > 0 ? "PRESENT" : "ABSENT",
+    activeTags: active.map((notification) => notification.tag),
   });
   const status = await readStatus();
   if (result.status === "VERIFIED") {

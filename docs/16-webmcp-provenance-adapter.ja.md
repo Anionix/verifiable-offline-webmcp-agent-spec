@@ -4,8 +4,10 @@ language: "ja"
 stable_uuid_v5: "863bbade-f21a-5f1e-b0eb-7c965926de65"
 event_uuid_v7: "01a04904-ca93-7529-bc52-710b6977819a"
 verified_event_uuid_v7: "01a0490d-f64e-7aa1-bb90-b3b392194fb2"
+permissions_policy_event_uuid_v7: "01a04984-7ca1-717d-a8bb-4eceafaedc31"
 generated_at: "2026-08-28T15:37:25.907Z"
 verified_at: "2026-08-28T15:47:26.926Z"
+updated_at: "2026-08-28T17:56:54.561Z"
 version: "0.3.0-candidate"
 status: "browser-verified"
 browser_evidence: "CONFIRMED"
@@ -24,7 +26,7 @@ English purpose: Isolate the draft WebMCP surface behind one adapter and preserv
 
 - WebMCP草案は、登録道具の`origin`、`exposedTo`、`readOnlyHint`、`untrustedContentHint`を定義し、道具への過剰な引数、道具の説明汚染、出力による命令注入を安全上の論点として挙げています。[WebMCP Draft](https://webmachinelearning.github.io/webmcp/)
 - 同草案の安全性調査は、同一生成元を既定の範囲としつつ、生成元をまたぐ状態共有の危険を未解決項目として残しています。[WebMCP Security and Privacy Questionnaire](https://github.com/webmachinelearning/webmcp/blob/main/security-privacy-questionnaire.md)
-- Permissions Policyは、機能ごとに利用可能な生成元を制限する仕組みです。本デモは`tools=(self)`に加え、サーバー側で受信`Origin`を正規化済みのページ生成元と完全一致させます。[W3C Permissions Policy](https://www.w3.org/TR/permissions-policy/)
+- Permissions Policyは、機能ごとに利用可能な生成元を制限する仕組みです。WebMCP草案の`tools`機能は既定で`self`だけを許すため、本デモはその既定値を維持し、サーバー側でも受信`Origin`を正規化済みのページ生成元と完全一致させます。未対応ブラウザーへ未知の`tools`指示は送りません。[WebMCP Permissions policy integration](https://webmachinelearning.github.io/webmcp/#permissions-policy-integration)
 
 このため、`document.modelContext`と`registerTool()`へ触れるのは[`src/typescript/webmcp/notification-adapter.js`](../src/typescript/webmcp/notification-adapter.js)だけです。通知エンジン、画面、SQLiteはWebMCP草案の形を知りません。
 

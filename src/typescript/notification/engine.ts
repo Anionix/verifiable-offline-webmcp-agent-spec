@@ -3,8 +3,25 @@
 // machine-contract: DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED; AMBIGUOUS -> RECONCILING before any retry.
 // event_uuid_v7=01a048bc-86ba-79d9-8db9-31f8276c06e8
 // machine-contract: effect-start evidence is exposed as a measured integer so the UI cannot claim a decorative count of one.
+// information_uuid_v5=5b3dd6c4-39fd-57b2-98bc-842b8d7f88bc
+// event_uuid_v7=01a0498b-5662-7094-9bef-88e9b2f13a10
+// machine-contract: explicitly proven pre-effect failures count zero; STARTED and UNKNOWN claims count conservatively.
+// information_uuid_v5=9ca3a8c3-2305-534c-a98f-8127cae34c23
+// event_uuid_v7=01a04993-3867-7e11-b120-01b3bab8ec62
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T18:13:00.135Z
+// machine-contract: a current ABSENT readback cannot erase an UNKNOWN historical effect start.
 import { createHash } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
+import {
+  ReplayBlockedError,
+  evaluateReplayEvidence,
+  sha256Canonical,
+  verifyIndependentEffect,
+  type EffectStartStatus,
+  type EffectVerification,
+  type RecordedPresence,
+  type ReplayEvidence,
+} from "../governance/replay-verification.ts";
 import { uuidV5, uuidV7 } from "../uuid.ts";
 import { AuditLog } from "./audit-log.ts";
 import { internalInputProvenance, type InputProvenance } from "./input-provenance.ts";
@@ -37,6 +54,12 @@ export type ExecutionOutcome =
   | { status: "ALREADY_VERIFIED"; intent: NotificationIntent }
   | { status: "RECONCILE_REQUIRED"; intent: NotificationIntent }
   | { status: "APPROVAL_EXPIRED"; intent: NotificationIntent };
+
+export interface BrowserNotificationReadBack {
+  activeTags: readonly string[];
+}
+
+const REPLAY_CONTRACT_VERSION = "0.1.0";
 
 function digest(value: CanonicalValue): string {
   return createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
@@ -132,20 +155,23 @@ export class NotificationEngine {
     const approval = this.approvalFrom(claim.intent, now);
     try {
       const result = await adapter.execute(claim.intent, approval);
-      if (result.presence === "PRESENT") return this.confirmPresent(intentId, result.receipt ?? {});
-      if (result.presence === "ABSENT") return this.confirmAbsent(intentId, result.receipt ?? {});
+      if (result.presence !== "UNKNOWN") {
+        return await this.verifyAdapterReadBack(claim.intent, adapter, result.presence, "TOOL_RETURN");
+      }
       return { status: "AMBIGUOUS", intent: this.requireIntent(intentId) };
     } catch (error) {
-      if (error instanceof ConfirmedAbsentError) return this.confirmAbsent(intentId, { reason: error.message });
+      if (error instanceof ConfirmedAbsentError) {
+        this.assessEffectStart(intentId, "NOT_STARTED", "adapter-confirmed-failure-before-effect");
+        return await this.verifyAdapterReadBack(claim.intent, adapter, "ABSENT", "TOOL_RETURN");
+      }
       if (error instanceof AmbiguousEffectError) return { status: "AMBIGUOUS", intent: this.requireIntent(intentId) };
       return { status: "AMBIGUOUS", intent: this.requireIntent(intentId) };
     }
   }
 
   async reconcile(intentId: string, adapter: NotificationAdapter): Promise<ExecutionOutcome> {
-    const start = this.beginReconcile(intentId);
-    const presence = await adapter.reconcile(start);
-    return this.finishReconcile(intentId, presence, { source: "adapter-readback" });
+    const intent = this.requireIntent(intentId);
+    return this.verifyAdapterReadBack(intent, adapter, "UNKNOWN", "NO_RESPONSE");
   }
 
   claimBrowserExecution(intentId: string):
@@ -165,20 +191,60 @@ export class NotificationEngine {
     };
   }
 
-  confirmBrowserReceipt(intentId: string, receipt: Record<string, unknown>): ExecutionOutcome {
-    return this.confirmPresent(intentId, { ...receipt, source: "service-worker-readback" });
+  confirmBrowserReceipt(intentId: string, readBack: BrowserNotificationReadBack): ExecutionOutcome {
+    const tags = this.validateBrowserTags(intentId, readBack, false);
+    if (tags.length !== 1) throw new StateConflictError("confirmation requires exactly one active notification tag");
+    return this.verifyBrowserReadBack(intentId, tags, "PRESENT", "BROWSER_SHOW_NOTIFICATION");
   }
 
-  reconcileBrowser(intentId: string, presence: Presence): ExecutionOutcome {
-    this.beginReconcile(intentId);
-    return this.finishReconcile(intentId, presence, { source: "service-worker-getNotifications" });
+  reconcileBrowser(intentId: string, readBack: BrowserNotificationReadBack): ExecutionOutcome {
+    const tags = this.validateBrowserTags(intentId, readBack, true);
+    const presence: Presence = tags.length === 0 ? "ABSENT" : "PRESENT";
+    return this.verifyBrowserReadBack(intentId, tags, presence, "NO_RESPONSE");
   }
 
-  resetAfterConfirmedAbsent(intentId: string): NotificationIntent {
+  resetAfterConfirmedAbsent(intentId: string, evidence: ReplayEvidence): NotificationIntent {
+    const before = this.requireIntent(intentId);
+    if (before.controlState !== "ABORTED" || before.effectState !== "CONFIRMED_ABSENT") {
+      throw new StateConflictError("replay evaluation requires ABORTED/CONFIRMED_ABSENT");
+    }
     const now = this.now();
-    const result = this.store.resetAfterAbsent(intentId, this.newEventId(now), now);
+    const evaluation = evaluateReplayEvidence({
+      expectedIntentId: before.intentId,
+      expectedPayloadDigest: before.payloadDigest,
+      expectedVersion: REPLAY_CONTRACT_VERSION,
+      expectedPreconditionDigest: this.replayPreconditionDigest(before),
+      expectedEffectStartStatus: this.requireEffectClaim(intentId).startStatus,
+      requiredFreshAfterEpochMs: before.updatedAt,
+      nowEpochMs: now,
+      evaluationEventId: this.newEventId(now),
+      evidence,
+    });
+    const details = {
+      replayDecision: evaluation.decision,
+      passedGateCount: evaluation.gates.filter((gate) => gate.status === "PASS").length,
+      blockedGates: evaluation.gates.filter((gate) => gate.status === "BLOCKED").map((gate) => gate.gate).join(","),
+      replayContractVersion: REPLAY_CONTRACT_VERSION,
+    };
+    if (evaluation.decision === "STOP") {
+      const stopped = this.store.recordReplayStopped(intentId, evaluation.evaluationEventId, now, details);
+      this.append(stopped.transition);
+      throw new ReplayBlockedError(evaluation);
+    }
+    const result = this.store.resetAfterAbsent(intentId, evaluation.evaluationEventId, now, details);
     this.append(result.transition);
     return result.intent;
+  }
+
+  replayPreconditionDigest(intent: NotificationIntent): string {
+    return sha256Canonical({
+      controlState: intent.controlState,
+      effectState: intent.effectState,
+      effectStartStatus: this.requireEffectClaim(intent.intentId).startStatus,
+      intentId: intent.intentId,
+      payloadDigest: intent.payloadDigest,
+      revision: intent.revision,
+    });
   }
 
   getIntent(intentId: string): NotificationIntent | null {
@@ -187,7 +253,7 @@ export class NotificationEngine {
 
   getEffectStartCount(intentId: string): number {
     if (!this.getIntent(intentId)) return 0;
-    return this.store.countEffectClaims(intentId);
+    return this.store.countEffectStarts(intentId);
   }
 
   getInputProvenance(intentId: string): Readonly<InputProvenance> | null {
@@ -203,6 +269,122 @@ export class NotificationEngine {
     const result = this.store.beginReconcile(intentId, this.newEventId(now), now);
     this.append(result.transition);
     return result.intent;
+  }
+
+  private async verifyAdapterReadBack(
+    intent: NotificationIntent,
+    adapter: NotificationAdapter,
+    claimedPresence: RecordedPresence,
+    claimSource: "TOOL_RETURN" | "NO_RESPONSE",
+  ): Promise<ExecutionOutcome> {
+    const start = this.beginReconcile(intent.intentId);
+    let observedPresence: Presence;
+    try {
+      observedPresence = await adapter.reconcile(start);
+    } catch {
+      return this.finishReconcile(intent.intentId, "UNKNOWN", {
+        source: "adapter-readback-error",
+      });
+    }
+    const claim = this.requireEffectClaim(intent.intentId);
+    const observedAtEpochMs = this.now();
+    const verification = verifyIndependentEffect({
+      expectedIntentId: intent.intentId,
+      expectedPayloadDigest: intent.payloadDigest,
+      nowEpochMs: observedAtEpochMs,
+      recordedClaim: {
+        intentId: intent.intentId,
+        payloadDigest: intent.payloadDigest,
+        claimEventId: claim.eventId,
+        claimedAtEpochMs: claim.startedAt,
+        claimedPresence,
+        effectStartStatus: claim.startStatus,
+        source: claimSource,
+      },
+      independentObservation: {
+        intentId: intent.intentId,
+        payloadDigest: intent.payloadDigest,
+        observationEventId: this.newEventId(observedAtEpochMs),
+        observedAtEpochMs,
+        observedPresence,
+        source: "INDEPENDENT_READ_BACK",
+        method: "ADAPTER_RECONCILE",
+      },
+    });
+    return this.finishIndependentVerification(intent.intentId, verification);
+  }
+
+  private verifyBrowserReadBack(
+    intentId: string,
+    activeTags: readonly string[],
+    claimedPresence: RecordedPresence,
+    claimSource: "BROWSER_SHOW_NOTIFICATION" | "NO_RESPONSE",
+  ): ExecutionOutcome {
+    const intent = this.beginReconcile(intentId);
+    const claim = this.requireEffectClaim(intentId);
+    const observedAtEpochMs = this.now();
+    const verification = verifyIndependentEffect({
+      expectedIntentId: intent.intentId,
+      expectedPayloadDigest: intent.payloadDigest,
+      nowEpochMs: observedAtEpochMs,
+      recordedClaim: {
+        intentId: intent.intentId,
+        payloadDigest: intent.payloadDigest,
+        claimEventId: claim.eventId,
+        claimedAtEpochMs: claim.startedAt,
+        claimedPresence,
+        effectStartStatus: claim.startStatus,
+        source: claimSource,
+      },
+      independentObservation: {
+        intentId: intent.intentId,
+        payloadDigest: intent.payloadDigest,
+        observationEventId: this.newEventId(observedAtEpochMs),
+        observedAtEpochMs,
+        observedPresence: activeTags.length === 0 ? "ABSENT" : "PRESENT",
+        source: "INDEPENDENT_READ_BACK",
+        method: "SERVICE_WORKER_GET_NOTIFICATIONS",
+      },
+    });
+    return this.finishIndependentVerification(intentId, verification);
+  }
+
+  private finishIndependentVerification(intentId: string, verification: EffectVerification): ExecutionOutcome {
+    if (verification.decision === "VERIFY_PRESENT") {
+      this.assessEffectStart(intentId, "STARTED", "independent-readback-confirmed-presence");
+      return this.confirmPresent(intentId, { verification });
+    }
+    if (verification.decision === "VERIFY_ABSENT") return this.confirmAbsent(intentId, { verification });
+    return this.finishReconcile(intentId, "UNKNOWN", {
+      evidenceStatus: verification.truthEstimate.evidenceStatus,
+      source: "independent-verification",
+    });
+  }
+
+  private validateBrowserTags(intentId: string, readBack: BrowserNotificationReadBack, allowEmpty: boolean): readonly string[] {
+    if (!readBack || !Array.isArray(readBack.activeTags)) throw new TypeError("activeTags must be an array");
+    if (readBack.activeTags.length > 1) throw new StateConflictError("duplicate notification readback detected");
+    if (!allowEmpty && readBack.activeTags.length === 0) throw new StateConflictError("active notification readback is empty");
+    if (readBack.activeTags.some((tag) => typeof tag !== "string" || tag !== intentId)) {
+      throw new StateConflictError("notification readback is bound to a different intent tag");
+    }
+    return Object.freeze([...readBack.activeTags]);
+  }
+
+  private requireEffectClaim(intentId: string): { eventId: string; startedAt: number; startStatus: EffectStartStatus } {
+    const claim = this.store.getLatestEffectClaimEvidence(intentId);
+    if (!claim) throw new StateConflictError("effect claim is missing");
+    return claim;
+  }
+
+  private assessEffectStart(
+    intentId: string,
+    startStatus: Exclude<EffectStartStatus, "UNKNOWN">,
+    reason: string,
+  ): void {
+    const now = this.now();
+    const result = this.store.assessEffectStart(intentId, this.newEventId(now), now, startStatus, reason);
+    if (result.transition) this.append(result.transition);
   }
 
   private finishReconcile(intentId: string, presence: Presence, receipt: Record<string, unknown>): ExecutionOutcome {

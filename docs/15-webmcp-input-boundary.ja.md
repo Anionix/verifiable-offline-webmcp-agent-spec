@@ -5,9 +5,10 @@ stable_uuid_v5: "6981d5d4-7504-5ebe-aee0-4d0567e37d86"
 event_uuid_v7: "01a048da-1889-777d-a11d-87d4f4bdefa0"
 verified_event_uuid_v7: "01a048e8-9b29-7f4c-af71-32eaff3519be"
 adapter_event_uuid_v7: "01a04904-ca9a-7fb0-ada5-b80ab8e02e6c"
+permissions_policy_event_uuid_v7: "01a04984-7ca1-717d-a8bb-4eceafaedc31"
 generated_at: "2026-08-28T14:50:47.817Z"
 verified_at: "2026-08-28T15:06:38.761Z"
-updated_at: "2026-08-28T15:37:25.914Z"
+updated_at: "2026-08-28T17:56:54.561Z"
 version: "0.3.0-candidate"
 status: "browser-verified"
 browser_evidence: "CONFIRMED"
@@ -26,7 +27,7 @@ English purpose: Independently project WebMCP input into three literal notificat
 
 - WebMCPは2026年8月26日付のCommunity Group草案であり、W3C標準ではありません。[SRC-WEBMCP-2026](source-map.md#src-webmcp-2026)
 - 草案の`registerTool()`は`inputSchema`をJSON文字列として保存します。一方、現在の命令型実行手順は受信JSONをJavaScriptの物体へ解析して`execute`へ渡すところまでで、JSON Schemaによる値検査の規範手順は含んでいません。[WebMCP Draft](https://webmachinelearning.github.io/webmcp/#modelcontext-interface)
-- `tools`権限の既定許可先は`self`です。本デモはさらに`Permissions-Policy: tools=(self)`、相対URL、localhost APIの`Origin`一致検査を重ねます。[WebMCP Permissions policy integration](https://webmachinelearning.github.io/webmcp/#permissions-policy-integration)
+- `tools`権限の既定許可先は`self`です。本デモはその既定値、相対URL、localhost APIの`Origin`完全一致検査を使います。未対応ブラウザーで未知の権限名という警告を出さないため、同じ意味を重ねる明示的な`tools=(self)`ヘッダーは送信しません。[WebMCP Permissions policy integration](https://webmachinelearning.github.io/webmcp/#permissions-policy-integration)
 - 草案の安全性文書も、複数の生成元をまたぐエージェント状態の危険を未解決項目として扱っています。[WebMCP Security and Privacy Questionnaire](https://github.com/webmachinelearning/webmcp/blob/main/security-privacy-questionnaire.md)
 
 したがって、`inputSchema`は発見と説明の契約として残しつつ、実装側の投影器を安全性の正本にします。これは草案の不足を埋める設計判断であり、ブラウザー全体の適合を証明するものではありません。

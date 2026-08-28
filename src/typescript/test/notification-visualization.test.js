@@ -26,6 +26,9 @@ import {
 // information_uuid_v5=a031493c-3143-5904-a218-bf47e8be4654
 // event_uuid_v7=01a048f8-3326-7ad0-a607-d9b64a598798
 // machine-contract: provenance is visible as labeled evidence rather than color-only decoration.
+// information_uuid_v5=d53907bf-96cd-56e5-be92-5c4f3576e477
+// event_uuid_v7=01a04972-c11c-74d1-8639-c71dded7b68a
+// machine-contract: six replay gates are complete, text-labeled, and never bypass prior ledger or reconciliation stops.
 
 test("the input boundary shows accepted WebMCP input reaching dry run only", () => {
   let state = reduceInputBoundaryState(createInputBoundaryState(), { type: "INPUT_RECEIVED" });
@@ -60,6 +63,8 @@ test("the visible flow converges two requests to one notification", () => {
   assert.equal(state.notificationCount, 1);
   assert.equal(state.retryText, "ALREADY_VERIFIED");
   assert.equal(state.blockedText, "二件目を停止");
+  assert.equal(Object.values(state.replayGates).every((gate) => gate.state === "skipped"), true);
+  assert.match(state.replayGateSummary, /6項目は確認不要/);
 });
 
 test("the visualization never hides a duplicate-effect violation", () => {
@@ -91,6 +96,27 @@ test("ambiguous execution explicitly requires reconciliation", () => {
   assert.equal(state.phase, "ambiguous");
   assert.equal(state.countLabel, "結果不明");
   assert.match(state.countText, /再送しません/);
+  assert.equal(Object.values(state.replayGates).every((gate) => gate.text === "照合が先"), true);
+});
+
+test("all six replay checks are visible and one failure stops replay", () => {
+  const state = reduceVisualState(createVisualState(), {
+    type: "REPLAY_GATES_EVALUATED",
+    decision: "STOP",
+    gates: [
+      { gate: "AUTHORIZATION", status: "PASS" },
+      { gate: "PERMISSION", status: "BLOCKED" },
+      { gate: "VERSION", status: "PASS" },
+      { gate: "CONSENT", status: "PASS" },
+      { gate: "TIME_TO_LIVE", status: "PASS" },
+      { gate: "PRECONDITION", status: "PASS" },
+    ],
+  });
+  assert.equal(state.phase, "replay-blocked");
+  assert.equal(Object.keys(state.replayGates).length, 6);
+  assert.equal(state.replayGates.permission.state, "blocked");
+  assert.equal(state.replayGates.authorization.state, "success");
+  assert.equal(state.blockedText, "再送を停止");
 });
 
 test("the visualization exposes status semantics and a reduced-motion path", async () => {
@@ -111,9 +137,18 @@ test("the visualization exposes status semantics and a reduced-motion path", asy
   assert.match(html, /id="provenance-trust"/);
   assert.match(html, /id="provenance-origin"/);
   assert.match(html, /id="provenance-readback"/);
+  assert.match(html, /id="replay-gate-title"/);
+  assert.match(html, /再試行前の6項目/);
+  assert.match(html, /id="replay-authorization"/);
+  assert.match(html, /id="replay-permission"/);
+  assert.match(html, /id="replay-version"/);
+  assert.match(html, /id="replay-consent"/);
+  assert.match(html, /id="replay-time-to-live"/);
+  assert.match(html, /id="replay-precondition"/);
   assert.match(css, /@media \(max-width: 820px\)/);
   assert.match(css, /\.input-boundary-flow \{ grid-template-columns: 1fr/);
   assert.match(css, /\.provenance-rail \{ grid-template-columns: repeat\(2/);
+  assert.match(css, /\.replay-gates \{ grid-template-columns: repeat\(3/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif/);
   assert.doesNotMatch(css, /\b(?:Inter|Roboto|Fraunces|Geist|Plus Jakarta Sans|Space Grotesk)\b/i);

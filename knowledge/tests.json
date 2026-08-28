@@ -1849,7 +1849,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "offline-sync-scenario-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: replay前にauthorization、permission、version、consent、TTL、preconditionを再評価しなければならない。",
@@ -1866,16 +1866,21 @@
         "SRC-MCP-2026"
       ],
       "automation_artifacts": [
+        "examples/notification-demo/app.js",
+        "examples/notification-demo/index.html",
+        "examples/notification-demo/visual-state.js",
+        "src/typescript/governance/replay-verification.ts",
         "src/typescript/notification/engine.ts",
+        "src/typescript/notification/store.ts",
         "src/typescript/test/notification.test.ts",
-        "examples/notification-demo/app.js"
+        "src/typescript/test/replay-verification.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-31f1-77d6-bedb-535b8bf27f47",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "notification approval expiry, payload, target, and browser permission checks"
+        "event_uuid_v7": "01a0497d-eea8-7133-9821-54f2828c8dcd",
+        "occurred_at": "2026-08-28T17:49:45.000Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "six fresh replay checks, independent readback, claim-versus-truth separation, and duplicate-stop visualization"
       }
     },
     {
@@ -3461,7 +3466,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "evidence-verification-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: 観測可能なwriteはread-backでpostconditionを確認すべきである。",
@@ -3479,16 +3484,21 @@
         "SRC-NOTIFICATIONS"
       ],
       "automation_artifacts": [
+        "examples/notification-demo/app.js",
+        "examples/notification-demo/index.html",
+        "examples/notification-demo/visual-state.js",
+        "src/typescript/governance/replay-verification.ts",
         "src/typescript/notification/engine.ts",
+        "src/typescript/notification/store.ts",
         "src/typescript/test/notification.test.ts",
-        "examples/notification-demo/app.js"
+        "src/typescript/test/replay-verification.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-322d-78ab-9e1b-be502ad59598",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "notification readback only"
+        "event_uuid_v7": "01a0497d-eea8-7bad-a3d7-c52c271df171",
+        "occurred_at": "2026-08-28T17:49:45.000Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "six fresh replay checks, independent readback, claim-versus-truth separation, and duplicate-stop visualization"
       }
     },
     {
@@ -3519,7 +3529,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "evidence-verification-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: 外部副作用のcommitはtool自己申告だけでなく独立観測またはreceiptを必要とする。",
@@ -3537,16 +3547,21 @@
         "SRC-NOTIFICATIONS"
       ],
       "automation_artifacts": [
+        "examples/notification-demo/index.html",
+        "examples/notification-demo/service-worker.js",
+        "examples/notification-demo/visual-state.js",
+        "src/typescript/governance/replay-verification.ts",
         "src/typescript/notification/engine.ts",
+        "src/typescript/notification/store.ts",
         "src/typescript/test/notification.test.ts",
-        "examples/notification-demo/service-worker.js"
+        "src/typescript/test/replay-verification.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-326b-724c-93a1-115b7f686bb1",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "notification receipt and service-worker readback"
+        "event_uuid_v7": "01a0497d-eea8-791d-a2c4-6fd6b312a209",
+        "occurred_at": "2026-08-28T17:49:45.000Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "six fresh replay checks, independent readback, claim-versus-truth separation, and duplicate-stop visualization"
       }
     },
     {
@@ -3577,7 +3592,7 @@
       },
       "type": "VerificationTest",
       "test_kind": "evidence-verification-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
         "ja": "次の要件を検証する: 記録されたclaimと独立に観測されたtruth estimateを区別しなければならない。",
@@ -3594,16 +3609,21 @@
         "SRC-PROVO-2013"
       ],
       "automation_artifacts": [
+        "examples/notification-demo/index.html",
+        "examples/notification-demo/visual-state.js",
+        "src/typescript/governance/replay-verification.ts",
         "src/typescript/notification/audit-log.ts",
         "src/typescript/notification/engine.ts",
-        "src/typescript/test/notification.test.ts"
+        "src/typescript/notification/store.ts",
+        "src/typescript/test/notification.test.ts",
+        "src/typescript/test/replay-verification.test.ts"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a04874-32a4-7283-8fb0-aeb47fd98328",
-        "occurred_at": "2026-08-28T12:59:32.284Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "notification claim and observed presence separation"
+        "event_uuid_v7": "01a0497d-eea8-7925-8dc4-28d196d7a22b",
+        "occurred_at": "2026-08-28T17:49:45.000Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "six fresh replay checks, independent readback, claim-versus-truth separation, and duplicate-stop visualization"
       }
     }
   ]

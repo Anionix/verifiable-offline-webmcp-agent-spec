@@ -3,7 +3,9 @@ title: "Verifiable Offline WebMCP Agent Architecture / 検証可能なオフラ�
 language: "ja-en"
 stable_uuid_v5: "5c98b5f4-c536-532d-a8ac-e2d88397a006"
 event_uuid_v7: "01a04291-b452-750e-a9e5-19fbca156cb5"
+updated_event_uuid_v7: "01a04896-44df-723a-b7d5-b139ceb4a226"
 generated_at: "2026-08-27T09:34:00Z"
+updated_at: "2026-08-28T13:36:42.719Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -21,7 +23,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 
 このリポジトリは、モバイル優先・オフライン対応・検証可能なエージェント設計を、英日併記、JSON-LD、PROV-O、DCAT風catalog、JSON Schema、UUIDv5/v7、形式仕様、実行可能な参照コードでまとめたものです。「Open Knowledge Format」という単一の公式標準への適合を主張するものではありません。
 
-> **公開状態 / Public status:** これは設計仕様と参照実装候補であり、実働製品ではありません。`0.2.0`向けの二重送信防止通知デモは模擬試験まで実装済みですが、実通知の証拠とネイティブWebMCP対応は未確認です。既知の欠陥と未実装範囲は[GitHub Issues](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues)で公開します。
+> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。`0.2.0`の二重送信防止通知デモは、このMacで実通知1件と同一操作再試行後の1件維持まで検証済みです。ネイティブWebMCP対応は引き続き`INCONCLUSIVE`です。既知の欠陥と未実装範囲は[GitHub Issues](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues)で公開します。
 
 ## Architectural stance / 設計の立場
 
@@ -72,7 +74,7 @@ The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-re
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 
-The `0.2.0` candidate stores notification intent, attempts, and effect state in SQLite. A UUIDv5 intent ID is derived from the logical operation, every state change gets a UUIDv7 event ID, and a hash-chained JSON Lines audit record is appended before an external adapter call. `AMBIGUOUS` never retries directly; only reconciliation is allowed.
+The `0.2.0` reference demo stores notification intent, attempts, and effect state in SQLite. A UUIDv5 intent ID is derived from the logical operation, every state change or suppressed retry gets a UUIDv7 event ID, and a hash-chained JSON Lines audit record is appended before an external adapter call. `AMBIGUOUS` never retries directly; only reconciliation is allowed.
 
 ```bash
 uv sync --frozen
@@ -83,6 +85,8 @@ make demo
 ```
 
 Open `http://127.0.0.1:4173`. The page first shows a dry run. A real Mac browser notification is requested only after an explicit click, and the same logical operation is then retried to prove that a second effect is blocked. If `document.modelContext` is absent, native WebMCP support remains `INCONCLUSIVE`; the same typed local path stays usable.
+
+The 2026-08-28 live run finished `VERIFIED / CONFIRMED_PRESENT`: Service Worker readback found one notification, the same-operation retry returned `ALREADY_VERIFIED`, the SQLite effect-start count remained one, and the six-event public audit chain validates. See [`metadata/notification-demo-live-verification.json`](metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](data/audit/notification-demo-live-events.ndjson).
 
 ## Primary-source posture / 一次情報源の扱い
 

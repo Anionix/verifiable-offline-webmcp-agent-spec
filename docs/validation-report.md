@@ -3,10 +3,11 @@ title: "Validation Report / 検証報告"
 language: "ja-en"
 stable_uuid_v5: "a6b95fb5-3315-581f-8c52-faf489415b1e"
 event_uuid_v7: "01a04291-c4d4-729d-b9a2-d5cdbe2705b3"
-updated_event_uuid_v7: "01a04878-183e-7abc-898c-ae2f3f18d768"
+updated_event_uuid_v7: "01a04897-8519-7a33-b14c-150d0a7afa51"
+live_verification_event_uuid_v7: "01a04896-44e2-7ad8-9c68-587631dc4945"
 generated_at: "2026-08-27T09:34:04.500Z"
-updated_at: "2026-08-28T13:03:35.246072Z"
-version: "0.2.0-candidate"
+updated_at: "2026-08-28T13:38:04.697198Z"
+version: "0.2.0"
 status: "validation-report"
 ---
 
@@ -17,7 +18,7 @@ status: "validation-report"
 
 ## Snapshot / 検証snapshot
 
-- Validator timestamp: `2026-08-28T13:03:35.246072Z`
+- Validator timestamp: `2026-08-28T13:38:04.697198Z`
 - Overall: **PASS**
 - Error count: `0`
 - Validation command: `make validate`
@@ -27,6 +28,7 @@ status: "validation-report"
 |---|---:|
 | `structured_parse` | PASS |
 | `local_markdown_links` | PASS |
+| `live_notification_evidence` | PASS |
 | `json_schema` | PASS |
 | `source_graph` | PASS |
 | `uuid_v5_v7` | PASS |
@@ -65,7 +67,8 @@ status: "validation-report"
 
 - The simulated adapter started at most one visible effect for one logical operation across duplicate retry, response loss, and restart tests.
 - 100 simulated healthy runs measured `8.99 ms` at the 95th percentile against a `2,000 ms` limit. Environment and all samples are preserved in [`metadata/notification-demo-latency.json`](../metadata/notification-demo-latency.json) and [`data/timeseries/notification-demo-latency.ndjson`](../data/timeseries/notification-demo-latency.ndjson).
-- No real Mac notification was executed by this validation snapshot; that evidence remains `UNMEASURED` pending immediate user approval.
+- One real Mac browser notification was displayed after immediate user approval. Service Worker readback returned one active notification, the same-operation retry returned `ALREADY_VERIFIED`, and the SQLite external-effect claim count remained one.
+- The six-event public hash chain and machine-readable summary are [`data/audit/notification-demo-live-events.ndjson`](../data/audit/notification-demo-live-events.ndjson) and [`metadata/notification-demo-live-verification.json`](../metadata/notification-demo-live-verification.json). The validator independently checks the chain, UUID versions and times, final states, one claim, and the suppressed retry.
 - Native WebMCP availability remains `INCONCLUSIVE`.
 
 ### Finite reachability model

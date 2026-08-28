@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# information_uuid_v5=cd034fcd-9a4a-5d32-bea8-375d2511206c
+# event_uuid_v7=01a04895-5146-74b1-af5b-00e8ce98730d
+# machine-contract: live notification evidence must preserve a valid hash chain, one effect claim, and an auditable suppressed retry.
 from __future__ import annotations
 
 import argparse
@@ -117,6 +120,55 @@ def main():
         try: yaml.safe_load(p.read_text(encoding="utf-8"))
         except Exception as e: errors.append(f"YAML {p.relative_to(ROOT)}: {e}")
     checks["structured_parse"] = not errors
+
+    # Live browser-notification evidence: independently bind the public summary
+    # to the captured transition stream without trusting the local SQLite file.
+    live_start = len(errors)
+    live_path = ROOT / "data/audit/notification-demo-live-events.ndjson"
+    live_events = [json.loads(line) for line in live_path.read_text(encoding="utf-8").splitlines() if line]
+    live_evidence = load_json(ROOT / "metadata/notification-demo-live-verification.json")
+    previous_hash = ""
+    for index, event in enumerate(live_events, 1):
+        event_hash = event.get("eventHash", "")
+        core = {key: value for key, value in event.items() if key != "eventHash"}
+        if core.get("previousHash") != previous_hash:
+            errors.append(f"live notification event {index} previous hash mismatch")
+        if sha256(canonical_bytes(core)) != event_hash:
+            errors.append(f"live notification event {index} digest mismatch")
+        try:
+            event_id = uuid.UUID(event["eventId"])
+            intent_id = uuid.UUID(event["intentId"])
+            if event_id.version != 7 or abs(uuid7_ms(str(event_id)) - event["occurredAt"]) > 1:
+                raise ValueError("event UUIDv7 timestamp mismatch")
+            if intent_id.version != 5:
+                raise ValueError("intent ID is not UUIDv5")
+        except Exception as exc:
+            errors.append(f"live notification event {index} UUID: {exc}")
+        previous_hash = event_hash
+    observation = live_evidence["observations"]
+    execution_claims = sum(event["kind"] == "execution-claimed" for event in live_events)
+    suppressed_retries = sum(event["kind"] == "duplicate-execution-suppressed" for event in live_events)
+    if execution_claims != 1 or observation["effect_start_count_after_retry"] != 1:
+        errors.append("live notification evidence must contain exactly one external-effect claim")
+    if suppressed_retries < 1 or observation["same_operation_retry_status"] != "ALREADY_VERIFIED":
+        errors.append("live notification evidence is missing the suppressed duplicate retry")
+    if observation["service_worker_active_count"] != 1:
+        errors.append("live notification service-worker readback must contain exactly one active notification")
+    if observation["control_state"] != "VERIFIED" or observation["effect_state"] != "CONFIRMED_PRESENT":
+        errors.append("live notification evidence did not finish VERIFIED/CONFIRMED_PRESENT")
+    if not observation["audit_valid"] or observation["audit_event_count"] != len(live_events):
+        errors.append("live notification audit count or validity summary mismatch")
+    if observation["audit_last_hash"] != previous_hash:
+        errors.append("live notification audit last hash mismatch")
+    if observation["retry_event_id"] != live_events[-1]["eventId"]:
+        errors.append("live notification retry event ID mismatch")
+    try:
+        evidence_uuid = uuid.UUID(live_evidence["identity"]["uuid_v7"])
+        if evidence_uuid.version != 7 or abs(uuid7_ms(str(evidence_uuid)) - live_evidence["temporal"]["epoch_ms"]) > 1:
+            raise ValueError("evidence UUIDv7 timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"live notification evidence UUID: {exc}")
+    checks["live_notification_evidence"] = len(errors) == live_start
 
     # Local Markdown link integrity. External URLs are tracked in the source registry
     # and are intentionally not fetched by the offline validator.

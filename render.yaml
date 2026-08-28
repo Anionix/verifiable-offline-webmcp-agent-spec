@@ -1,0 +1,31 @@
+# information_uuid_v5=f04748b8-7978-518b-b82c-9fafecba25c7
+# event_uuid_v7=01a04a96-683f-7976-b031-99d97ce3bfe7 state_transition=PORTABLE_STATIC_BUILD -> RENDER_STATIC_SITE_READY occurred_at=2026-08-28T22:56:06Z
+# machine-contract: publish only ./dist as a static site; unmatched paths stay missing and must never be rewritten to index.html.
+services:
+  - type: web
+    name: verifiable-offline-webmcp-agent-spec
+    runtime: static
+    buildCommand: npm run build:web
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+      - path: /*
+        name: Permissions-Policy
+        value: "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /service-worker.js
+        name: Cache-Control
+        value: no-cache
+      - path: /service-worker.js
+        name: Service-Worker-Allowed
+        value: /

@@ -1,0 +1,23 @@
+# information_uuid_v5=90befe4d-8827-5dd7-b7d2-c482e737243b
+# event_uuid_v7=01a04a96-683f-7903-ac62-5457271bf17e state_transition=PORTABLE_STATIC_BUILD -> NETLIFY_STATIC_SITE_READY occurred_at=2026-08-28T22:56:06Z
+# machine-contract: publish only dist; unmatched paths stay missing and must never be rewritten to index.html.
+[build]
+command = "npm run build:web"
+publish = "dist"
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+Permissions-Policy = "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+Referrer-Policy = "no-referrer"
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "DENY"
+
+[[headers]]
+for = "/service-worker.js"
+
+[headers.values]
+Cache-Control = "no-cache"
+Service-Worker-Allowed = "/"

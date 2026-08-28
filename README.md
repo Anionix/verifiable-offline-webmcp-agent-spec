@@ -15,8 +15,9 @@ effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
 slo_gate_review_fix_event_uuid_v7: "01a049ba-c4e3-753e-8c7d-c353034a2a3b"
 final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
+service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T18:56:12.003Z"
+updated_at: "2026-08-28T23:07:05.647Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -69,6 +70,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 15. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 16. [`docs/20-final-verification.ja.md`](docs/20-final-verification.ja.md) — bounded browser observation, two formal checks, and the 67-test public-evidence boundary / ブラウザー実測・二つの形式検証・67件の公開証拠境界
 17. [`docs/21-review-thread-reconciliation.ja.md`](docs/21-review-thread-reconciliation.ja.md) — 31 review findings bound to fixes and regression evidence / 31件のレビューを修正と回帰証拠へ結合
+18. [`docs/22-service-integrations.ja.md`](docs/22-service-integrations.ja.md) — eight service boundaries and the everyday value of preventing duplicate sends / 8サービスの境界と二重送信防止の生活価値
 
 ## Machine-readable assets / 機械可読asset
 
@@ -80,6 +82,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `data/audit/*.json|ndjson` — signed sample log, Merkle checkpoint, inclusion proof, tamper report
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
 - `metadata/final-verification.json` — bounded WebMCP observation, formal results, 67-test count, and zero-effect final evidence
+- `metadata/service-integration-registry.json` — eight official resource services, truthful readiness states, and illustrative duplicate-risk scenarios
 - `MANIFEST.sha256` — artifact integrity manifest
 
 The four 1.0.0 governance slices bind security, replay, operational-quality, browser-observation, and formal-evidence claims. The catalog contains **67 implemented and automated tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`, and native WebMCP conformance remains `INCONCLUSIVE`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), [`metadata/final-verification.json`](metadata/final-verification.json), and [`docs/test-catalog.md`](docs/test-catalog.md).
@@ -93,6 +96,18 @@ make validate
 The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-references, verifies UUID versions and UUIDv7 timestamps, runs TypeScript golden vectors, verifies Ed25519 signatures/hash chains/Merkle roots, runs the independent reachability model, and rebuilds the final evidence in memory for a byte-for-byte comparison.
 
 `make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
+
+<!-- information_uuid_v5=81366b7a-5c59-5af5-be85-e988d824320c -->
+<!-- event_uuid_v7=01a04aa0-782f-7b3e-8cec-6cb8a87937df state_transition=SERVICE_BOUNDARIES_DOCUMENTED -> EVERYDAY_DUPLICATE_VALUE_VISIBLE occurred_at=2026-08-28T23:07:05.647Z -->
+<!-- machine-contract=Every service example is illustrative and unobserved; current deployment state comes from metadata/service-integration-registry.json. -->
+
+## Everyday value of duplicate prevention / 二重送信を防ぐ生活価値
+
+A lost response must not turn one human intention into two real-world effects. The concrete risks are easy to recognize: an OpenAI or Chrome agent repeats a notification or form; a page hosted on Cloudflare, Vercel, Render, or Netlify repeats an alert, job, or booking after a network or process interruption; a Shopify cart receives two items instead of one; or a Devpost submission helper sends the same version update twice. Preventing the second effect reduces extra cost, correction work, confusion, and trust loss.
+
+応答が消えても、1回の意思を現実の2回の結果にしてはいけません。OpenAIやGoogle Chromeでは通知・フォームの再実行、Cloudflare・Vercel・Render・Netlifyでは通信切替、二度押し、処理再開後の警告・仕事・予約の重複、Shopifyでは1個のつもりが2個になるカート操作、Devpostでは版更新通知の重複が想定例です。いずれも各サービスで観測した事故ではなく、設計を確認するための例です。詳細な状態と承認境界は[`docs/22-service-integrations.ja.md`](docs/22-service-integrations.ja.md)、機械可読の正本は[`metadata/service-integration-registry.json`](metadata/service-integration-registry.json)にあります。
+
+今回の限定したローカル確認では、アプリ内ブラウザーから同じ`notify_once`操作を2回呼び、同じUUIDv5 Intentと外部効果開始数`0`を確認しました。これは共通成果物の確認であり、各外部サービスでの本番実証ではありません。
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

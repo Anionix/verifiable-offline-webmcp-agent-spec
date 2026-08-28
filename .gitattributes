@@ -1,0 +1,4 @@
+# information_uuid_v5=4a9e28cd-b691-5d34-94ae-c01ece789af9 event_uuid_v7=01a0496b-b1c3-7de3-b04e-38f818ac1922 state_transition=PROPOSED -> EXECUTING
+# machine-contract: reviewers inspect source contracts and tests first; deterministic integrity catalogs remain available but are collapsed as generated diffs.
+MANIFEST.sha256 linguist-generated=true
+metadata/file-catalog.json linguist-generated=true

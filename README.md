@@ -7,8 +7,9 @@ updated_event_uuid_v7: "01a048c2-e2b4-71da-a6c7-c5269c9b69d3"
 provenance_event_uuid_v7: "01a04904-ca9b-7c0b-8987-01c2078e6b4c"
 offline_sync_event_uuid_v7: "01a04927-4629-774e-a927-d87c66c1aa09"
 online_planner_event_uuid_v7: "01a04948-c160-716f-ba38-d5125fd214b6"
+security_boundary_event_uuid_v7: "01a04967-af58-747f-852e-830783019817"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T16:15:05.929Z"
+updated_at: "2026-08-28T17:25:27.000Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -69,6 +70,8 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `data/audit/*.json|ndjson` — signed sample log, Merkle checkpoint, inclusion proof, tamper report
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
 - `MANIFEST.sha256` — artifact integrity manifest
+
+The 1.0.0 pre-execution governance slice has promoted 13 security and contract records. The catalog currently contains **57 implemented and 10 partially implemented tests**. Critical commit tools remain inside policy control; the planner sees proposal-only capabilities, and a UUID alone never grants authority. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts) and [`docs/test-catalog.md`](docs/test-catalog.md).
 
 ## Validation / 検証
 

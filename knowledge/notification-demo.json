@@ -3,14 +3,14 @@
   "identity": {
     "uuid_v5": "c1cc8d89-f2d2-55e8-b4a7-8acdc06d2723",
     "uuid_v7": "01a04867-0db0-701d-a8fc-db4ca1814c02",
-    "updated_uuid_v7": "01a04896-44e3-7fc7-bd20-9193c23bba1c",
+    "updated_uuid_v7": "01a048c2-e391-72ee-aef1-b019bb6c522c",
     "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "canonical_name": "duplicate-safe-local-notification-demo",
     "category": "reference-implementation"
   },
   "temporal": {
     "created_at": "2026-08-28T12:23:50Z",
-    "updated_at": "2026-08-28T13:36:42.723Z",
+    "updated_at": "2026-08-28T14:25:32.776Z",
     "observed_at": "2026-08-28T13:34:50.219Z",
     "valid_from": "2026-08-28T12:23:50Z",
     "valid_to": null,
@@ -32,6 +32,7 @@
     "simulated_faults": "CONFIRMED",
     "simulated_latency_100_samples": "CONFIRMED",
     "native_webmcp": "INCONCLUSIVE",
+    "codex_in_app_browser_webmcp_registration": "CONFIRMED",
     "real_mac_notification": "CONFIRMED"
   },
   "evidence_artifacts": [
@@ -39,14 +40,18 @@
     "data/timeseries/notification-demo-latency.ndjson",
     "metadata/notification-demo-live-verification.json",
     "data/audit/notification-demo-live-events.ndjson",
-    "src/typescript/test/notification.test.ts"
+    "src/typescript/test/notification.test.ts",
+    "src/typescript/test/notification-visualization.test.js",
+    "examples/notification-demo/visual-state.js",
+    "docs/14-notification-visualization.ja.md"
   ],
   "machine_contract": {
     "identity": "UUIDv5(intent namespace, logical operation identifier)",
     "event_identity": "UUIDv7 per attempt and state change, including suppressed retries",
     "ambiguous_rule": "AMBIGUOUS permits reconcile only; direct execute is denied",
     "approval_rule": "target, payload digest, and expiry must match immediately before execution",
-    "deduplication_rule": "one SQLite intent row and one active effect claim per logical operation identifier"
+    "deduplication_rule": "one SQLite intent row and one active effect claim per logical operation identifier",
+    "visualization_count_rule": "show the measured SQLite effect-start count; confirmed states require exactly one, and zero or values above one are never hidden"
   },
   "live_verification": {
     "intent_id": "03c9c953-71ea-5405-b1eb-3c0536e78ec1",
@@ -57,6 +62,18 @@
     "retry_status": "ALREADY_VERIFIED",
     "audit_event_count": 6,
     "audit_valid": true
+  },
+  "visualization_candidate": {
+    "version": "0.3.0-candidate",
+    "state": "BROWSER_VERIFIED",
+    "browser": "Codex in-app browser",
+    "desktop_viewport": "1440x1000",
+    "mobile_viewport": "390x844",
+    "mobile_horizontal_overflow": false,
+    "dry_run_effect_start_count": 0,
+    "real_notification_triggered_during_visual_check": false,
+    "webmcp_tool_registration": "CONFIRMED_SCOPED",
+    "target_browser_conformance": "INCONCLUSIVE"
   },
   "source_refs": [
     "SRC-NOTIFICATIONS",

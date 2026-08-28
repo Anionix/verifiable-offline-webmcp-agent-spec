@@ -1,5 +1,16 @@
 # Changelog
 
+<!-- information_uuid_v5=06f137fc-6ca9-5499-b447-b9cd9df976b5 event_uuid_v7=01a048c2-e3c4-7c0c-9abb-21b175b0719a state_transition=IMPLEMENTING -> BROWSER_VERIFIED occurred_at=2026-08-28T14:25:32.776Z -->
+
+## 0.3.0-candidate — 2026-08-28
+
+- Added a state-driven visualization in which the initial request and same-operation retry converge on one SQLite-backed intent ledger.
+- Added a measured external-effect count; values above one are disclosed as safety violations instead of being rounded to a successful result.
+- Added automated checks for the one-effect invariant, ambiguous reconciliation, violation disclosure, status semantics, responsive layout, and reduced motion.
+- Verified the dry-run screen at `1440 x 1000` and `390 x 844` without requesting another real notification; the narrow view had no horizontal overflow.
+- Observed `document.modelContext` and `notify_once` registration in the Codex in-app browser. Broader native WebMCP conformance remains `INCONCLUSIVE`.
+- Excluded the ignored host-only Impeccable hook cache from reproducible integrity catalogs so clean GitHub checkouts produce the same file identities.
+
 <!-- information_uuid_v5=98e355d2-8469-5427-937c-a922fcf5ad50 event_uuid_v7=01a04896-44e4-74b6-803b-38cd809c1837 state_transition=REVIEW -> VERIFIED occurred_at=2026-08-28T13:36:42.724Z -->
 
 ## 0.2.0 — 2026-08-28

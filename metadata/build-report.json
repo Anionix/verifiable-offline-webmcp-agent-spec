@@ -1,7 +1,7 @@
 {
   "artifact": "verifiable-offline-webmcp-agent-spec",
-  "validatedAt": "2026-08-28T13:38:04.697198Z",
-  "snapshotEventId": "01a04897-8519-7a33-b14c-150d0a7afa51",
+  "validatedAt": "2026-08-28T14:29:29.313110Z",
+  "snapshotEventId": "01a048c7-747e-7be4-b140-f695551e713b",
   "checks": {
     "structured_parse": true,
     "live_notification_evidence": true,

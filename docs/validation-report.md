@@ -3,11 +3,12 @@ title: "Validation Report / 検証報告"
 language: "ja-en"
 stable_uuid_v5: "a6b95fb5-3315-581f-8c52-faf489415b1e"
 event_uuid_v7: "01a04291-c4d4-729d-b9a2-d5cdbe2705b3"
-updated_event_uuid_v7: "01a04897-8519-7a33-b14c-150d0a7afa51"
+updated_event_uuid_v7: "01a048c7-747e-7be4-b140-f695551e713b"
 live_verification_event_uuid_v7: "01a04896-44e2-7ad8-9c68-587631dc4945"
+browser_visual_verification_event_uuid_v7: "01a048c2-028c-70c7-ab61-69ac805348df"
 generated_at: "2026-08-27T09:34:04.500Z"
-updated_at: "2026-08-28T13:38:04.697198Z"
-version: "0.2.0"
+updated_at: "2026-08-28T14:29:29.313110Z"
+version: "0.3.0-candidate"
 status: "validation-report"
 ---
 
@@ -18,7 +19,7 @@ status: "validation-report"
 
 ## Snapshot / 検証snapshot
 
-- Validator timestamp: `2026-08-28T13:38:04.697198Z`
+- Validator timestamp: `2026-08-28T14:29:29.313110Z`
 - Overall: **PASS**
 - Error count: `0`
 - Validation command: `make validate`
@@ -59,9 +60,16 @@ status: "validation-report"
 
 ### TypeScript
 
-- 20 Node test cases passed: decision golden vectors, UUID checks, canonical JSON constraints, approval binding, duplicate retry, confirmed absence, ambiguous reconciliation, restart persistence, expiry, and the 100-run simulated latency bound.
+- 25 Node test cases passed: decision golden vectors, UUID checks, canonical JSON constraints, approval binding, duplicate retry, confirmed absence, ambiguous reconciliation, restart persistence, expiry, the 100-run simulated latency bound, visible deduplication states, zero-or-duplicate count violation disclosure, and accessibility contracts.
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
-- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts) and [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts).
+- Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), and [`src/typescript/test/notification-visualization.test.js`](../src/typescript/test/notification-visualization.test.js).
+
+### Duplicate-safe visualization candidate
+
+- A dry run in the Codex in-app browser rendered `DRY_RUN / NOT_STARTED` with an SQLite external-effect start count of `0`; no real notification was requested during this check.
+- The desktop `1440 x 1000` view exposed the two paths, measured count, and state ledger. At width `390`, document width equaled viewport width and no horizontal overflow was detected.
+- Browser semantics exposed the main region, labeled subregions, headings, labeled inputs, buttons, and a status message. The stylesheet provides a reduced-motion path; browser warning and error logs were empty.
+- `document.modelContext` and `notify_once` registration were observed in the Codex in-app browser. Broader native WebMCP conformance remains `INCONCLUSIVE`.
 
 ### Duplicate-safe notification candidate
 

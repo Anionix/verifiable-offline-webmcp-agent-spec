@@ -1,6 +1,8 @@
 // information_uuid_v5=ce2ab902-2301-5254-8ecd-362b63b7949c
 // event_uuid_v7=01a04872-0565-797d-93af-3f08082f13ce
 // machine-contract: localhost and same-origin only; approval and execution remain separate HTTP requests.
+// event_uuid_v7=01a048b7-262a-7dc0-a907-cce53d32aa5b
+// machine-contract: the visualization reads the SQLite effect-start count; it never substitutes a decorative fixed value.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -26,6 +28,7 @@ const engine = new NotificationEngine({ store, audit: new AuditLog(auditPath) })
 const staticFiles = new Map<string, readonly [string, string]>([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
+  ["/visual-state.js", ["visual-state.js", "text/javascript; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
   ["/service-worker.js", ["service-worker.js", "text/javascript; charset=utf-8"]],
 ] as const);
@@ -73,7 +76,11 @@ async function api(request: IncomingMessage, response: ServerResponse, pathname:
   if (request.method === "GET" && pathname === "/api/status") {
     const intentId = search.get("intentId") ?? "";
     const intent = engine.getIntent(intentId);
-    json(response, intent ? 200 : 404, { intent, audit: engine.audit.verify() });
+    json(response, intent ? 200 : 404, {
+      intent,
+      effectStartCount: engine.getEffectStartCount(intentId),
+      audit: engine.audit.verify(),
+    });
     return;
   }
   if (request.method !== "POST") {

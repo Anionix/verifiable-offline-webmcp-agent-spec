@@ -62,6 +62,7 @@ test("a duplicate request never starts a second visible effect", async () => {
     assert.equal(adapter.executionCount, 1);
     assert.equal(adapter.visible.size, 1);
     assert.equal(item.store.countEffectClaims(intent.intentId), 1);
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
     assert.equal(item.audit.verify().count, 6);
   } finally {
     item.close();

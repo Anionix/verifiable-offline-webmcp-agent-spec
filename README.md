@@ -3,9 +3,9 @@ title: "Verifiable Offline WebMCP Agent Architecture / 検証可能なオフラ�
 language: "ja-en"
 stable_uuid_v5: "5c98b5f4-c536-532d-a8ac-e2d88397a006"
 event_uuid_v7: "01a04291-b452-750e-a9e5-19fbca156cb5"
-updated_event_uuid_v7: "01a04896-44df-723a-b7d5-b139ceb4a226"
+updated_event_uuid_v7: "01a048c2-e2b4-71da-a6c7-c5269c9b69d3"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T13:36:42.719Z"
+updated_at: "2026-08-28T14:25:32.776Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -49,7 +49,8 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 6. [`formal/tla/ToolExecution.tla`](formal/tla/ToolExecution.tla)
 7. [`src/typescript/evaluator.ts`](src/typescript/evaluator.ts)
 8. [`docs/13-notification-demo.ja.md`](docs/13-notification-demo.ja.md) / [`en`](docs/13-notification-demo.en.md) — duplicate-safe local notification reference
-9. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
+9. [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md) — two requests to one measured effect, visualized / 二要求を一効果へ収束する画面契約
+10. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 
 ## Machine-readable assets / 機械可読asset
 
@@ -85,6 +86,8 @@ make demo
 ```
 
 Open `http://127.0.0.1:4173`. The page first shows a dry run. A real Mac browser notification is requested only after an explicit click, and the same logical operation is then retried to prove that a second effect is blocked. If `document.modelContext` is absent, native WebMCP support remains `INCONCLUSIVE`; the same typed local path stays usable.
+
+The `0.3.0` candidate screen makes that safety path visible: the first request and retry converge on the same intent ledger, while the count card reads the SQLite external-effect claim count and exposes any value above one as a safety violation. Desktop and 390-pixel-wide browser checks are documented in [`docs/14-notification-visualization.ja.md`](docs/14-notification-visualization.ja.md). Codex's in-app browser exposed `document.modelContext` and registered `notify_once` during this check; broader native WebMCP conformance remains `INCONCLUSIVE`.
 
 The 2026-08-28 live run finished `VERIFIED / CONFIRMED_PRESENT`: Service Worker readback found one notification, the same-operation retry returned `ALREADY_VERIFIED`, the SQLite effect-start count remained one, and the six-event public audit chain validates. See [`metadata/notification-demo-live-verification.json`](metadata/notification-demo-live-verification.json) and [`data/audit/notification-demo-live-events.ndjson`](data/audit/notification-demo-live-events.ndjson).
 

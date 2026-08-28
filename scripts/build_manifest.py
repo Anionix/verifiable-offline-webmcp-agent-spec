@@ -14,6 +14,10 @@ MANIFEST_NAME = "MANIFEST.sha256"
 CATALOG_PATH = "metadata/file-catalog.json"
 EXCLUDED_PARTS = {".git", ".jj", ".local", ".venv", "node_modules", "__pycache__"}
 EXCLUDED_FILES = {".DS_Store", "results.sarif"}
+# information_uuid_v5=50ced5c7-92a0-5047-b4c0-aafb22a1edcb
+# event_uuid_v7=01a048ca-67e3-7b0f-9c74-2f7092340b03
+# machine-contract: host-only ignored caches never influence a reproducible public artifact catalog.
+EXCLUDED_PATHS = {".impeccable/hook.cache.json"}
 MEDIA_TYPES = {
     ".css": "text/css",
     ".html": "text/html",
@@ -87,7 +91,7 @@ def source_paths() -> list[Path]:
         if not path.is_file() or any(part in EXCLUDED_PARTS for part in path.parts):
             continue
         relative = path.relative_to(ROOT).as_posix()
-        if relative in {MANIFEST_NAME, CATALOG_PATH} or path.name in EXCLUDED_FILES:
+        if relative in {MANIFEST_NAME, CATALOG_PATH} or relative in EXCLUDED_PATHS or path.name in EXCLUDED_FILES:
             continue
         paths.append(path)
     return sorted(paths, key=lambda item: item.relative_to(ROOT).as_posix())

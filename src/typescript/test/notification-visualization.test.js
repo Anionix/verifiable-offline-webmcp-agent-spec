@@ -4,7 +4,12 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { createVisualState, reduceVisualState } from "../../../examples/notification-demo/visual-state.js";
+import {
+  createInputBoundaryState,
+  createVisualState,
+  reduceInputBoundaryState,
+  reduceVisualState,
+} from "../../../examples/notification-demo/visual-state.js";
 
 // information_uuid_v5=233068fa-1846-5b44-94fe-2479cdc8796d
 // event_uuid_v7=01a048c2-e27e-721b-8f08-3bdadbfc683f
@@ -15,6 +20,31 @@ import { createVisualState, reduceVisualState } from "../../../examples/notifica
 // information_uuid_v5=fd39f8d9-5fc5-56ae-8efc-bf4310a6a924
 // event_uuid_v7=01a048d1-d607-7161-8e76-35f6f5ff592c
 // machine-contract: the offline demo uses its local font stack without the overused web-font set.
+// information_uuid_v5=cbeb5a00-12c7-5557-a8ec-c50cd3765001
+// event_uuid_v7=01a048da-1888-7be0-9eef-3e1d0cadd1b1
+// machine-contract: accepted input reaches dry run only; rejected input visibly stops before intent creation.
+
+test("the input boundary shows accepted WebMCP input reaching dry run only", () => {
+  let state = reduceInputBoundaryState(createInputBoundaryState(), { type: "INPUT_RECEIVED" });
+  state = reduceInputBoundaryState(state, { type: "INPUT_ACCEPTED" });
+  state = reduceInputBoundaryState(state, { type: "DRY_RUN_COMPLETED" });
+  assert.equal(state.phase, "dry-run");
+  assert.equal(state.receivedState, "success");
+  assert.equal(state.validationState, "success");
+  assert.equal(state.dryRunState, "success");
+  assert.equal(state.dryRunText, "DRY_RUN / NOT_STARTED");
+  assert.match(state.announcement, /通知はまだありません/);
+});
+
+test("the input boundary exposes rejection before intent creation", () => {
+  let state = reduceInputBoundaryState(createInputBoundaryState(), { type: "INPUT_RECEIVED" });
+  state = reduceInputBoundaryState(state, { type: "INPUT_REJECTED", message: "許可されていない項目があります" });
+  assert.equal(state.phase, "rejected");
+  assert.equal(state.validationState, "error");
+  assert.equal(state.dryRunState, "blocked");
+  assert.match(state.dryRunText, /Intentを作らず停止/);
+  assert.match(state.announcement, /通知は作成していません/);
+});
 
 test("the visible flow converges two requests to one notification", () => {
   let state = reduceVisualState(createVisualState(), { type: "PREVIEWED" });
@@ -69,7 +99,12 @@ test("the visualization exposes status semantics and a reduced-motion path", asy
   assert.match(html, /role="status"/);
   assert.match(html, /<button[^>]+id="preview"/);
   assert.match(html, /<label[^>]+for="logical-operation"/);
+  assert.match(html, /id="input-boundary-flow"/);
+  assert.match(html, /受信/);
+  assert.match(html, /厳格検査/);
+  assert.match(html, /乾式実行だけ/);
   assert.match(css, /@media \(max-width: 820px\)/);
+  assert.match(css, /\.input-boundary-flow \{ grid-template-columns: 1fr/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif/);
   assert.doesNotMatch(css, /\b(?:Inter|Roboto|Fraunces|Geist|Plus Jakarta Sans|Space Grotesk)\b/i);

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/notification-tool-input.schema.json",
+  "$comment": "information_uuid_v5=69f26f68-f76b-5df8-a428-e523923b26c5 event_uuid_v7=01a048da-1888-7f94-b285-d0e5e23d2b9b machine-contract=RECEIVED->STRICTLY_PROJECTED->DRY_RUN; rejection has no external effect",
+  "title": "Strict WebMCP notification preview input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "logicalOperationId",
+    "title",
+    "body"
+  ],
+  "properties": {
+    "logicalOperationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:@/-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$"
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]+$"
+    }
+  }
+}

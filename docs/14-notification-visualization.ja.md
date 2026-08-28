@@ -79,6 +79,7 @@ English purpose: Make the measured `two requests -> one effect` invariant unders
 - `AMBIGUOUS`は再送せず、照合だけを許可します。
 - 通知タグはUUIDバージョン5の予定識別子です。
 - ネイティブWebMCPは`document.modelContext`を観測した場合だけ登録し、未観測時は`INCONCLUSIVE`を維持します。
+- WebMCPから通知予定へ入る前段は、[`15-webmcp-input-boundary.ja.md`](15-webmcp-input-boundary.ja.md)の「受信 → 厳格検査 → 乾式実行だけ」で可視化し、拒否時は入力欄・Intent・監査を変えません。
 - 表示ロジックは安全性を生成しません。安全性の正本はSQLite一意制約、状態機械、外部効果開始台帳、読み戻し証拠です。
 
 通知タグと同一タグ通知の置換動作はNotifications APIの規範仕様に基づきます。[WHATWG Notifications API](https://notifications.spec.whatwg.org/)

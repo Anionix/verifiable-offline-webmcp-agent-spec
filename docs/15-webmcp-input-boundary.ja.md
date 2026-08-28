@@ -4,8 +4,10 @@ language: "ja"
 stable_uuid_v5: "6981d5d4-7504-5ebe-aee0-4d0567e37d86"
 event_uuid_v7: "01a048da-1889-777d-a11d-87d4f4bdefa0"
 verified_event_uuid_v7: "01a048e8-9b29-7f4c-af71-32eaff3519be"
+adapter_event_uuid_v7: "01a04904-ca9a-7fb0-ada5-b80ab8e02e6c"
 generated_at: "2026-08-28T14:50:47.817Z"
 verified_at: "2026-08-28T15:06:38.761Z"
+updated_at: "2026-08-28T15:37:25.914Z"
 version: "0.3.0-candidate"
 status: "browser-verified"
 browser_evidence: "CONFIRMED"
@@ -29,6 +31,8 @@ English purpose: Independently project WebMCP input into three literal notificat
 
 したがって、`inputSchema`は発見と説明の契約として残しつつ、実装側の投影器を安全性の正本にします。これは草案の不足を埋める設計判断であり、ブラウザー全体の適合を証明するものではありません。
 
+草案の接続面はさらに[`src/typescript/webmcp/notification-adapter.js`](../src/typescript/webmcp/notification-adapter.js)へ隔離しました。画面は登録結果を表示するだけで、`document.modelContext`や`registerTool()`を直接呼びません。
+
 ## 入力契約
 
 | 項目 | 条件 | 投影後 |
@@ -42,6 +46,8 @@ English purpose: Independently project WebMCP input into three literal notificat
 | Unicode | 対にならないサロゲート、制御文字、方向制御文字、非文字を禁止 | 正しい文字列だけ |
 
 入力本文は「命令」ではなく通知へ表示する文字列として扱います。`innerHTML`へ入れず、WebMCPの戻り値にもタイトルや本文を反射しません。戻すのはUUIDバージョン5の`intentId`、対象、要約値、制御状態、外部効果状態、承認要否だけです。
+
+入力来歴も通知本文とは別の厳格な契約にします。`WEBMCP / LOCAL_FORM`は常に`UNTRUSTED`、内部の型付き呼び出しだけを`TRUSTED_INTERNAL`とし、生成元と未信頼の印はサーバー経路から作ります。要求本文から来歴項目を受け付けないため、外部入力が内部入力を名乗れません。詳しい型と読み戻し条件は[`16-webmcp-provenance-adapter.ja.md`](16-webmcp-provenance-adapter.ja.md)にあります。
 
 ## 状態と不変条件
 
@@ -82,6 +88,10 @@ Accept(x) \Rightarrow Control=DRY\_RUN \land Effect=NOT\_STARTED
 - 拒否後のSQLite Intent、外部効果開始件数、監査記録がすべて0のままである。
 - 受理後は`DRY_RUN / NOT_STARTED`で、外部効果開始件数が0である。
 - WebMCP callback内に通知権限要求がなく、戻り値へ本文を反射しない。
+- WebMCP草案への参照が専用アダプター以外にない。
+- 外部入力の来歴がサーバー側で生成され、SQLiteと監査記録から同じ値を読み戻せる。
+- 同一論理操作を別経路から再要求しても、最初の来歴と同じIntent IDを保持する。
+- 異なる生成元はIntent作成前に拒否する。
 
 ## ブラウザー観測
 
@@ -95,5 +105,7 @@ Accept(x) \Rightarrow Control=DRY\_RUN \land Effect=NOT\_STARTED
 - この確認では承認ボタン、通知権限要求、通知アダプターを呼んでおらず、実通知は表示していません。
 
 公開できる数値と監査鎖は[`metadata/webmcp-input-boundary-verification.json`](../metadata/webmcp-input-boundary-verification.json)と[`data/audit/webmcp-input-boundary-events.ndjson`](../data/audit/webmcp-input-boundary-events.ndjson)に保存します。
+
+専用アダプターと来歴読み戻しの追加観測は[`metadata/webmcp-provenance-verification.json`](../metadata/webmcp-provenance-verification.json)と[`data/audit/webmcp-provenance-events.ndjson`](../data/audit/webmcp-provenance-events.ndjson)に保存します。
 
 対象ブラウザー全体のネイティブWebMCP適合、キャンセル競合のすべて、複数生成元をまたぐエージェント実装の安全性は、引き続き`INCONCLUSIVE`です。

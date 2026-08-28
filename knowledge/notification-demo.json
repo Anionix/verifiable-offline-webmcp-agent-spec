@@ -3,21 +3,21 @@
   "identity": {
     "uuid_v5": "c1cc8d89-f2d2-55e8-b4a7-8acdc06d2723",
     "uuid_v7": "01a04867-0db0-701d-a8fc-db4ca1814c02",
-    "updated_uuid_v7": "01a048e8-9b29-7f4c-af71-32eaff3519be",
+    "updated_uuid_v7": "01a0490d-f64c-7c81-80a2-a6537e8eb038",
     "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "canonical_name": "duplicate-safe-local-notification-demo",
     "category": "reference-implementation"
   },
   "temporal": {
     "created_at": "2026-08-28T12:23:50Z",
-    "updated_at": "2026-08-28T15:06:38.761Z",
-    "observed_at": "2026-08-28T15:06:38.761Z",
+    "updated_at": "2026-08-28T15:47:26.924Z",
+    "observed_at": "2026-08-28T15:47:26.924Z",
     "valid_from": "2026-08-28T12:23:50Z",
     "valid_to": null,
-    "epoch_ms": 1787929598761,
+    "epoch_ms": 1787932046924,
     "time_zone": "UTC",
     "local_time_zone": "Asia/Tokyo",
-    "local_rendering": "2026-08-29T00:06:38.761+09:00",
+    "local_rendering": "2026-08-29T00:47:26.924+09:00",
     "precision": "millisecond",
     "standard": "RFC 3339 profile"
   },
@@ -35,6 +35,9 @@
     "codex_in_app_browser_webmcp_registration": "CONFIRMED",
     "strict_webmcp_input_projection": "CONFIRMED",
     "webmcp_rejection_without_intent_or_audit_mutation": "CONFIRMED",
+    "dedicated_webmcp_adapter": "CONFIRMED",
+    "webmcp_provenance_round_trip": "CONFIRMED",
+    "cross_channel_duplicate_preserves_first_provenance": "CONFIRMED",
     "real_mac_notification": "CONFIRMED"
   },
   "evidence_artifacts": [
@@ -46,12 +49,18 @@
     "src/typescript/test/notification-visualization.test.js",
     "src/typescript/test/notification-input-projection.test.ts",
     "src/typescript/test/notification-demo-api.test.ts",
+    "src/typescript/test/input-provenance.test.ts",
+    "src/typescript/test/webmcp-notification-adapter.test.js",
     "examples/notification-demo/visual-state.js",
     "schemas/notification-tool-input.schema.json",
+    "schemas/input-provenance.schema.json",
     "metadata/webmcp-input-boundary-verification.json",
     "data/audit/webmcp-input-boundary-events.ndjson",
+    "metadata/webmcp-provenance-verification.json",
+    "data/audit/webmcp-provenance-events.ndjson",
     "docs/14-notification-visualization.ja.md",
-    "docs/15-webmcp-input-boundary.ja.md"
+    "docs/15-webmcp-input-boundary.ja.md",
+    "docs/16-webmcp-provenance-adapter.ja.md"
   ],
   "machine_contract": {
     "identity": "UUIDv5(intent namespace, logical operation identifier)",
@@ -62,7 +71,10 @@
     "visualization_count_rule": "show the measured SQLite effect-start count; confirmed states require exactly one, and zero or values above one are never hidden",
     "input_projection_rule": "accept exactly three own enumerable data properties, normalize literal strings, and reject before intent creation",
     "webmcp_permission_rule": "same-origin WebMCP may reach preview only; permission and notification remain explicit-click operations",
-    "contamination_rule": "notification title and body remain literal text and are not reflected in the WebMCP result"
+    "contamination_rule": "notification title and body remain literal text and are not reflected in the WebMCP result",
+    "adapter_isolation_rule": "only the dedicated notification adapter may access document.modelContext or registerTool",
+    "provenance_rule": "external provenance is derived from the server route, persisted in the first intent-created event, and matched through independent readback",
+    "provenance_duplicate_rule": "a same-operation request from another channel keeps the first persisted provenance and the same UUIDv5 intent"
   },
   "live_verification": {
     "intent_id": "03c9c953-71ea-5405-b1eb-3c0536e78ec1",
@@ -91,6 +103,15 @@
     "input_boundary_rejected_intent_created": false,
     "input_boundary_effect_start_count": 0,
     "input_boundary_audit_event_count": 2,
+    "provenance_browser_verification": "CONFIRMED",
+    "provenance_persisted_channel": "WEBMCP",
+    "provenance_source_trust": "UNTRUSTED",
+    "provenance_annotation": "UNTRUSTED_LITERAL",
+    "provenance_matches_persisted_readback": true,
+    "provenance_sqlite_matches_audit": true,
+    "cross_channel_duplicate_preserved_first_provenance": true,
+    "provenance_effect_start_count": 0,
+    "provenance_audit_event_count": 2,
     "target_browser_conformance": "INCONCLUSIVE"
   },
   "source_refs": [

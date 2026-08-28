@@ -1,6 +1,8 @@
 // information_uuid_v5=34f7f3c3-adc1-514c-a7a8-4c8fb7891dd2
 // event_uuid_v7=01a04872-0460-7dec-b47f-6ea6a3348078
 // machine-contract: control_state and effect_state are separate; AMBIGUOUS permits reconciliation only.
+import type { InputProvenance } from "./input-provenance.ts";
+
 export const ROOT_UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 
 export type ControlState =
@@ -28,6 +30,7 @@ export interface NotificationIntentInput {
   title: string;
   body: string;
   target?: NotificationTarget;
+  inputProvenance?: InputProvenance;
 }
 
 export interface NotificationIntent {

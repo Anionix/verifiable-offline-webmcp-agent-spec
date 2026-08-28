@@ -3,11 +3,13 @@
 <!-- information_uuid_v5=29700bcc-2f12-5cf7-8330-580bc700c0f3 event_uuid_v7=01a048b7-2627-7587-9745-a7b5e28e024f machine-contract=two visible request lanes converge through the measured ledger to at most one effect -->
 <!-- information_uuid_v5=96dea50d-2218-5b6d-86ce-6beaa00f5fe4 event_uuid_v7=01a048c4-45b3-7120-928e-b7ff8f03ae05 machine-contract=labels and changing effect counts expose explicit assistive-technology semantics -->
 <!-- information_uuid_v5=cbeb5a00-12c7-5557-a8ec-c50cd3765001 event_uuid_v7=01a048da-1888-7be0-9eef-3e1d0cadd1b1 machine-contract=WebMCP RECEIVED->STRICTLY_PROJECTED->DRY_RUN is visible and rejection stops before intent creation -->
+<!-- information_uuid_v5=a031493c-3143-5904-a218-bf47e8be4654 event_uuid_v7=01a048f8-3326-7ad0-a607-d9b64a598798 machine-contract=WEBMCP->UNTRUSTED_MARK->SAME_ORIGIN->SQLITE_AUDIT_READBACK is visible without enabling notification permission -->
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>二重送信しないMac通知デモ</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307101b'/%3E%3Cpath d='M18 45h28M22 27a10 10 0 0 1 20 0c0 11 5 13 5 13H17s5-2 5-13Z' fill='none' stroke='%2335dfa1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -71,6 +73,15 @@
           <div><h3>乾式実行だけ</h3><p id="input-dry-run-status">通知権限には進みません</p></div>
         </article>
         <p id="input-boundary-announcer" class="sr-only" aria-live="polite">WebMCP入力を待っています。</p>
+      </div>
+      <div class="provenance-evidence" aria-labelledby="provenance-title">
+        <h3 id="provenance-title">未信頼の印を読み戻す</h3>
+        <dl class="provenance-rail">
+          <div><dt>入力経路</dt><dd id="provenance-channel">未観測</dd></div>
+          <div><dt>信頼状態</dt><dd id="provenance-trust">未観測</dd></div>
+          <div><dt>生成元</dt><dd id="provenance-origin">未観測</dd></div>
+          <div><dt>永続証拠</dt><dd id="provenance-readback">読み戻し待ち</dd></div>
+        </dl>
       </div>
     </section>
 

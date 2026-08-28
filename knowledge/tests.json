@@ -60,10 +60,10 @@
       },
       "type": "VerificationTest",
       "test_kind": "architecture-requirement-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
-        "ja": "次の要件を検証する: WebMCPのdraft APIは専用adapterに隔離しなければならない。",
+        "ja": "次の要件を検証する: WebMCP草案の接続面は専用アダプターに隔離しなければならない。",
         "en": "Verifies the following requirement(s): The draft WebMCP API MUST be isolated behind a dedicated adapter."
       },
       "expected": {
@@ -80,15 +80,17 @@
         "schemas/notification-tool-input.schema.json",
         "src/typescript/notification/input-projection.js",
         "src/typescript/notification/preview-boundary.ts",
+        "src/typescript/webmcp/notification-adapter.js",
         "src/typescript/test/notification-input-projection.test.ts",
-        "src/typescript/test/notification-demo-api.test.ts"
+        "src/typescript/test/notification-demo-api.test.ts",
+        "src/typescript/test/webmcp-notification-adapter.test.js"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a048e1-840c-70cf-8873-0e6d3caddc58",
-        "occurred_at": "2026-08-28T14:58:54.092Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "strict duplicate-safe notification WebMCP adapter boundary"
+        "event_uuid_v7": "01a04904-ca94-79ea-8b15-57824eb4ceff",
+        "occurred_at": "2026-08-28T15:37:25.908Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "dedicated notification adapter is the only runtime module that accesses the draft WebMCP surface"
       }
     },
     {
@@ -2562,10 +2564,10 @@
       },
       "type": "VerificationTest",
       "test_kind": "security-policy-test",
-      "implementation_status": "partially-implemented",
+      "implementation_status": "implemented",
       "automated": true,
       "description": {
-        "ja": "次の要件を検証する: source trust、origin、untrusted annotationをtaint metadataとして伝播しなければならない。",
+        "ja": "次の要件を検証する: 入力元の信頼状態、生成元、未信頼の印を汚染追跡情報として伝播しなければならない。",
         "en": "Verifies the following requirement(s): Source trust, origin, and untrusted annotations MUST propagate as taint metadata."
       },
       "expected": {
@@ -2579,18 +2581,24 @@
         "SRC-WEBMCP-2026"
       ],
       "automation_artifacts": [
+        "schemas/input-provenance.schema.json",
+        "src/typescript/notification/input-provenance.ts",
         "src/typescript/notification/input-projection.js",
         "src/typescript/notification/demo-server.ts",
+        "src/typescript/notification/store.ts",
+        "src/typescript/webmcp/notification-adapter.js",
         "examples/notification-demo/app.js",
+        "src/typescript/test/input-provenance.test.ts",
         "src/typescript/test/notification-input-projection.test.ts",
-        "src/typescript/test/notification-demo-api.test.ts"
+        "src/typescript/test/notification-demo-api.test.ts",
+        "src/typescript/test/webmcp-notification-adapter.test.js"
       ],
       "status_transition": {
-        "event_uuid_v7": "01a048e1-840b-73e5-97f5-8b5a163df2a0",
-        "occurred_at": "2026-08-28T14:58:54.091Z",
-        "from": "specified",
-        "to": "partially-implemented",
-        "scope": "same-origin and literal-content controls for the local notification path"
+        "event_uuid_v7": "01a04904-ca95-7468-9bd0-cb597093a64a",
+        "occurred_at": "2026-08-28T15:37:25.909Z",
+        "from": "partially-implemented",
+        "to": "implemented",
+        "scope": "server-derived provenance persists through SQLite and hash-chained audit readback for the local notification path"
       }
     },
     {

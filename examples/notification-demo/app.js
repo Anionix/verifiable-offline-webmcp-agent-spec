@@ -11,10 +11,9 @@
 // event_uuid_v7=01a048da-1888-70e0-ae63-0eeaf0ec9fde
 // machine-contract: WebMCP input is projected before UI mutation and can call preview only; permission and notification remain click-only.
 import {
-  NOTIFICATION_TOOL_INPUT_SCHEMA,
   NotificationInputError,
-  projectNotificationToolInput,
-} from "/input-projection.js";
+  registerNotificationWebMcpTool,
+} from "/webmcp-notification-adapter.js";
 import {
   createInputBoundaryState,
   createVisualState,
@@ -63,6 +62,10 @@ const elements = {
   inputValidationStatus: document.querySelector("#input-validation-status"),
   inputDryRunNode: document.querySelector("#input-dry-run-node"),
   inputDryRunStatus: document.querySelector("#input-dry-run-status"),
+  provenanceChannel: document.querySelector("#provenance-channel"),
+  provenanceTrust: document.querySelector("#provenance-trust"),
+  provenanceOrigin: document.querySelector("#provenance-origin"),
+  provenanceReadback: document.querySelector("#provenance-readback"),
 };
 
 let currentIntentId = null;
@@ -145,6 +148,10 @@ async function request(path, value, signal) {
   return result;
 }
 
+async function requestPreview(values, signal, path = "/api/preview") {
+  return request(path, values, signal);
+}
+
 async function readStatus() {
   if (!currentIntentId) throw new Error("状態を読むIntentがありません");
   const response = await fetch(`/api/status?intentId=${encodeURIComponent(currentIntentId)}`, {
@@ -178,10 +185,52 @@ function render(result, message) {
   elements.log.textContent = message + "\n\n" + JSON.stringify(result, null, 2);
 }
 
+function assertLocalDryRunReadback(result) {
+  const intent = result?.intent;
+  const previewResult = result?.preview;
+  const inputEvidence = result?.inputEvidence;
+  if (
+    !intent
+    || !previewResult
+    || !inputEvidence?.invocation
+    || !inputEvidence?.persisted
+    || !inputEvidence?.auditPersisted
+    || inputEvidence.sqliteMatchesAudit !== true
+    || inputEvidence.persistedEventId !== inputEvidence.auditEventId
+    || intent.controlState !== "DRY_RUN"
+    || intent.effectState !== "NOT_STARTED"
+    || previewResult.intentId !== intent.intentId
+    || previewResult.payloadDigest !== intent.payloadDigest
+    || previewResult.approvalRequired !== true
+  ) throw new Error("dry-run readback mismatch");
+}
+
+function renderProvenanceObservation(observation) {
+  if (!observation) return;
+  elements.provenanceChannel.textContent = observation.channel === "WEBMCP" ? "WebMCP" : observation.channel;
+  elements.provenanceTrust.textContent = observation.sourceTrust === "UNTRUSTED" ? "未信頼の入力" : observation.sourceTrust;
+  elements.provenanceOrigin.textContent = observation.sourceOrigin;
+  elements.provenanceReadback.textContent = "読み戻し待ち";
+}
+
+function renderInputEvidence(inputEvidence) {
+  const invocation = inputEvidence?.invocation;
+  const persisted = inputEvidence?.persisted;
+  if (!invocation || !persisted) return;
+  elements.provenanceChannel.textContent = invocation.channel === "WEBMCP" ? "WebMCP" : "ローカル画面";
+  elements.provenanceTrust.textContent = invocation.sourceTrust === "UNTRUSTED" ? "未信頼の印を保持" : "内部入力";
+  elements.provenanceOrigin.textContent = invocation.sourceOrigin;
+  elements.provenanceReadback.textContent = inputEvidence.matchesPersisted
+    ? "SQLite・監査と一致"
+    : `既存台帳の${persisted.channel}を保持`;
+}
+
 async function preview(values = formValue(), signal) {
   updateVisual({ type: "RESET" });
-  const result = await request("/api/preview", values, signal);
+  const result = await requestPreview(values, signal);
+  assertLocalDryRunReadback(result);
   render(result.intent, "乾式実行が完了しました。内容を確認してから承認してください。");
+  renderInputEvidence(result.inputEvidence);
   updateVisual({ type: "PREVIEWED" });
   return result;
 }
@@ -261,57 +310,47 @@ elements.retry.addEventListener("click", () => handle(() => approveAndNotify("re
 elements.reconcile.addEventListener("click", () => handle(reconcile));
 
 async function registerWebMcp() {
-  const context = document.modelContext;
-  if (!context?.registerTool) {
-    elements.webmcp.textContent = "INCONCLUSIVE — このブラウザーにdocument.modelContextがありません";
-    return;
-  }
-  try {
-    await context.registerTool({
-      name: "notify_once",
-      title: "Prepare one duplicate-safe local notification",
-      description: "Strictly validates three literal notification fields and prepares a dry run. It cannot request notification permission or create a visible notification.",
-      inputSchema: NOTIFICATION_TOOL_INPUT_SCHEMA,
-      execute: async (input, options = {}) => {
+  let pendingResult = null;
+  const registration = await registerNotificationWebMcpTool({
+    preview: async (projected, context) => {
+      pendingResult = await requestPreview(projected, context.signal, "/api/webmcp-preview");
+      return pendingResult;
+    },
+    onLifecycle: (event) => {
+      renderProvenanceObservation(event.observation);
+      if (event.type === "INPUT_RECEIVED") {
         updateInputBoundary({ type: "INPUT_RECEIVED" });
-        let projected;
-        try {
-          options.signal?.throwIfAborted();
-          projected = projectNotificationToolInput(input);
-        } catch (error) {
-          const message = inputRejectionMessage(error);
-          updateInputBoundary({ type: "INPUT_REJECTED", message });
-          elements.log.textContent = `WebMCP入力を拒否: ${message}`;
-          throw error;
-        }
+      } else if (event.type === "INPUT_REJECTED") {
+        const message = inputRejectionMessage(event.error);
+        updateInputBoundary({ type: "INPUT_REJECTED", message });
+        elements.provenanceReadback.textContent = "Intent作成前に停止";
+        elements.log.textContent = `WebMCP入力を拒否: ${message}`;
+      } else if (event.type === "INPUT_ACCEPTED") {
         updateInputBoundary({ type: "INPUT_ACCEPTED" });
-        let result;
-        try {
-          result = await preview(projected, options.signal);
-          assertDryRunReadback(result);
-        } catch (error) {
-          updateInputBoundary({ type: "DRY_RUN_FAILED" });
-          elements.log.textContent = "WebMCP乾式実行を停止: 結果を確認できません。実通知は開始していません。";
-          throw error;
-        }
-        elements.logicalOperation.value = projected.logicalOperationId;
-        elements.title.value = projected.title;
-        elements.body.value = projected.body;
+      } else if (event.type === "DRY_RUN_COMPLETED" && pendingResult && event.input) {
+        render(pendingResult.intent, "WebMCP入力の由来をSQLiteと監査記録から読み戻しました。実通知は開始していません。");
+        renderInputEvidence(pendingResult.inputEvidence);
+        updateVisual({ type: "PREVIEWED" });
+        elements.logicalOperation.value = event.input.logicalOperationId;
+        elements.title.value = event.input.title;
+        elements.body.value = event.input.body;
         updateInputBoundary({ type: "DRY_RUN_COMPLETED" });
-        return {
-          intentId: result.intent.intentId,
-          target: result.intent.target,
-          payloadDigest: result.intent.payloadDigest,
-          controlState: result.intent.controlState,
-          effectState: result.intent.effectState,
-          humanApprovalRequired: true,
-        };
-      },
-    }, { exposedTo: [] });
-    elements.webmcp.textContent = "CONFIRMED — same-origin notify_onceを登録済み";
-  } catch (error) {
-    const name = error instanceof Error ? error.name : "UnknownError";
-    elements.webmcp.textContent = `INCONCLUSIVE — notify_onceを登録できません (${name})`;
+      } else if (event.type === "DRY_RUN_FAILED") {
+        updateInputBoundary({ type: "DRY_RUN_FAILED" });
+        elements.provenanceReadback.textContent = "結果不一致で停止";
+        elements.log.textContent = "WebMCP乾式実行を停止: 由来か結果を確認できません。実通知は開始していません。";
+      }
+    },
+  });
+
+  if (registration.status === "REGISTERED") {
+    elements.webmcp.textContent = "CONFIRMED — 専用アダプターがsame-origin notify_onceを登録済み";
+  } else if (registration.status === "UNAVAILABLE") {
+    elements.webmcp.textContent = "INCONCLUSIVE — このブラウザーにWebMCP入口がありません。ローカル経路は利用できます";
+  } else if (registration.status === "PERMISSION_DENIED") {
+    elements.webmcp.textContent = "BLOCKED — tools権限方針が登録を拒否しました";
+  } else {
+    elements.webmcp.textContent = `INCONCLUSIVE — 専用アダプターの登録失敗 (${registration.errorName})`;
   }
 }
 
@@ -332,22 +371,6 @@ function inputRejectionMessage(error) {
     UNSUPPORTED_CHARACTER: "論理操作識別子に未対応文字があります",
   };
   return messages[error.code] ?? "入力検査で拒否しました";
-}
-
-function assertDryRunReadback(result) {
-  const intent = result?.intent;
-  const previewResult = result?.preview;
-  if (
-    !intent
-    || !previewResult
-    || intent.controlState !== "DRY_RUN"
-    || intent.effectState !== "NOT_STARTED"
-    || previewResult.intentId !== intent.intentId
-    || previewResult.payloadDigest !== intent.payloadDigest
-    || previewResult.approvalRequired !== true
-  ) {
-    throw new Error("dry-run readback mismatch");
-  }
 }
 
 await registerWebMcp();

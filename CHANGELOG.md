@@ -1,6 +1,7 @@
 # Changelog
 
 <!-- information_uuid_v5=06f137fc-6ca9-5499-b447-b9cd9df976b5 event_uuid_v7=01a048c2-e3c4-7c0c-9abb-21b175b0719a state_transition=IMPLEMENTING -> BROWSER_VERIFIED occurred_at=2026-08-28T14:25:32.776Z -->
+<!-- information_uuid_v5=34c13a76-73d8-5cf5-9fe1-fec1e071ba2f event_uuid_v7=01a04904-ca97-76f0-a4ed-56ea8c3ac507 state_transition=INPUT_PROJECTED -> PROVENANCE_READ_BACK occurred_at=2026-08-28T15:37:25.911Z -->
 
 ## 0.3.0-candidate — 2026-08-28
 
@@ -14,6 +15,10 @@
 - Added one strict three-field input projector shared by the WebMCP callback and localhost preview API; unknown fields, inherited values, accessors, invalid types, control characters, malformed Unicode, and length violations fail closed.
 - Added a visible `received -> strict validation -> dry run only` boundary, with a rejection state that leaves the form, SQLite intent store, audit chain, and external-effect count unchanged.
 - Restricted WebMCP exposure to the same origin, kept notification permission outside the callback, and stopped reflecting notification title or body in tool results.
+- Isolated `document.modelContext` and `registerTool()` behind one notification adapter, with typed unavailable, permission-denied, security-rejected, and registration-failed results.
+- Added a server-derived input-provenance contract and persisted WebMCP channel, trust, origin, annotation, and derivation in the first SQLite-backed audit event.
+- Added independent provenance readback, cross-channel duplicate preservation, exact-origin rejection, and a visible provenance rail without triggering a real notification.
+- Excluded ignored Playwright browser-output files from the reproducible public catalog after the first GitHub clean-checkout run exposed the host-only mismatch.
 
 <!-- information_uuid_v5=98e355d2-8469-5427-937c-a922fcf5ad50 event_uuid_v7=01a04896-44e4-74b6-803b-38cd809c1837 state_transition=REVIEW -> VERIFIED occurred_at=2026-08-28T13:36:42.724Z -->
 

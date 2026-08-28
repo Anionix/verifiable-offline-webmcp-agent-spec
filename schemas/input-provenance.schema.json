@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/input-provenance.schema.json",
+  "$comment": "information_uuid_v5=2f19eacb-01de-5ce1-8c53-6a11bf4cc966 event_uuid_v7=01a048f8-3326-7152-9e16-1c55a81d7e50 machine-contract=external provenance is server-derived and untrusted; internal provenance is explicit and never impersonates WebMCP",
+  "title": "Input provenance evidence",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "sourceTrust", "sourceOrigin", "untrustedContent", "annotation", "derivation"],
+      "properties": {
+        "channel": { "enum": ["WEBMCP", "LOCAL_FORM"] },
+        "sourceTrust": { "const": "UNTRUSTED" },
+        "sourceOrigin": { "type": "string", "format": "uri", "maxLength": 256 },
+        "untrustedContent": { "const": true },
+        "annotation": { "const": "UNTRUSTED_LITERAL" },
+        "derivation": { "const": "SERVER_ROUTE" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "sourceTrust", "sourceOrigin", "untrustedContent", "annotation", "derivation"],
+      "properties": {
+        "channel": { "const": "TYPED_INTERNAL" },
+        "sourceTrust": { "const": "TRUSTED_INTERNAL" },
+        "sourceOrigin": { "const": "LOCAL_PROCESS" },
+        "untrustedContent": { "const": false },
+        "annotation": { "const": "TRUSTED_INTERNAL" },
+        "derivation": { "const": "INTERNAL_CALL" }
+      }
+    }
+  ]
+}

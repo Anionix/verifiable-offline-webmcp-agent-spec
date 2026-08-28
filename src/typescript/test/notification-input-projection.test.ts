@@ -104,17 +104,19 @@ test("runtime projection and public JSON Schema expose the same field contract",
 });
 
 test("the browser and localhost API use the same projector and keep permission outside WebMCP", async () => {
-  const [app, server] = await Promise.all([
+  const [adapter, app, server] = await Promise.all([
+    readFile(new URL("../webmcp/notification-adapter.js", import.meta.url), "utf8"),
     readFile(new URL("../../../examples/notification-demo/app.js", import.meta.url), "utf8"),
     readFile(new URL("../notification/demo-server.ts", import.meta.url), "utf8"),
   ]);
-  assert.match(app, /inputSchema: NOTIFICATION_TOOL_INPUT_SCHEMA/);
-  assert.match(app, /projectNotificationToolInput\(input\)/);
-  assert.doesNotMatch(app, /\.\.\.result\.preview/);
-  assert.equal(app.indexOf("projectNotificationToolInput(input)"), app.lastIndexOf("projectNotificationToolInput(input)"));
-  assert.ok(app.indexOf("projectNotificationToolInput(input)") < app.indexOf("elements.logicalOperation.value = projected.logicalOperationId"));
+  assert.match(adapter, /inputSchema: NOTIFICATION_TOOL_INPUT_SCHEMA/);
+  assert.match(adapter, /projectNotificationToolInput\(input\)/);
+  assert.doesNotMatch(adapter, /\.\.\.result\.preview/);
+  assert.equal(adapter.indexOf("projectNotificationToolInput(input)"), adapter.lastIndexOf("projectNotificationToolInput(input)"));
+  assert.ok(adapter.indexOf("projectNotificationToolInput(input)") < adapter.indexOf("options.preview(projected"));
+  assert.doesNotMatch(app, /projectNotificationToolInput/);
   const webMcpSection = app.slice(app.indexOf("async function registerWebMcp"));
   assert.doesNotMatch(webMcpSection, /Notification\.requestPermission/);
-  assert.match(server, /prepareNotificationPreview\(engine, input\)/);
+  assert.match(server, /prepareNotificationPreview\(engine, input, provenance\)/);
   assert.match(server, /Permissions-Policy", "tools=\(self\)"/);
 });

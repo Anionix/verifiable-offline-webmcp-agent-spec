@@ -680,6 +680,27 @@ def main():
                 errors.append(f"Devpost observation context repeats identifier {context_id}")
             context_by_id[context_id] = context
             source_commit = context["sourceCommit"]
+            context_path = (ROOT / context["path"]).resolve()
+            if ROOT not in context_path.parents or not context_path.is_file():
+                errors.append(f"Devpost observation context is missing or outside the repository: {context['path']}")
+                continue
+            if source_commit == "CHECKOUT_TREE":
+                tracked = subprocess.run(
+                    ["git", "ls-files", "--error-unmatch", "--", context["path"]],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if tracked.returncode != 0:
+                    errors.append(
+                        f"Devpost checkout-tree context is not tracked by Git: {context['path']}"
+                    )
+                elif sha256(context_path.read_bytes()) != context["artifactSha256"]:
+                    errors.append(
+                        f"Devpost checkout-tree context SHA-256 differs for {context['path']}"
+                    )
+                continue
             if source_commit not in validated_context_commits:
                 commit_type = subprocess.run(
                     ["git", "cat-file", "-t", source_commit],
@@ -705,9 +726,6 @@ def main():
                     errors.append(
                         f"Devpost observation context source {source_commit} does not descend from preparedFromCommit"
                     )
-            context_path = (ROOT / context["path"]).resolve()
-            if ROOT not in context_path.parents or not context_path.is_file():
-                errors.append(f"Devpost observation context is missing or outside the repository: {context['path']}")
             committed_blob = subprocess.run(
                 ["git", "cat-file", "blob", f"{source_commit}:{context['path']}"],
                 cwd=ROOT,

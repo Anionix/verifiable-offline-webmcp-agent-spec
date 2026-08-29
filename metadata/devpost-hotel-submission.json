@@ -41,20 +41,20 @@
         "occurredAt": "2026-08-29T12:54:00.000Z",
         "from": "SUBMISSION_PREPARED",
         "to": "FINAL_SUBMISSION_PENDING",
-        "evidence": "Authenticated Devpost readback returned submittedAt null, and every observed claim now resolves to a SHA-256-verified file blob in commit 89d803fb822fc2d2a6182cecdb90eb0dfa5317da; final challenge submission remains pending."
+        "evidence": "Authenticated Devpost readback returned submittedAt null; final challenge submission remained pending."
       },
       {
         "eventUuidV7": "01a04dab-38f1-7c24-92ec-322d89263c16",
         "occurredAt": "2026-08-29T13:17:42.001Z",
         "from": "FINAL_SUBMISSION_PENDING",
         "to": "FINAL_SUBMISSION_VERIFIED",
-        "evidence": "Devpost submit-project returned submission 1158722 with status Submitted, authenticated readback confirmed submittedAt 2026-08-29T13:14:00.129Z, and later anonymous HTML exposed the current hotel title and uploaded image; the three final local records are bound to immutable blobs in commit e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb."
+        "evidence": "Devpost submit-project returned submission 1158722 with status Submitted, authenticated readback confirmed submittedAt 2026-08-29T13:14:00.129Z, and later anonymous HTML exposed the current hotel title and uploaded image; the three final local records are SHA-256-bound in the tracked checkout tree."
       }
     ],
     "invariants": [
       "Only a Devpost-owned readback with non-null submitted_at proves final challenge submission.",
       "The local workflow state records preparation progress but does not persist Devpost-owned submission truth.",
-      "Every observed claim resolves through one contextIdUuidV5 to a repository path, an existing Git commit containing that file blob, and its recorded SHA-256 digest.",
+      "Every observed claim resolves through one contextIdUuidV5 to a tracked checkout path and its recorded SHA-256 digest; it never requires an off-history commit object.",
       "Every observed, unmeasured, and not-applicable claim remains in a separate collection.",
       "WebMCP exposes check, prepare, status, and cancellation preview only; confirmation, payment, and cancellation mutation remain unavailable.",
       "The running demo never represents a real booking, payment, hotel, email, cancellation, or personal record."
@@ -104,111 +104,25 @@
   ],
   "observationContexts": [
     {
-      "contextIdUuidV5": "0b62bf24-d69f-593b-8b2c-4d2d70363dd8",
-      "path": "metadata/devpost-public-readback.json",
-      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
-      "artifactSha256": "54664946e53e068571be963ca4120a594d777db04009f63ff46a97fda07e8e2d"
-    },
-    {
-      "contextIdUuidV5": "6c7fb53b-d39e-5fe0-bf2e-1f012f6a8151",
-      "path": "devpost-submission.md",
-      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
-      "artifactSha256": "ab4ffe4ea43f286ac65d70d9181b7ab7ffaae949486f6189d7c0f26352df3cbe"
-    },
-    {
-      "contextIdUuidV5": "7556df45-80bf-5905-8f90-7027436a4f69",
-      "path": ".devpost-hackathon-state.json",
-      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
-      "artifactSha256": "e450fcb73d52ebdaa56255879fc4f520e9ef5a73b6f0f90c0703cda0303d9bcf"
-    },
-    {
-      "contextIdUuidV5": "e7a6f585-d06c-543e-af29-975746ab0e12",
-      "path": "docs/assets/devpost-hotel-thumbnail.png",
-      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
-      "artifactSha256": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10"
-    },
-    {
       "contextIdUuidV5": "198fed6c-23d7-5e3a-acc0-e048397f1819",
       "path": "metadata/devpost-public-readback.json",
-      "sourceCommit": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+      "sourceCommit": "CHECKOUT_TREE",
       "artifactSha256": "72ab2ddd9f21eb1fd0a538c8e2fd501f3ce828729f2368cac06b924bf9040a7c"
     },
     {
       "contextIdUuidV5": "ca688e1d-e973-55e5-ba31-c9d7b10b304b",
       "path": "devpost-submission.md",
-      "sourceCommit": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+      "sourceCommit": "CHECKOUT_TREE",
       "artifactSha256": "3f3071ed1894752623e52fc95fdaecf81e234d4f288bd6967588b24e37d7fbc9"
     },
     {
       "contextIdUuidV5": "bb838f07-e9de-58c7-9838-9b366356bde9",
       "path": ".devpost-hackathon-state.json",
-      "sourceCommit": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+      "sourceCommit": "CHECKOUT_TREE",
       "artifactSha256": "0e410d9307d396eb5820a2f41b613b6e20ee31ff519235fb9e8fc0404d0feb5c"
     }
   ],
   "observed": [
-    {
-      "claimIdUuidV5": "47fa192a-c8c0-5e89-8965-1a22a17858ab",
-      "observationEventUuidV7": "01a04d7a-8fe8-7c83-a853-d9768766b818",
-      "observedAt": "2026-08-29T12:24:33.000Z",
-      "state": "OBSERVED",
-      "contextIdUuidV5": "0b62bf24-d69f-593b-8b2c-4d2d70363dd8",
-      "claim": "Devpost version 11 publicly shows Kyoto Booking Retry Proof, the 60-second four-step flow, exactly four hotel WebMCP tools, and the 153 Node tests marker; submittedAt remains null.",
-      "evidenceBoundary": "The same readback records anonymous HTTP 200, a stale og:title value of 未定, the shared Devpost og:image, and no proof of final challenge submission.",
-      "sourceIds": [
-        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd"
-      ]
-    },
-    {
-      "claimIdUuidV5": "581e0d6c-fe85-5504-9706-7435b4ac63b9",
-      "observationEventUuidV7": "01a04d7a-8fe8-7ee0-beda-7c41885e615c",
-      "observedAt": "2026-08-29T12:24:33.000Z",
-      "state": "OBSERVED",
-      "contextIdUuidV5": "6c7fb53b-d39e-5fe0-bf2e-1f012f6a8151",
-      "claim": "The prepared draft names check_existing_hotel_booking, prepare_hotel_booking, get_hotel_booking_status, and preview_hotel_cancellation and preserves UNMEASURED and INCONCLUSIVE limits.",
-      "evidenceBoundary": "The draft is a local submission packet, not a Devpost-owned final-submission receipt.",
-      "sourceIds": [
-        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
-        "58548cc1-9435-51ef-a9df-c39e61625e06"
-      ]
-    },
-    {
-      "claimIdUuidV5": "88a8f9a1-1504-504c-b6a1-beaeee10f36a",
-      "observationEventUuidV7": "01a04d7a-8fe8-7a3e-b103-45b35b26b79f",
-      "observedAt": "2026-08-29T12:24:33.000Z",
-      "state": "OBSERVED",
-      "contextIdUuidV5": "7556df45-80bf-5905-8f90-7027436a4f69",
-      "claim": "The workflow state is ready at submit-project with Devpost project version 11 and FINAL_SUBMISSION_PENDING.",
-      "evidenceBoundary": "The local workflow state coordinates the next action but cannot prove Devpost accepted a final challenge submission.",
-      "sourceIds": [
-        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd"
-      ]
-    },
-    {
-      "claimIdUuidV5": "448f15e1-261e-5c80-b858-78039e76618f",
-      "observationEventUuidV7": "01a04d62-aa08-74a5-8527-df10feac9945",
-      "observedAt": "2026-08-29T11:58:26.824Z",
-      "state": "OBSERVED",
-      "contextIdUuidV5": "e7a6f585-d06c-543e-af29-975746ab0e12",
-      "claim": "The repository thumbnail is a 1672 by 941 PNG with SHA-256 c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10.",
-      "evidenceBoundary": "This binds the local derivative bytes only; it does not establish that Devpost associates the uploaded asset with the public project card.",
-      "sourceIds": [
-        "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa"
-      ]
-    },
-    {
-      "claimIdUuidV5": "75985999-129c-546a-aa8b-2c5010510fe0",
-      "observationEventUuidV7": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc",
-      "observedAt": "2026-08-29T12:24:33.000Z",
-      "state": "OBSERVED",
-      "contextIdUuidV5": "0b62bf24-d69f-593b-8b2c-4d2d70363dd8",
-      "claim": "At the pre-submission public readback, association of the uploaded image URL with the Devpost project Open Graph image was INCONCLUSIVE.",
-      "evidenceBoundary": "This is a historical observation: the asset returned HTTP 200, while the 2026-08-29T12:24:33.000Z anonymous HTML exposed the shared Devpost image and did not reference the uploaded URL.",
-      "sourceIds": [
-        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
-        "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa"
-      ]
-    },
     {
       "claimIdUuidV5": "b81a224a-1259-5632-b90c-241a7e7fddaa",
       "observationEventUuidV7": "01a04dab-38f0-7bfc-a376-f9208a3dcdd4",
@@ -326,7 +240,7 @@
     "localStatus": "SUBMITTED",
     "devpostSubmittedAt": "2026-08-29T13:14:00.129Z",
     "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
-    "finalEvidenceSourceCommit": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+    "finalEvidenceSourceCommit": "CHECKOUT_TREE",
     "requiredOwnerAnswers": [],
     "confirmedAnswers": {
       "informationUuidV5": "38c68b77-906e-5988-9869-76a4caceb8a5",

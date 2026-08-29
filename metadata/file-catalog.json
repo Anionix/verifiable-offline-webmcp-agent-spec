@@ -1859,8 +1859,8 @@
     },
     {
       "path": "docs/24-hotel-release-package.ja.md",
-      "sha256": "27afad16c948159971ca6850df713818d5d076abbcd18f50a7e32d17e37687d5",
-      "bytes": 2474,
+      "sha256": "e035bd3dd43b04916de9cfacef009b8d4c13e97272a9aef4212ae06241c9cd7e",
+      "bytes": 2940,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3778,8 +3778,8 @@
     },
     {
       "path": "metadata/devpost-hotel-submission.json",
-      "sha256": "24da7de73d4cbe33c92c5313a8d3b71f57051a25280823b45a79f1d0cedc042a",
-      "bytes": 17036,
+      "sha256": "0ac15e62de0eab7f6d1274e5bf66fd731efdbddc5b38a00eed95618702b4d36b",
+      "bytes": 12071,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4463,8 +4463,8 @@
     },
     {
       "path": "schemas/devpost-hotel-submission.schema.json",
-      "sha256": "e7f2df8f3875d187b37e13d454f08f8525c24a0fd8dce90557b35aa2150b27df",
-      "bytes": 15519,
+      "sha256": "34464e8d49fafc21a0bea13b238f04d91c9eefd52dc22d9da7d4f73de5f9fe88",
+      "bytes": 15567,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4995,8 +4995,8 @@
     },
     {
       "path": "scripts/build_hotel_release.mjs",
-      "sha256": "b64369c360da5b962542627d33af486ac2ceb32fd3cc088b816d47e96429e84e",
-      "bytes": 8584,
+      "sha256": "b3a04713318da7c3ebc4ab08938afeca0d9fb82402d2f6b1a4a2182595927bb1",
+      "bytes": 9066,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5261,8 +5261,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "04af65f21da40ef86c46783fa3629be1d60d046f0f390e55b907f865c0346c00",
-      "bytes": 129813,
+      "sha256": "611cdf84e8a158ea5621f569ed78b41c0b2ed9f74488917d92d485234186d29a",
+      "bytes": 130626,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

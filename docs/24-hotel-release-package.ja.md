@@ -6,6 +6,8 @@
 
 `npm run release:hotel`は、既存のホテル画面とChatGPT Sites用成果物を構築して検査した後、`release/kyoto-booking-retry-proof/`へ再現可能なファイル集合を作ります。配布物を`dist/`の外へ分けるため、ChatGPT Sites包装へ混ざりません。`release/`はGitの追跡対象外です。
 
+実行には、Git、依存関係を導入済みのNode.js、Gitleaksが必要です。Gitleaksは配布物の秘密情報検査に使います。macOSでは`brew install gitleaks`、それ以外は[Gitleaksの公式導入手順](https://github.com/gitleaks/gitleaks#installing)を使い、先に`gitleaks version`が成功することを確認してください。未導入なら、構築を始める前に具体的な導入方法を表示して停止します。
+
 - `release-manifest.json`: 元コミット、公開先、三つの成果物要約値、60秒の試し方
 - `SHA256SUMS`: 目録を含む全配布ファイルのSHA-256
 

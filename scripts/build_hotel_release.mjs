@@ -29,6 +29,20 @@ function command(name, args) {
   return execFileSync(name, args, { cwd: repositoryRoot, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim();
 }
 
+function requireGitleaks() {
+  try {
+    command("gitleaks", ["version"]);
+  } catch (error) {
+    if (error && typeof error === "object" && error.code === "ENOENT") {
+      throw new Error(
+        "hotel release requires the Gitleaks command. Install it first (macOS: brew install gitleaks; other systems: https://github.com/gitleaks/gitleaks#installing), then confirm with `gitleaks version`.",
+        { cause: error },
+      );
+    }
+    throw error;
+  }
+}
+
 function assertCleanSource(sourceCommit) {
   assert.equal(command("git", ["status", "--porcelain=v1", "--untracked-files=all"]), "", "release requires a clean committed source");
   assert.equal(command("git", ["rev-parse", "HEAD"]), sourceCommit, "release source commit changed during generation");
@@ -89,6 +103,7 @@ async function fileReceipt(path) {
 const sourceCommit = command("git", ["rev-parse", "HEAD"]);
 assert.match(sourceCommit, /^[0-9a-f]{40}$/u);
 assertCleanSource(sourceCommit);
+requireGitleaks();
 const commitSeconds = Number(command("git", ["show", "-s", "--format=%ct", sourceCommit]));
 assert(Number.isSafeInteger(commitSeconds), "source commit time is invalid");
 const occurredAt = new Date(commitSeconds * 1000).toISOString();

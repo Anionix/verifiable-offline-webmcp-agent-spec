@@ -21,6 +21,10 @@ jobs:
   # event_uuid_v7=01a04d40-5d78-7e5e-a69a-8ea902356b69
   # state_transition=WINDOWS_STORAGE_UNMEASURED -> WINDOWS_LINK_BOUNDARY_EXECUTED occurred_at=2026-08-29T11:20:59.000Z
   # machine-contract: a real Windows runner must reject final storage-file links and accept ordinary files before the platform claim can pass.
+  # information_uuid_v5=ca276326-4a8a-586f-bd31-e9a8b9ab1d1a
+  # event_uuid_v7=01a04d54-cecc-7c14-821b-0b303522d484
+  # state_transition=DANGLING_LINK_UNMEASURED -> DANGLING_LINK_REJECTED_WITHOUT_TARGET_CREATION occurred_at=2026-08-29T11:43:18.732Z
+  # machine-contract: Windows validation must cover existing-target links, dangling links, post-construction replacement, and ordinary exclusive creation.
   notification-storage-windows:
     name: notification storage (Windows)
     runs-on: windows-latest
@@ -42,7 +46,7 @@ jobs:
         working-directory: src/typescript
         run: >-
           node --experimental-strip-types --test
-          --test-name-pattern="notification storage rejects unexpected filenames and symbolic links before I/O|notification storage rejects final links when Windows cannot rely on O_NOFOLLOW|notification storage keeps ordinary Windows storage files usable|notification storage rejects a linked repository root without touching its target|notification storage rejects a different regular file while the reviewed descriptor remains open"
+          --test-name-pattern="notification storage rejects unexpected filenames and symbolic links before I/O|notification storage rejects final links when Windows cannot rely on O_NOFOLLOW|notification storage rejects dangling final links before Windows creation|audit I/O rejects a dangling replacement without creating its target|notification storage creates truly absent Windows files through exclusive guards|Windows publication refuses dangling links inserted after absence|notification storage keeps ordinary Windows storage files usable|notification storage rejects a linked repository root without touching its target|notification storage rejects a different regular file while the reviewed descriptor remains open"
           test/notification.test.ts
 
   validate:

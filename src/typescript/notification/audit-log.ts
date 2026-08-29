@@ -13,12 +13,16 @@
 // event_uuid_v7=01a04d0d-7648-762e-8124-3ceea8de45f9
 // state_transition=NOFOLLOW_WITH_UNCHECKED_HARDLINK -> SINGLE_LINK_DESCRIPTOR_BOUND_IO occurred_at=2026-08-29T10:25:23.016Z
 // machine-contract: every audit read and append rejects multiple links and proves the opened descriptor still names the reviewed path before bytes are read or appended.
+// information_uuid_v5=77d013eb-4de8-5cee-9ad6-80d2caf3566e
+// event_uuid_v7=01a04d54-cedc-7a4a-8fab-4b84061d412d
+// state_transition=DIRECT_CREATE_THROUGH_UNCHECKED_NAME -> EXCLUSIVE_CREATE_THEN_DESCRIPTOR_BOUND_APPEND occurred_at=2026-08-29T11:43:18.748Z
+// machine-contract: audit reads and appends use shared final-name guards; a dangling link is rejected before O_CREAT can create its external target.
 import { createHash } from "node:crypto";
-import { appendFileSync, closeSync, constants, openSync, readFileSync } from "node:fs";
+import { appendFileSync, closeSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson } from "../canonical.ts";
-import { assertNotificationStorageDescriptor, containedNotificationStoragePath } from "./storage-path.ts";
+import { containedNotificationStoragePath, openExistingNotificationStorageGuard, openNotificationStorageAppendGuard } from "./storage-path.ts";
 import type { TransitionRecord } from "./types.ts";
 
 interface AuditLine extends TransitionRecord {
@@ -38,34 +42,21 @@ function containedAuditPath(candidate: string): string {
 }
 
 function readAuditText(path: string): string | null {
-  let descriptor: number | null = null;
+  const descriptor = openExistingNotificationStorageGuard(path, "audit");
+  if (descriptor === null) return null;
   try {
-    descriptor = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
-    assertNotificationStorageDescriptor(path, descriptor, "audit");
     return readFileSync(descriptor, "utf8");
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") return null;
-    if (code === "ELOOP") throw new TypeError("audit path must not be a symbolic link", { cause: error });
-    throw error;
   } finally {
-    if (descriptor !== null) closeSync(descriptor);
+    closeSync(descriptor);
   }
 }
 
 function appendAuditText(path: string, text: string): void {
-  let descriptor: number | null = null;
+  const descriptor = openNotificationStorageAppendGuard(path, "audit");
   try {
-    descriptor = openSync(path, constants.O_APPEND | constants.O_CREAT | constants.O_WRONLY | constants.O_NOFOLLOW, 0o600);
-    assertNotificationStorageDescriptor(path, descriptor, "audit");
     appendFileSync(descriptor, text, { encoding: "utf8" });
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ELOOP") {
-      throw new TypeError("audit path must not be a symbolic link", { cause: error });
-    }
-    throw error;
   } finally {
-    if (descriptor !== null) closeSync(descriptor);
+    closeSync(descriptor);
   }
 }
 

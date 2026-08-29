@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04c71-bf70-7803-90ba-6f24fe5f0f8f"
-observed_at: "2026-08-29T07:35:18.128Z"
-status: "sites-version-9-vercel-current-release-youtube-public-devpost-final-submission-pending"
+event_uuid_v7: "01a04c90-5270-7592-8a9a-66a94266b2d7"
+observed_at: "2026-08-29T08:08:41.840Z"
+status: "sites-version-9-vercel-current-release-youtube-upload-digest-bound-devpost-final-submission-pending"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -81,7 +81,7 @@ Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../met
 
 - WebMCP比較画面とVercel状態表を含む配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`は、ChatGPT Sites版9として版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16`、配置`appgdep_6a928af2553c8191a6943104aa937eef`から従来のURLへ一般公開済みです。匿名HTTP 200と配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は版8と同じです。人間確認境界、2試行から1予約・処理開始1回への収束、再読込復元の実URL直接証拠は直前の版8のもので、版9では再試験していません。
 - 同じ配置元コミットは、ホテル専用Vercel配置`dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`にも一般公開済みです。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。2試行から1予約・処理開始1回への収束と再読込復元の直接証拠は直前配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`のもので、現行配置では再試験していません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ直ちに復旧し、従来URLの匿名HTTP 200応答と通知実演表示を確認しました。
-- 最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、実際の公開Site画面録画は113.2秒（75.5%）です。終盤には一般公開Sites版7のサービス状態表と、`RETRY_RECOGNIZED`・試行2・予約1・処理開始1を示す再送結果キャプチャがあります。SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。[YouTube](https://youtu.be/tdSvJw4ghX8)では`WebMCP vs Duplicate Bookings: A Live Demo`として一般公開し、公開プレーヤーは2分30秒と表示します。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声、焼き込み英語字幕、日本語字幕トラックを確認しました。
+- 最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、実際の公開Site画面録画は113.2秒（75.5%）です。終盤には一般公開Sites版7のサービス状態表と、`RETRY_RECOGNIZED`・試行2・予約1・処理開始1を示す再送結果キャプチャがあります。SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。[YouTube](https://youtu.be/tdSvJw4ghX8)では`WebMCP vs Duplicate Bookings: A Live Demo`として一般公開し、公開プレーヤーは2分30秒と表示します。アップロード操作で選択した端末内の最終動画v10の識別子、パス、SHA-256と、返されたYouTube動画識別子`tdSvJw4ghX8`を同じ記録へ結び付けました。長さが同じだけでは同一動画と扱いません。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声、焼き込み英語字幕、日本語字幕トラックを確認しました。
 - Canvaで選んだ専用サムネイルは端末内に準備済みです。ただしYouTube画面のブラウザー用ファイル選択が失敗し、専用画像は反映できなかったため、現在はYouTubeが自動生成したサムネイルを使っています。専用サムネイルの外部公開状態は未確認ではなく、未反映です。
 - Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、公開URL、YouTube動画を反映しました。更新操作は版6を返し、その後の読み戻しでプロジェクト識別子`1405191`、名称`未定`、状態`published`、YouTubeの動画URLを確認しました。読み取り機能は版番号を返さないため、版6は更新応答の記録です。WebMCP Challengeの`submitted_at`は`null`であり、最終提出は行っていません。
 

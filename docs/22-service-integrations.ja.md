@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c82-7268-7c70-b652-6c42e98c965b"
-observed_at: "2026-08-29T07:53:32.520Z"
-state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> VOID_LOCAL_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN -> FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04c90-5270-772e-ba7d-ec64df571f99"
+observed_at: "2026-08-29T08:08:41.840Z"
+state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> VOID_LOCAL_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN -> DEVPOST_DRAFT_APPROVAL_RECONCILED -> FINAL_SUBMISSION_PENDING"
 ---
 
 # サービス連携状態の読み方
@@ -39,7 +39,7 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日7時53分32秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日8時8分41秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
@@ -116,10 +116,10 @@ Google Chromeでは一般公開の版6を未ログインで表示し、初期状
 | Render | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は構成確認だけで、一般公開しない |
 | Shopify | `COMMERCE_WRITE` | `OUT_OF_SCOPE` | 商品、買い物かご、購入、注文を書き換えない |
 | Google Chrome | `PUBLIC_DEPLOYMENT` | `NOT_APPLICABLE` | 検査用ブラウザーであり、公開先ではない |
-| Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_USER` | 最終提出直前までの更新を利用者が明示的に許可し、版6へ動画URLまで反映済み |
+| Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_PLAN` | 利用者が実装を指示した計画に含まれる下書き更新として、版6へ動画URLまで反映済み |
 | Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 最終提出せず停止し、利用者の明示的な再指示を待つ |
 
-`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開、Devpostの最終提出直前までの更新に使っています。YouTubeの一般公開も利用者の明示許可に基づきます。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
+`AUTHORIZED_BY_USER`は、利用者が対象操作を個別に明示許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開に使っています。YouTubeの一般公開も利用者の明示許可に基づきます。Devpostの下書き更新は、利用者が実装を指示した計画を根拠とする`AUTHORIZED_BY_PLAN`へ文書、台帳、スキーマ、検査を統一しました。最終提出は別操作なので`REQUIRES_SEPARATE_APPROVAL`のままです。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
 
 ## 認証を成功扱いする条件
 

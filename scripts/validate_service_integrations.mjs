@@ -18,6 +18,9 @@
 // event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
 // state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
 // machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
+// event_uuid_v7=01a04c90-5270-70a7-8d6b-5b519db83ceb
+// state_transition=PUBLICATION_TIMELINE_AMBIGUOUS -> AGGREGATE_AFTER_ALL_PROVIDER_OBSERVATIONS occurred_at=2026-08-29T08:08:41.840Z
+// machine-contract: the aggregate publication event cannot complete before the Sites observation or the latest Vercel readback it claims, and Devpost draft authority must match the schema-fixed plan approval.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -612,6 +615,25 @@ if (vercelDeployment && vercelDeploymentSchema) {
   checkSecretFields(vercelDeployment, "$vercelDeployment");
 }
 
+if (hotelVerification && vercelDeployment) {
+  const aggregateObservedAt = hotelVerification.observedAt;
+  checkUuidV7Time(hotelVerification.identity?.observationUuidV7 ?? "", aggregateObservedAt ?? "", "hotel publication aggregate");
+  const claimedProviderObservations = [
+    hotelVerification.liveDeployment?.observedAt,
+    vercelDeployment.identity?.observedAt,
+    vercelDeployment.remoteArtifacts?.remoteHashReadbackAt,
+    vercelDeployment.postDeployObservability?.queryExecutedAt,
+    vercelDeployment.restoredNotificationDeployment?.recoveryObservedAt,
+  ];
+  const aggregateTime = Date.parse(aggregateObservedAt);
+  record(Number.isFinite(aggregateTime), "hotel publication aggregate has an invalid observation time");
+  for (const providerObservedAt of claimedProviderObservations) {
+    const providerTime = Date.parse(providerObservedAt);
+    record(Number.isFinite(providerTime), `claimed provider observation is invalid: ${providerObservedAt}`);
+    record(aggregateTime >= providerTime, `hotel publication aggregate predates claimed provider observation ${providerObservedAt}`);
+  }
+}
+
 if (registry && schema) {
   validateWithSchema(registry, schema, "$", schema);
 
@@ -629,6 +651,13 @@ if (registry && schema) {
   record(
     isDeepStrictEqual(schema.$defs?.approvalGate?.properties?.state?.enum, APPROVAL_STATES),
     "JSON Schema approval state enum differs from the machine contract",
+  );
+  const devpostApprovalContract = schema.$defs?.service?.allOf
+    ?.map((condition) => condition?.then?.properties?.approvalGates?.const)
+    .find(Array.isArray);
+  record(
+    isDeepStrictEqual(devpostApprovalContract, EXPECTED_APPROVAL_GATES.devpost),
+    "JSON Schema Devpost approval gates differ from the plan-authorized draft and separately approved final submission contract",
   );
 
   const services = Array.isArray(registry.services) ? registry.services : [];

@@ -22,4 +22,5 @@ node "$ROOT/scripts/validate_void_integration.mjs"
 node "$ROOT/scripts/validate_hotel_portable_validator.mjs"
 node "$ROOT/scripts/validate_hotel_sites_validator.mjs"
 node "$ROOT/scripts/validate_service_integrations.mjs"
+node "$ROOT/scripts/validate_security_remediation.mjs"
 uv run --frozen python "$ROOT/scripts/build_manifest.py" --check

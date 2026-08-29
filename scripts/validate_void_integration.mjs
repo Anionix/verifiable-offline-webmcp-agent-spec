@@ -7,6 +7,8 @@
 // machine-contract: Void 0.10.12 must retain the Cloudflare plugin and Wrangler versions whose workers-types ranges intersect; force and legacy-peer bypasses are forbidden.
 // event_uuid_v7=01a04cb2-3f0b-7892-bd37-f806bd1512f5 state_transition=DEPENDENCY_ALERTS_TRACKED -> DEPENDENCY_GRAPH_PATCHED occurred_at=2026-08-29T08:45:45.099Z
 // machine-contract: every tracked Dependabot advisory must resolve to a patched package version without force or legacy-peer bypasses; publication state remains separate.
+// event_uuid_v7=01a04cd1-2d20-795f-907d-b2a323d46fc0 state_transition=DYNAMIC_SCHEMA_AND_EXECUTABLE -> FIXED_VALIDATOR_BOUNDARY occurred_at=2026-08-29T09:19:32.128Z
+// machine-contract: only reviewed Void schema patterns may execute, and the version check uses the current Node executable with one fixed local module path; package metadata never selects a command.
 
 import { constants, accessSync, existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
@@ -24,10 +26,17 @@ const EXPECTED_UNDICI_VERSION = "7.29.0";
 const EXPECTED_SHARP_VERSION = "0.35.2";
 const EXPECTED_WS_VERSION = "8.21.0";
 const EXPECTED_ESBUILD_OVERRIDE_VERSION = "0.25.12";
+const EXPECTED_ESBUILD_GRAPH = [
+  ["node_modules/@esbuild-kit/core-utils/node_modules/esbuild", "0.25.12"],
+  ["node_modules/drizzle-kit/node_modules/esbuild", "0.25.12"],
+  ["node_modules/esbuild", "0.28.1"],
+  ["node_modules/tsx/node_modules/esbuild", "0.28.2"],
+];
 const EXPECTED_SCHEMA_REF = "./node_modules/void/schema.json";
 const EXPECTED_OUTPUT_DIR = "dist/client";
 const EXPECTED_BUILD_COMMAND = "npm run build:web";
 const EXPECTED_COMPATIBILITY_DATE = "2026-05-22";
+const EXPECTED_VOID_BIN_RELATIVE = "dist/cli/cli.mjs";
 const EXPECTED_INFORMATION_UUID_V5 = "22fa5437-e104-5ea2-acfe-fe57cc2553f2";
 const EXPECTED_UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const EXPECTED_BINDINGS = ["ai", "db", "kv", "storage"];
@@ -210,9 +219,19 @@ const EXPECTED_PACKAGE_SCRIPTS = {
   "deploy:void:static": "npm run build:void:static && void deploy --dir dist/client",
 };
 const SAFE_SCRIPT_PATTERN = /^node scripts\/[a-z0-9_-]+\.mjs$/u;
+const SCHEMA_PATTERN_MATCHERS = new Map([
+  [
+    String.raw`^(?!/)(?!\.\.?$)(?!\./$)(?!\.\./)(?!.*(?:^|/)\.\.(?:/|$))(?!.*\s$)(?!\s).+$`,
+    /^(?!\/)(?!\.\.?$)(?!\.\/$)(?!\.\.\/)(?!.*(?:^|\/)\.\.(?:\/|$))(?!.*\s$)(?!\s).+$/u,
+  ],
+  ["^/", /^\//u],
+  ["^/(?!/)[^?]*$", /^\/(?!\/)[^?]*$/u],
+  [String.raw`^(\/|\*$)`, /^(\/|\*)$/u],
+  ["^(/|https://)", /^(\/|https:\/\/)/u],
+]);
 const SECRET_KEY_PATTERN = /(?:^|[_-])(api[_-]?key|credential|password|private[_-]?key|secret|token)(?:$|[_-])/iu;
 const SECRET_VALUE_PATTERNS = [
-  new RegExp(["-{5}BEGIN [A-Z ]*", "PRIVATE", " KEY-{5}"].join(""), "u"),
+  /-{5}BEGIN [A-Z ]*PRIVATE KEY-{5}/u,
   /\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})\b/u,
   /(?:password|secret|token)\s*[:=]\s*[^\s]+/iu,
   /https?:\/\/[^/@:\s]+:[^/@\s]+@/iu,
@@ -255,6 +274,36 @@ function jsonTypeMatches(value, expectedType) {
   }
 }
 
+function approvedSchemaPattern(pattern) {
+  return SCHEMA_PATTERN_MATCHERS.get(pattern) ?? null;
+}
+
+function schemaPatternContractErrors(value, pointer = "$schema") {
+  const errors = [];
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => errors.push(...schemaPatternContractErrors(item, `${pointer}[${index}]`)));
+    return errors;
+  }
+  if (value === null || typeof value !== "object") return errors;
+
+  if (Object.hasOwn(value, "pattern") && (typeof value.pattern !== "string" || !approvedSchemaPattern(value.pattern))) {
+    errors.push(`${pointer}.pattern is outside the fixed validator contract`);
+  }
+  if (Object.hasOwn(value, "patternProperties")) {
+    if (value.patternProperties === null || typeof value.patternProperties !== "object" || Array.isArray(value.patternProperties)) {
+      errors.push(`${pointer}.patternProperties must be an object`);
+    } else {
+      for (const pattern of Object.keys(value.patternProperties)) {
+        if (!approvedSchemaPattern(pattern)) errors.push(`${pointer}.patternProperties has an unreviewed key`);
+      }
+    }
+  }
+  for (const [key, child] of Object.entries(value)) {
+    errors.push(...schemaPatternContractErrors(child, `${pointer}.${key}`));
+  }
+  return errors;
+}
+
 function schemaErrors(value, schema, pointer = "$") {
   const errors = [];
 
@@ -278,8 +327,13 @@ function schemaErrors(value, schema, pointer = "$") {
     errors.push(`${pointer} must be one of ${schema.enum.map(String).join(", ")}`);
   }
 
-  if (typeof value === "string" && typeof schema.pattern === "string" && !new RegExp(schema.pattern, "u").test(value)) {
-    errors.push(`${pointer} does not match ${schema.pattern}`);
+  if (typeof value === "string" && typeof schema.pattern === "string") {
+    const matcher = approvedSchemaPattern(schema.pattern);
+    if (!matcher) {
+      errors.push(`${pointer} uses a JSON Schema pattern outside the fixed validator contract`);
+    } else if (!matcher.test(value)) {
+      errors.push(`${pointer} does not match ${schema.pattern}`);
+    }
   }
 
   if (typeof value === "number" && typeof schema.minimum === "number" && value < schema.minimum) {
@@ -306,7 +360,15 @@ function schemaErrors(value, schema, pointer = "$") {
 
   if (value !== null && typeof value === "object" && !Array.isArray(value)) {
     const properties = schema.properties ?? {};
-    const patternProperties = Object.entries(schema.patternProperties ?? {}).map(([pattern, childSchema]) => [new RegExp(pattern, "u"), childSchema]);
+    const patternProperties = [];
+    for (const [pattern, childSchema] of Object.entries(schema.patternProperties ?? {})) {
+      const matcher = approvedSchemaPattern(pattern);
+      if (!matcher) {
+        errors.push(`${pointer} uses a patternProperties key outside the fixed validator contract`);
+      } else {
+        patternProperties.push([matcher, childSchema]);
+      }
+    }
 
     for (const requiredKey of schema.required ?? []) {
       if (!Object.hasOwn(value, requiredKey)) {
@@ -383,6 +445,12 @@ record(schemaPath === resolve(ROOT, EXPECTED_SCHEMA_REF), "Void JSON Schema must
 record(existsSync(schemaPath), "the Void package JSON Schema is missing");
 const schema = readJson(schemaPath, "Void package JSON Schema");
 record(schema.$schema === "http://json-schema.org/draft-07/schema#", "Void schema must declare JSON Schema draft 7");
+record(
+  schemaPatternContractErrors({ pattern: "^(a+)+$", patternProperties: { "^(.+)+$": {} } }).length === 2,
+  "unreviewed JSON Schema value and property patterns must remain rejected",
+);
+const schemaPatternErrors = schemaPatternContractErrors(schema);
+record(schemaPatternErrors.length === 0, `Void schema contains an unreviewed pattern: ${schemaPatternErrors.join("; ")}`);
 const validationErrors = schemaErrors(config, schema);
 record(validationErrors.length === 0, `void.json violates its package schema: ${validationErrors.join("; ")}`);
 
@@ -416,6 +484,14 @@ record(packageLock.packages?.["node_modules/vite"]?.version === EXPECTED_VITE_VE
 record(packageLock.packages?.["node_modules/undici"]?.version === EXPECTED_UNDICI_VERSION, `Undici must resolve ${EXPECTED_UNDICI_VERSION}`);
 record(packageLock.packages?.["node_modules/miniflare/node_modules/sharp"]?.version === EXPECTED_SHARP_VERSION, `Sharp must resolve ${EXPECTED_SHARP_VERSION}`);
 record(packageLock.packages?.["node_modules/ws"]?.version === EXPECTED_WS_VERSION, `ws must resolve ${EXPECTED_WS_VERSION}`);
+const installedEsbuildGraph = Object.entries(packageLock.packages)
+  .filter(([installedPath]) => installedPath.endsWith("node_modules/esbuild"))
+  .map(([installedPath, packageEntry]) => [installedPath, packageEntry.version])
+  .sort(([left], [right]) => left.localeCompare(right));
+record(
+  isDeepStrictEqual(installedEsbuildGraph, EXPECTED_ESBUILD_GRAPH),
+  "every installed esbuild path and resolved version must match the reviewed Dependabot graph",
+);
 record(
   packageLock.packages?.["node_modules/@esbuild-kit/core-utils/node_modules/esbuild"]?.version === EXPECTED_ESBUILD_OVERRIDE_VERSION,
   `legacy esbuild must resolve ${EXPECTED_ESBUILD_OVERRIDE_VERSION}`,
@@ -527,16 +603,16 @@ record(/\bcloudflare\s*\(/u.test(viteConfig), "existing Cloudflare Vite integrat
 record(/\bsites\s*\(/u.test(viteConfig), "existing ChatGPT Sites Vite integration must remain present");
 record(!/\bvoidPlugin\b|from\s+["']void["']/u.test(viteConfig), "Void must not be layered into the existing Vite plugin graph");
 
-const voidBinRelative = installedPackage.bin?.void;
-record(voidBinRelative === "dist/cli/cli.mjs", "installed package must expose the expected Void command entry point");
-const voidBinPath = resolve(ROOT, "node_modules/void", voidBinRelative);
+record(installedPackage.bin?.void === EXPECTED_VOID_BIN_RELATIVE, "installed package must expose the expected Void command entry point");
+const voidBinPath = resolve(ROOT, "node_modules/void", EXPECTED_VOID_BIN_RELATIVE);
 record(existsSync(voidBinPath), "Void command entry point is missing");
-accessSync(voidBinPath, constants.X_OK);
+accessSync(voidBinPath, constants.R_OK);
 checks += 1;
-const cliResult = spawnSync(voidBinPath, ["--version"], {
+const cliResult = spawnSync(process.execPath, [voidBinPath, "--version"], {
   cwd: ROOT,
   encoding: "utf8",
-  env: { ...process.env, NO_COLOR: "1" },
+  env: { NO_COLOR: "1" },
+  shell: false,
   timeout: 10_000,
 });
 record(cliResult.error === undefined, `Void version command failed to start: ${cliResult.error?.message ?? "unknown error"}`);

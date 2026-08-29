@@ -20,8 +20,9 @@ hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
 source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
 publication_state_event_uuid_v7: "01a04c90-5270-7592-8a9a-66a94266b2d7"
 void_integration_event_uuid_v7: "01a04c82-7268-7a01-b288-6d617c70cf55"
+security_remediation_event_uuid_v7: "01a04cdc-3b33-7720-9567-66e1e046e0ea"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T08:08:41.840Z"
+updated_at: "2026-08-29T09:31:36.627Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -90,6 +91,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `metadata/service-integration-registry.json` — eight official resource services, truthful readiness states, and illustrative duplicate-risk scenarios
 - `metadata/hotel-booking-verification.json` — local browser, offline, responsive, and design-fidelity evidence for the fictional hotel demo
 - `metadata/demo-video-production.json` — generated-media prompts, service identifiers, billing boundary, local paths, and SHA-256 values without committing the video files
+- `metadata/security-remediation.json` — one-to-one CodeQL alert and issue ledger, separate dependency audits, and the pending main-branch rescan gate
 - `MANIFEST.sha256` — artifact integrity manifest
 
 The four 1.0.0 governance slices bind security, replay, operational-quality, browser-observation, and formal-evidence claims. The catalog contains **67 implemented and automated tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`, and native WebMCP conformance remains `INCONCLUSIVE`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), [`metadata/final-verification.json`](metadata/final-verification.json), and [`docs/test-catalog.md`](docs/test-catalog.md).
@@ -146,6 +148,12 @@ Void `0.10.12` is fixed as an exact local development dependency. The Codex-wide
 
 Void `0.10.12`を端末内の開発依存として完全一致で固定しました。Codex全体のModel Context Protocolコマンド`npx -y void@0.10.12 mcp`も有効化済みで、Codex再起動後に利用できます。`void.json`は`dist/client`だけを対象とする別の静的アダプターです。データベース、キーと値、保管、人工知能の各結合はすべて無効で、既存の`cloudflare()`と`sites()`へ`voidPlugin`を重ねません。Voidは、検査済みのルート依存集合（Cloudflare Vite plug-in `1.54.2`、Wrangler `4.127.1`、Vite `8.2.2`、Undici `7.29.0`、Sharp `0.35.2`、ws `8.21.0`）を共有します。公開中だったDependabot警告17件は修正前に課題#73〜#89へ一件ずつ対応付け、端末内の`npm audit`は既知の脆弱性0件になりました。
 
+<!-- information_uuid_v5=63aa7af6-ddbb-5422-b2f0-2fda9e60fc39 -->
+<!-- event_uuid_v7=01a04cdc-3b33-7720-9567-66e1e046e0ea state_transition=CODE_SCANNING_UNMEASURED -> CODEQL_CONFIGURED -> 13_ALERTS_ISSUEIZED -> LOCAL_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING occurred_at=2026-08-29T09:31:36.627Z -->
+<!-- machine-contract=Each CodeQL alert maps to exactly one public tracking issue without exploit instructions; fixed-on-main is claimed only after a successful merged-commit analysis reads back no matching open alert. -->
+
+GitHub CodeQLの既定設定は、Actions、JavaScript・TypeScript、Pythonを対象に拡張検査で有効化しました。初回解析の13件は課題#91〜#103へ一件ずつ結び付けています。動的な正規表現と実行ファイル選択を固定契約へ変更し、通知デモの保存先を固定領域へ制限し、自作UUIDv5処理を推移依存のない標準実装`14.0.2`へ置き換えました。ルートとTypeScript参照パッケージを別々に監査し、どちらも既知の脆弱性0件でした。現時点は端末内修正済み・GitHub再解析待ちであり、CodeQL警告0件とはまだ主張しません。
+
 ```bash
 npm run validate:void
 npm run build:void:static
@@ -188,9 +196,9 @@ The shared build produces `dist/client/**` for Vercel, Netlify, and Render confi
 
 Confirmation, payment, and cancellation mutation are deliberately absent. IndexedDB unique constraints, UUIDv7 events, and a SHA-256 forward chain protect the local result across repeated clicks, two tabs, reload, and retry. ChatGPT Sites and Vercel do not share browser storage, so the page explicitly says the fictional result belongs only to this device and deployment.
 
-Local evidence currently passes 135 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one.
+Local evidence currently passes 153 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one.
 
-Public ChatGPT Sites version 9 uses exact source commit `285127fecb3d0395e9a773909b79e5c08a865987` in version `appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16` and deployment `appgdep_6a928af2553c8191a6943104aa937eef` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The current URL returned anonymous HTTP 200 and its delivered `service-integrations.json` matched the local release. The feature digest did not change. A fresh browser-storage retry run was not repeated on version 9: the direct `PREPARED → COMMITTED → RETRY_RECOGNIZED` evidence belongs to immediately preceding version 8 and reached two attempts, one booking, one effect start, and the same result after reload. The current [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) and its [deployment-specific URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app) use the same exact source commit in deployment `dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`; both the anonymous HTTP 200 result and delivered `service-integrations.json` match were confirmed. Its feature digest is also unchanged, while the direct fresh-storage retry run remains the immediately preceding deployment `dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN` evidence rather than a new run on the current deployment.
+Public ChatGPT Sites version 11 uses exact source commit `51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf` in version `appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d` and deployment `appgdep_6a92a1cf0bb08191bbd00064ac2cdd12` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The current URL returned anonymous HTTP 200 and its delivered `service-integrations.json` matched the local release. A fresh version 10 browser run on dependency-patched commit `5ac1fe51a29800eb052f9a63e7311559b7c01e45` directly proved `PREPARED → COMMITTED → RETRY_RECOGNIZED`, two attempts, one booking, one effect start, four WebMCP tools, and confirmation `FKR-7EF2A00FA2`; version 11 has the same functional digest and restored that result after reload. The current [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) and its [deployment-specific URL](https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app) use the same final source commit in deployment `dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe`. The fresh retry run belongs to immediately preceding deployment `dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`; the final deployment has the identical functional digest, restored the result after reload, returned anonymous HTTP 200, and matched five local file hashes.
 
 One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
 

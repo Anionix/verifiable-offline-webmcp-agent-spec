@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04c90-5270-7592-8a9a-66a94266b2d7"
-observed_at: "2026-08-29T08:08:41.840Z"
-status: "sites-version-9-vercel-current-release-youtube-upload-digest-bound-devpost-final-submission-pending"
+event_uuid_v7: "01a04ccc-9589-7477-ad4a-56e73cf9f0ab"
+observed_at: "2026-08-29T09:14:31.177Z"
+status: "dependency-patched-sites-version-11-vercel-current-release-youtube-public-devpost-final-submission-pending"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -65,22 +65,22 @@ status: "sites-version-9-vercel-current-release-youtube-upload-digest-bound-devp
 | 言語変更でも同じUUIDv5 | 成功 | Node試験 |
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
-| WebMCP四機能の発見と実行 | 成功 | 一般公開前の版3で発見と実行を確認。版7で同じ四機能と通常の再送との比較を確認。現行版9も同じ機能要約値を保持するが、実操作の再試験はしていない |
+| WebMCP四機能の発見と実行 | 成功 | 一般公開の安全版依存を使う版10で四機能を発見し、`get_hotel_booking_status`を実行。版11は同じ機能要約値を保持 |
 | 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites一般公開 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版9はコミット`285127fecb3d0395e9a773909b79e5c08a865987`、配置`appgdep_6a928af2553c8191a6943104aa937eef`。匿名HTTP 200と`service-integrations.json`の端末内成果物との一致を確認。実操作は機能要約値が同じ直前の版8で確認 |
-| 可視証拠パネル | 成功（直前機能版） | 版7でUUIDv5、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版5の同じ機能を実画面録画。版9での再試験は未実施 |
-| Vercel一般公開 | 成功（現行版） | 配置`dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`の[ホテル専用URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app)を匿名表示。`service-integrations.json`の端末内成果物との一致を確認。再送収束と再読込復元は機能要約値が同じ直前配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`で実測 |
+| ChatGPT Sites一般公開 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版11はコミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`、配置`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`。匿名HTTP 200と`service-integrations.json`の端末内成果物との一致を確認。再送収束は同じ機能要約値の版10で実測し、版11で再読込復元を確認 |
+| 可視証拠パネル | 成功（現行機能） | 版10でUUIDv5`64ccc2dc-0404-5566-b296-92d0eb7ed00f`、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版11で同じ結果を復元 |
+| Vercel一般公開 | 成功（現行版） | 配置`dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe`の[ホテル専用URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app)を匿名表示。5ファイルの端末内成果物との一致と再読込復元を確認。再送収束は同じ機能要約値の直前配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`で実測 |
 
 Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)、Vercelの正本は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)です。二つの提供元の配置証拠を混ぜません。
 
 ## 公開、動画、Devpostの現在状態
 
-- WebMCP比較画面とVercel状態表を含む配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`は、ChatGPT Sites版9として版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16`、配置`appgdep_6a928af2553c8191a6943104aa937eef`から従来のURLへ一般公開済みです。匿名HTTP 200と配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は版8と同じです。人間確認境界、2試行から1予約・処理開始1回への収束、再読込復元の実URL直接証拠は直前の版8のもので、版9では再試験していません。
-- 同じ配置元コミットは、ホテル専用Vercel配置`dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`にも一般公開済みです。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。2試行から1予約・処理開始1回への収束と再読込復元の直接証拠は直前配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`のもので、現行配置では再試験していません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ直ちに復旧し、従来URLの匿名HTTP 200応答と通知実演表示を確認しました。
+- 安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`は、ChatGPT Sites版10でWebMCP四機能、人間確認境界、2試行から1予約・処理開始1回への収束を実測しました。状態表だけを更新した最終コミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`は、版11として版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d`、配置`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`から従来のURLへ一般公開済みです。二版の機能要約値は同一で、版11の再読込後も同じ結果を復元しました。
+- Vercelでは直前配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`で同じ再送収束を実測し、最終コミットを現行配置`dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe`へ一般公開しました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200、配信された5ファイルの端末内成果物との一致、再読込復元、警告・エラー0件を確認しました。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧済みで、現在も別プロジェクトです。
 - 最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、実際の公開Site画面録画は113.2秒（75.5%）です。終盤には一般公開Sites版7のサービス状態表と、`RETRY_RECOGNIZED`・試行2・予約1・処理開始1を示す再送結果キャプチャがあります。SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。[YouTube](https://youtu.be/tdSvJw4ghX8)では`WebMCP vs Duplicate Bookings: A Live Demo`として一般公開し、公開プレーヤーは2分30秒と表示します。アップロード操作で選択した端末内の最終動画v10の識別子、パス、SHA-256と、返されたYouTube動画識別子`tdSvJw4ghX8`を同じ記録へ結び付けました。長さが同じだけでは同一動画と扱いません。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声、焼き込み英語字幕、日本語字幕トラックを確認しました。
 - Canvaで選んだ専用サムネイルは端末内に準備済みです。ただしYouTube画面のブラウザー用ファイル選択が失敗し、専用画像は反映できなかったため、現在はYouTubeが自動生成したサムネイルを使っています。専用サムネイルの外部公開状態は未確認ではなく、未反映です。
 - Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、公開URL、YouTube動画を反映しました。更新操作は版6を返し、その後の読み戻しでプロジェクト識別子`1405191`、名称`未定`、状態`published`、YouTubeの動画URLを確認しました。読み取り機能は版番号を返さないため、版6は更新応答の記録です。WebMCP Challengeの`submitted_at`は`null`であり、最終提出は行っていません。

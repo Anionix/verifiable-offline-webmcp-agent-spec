@@ -1,4 +1,5 @@
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
+import { v5 as standardUuidV5 } from "uuid";
 
 const CANONICAL_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -17,12 +18,12 @@ export function isUuidVersion(value: string, version: 5 | 7): boolean {
 }
 
 export function uuidV5(namespace: string, name: string): string {
-  const ns = canonicalUuidBytes(namespace);
-  const digest = createHash("sha1").update(ns).update(Buffer.from(name, "utf8")).digest();
-  const bytes = digest.subarray(0, 16);
-  bytes[6] = (bytes[6]! & 0x0f) | 0x50;
-  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
-  return format(bytes);
+  // information_uuid_v5=51e1df88-0bd8-5bce-802c-3ee0370f3b5a
+  // event_uuid_v7=01a04cd8-5ae9-7fbd-a286-40502e8f2aa4 state_transition=INLINE_SHA1 -> REVIEWED_STANDARD_UUIDV5 occurred_at=2026-08-29T09:27:22.601Z
+  // machine-contract: UNTRUSTED_NAMESPACE -> CANONICAL_NAMESPACE -> RFC_9562_UUIDV5.
+  // UUIDv5 is a deterministic identifier, never a password, signature, or integrity proof.
+  canonicalUuidBytes(namespace);
+  return standardUuidV5(name, namespace);
 }
 
 export function uuidV7(epochMs = Date.now()): string {

@@ -10,6 +10,8 @@ import type { CanonicalIR } from "../types.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const vectors = JSON.parse(readFileSync(resolve(here, "../../../data/golden-vectors.json"), "utf8"));
+const referencePackage = JSON.parse(readFileSync(resolve(here, "../package.json"), "utf8"));
+const referenceLock = JSON.parse(readFileSync(resolve(here, "../package-lock.json"), "utf8"));
 
 for (const group of [vectors.pre, vectors.post]) {
   for (const vector of group) {
@@ -20,6 +22,24 @@ for (const group of [vectors.pre, vectors.post]) {
 test("UUIDv5 RFC DNS example", () => {
   assert.equal(uuidV5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", "www.example.com"),
     "2ed6657d-e927-568b-95e1-2665a8aea6a2");
+  assert.throws(
+    () => uuidV5("6BA7B810-9DAD-11D1-80B4-00C04FD430C8", "www.example.com"),
+    /canonical lowercase/,
+  );
+});
+
+test("UUIDv5 standard implementation is exact, integrity-bound, and has no transitive dependencies", () => {
+  assert.equal(referencePackage.dependencies?.uuid, "14.0.2");
+  assert.equal(referenceLock.packages?.[""]?.dependencies?.uuid, "14.0.2");
+  const installed = referenceLock.packages?.["node_modules/uuid"];
+  assert.deepEqual(
+    { version: installed?.version, integrity: installed?.integrity, dependencies: installed?.dependencies ?? {} },
+    {
+      version: "14.0.2",
+      integrity: "sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==",
+      dependencies: {},
+    },
+  );
 });
 
 test("UUIDv7 exposes its Unix millisecond timestamp", () => {
@@ -34,9 +54,22 @@ test("canonical JSON sorts keys and rejects floats", () => {
 
 test("post evaluation denies every failed hard gate", () => {
   const source = vectors.post[0]!.input as CanonicalIR;
-  for (const gate of Object.keys(source.gates) as Array<keyof CanonicalIR["gates"]>) {
+  // information_uuid_v5=ae1dadb4-46d1-5739-bb6a-9cc0e79935b2
+  // event_uuid_v7=01a04cd8-5aea-7d7b-98b6-52e0bebe7d16 state_transition=DYNAMIC_PROPERTY_WRITE -> FIXED_GATE_CASES occurred_at=2026-08-29T09:27:22.602Z
+  // machine-contract: TRUSTED_TEST_VECTOR -> ONE_FIXED_GATE_FALSE -> DENY.
+  const cases: ReadonlyArray<readonly [string, CanonicalIR["gates"]]> = [
+    ["schema", { ...source.gates, schema: false }],
+    ["auth", { ...source.gates, auth: false }],
+    ["permission", { ...source.gates, permission: false }],
+    ["network", { ...source.gates, network: false }],
+    ["version", { ...source.gates, version: false }],
+    ["dependency", { ...source.gates, dependency: false }],
+    ["privacy", { ...source.gates, privacy: false }],
+    ["consent", { ...source.gates, consent: false }],
+  ];
+  for (const [gate, gates] of cases) {
     const input = structuredClone(source);
-    input.gates[gate] = false;
+    input.gates = gates;
     input.state.ambiguousPreviousEffect = false;
     input.state.humanRequired = false;
     input.verification.confidencePPM = input.verification.classFloorPPM;

@@ -14,8 +14,18 @@
 // event_uuid_v7=01a04c92-0d3a-7302-a9ae-07a565dd08db
 // state_transition=USER_APPROVED_EXPIRED -> DRY_RUN_REPREPARED occurred_at=2026-08-29T08:14:35.194Z
 // machine-contract: preview clears an expired approval before a new approval can be recorded; an old receipt can never authorize a later effect.
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+// information_uuid_v5=86a5edfe-a906-5771-8c0f-4dadad5aaebf
+// event_uuid_v7=01a04cd1-5eaa-70e9-aa80-545fb4d96d5d
+// state_transition=UNTRUSTED_STORAGE_PATH -> CONTAINED_NONSYMLINK_PATH occurred_at=2026-08-29T09:19:44.810Z
+// machine-contract: SQLite opens only :memory: or a canonical non-symlink .sqlite file below the repository .local directory or the operating-system test directory.
+// information_uuid_v5=c82fc322-fc96-5ce1-aa03-ba374d074d0e
+// event_uuid_v7=01a04ce0-0e77-76e2-b032-8dc5fd1e2f77
+// state_transition=SHARED_PARENT_ALLOWED -> CALLER_OWNED_PRIVATE_PARENT_REQUIRED occurred_at=2026-08-29T09:35:47.319Z
+// machine-contract: SQLite receives a reviewed regular path only from a directory owned by the current user with no group or other access; environment input cannot select the path.
+import { chmodSync, existsSync, lstatSync, mkdirSync, realpathSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import type { EffectStartStatus } from "../governance/replay-verification.ts";
 import {
@@ -74,12 +84,74 @@ export interface StoredEffectClaimEvidence {
   startStatus: EffectStartStatus;
 }
 
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const repositoryStorageRoot = join(repositoryRoot, ".local");
+const DATABASE_FILENAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.sqlite$/;
+
+function requirePrivateDirectory(path: string): void {
+  const stats = statSync(path);
+  if (!stats.isDirectory()) throw new TypeError("database parent must be a directory");
+  if (typeof process.getuid === "function" && stats.uid !== process.getuid()) {
+    throw new TypeError("database parent must be owned by the current user");
+  }
+  if ((stats.mode & 0o077) !== 0) throw new TypeError("database parent must be private to the current user");
+}
+
+function containedDatabasePath(candidate: string): string {
+  if (candidate === ":memory:") return candidate;
+  const filename = basename(candidate);
+  if (!DATABASE_FILENAME.test(filename)) {
+    throw new TypeError("database path must end in a simple .sqlite filename");
+  }
+
+  // Only this fixed application directory may be created. Caller-selected parents must already exist.
+  mkdirSync(repositoryStorageRoot, { recursive: true, mode: 0o700 });
+  chmodSync(repositoryStorageRoot, 0o700);
+  const requestedPath = resolve(candidate);
+  const localRoot = resolve(repositoryStorageRoot);
+  const temporaryRoot = resolve(tmpdir());
+  const fromLocalRoot = relative(localRoot, requestedPath);
+  const fromTemporaryRoot = relative(temporaryRoot, requestedPath);
+  const isBelowLocalRoot = fromLocalRoot !== ""
+    && fromLocalRoot !== ".."
+    && !fromLocalRoot.startsWith(`..${sep}`)
+    && !isAbsolute(fromLocalRoot);
+  const isBelowTemporaryRoot = fromTemporaryRoot !== ""
+    && fromTemporaryRoot !== ".."
+    && !fromTemporaryRoot.startsWith(`..${sep}`)
+    && !isAbsolute(fromTemporaryRoot);
+  const lexicalRoot = isBelowLocalRoot ? localRoot : isBelowTemporaryRoot ? temporaryRoot : null;
+  if (lexicalRoot === null) throw new TypeError("database path is outside the allowed storage roots");
+
+  const canonicalRoot = realpathSync(lexicalRoot);
+  const canonicalParent = realpathSync(dirname(requestedPath));
+  const fromCanonicalRoot = relative(canonicalRoot, canonicalParent);
+  if (fromCanonicalRoot === ".." || fromCanonicalRoot.startsWith(`..${sep}`) || isAbsolute(fromCanonicalRoot)) {
+    throw new TypeError("database path resolves outside its allowed storage root");
+  }
+  if (lexicalRoot === temporaryRoot) {
+    const rootStats = statSync(canonicalRoot);
+    const rootIsPrivate = (rootStats.mode & 0o077) === 0;
+    const rootIsSticky = (rootStats.mode & 0o1000) !== 0;
+    if (!rootIsPrivate && !rootIsSticky) throw new TypeError("temporary storage root must be private or sticky");
+    if (fromCanonicalRoot === "" || fromCanonicalRoot.includes(sep)) {
+      throw new TypeError("database parent must be one direct private child of the temporary root");
+    }
+  }
+  requirePrivateDirectory(canonicalParent);
+
+  const safePath = join(canonicalParent, filename);
+  if (existsSync(safePath) && lstatSync(safePath).isSymbolicLink()) {
+    throw new TypeError("database path must not be a symbolic link");
+  }
+  return safePath;
+}
+
 export class NotificationStore {
   readonly database: DatabaseSync;
 
   constructor(path: string) {
-    if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
-    this.database = new DatabaseSync(path);
+    this.database = new DatabaseSync(containedDatabasePath(path));
     this.database.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL;");
     this.database.exec(`
       CREATE TABLE IF NOT EXISTS intents (

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
-  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04c90-5270-78c4-8786-abbdd1ab7c00 state_transition=VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED occurred_at=2026-08-29T08:08:41.840Z machine-contract=the aggregate completion observation must not precede either the Sites observation or any Vercel provider observation that it claims",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04ccd-b75f-70e6-a355-3e8cba3ab3b7 state_transition=DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED occurred_at=2026-08-29T09:15:45.375Z machine-contract=the aggregate completion observation must follow Sites and Vercel provider readback and bind the fresh browser run to the same functional digest as the final deployments",
   "title": "Hotel booking demo verification record",
   "type": "object",
   "additionalProperties": false,

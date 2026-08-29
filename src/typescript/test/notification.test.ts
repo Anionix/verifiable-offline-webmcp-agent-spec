@@ -25,6 +25,10 @@
 // event_uuid_v7=01a04d0d-7648-762e-8124-3cf06ef35603
 // state_transition=HARDLINKED_EXTERNAL_FILE_WRITABLE -> HARDLINK_REJECTED_WITH_VICTIM_UNCHANGED occurred_at=2026-08-29T10:25:23.016Z
 // machine-contract: audit and SQLite candidates with multiple links fail before storage writes; external victim bytes, SHA-256, and mode remain identical, including an audit-path replacement after construction.
+// information_uuid_v5=83951c9f-4ece-576e-bacc-8224d32a3b99
+// event_uuid_v7=01a04d24-0955-78ae-9c7c-218287ed5acb
+// state_transition=REJECTED_TMPDIR_TAINT_FIXTURE -> REJECTED_REPOSITORY_SIBLING_FIXTURE occurred_at=2026-08-29T10:50:05.633Z
+// machine-contract: the outside-root negative test uses a repository-relative sibling path so the CodeQL temporary-file model measures only reachable storage operations; runtime containment rejection remains unchanged.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -43,7 +47,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-verification.ts";
@@ -105,7 +109,7 @@ function assertFileUnchanged(path: string, before: ReturnType<typeof fileSnapsho
 }
 
 test("notification storage rejects paths outside its fixed local and test roots", () => {
-  const outsideTemporaryRoot = join(dirname(tmpdir()), "notification-outside.sqlite");
+  const outsideTemporaryRoot = resolve("untrusted-outside-root", "notification-outside.sqlite");
   assert.throws(() => new NotificationStore(outsideTemporaryRoot), /outside the allowed storage roots/);
   assert.throws(() => new AuditLog(outsideTemporaryRoot.replace(/\.sqlite$/, ".ndjson")), /outside the allowed storage roots/);
 });

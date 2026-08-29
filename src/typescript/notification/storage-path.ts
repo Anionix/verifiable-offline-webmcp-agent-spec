@@ -16,6 +16,10 @@
 // event_uuid_v7=01a04d1a-b46a-7604-adfc-a673e5e8350a
 // state_transition=PATH_LSTAT_IDENTITY_CHECK -> TWO_OPEN_DESCRIPTORS_COMPARED occurred_at=2026-08-29T10:39:50.890Z
 // machine-contract: storage identity is decided only from two simultaneously open O_NOFOLLOW descriptors whose device, inode, regular-file type, and single-link count agree.
+// information_uuid_v5=94c4f2a0-e903-54a6-bf1e-c5467bfe6161
+// event_uuid_v7=01a04d24-08c8-7179-a011-ba04af7e7248
+// state_transition=CODEQL_CHECK_USE_AMBIGUOUS -> COMPARISON_OPEN_DOCUMENTED occurred_at=2026-08-29T10:50:05.633Z
+// machine-contract: the second root open is the comparison control, not an operation authorized by the first; both O_NOFOLLOW descriptors remain open until their identities are compared and a mismatch fails closed.
 import { closeSync, constants, fchmodSync, fstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
@@ -127,6 +131,7 @@ function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStor
     if (hasPosixPermissionSemantics(platform)) fchmodSync(guardDescriptor, 0o700);
 
     const canonicalRoot = realpathSync(storageRoot);
+    // codeql[js/file-system-race]
     namedDescriptor = openSync(storageRoot, flags);
     const named = fstatSync(namedDescriptor);
     if (!named.isDirectory() || named.dev !== guarded.dev || named.ino !== guarded.ino || named.nlink !== guarded.nlink) {

@@ -36,7 +36,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 
 このリポジトリは、モバイル優先・オフライン対応・検証可能なエージェント設計を、英日併記、JSON-LD、PROV-O、DCAT風catalog、JSON Schema、UUIDv5/v7、形式仕様、実行可能な参照コードでまとめたものです。「Open Knowledge Format」という単一の公式標準への適合を主張するものではありません。
 
-> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモはローカル構築、四つのWebMCP機能、二回の試行から一件への収束、再読込、通信断、四つの画面幅まで確認済みです。ChatGPT Sitesの一般公開、Vercelの更新、実ホテル予約、決済、取消はまだ行っていません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
+> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、所有者限定の[ChatGPT Sites本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)で四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。一般公開、Vercelの更新、実ホテル予約、決済、取消はまだ行っていません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
 
 ## Architectural stance / 設計の立場
 
@@ -134,7 +134,7 @@ The shared build produces `dist/client/**` for Vercel, Netlify, and Render confi
 
 Confirmation, payment, and cancellation mutation are deliberately absent. IndexedDB unique constraints, UUIDv7 events, and a SHA-256 forward chain protect the local result across repeated clicks, two tabs, reload, and retry. ChatGPT Sites and Vercel do not share browser storage, so the page explicitly says the fictional result belongs only to this device and deployment.
 
-Local evidence currently passes 130 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one. Keyboard traversal and screen-reader behavior remain `INCONCLUSIVE` until a physical keyboard and assistive-technology run are recorded. The owner-only Sites deployment and current Vercel deployment are separate future observations; neither is inferred from a successful local build. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json) and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
+Local evidence currently passes 131 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one. The owner-only ChatGPT Sites production URL independently passed four-tool discovery, the human-only commit boundary, safe retry, and reload restoration. Keyboard traversal, screen-reader behavior, Chrome execution behind the owner-only sign-in, general Sites access, and the current Vercel deployment remain `INCONCLUSIVE` or `UNMEASURED` until their separate checks are recorded. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json) and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04b38-0e40-7595-81ae-fd2db303c4ae"
-observed_at: "2026-08-29T01:52:40.000Z"
-state_transition: "DEVPOST_DRAFT_READ -> APPROVAL_GATES_ENFORCED"
+event_uuid_v7: "01a04b5a-5d98-7af3-b83b-9c5faf116863"
+observed_at: "2026-08-29T02:30:08.536Z"
+state_transition: "APPROVAL_GATES_ENFORCED -> OWNER_ONLY_SITE_LIVE_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -39,20 +39,22 @@ state_transition: "DEVPOST_DRAFT_READ -> APPROVAL_GATES_ENFORCED"
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日1時52分40秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日2時30分8秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | 主公開先。サイト作成までは成功 |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。所有者限定の本番URLで今回成果物を実行確認済み |
 | Vercel | `ACTIVE` | `CONFIRMED` | `BASELINE_ONLY` | `BASELINE_ONLY` | 予備公開先。確認済みなのは古い通知実演だけ |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
-| Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 画面動作は成功。Chrome側のWebMCP機能は未露出 |
+| Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 所有者限定URLはログイン要求。端末内検査でもWebMCP機能は未露出 |
 | Devpost | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_APPLICABLE` | 資料確認、下書き、最終提出 |
 
 DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未定`、説明・動画URLが空、最終提出前であることを確認しました。名称は利用者が決めるため変更していません。
+
+ChatGPT Sitesでは、コミット`64306a20916d9456794eb310e8f518eb6ecdb7ee`から作った成果物を[所有者限定の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。ChatGPT内ブラウザーで四つのWebMCP機能だけを発見し、準備、人間の画面操作による確定、安全な再送、状態確認、取り消し料金の読み取りを実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件で、再読込後も同じ値へ復元しました。一般公開は許可されておらず、共有範囲は所有者本人だけです。
 
 Vercelの`BASELINE_ONLY`は、過去の通知実演を見たという意味です。現在のホテル成果物が公開済み、匿名で閲覧可能、または正常動作するという意味ではありません。
 
@@ -77,7 +79,7 @@ NetlifyとRenderは、リポジトリ内の公開先パスと限定した設定�
 
 Shopifyは商品検索、買い物かご、購入画面、注文履歴に関する商取引の境界を説明するだけです。ホテル予約の操作機能として接続しません。
 
-Google Chromeでは、準備、画面上の人間による確定、安全な再送、再読込まで実行し、二回の試行が予約一件と処理開始一回へ収束することを確認しました。ただし、このChrome作業ではブラウザーのWebMCP実行機能がページへ露出しませんでした。したがって、四機能のChrome内発見と実行は`INCONCLUSIVE`のままです。
+Google Chromeでは所有者限定の本番URLへ到達しましたが、`Sign in required`が表示され、今回の本番成果物の画面とWebMCP機能は確認できませんでした。以前の端末内検査では、準備、画面上の人間による確定、安全な再送、再読込まで実行し、二回の試行が予約一件と処理開始一回へ収束しました。ただし、その検査でもChromeのWebMCP実行機能はページへ露出しませんでした。したがって、Chromeでの本番画面と四機能の発見・実行は`INCONCLUSIVE`のままです。
 
 ## 外部操作の承認境界
 
@@ -110,6 +112,8 @@ Google Chromeでは、準備、画面上の人間による確定、安全な再�
 ## 今回の成果物を成功扱いする条件
 
 `CURRENT_ARTIFACT`または`CURRENT_ARTIFACT_VERIFIED`へ変える場合は、`artifactCommit`と`artifactSha256`の両方が必要です。元のコードと公開した成果物を一緒に結び付けるため、古い公開先が偶然動いた事実を今回のホテル実演の成功へすり替えられません。
+
+`artifactCommit`は、画面と予約処理を作った機能ソースのコミットを指します。`artifactSha256`は、状態表そのものを除外した機能部分の要約値です。状態表は自分自身の公開結果を記録するため、機能要約値からだけ除外し、完全な配布物要約値には含めます。これにより、公開観測の追記で機能が変わったように見せず、配布物全体の変化は隠しません。
 
 公開と実行確認は別々に更新します。たとえば公開操作が成功しても、匿名アクセス、画面表示、四つのWebMCP機能を確認するまでは実行を成功扱いしません。
 

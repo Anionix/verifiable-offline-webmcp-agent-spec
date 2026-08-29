@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04b30-aa9a-7de0-814e-7a2f6be7ffee"
+    "observationUuidV7": "01a04b61-601d-71a8-bd97-51879b5e2bfd"
   },
-  "updatedAt": "2026-08-29T01:44:35.738Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED",
+  "updatedAt": "2026-08-29T02:37:47.933Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -131,7 +131,7 @@
       "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
       "kind": "STORYBOARD",
       "path": "media/demo-video/storyboard.md",
-      "sha256": "5d9595052152655c09c940ecd752dbd1f25ea97d3087ebe28a19811d425dc106",
+      "sha256": "dd0dc1a5ce73342296baf32b93ca619715832c14bdaba800cfabc183484814ab",
       "status": "DRAFT",
       "requiresAudioRetiming": false
     },
@@ -139,7 +139,7 @@
       "fileId": "f3efcb83-4fa6-5f89-a55e-4cb921cd2ea8",
       "kind": "NARRATION_EN",
       "path": "media/demo-video/narration.en.txt",
-      "sha256": "7a3ce59a405ecdabebade43c5e908b360809de74117934e01a4506603f67ffb7",
+      "sha256": "24f3543e116c78339087b21eefe6151cdf601f4442812ffe0b647ad64b5a3df7",
       "status": "DRAFT",
       "requiresAudioRetiming": false
     },

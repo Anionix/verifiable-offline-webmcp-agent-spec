@@ -2,10 +2,10 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04b49-2944-7032-bc74-7ff8be1caabc"
+    "observationUuidV7": "01a04b5a-5d98-77bc-8c2f-db0cb564eb68"
   },
-  "observedAt": "2026-08-29T02:11:21.028Z",
-  "sourceCommit": "WORKTREE",
+  "observedAt": "2026-08-29T02:30:08.536Z",
+  "sourceCommit": "64306a20916d9456794eb310e8f518eb6ecdb7ee",
   "artifactDigest": "435dc83c2a5d880a31b990970eef4d7b71112b66876bb7919795e16b167f28a6",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
@@ -16,21 +16,21 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "4dfbe9d78872f7464229f2dc0728dcb48f75cbb572f14b41191aa43a53de71e7",
+  "fullClientArtifactDigest": "9f6ceb7cfeebfcd5e6b681eb0249eab9155d4991ad22a3af3363d08e8a8e7865",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "fb087c3ebaa880d5dd82b62a132b45b83f335b70e7465d6bcd42dd156c8e6b2f",
+  "fullSitesPackageDigest": "dbd20208e063240b123d676a3417740dff237e071429f5e0e8dd041b9555f13f",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_DEPLOYED -> LIVE_VERIFIED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "checks": [
     {
@@ -43,13 +43,13 @@
       "checkId": "311a96f7-7859-5b7f-baf2-17e39b83502d",
       "name": "Two attempts remain one booking",
       "status": "PASS",
-      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. The final in-app browser run reports attempts=2, bookings=1, effectStartCount=1, and one stable confirmation number after reload."
+      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. At the owner-only production URL, the in-app browser reported attempts=2, bookings=1, effectStartCount=1, and the same confirmation number after asynchronous reload restoration completed."
     },
     {
       "checkId": "8982f898-c1da-55cd-834b-211099bc82ca",
       "name": "Exactly four non-destructive WebMCP tools",
       "status": "PASS",
-      "evidence": "For the artifact identified above, the in-app browser discovered and called exactly the four named tools at http://127.0.0.1:4184. WebMCP preparation changed the visible state to PREPARED and enabled the separate human confirmation button; no confirmation, payment, or cancellation tool was present."
+      "evidence": "At https://kyoto-booking-retry-proof.anionix.chatgpt.site, the in-app browser discovered and called exactly check_existing_hotel_booking, prepare_hotel_booking, get_hotel_booking_status, and preview_hotel_cancellation. Preparation changed the matching visible request to PREPARED and enabled the separate human confirmation button; no confirmation, payment, or cancellation tool was present."
     },
     {
       "checkId": "28fd6207-3a34-5294-9a4a-305b0ac2e96d",
@@ -91,13 +91,13 @@
       "checkId": "6f65cf02-40eb-51c3-bdbc-4d532082fe0e",
       "name": "Google Chrome page and WebMCP runtime",
       "status": "INCONCLUSIVE",
-      "evidence": "For the artifact at http://127.0.0.1:4184, Chrome restored the non-default 2026-11-10 to 2026-11-13 stay, three adults, two rooms, and Japanese presentation after PREPARED, COMMITTED, RETRY_RECOGNIZED, and reload with attempts=2, bookings=1, effects=1. The native WebMCP runtime was not exposed, so Chrome tool discovery and execution remain inconclusive."
+      "evidence": "Chrome reached the owner-only production URL but displayed Sign in required, so live page execution was not measured. Earlier local Chrome testing restored a non-default Japanese stay with attempts=2, bookings=1, effects=1, but the native WebMCP runtime was not exposed; Chrome discovery and execution remain inconclusive."
     },
     {
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
-      "status": "UNMEASURED",
-      "evidence": "No owner-only Sites deployment or live execution receipt exists yet."
+      "status": "PASS",
+      "evidence": "Commit 64306a20916d9456794eb310e8f518eb6ecdb7ee was saved and deployed to the owner-only production URL. The in-app browser loaded the page with no console warnings or errors, discovered exactly four safe tools, completed one human-only fictional commit, recognized one retry, preserved 2 attempts -> 1 booking -> 1 effect start -> 1 confirmation, and kept cancellation preview read-only."
     }
   ],
   "designFidelity": [

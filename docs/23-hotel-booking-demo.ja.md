@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04bd0-b895-7d97-b78c-725192dd71c3"
-observed_at: "2026-08-29T01:25:00Z"
-status: "locally-verified"
+event_uuid_v7: "01a04b5a-5d98-77bc-8c2f-db0cb564eb68"
+observed_at: "2026-08-29T02:30:08.536Z"
+status: "owner-only-live-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -61,13 +61,13 @@ status: "locally-verified"
 | 言語変更でも同じUUIDv5 | 成功 | Node試験 |
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
-| WebMCP四機能の発見と実行 | 成功 | 現行本番構築物のローカル実画面。準備後に人間確認ボタンが有効になることも確認 |
+| WebMCP四機能の発見と実行 | 成功 | 所有者限定のChatGPT Sites本番URL。準備後に人間確認ボタンが有効になることも確認 |
 | 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites所有者限定実行 | 未計測 | 保存・配備前 |
+| ChatGPT Sites所有者限定実行 | 成功 | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)で四機能、2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認 |
 | ChatGPT Sites一般公開、Vercel更新 | 未計測 | 別承認が必要 |
 
 機械可読の正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)です。

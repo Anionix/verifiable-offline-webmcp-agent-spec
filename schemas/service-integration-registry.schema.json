@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
-  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04b38-0e40-7595-81ae-fd2db303c4ae state_transition=DEVPOST_DRAFT_READ -> APPROVAL_GATES_ENFORCED occurred_at=2026-08-29T01:52:40.000Z machine-contract=external publication submission and commerce writes are blocked unless the named action has explicit authority",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04b5a-5d98-7af3-b83b-9c5faf116863 state_transition=APPROVAL_GATES_ENFORCED -> OWNER_ONLY_SITE_LIVE_VERIFIED occurred_at=2026-08-29T02:30:08.536Z machine-contract=owner-only live evidence never authorizes public publication submission or commerce writes",
   "title": "Service integration registry",
   "type": "object",
   "additionalProperties": false,
@@ -57,10 +57,10 @@
       ],
       "properties": {
         "from": {
-          "const": "DEVPOST_DRAFT_READ"
+          "const": "APPROVAL_GATES_ENFORCED"
         },
         "to": {
-          "const": "APPROVAL_GATES_ENFORCED"
+          "const": "OWNER_ONLY_SITE_LIVE_VERIFIED"
         },
         "eventId": {
           "$ref": "#/$defs/uuidV7"

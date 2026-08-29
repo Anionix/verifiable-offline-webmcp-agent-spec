@@ -1,17 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
-  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04dcb-8678-76bf-b181-d86c21eaa1ea state_transition=DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE -> SITES_VERSION_12_DEPLOYED_CURRENT occurred_at=2026-08-29T13:52:59.000Z machine-contract=Sites version 12 is current only when exact source commit full package digest provider version deployment and anonymous static-file readbacks agree; identical functional digest carries earlier runtime proof without claiming a new browser run",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04dcb-8678-76bf-b181-d86c21eaa1ea state_transition=DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE -> SITES_VERSION_12_DEPLOYED_CURRENT_OCCURRED_WITH_OFF_HISTORY_SOURCE occurred_at=2026-08-30T00:00:00.000Z machine-contract=Sites version 12 is current only when provider source reachability is stated explicitly and the current checkout plus full package digest define the reproducibility boundary; identical functional digest carries earlier runtime proof without claiming a new browser run",
   "title": "Hotel booking demo verification record",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "identity", "observedAt", "sourceCommit", "sourceState", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "liveDeployment", "checks", "designFidelity"],
+  "required": ["$schema", "identity", "observedAt", "sourceCommit", "sourceState", "sourceProvenance", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "liveDeployment", "checks", "designFidelity"],
   "properties": {
     "$schema": { "const": "../schemas/hotel-booking-verification.schema.json" },
     "identity": { "$ref": "#/$defs/identity" },
     "observedAt": { "type": "string", "format": "date-time" },
-    "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
+    "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE|CHECKOUT_TREE)$" },
     "sourceState": { "enum": ["WORKTREE_CANDIDATE", "COMMITTED_CANDIDATE", "DEPLOYED_CURRENT"] },
+    "sourceProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerReportedCommit", "providerCommitReachability", "reproducibilityBoundary"],
+      "properties": {
+        "providerReportedCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "providerCommitReachability": { "const": "OFF_HISTORY" },
+        "reproducibilityBoundary": { "const": "FULL_SITES_PACKAGE_DIGEST" }
+      }
+    },
     "artifactDigest": { "$ref": "#/$defs/sha256" },
     "artifactDigestScope": {
       "const": {
@@ -46,8 +56,8 @@
       "additionalProperties": false,
       "required": ["functionalSourceCommit", "deployedVersionSourceCommit", "functionalArtifactDigest", "fullSitesPackageDigest", "versionId", "versionNumber", "deploymentId", "providerArchiveContentHash", "url", "accessMode", "status", "observedAt", "evidence"],
       "properties": {
-        "functionalSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
-        "deployedVersionSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "functionalSourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE)$" },
+        "deployedVersionSourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE)$" },
         "functionalArtifactDigest": { "$ref": "#/$defs/sha256" },
         "fullSitesPackageDigest": { "$ref": "#/$defs/sha256" },
         "versionId": { "type": "string", "minLength": 3 },

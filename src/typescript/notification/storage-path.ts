@@ -24,7 +24,15 @@
 // event_uuid_v7=01a04d2b-e1fe-7097-808d-814578e6836f
 // state_transition=REPEATED_INLINE_PATH_OPEN -> SHARED_NONFOLLOW_DESCRIPTOR_OPEN occurred_at=2026-08-29T10:58:47.110Z
 // machine-contract: every storage-root descriptor is obtained through one non-following directory-open boundary; two returned descriptors stay open until identity comparison, so neither path observation authorizes later file I/O.
-import { closeSync, constants, fchmodSync, fstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
+// information_uuid_v5=0540c151-d37d-5b5e-83a4-5032033c34e3
+// event_uuid_v7=01a04d40-5d78-789e-90ff-3e02d9cf0045
+// state_transition=WINDOWS_LINK_TARGET_ACCEPTED -> NAMED_LINK_REJECTED_AND_DESCRIPTOR_BOUND occurred_at=2026-08-29T11:20:59.000Z
+// machine-contract: Windows does not gain link rejection from O_NOFOLLOW, so every accepted root or storage file must also be a non-link lstat entry whose identity matches the still-open descriptors before any bytes are read or written.
+// information_uuid_v5=122a2c58-92fc-5cd7-bb62-f46948d45a5d
+// event_uuid_v7=01a04d47-a0d8-7ba5-9dde-01bf920d3fc4
+// state_transition=OVERBROAD_STORAGE_CLAIM -> FINAL_LINK_SCOPE_EXPLICIT occurred_at=2026-08-29T11:28:55.000Z
+// machine-contract: final-name proof does not claim to solve concurrent parent replacement or to expose SQLite's internal handle; those independent boundaries remain fail-open risks tracked separately.
+import { closeSync, constants, fchmodSync, fstatSync, lstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
@@ -34,6 +42,10 @@ export type NotificationStorageKind = "audit" | "database";
 export interface StoragePathOptions {
   repositoryStorageRoot?: string;
   temporaryRoot?: string;
+  platform?: NodeJS.Platform;
+}
+
+export interface StorageDescriptorOptions {
   platform?: NodeJS.Platform;
 }
 
@@ -69,9 +81,20 @@ function requireSingleLinkRegularFile(stats: Stats, kind: NotificationStorageKin
   if (stats.nlink !== 1) throw new TypeError(`${kind} path must not have multiple hard links`);
 }
 
-function openExistingStorageDescriptor(path: string, kind: NotificationStorageKind): number | null {
+function noFollowFlag(platform: NodeJS.Platform): number {
+  return platform === "win32" ? 0 : constants.O_NOFOLLOW;
+}
+
+function requireNamedStorageFile(path: string, kind: NotificationStorageKind): Stats {
+  const named = lstatSync(path);
+  if (named.isSymbolicLink()) throw new TypeError(`${kind} path must not be a symbolic link`);
+  requireSingleLinkRegularFile(named, kind);
+  return named;
+}
+
+function openExistingStorageDescriptor(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): number | null {
   try {
-    return openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    return openSync(path, constants.O_RDONLY | noFollowFlag(platform) | constants.O_NONBLOCK);
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === "ENOENT") return null;
@@ -80,37 +103,51 @@ function openExistingStorageDescriptor(path: string, kind: NotificationStorageKi
   }
 }
 
-function openStorageRootDescriptor(path: string): number {
-  return openSync(path, constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW);
+function openStorageRootDescriptor(path: string, platform: NodeJS.Platform): number {
+  return openSync(path, constants.O_RDONLY | constants.O_DIRECTORY | noFollowFlag(platform));
 }
 
-export function assertNotificationStorageDescriptor(path: string, descriptor: number, kind: NotificationStorageKind): void {
-  const namedDescriptor = openExistingStorageDescriptor(path, kind);
+export function assertNotificationStorageDescriptor(
+  path: string,
+  descriptor: number,
+  kind: NotificationStorageKind,
+  options: StorageDescriptorOptions = {},
+): void {
+  const platform = options.platform ?? process.platform;
+  const namedDescriptor = openExistingStorageDescriptor(path, kind, platform);
   if (namedDescriptor === null) throw new TypeError(`${kind} path changed during open`);
   try {
     const guarded = fstatSync(descriptor);
     const named = fstatSync(namedDescriptor);
+    const namedEntry = requireNamedStorageFile(path, kind);
     requireSingleLinkRegularFile(guarded, kind);
     requireSingleLinkRegularFile(named, kind);
-    if (named.dev !== guarded.dev || named.ino !== guarded.ino) {
+    if (named.dev !== guarded.dev || named.ino !== guarded.ino || namedEntry.dev !== guarded.dev || namedEntry.ino !== guarded.ino) {
       throw new TypeError(`${kind} path changed during open`);
     }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new TypeError(`${kind} path changed during open`, { cause: error });
+    }
+    throw error;
   } finally {
     closeSync(namedDescriptor);
   }
 }
 
-export function openNotificationStorageGuard(path: string, kind: NotificationStorageKind): number {
+export function openNotificationStorageGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number {
+  const platform = options.platform ?? process.platform;
+  const noFollow = noFollowFlag(platform);
   let descriptor: number | null = null;
   try {
     try {
       // machine-contract: this path already passed fixed-root containment and private-parent checks; O_EXCL prevents pre-existing or raced aliases.
-      descriptor = openSync(path, constants.O_RDWR | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
+      descriptor = openSync(path, constants.O_RDWR | constants.O_CREAT | constants.O_EXCL | noFollow, 0o600);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-      descriptor = openSync(path, constants.O_RDWR | constants.O_NOFOLLOW);
+      descriptor = openSync(path, constants.O_RDWR | noFollow);
     }
-    assertNotificationStorageDescriptor(path, descriptor, kind);
+    assertNotificationStorageDescriptor(path, descriptor, kind, options);
     return descriptor;
   } catch (error) {
     if (descriptor !== null) closeSync(descriptor);
@@ -131,15 +168,27 @@ function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStor
   let guardDescriptor: number | null = null;
   let namedDescriptor: number | null = null;
   try {
-    guardDescriptor = openStorageRootDescriptor(storageRoot);
+    guardDescriptor = openStorageRootDescriptor(storageRoot, platform);
     const guarded = fstatSync(guardDescriptor);
     if (!guarded.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);
     if (hasPosixPermissionSemantics(platform)) fchmodSync(guardDescriptor, 0o700);
 
     const canonicalRoot = realpathSync(storageRoot);
-    namedDescriptor = openStorageRootDescriptor(storageRoot);
+    namedDescriptor = openStorageRootDescriptor(storageRoot, platform);
     const named = fstatSync(namedDescriptor);
-    if (!named.isDirectory() || named.dev !== guarded.dev || named.ino !== guarded.ino || named.nlink !== guarded.nlink) {
+    const namedEntry = lstatSync(storageRoot);
+    if (namedEntry.isSymbolicLink()) {
+      throw new TypeError(`${kind} storage root must not be a symbolic link and must be a directory`);
+    }
+    if (
+      !named.isDirectory() ||
+      !namedEntry.isDirectory() ||
+      named.dev !== guarded.dev ||
+      named.ino !== guarded.ino ||
+      named.nlink !== guarded.nlink ||
+      namedEntry.dev !== guarded.dev ||
+      namedEntry.ino !== guarded.ino
+    ) {
       throw new TypeError(`${kind} storage root changed during validation`);
     }
     return canonicalRoot;
@@ -194,9 +243,9 @@ export function containedNotificationStoragePath(candidate: string, kind: Notifi
   requirePrivateDirectory(canonicalParent, kind, platform);
 
   const safePath = resolve(canonicalParent, filename);
-  const existingDescriptor = openExistingStorageDescriptor(safePath, kind);
+  const existingDescriptor = openExistingStorageDescriptor(safePath, kind, platform);
   try {
-    if (existingDescriptor !== null) requireSingleLinkRegularFile(fstatSync(existingDescriptor), kind);
+    if (existingDescriptor !== null) assertNotificationStorageDescriptor(safePath, existingDescriptor, kind, { platform });
   } finally {
     if (existingDescriptor !== null) closeSync(existingDescriptor);
   }

@@ -17,6 +17,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # information_uuid_v5=f1067880-6f05-5541-8fe2-b16ebff23f6a
+  # event_uuid_v7=01a04d40-5d78-7e5e-a69a-8ea902356b69
+  # state_transition=WINDOWS_STORAGE_UNMEASURED -> WINDOWS_LINK_BOUNDARY_EXECUTED occurred_at=2026-08-29T11:20:59.000Z
+  # machine-contract: a real Windows runner must reject final storage-file links and accept ordinary files before the platform claim can pass.
+  notification-storage-windows:
+    name: notification storage (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+
+      - name: Install locked TypeScript dependencies
+        working-directory: src/typescript
+        run: npm ci
+
+      - name: Verify the Windows storage link boundary
+        working-directory: src/typescript
+        run: >-
+          node --experimental-strip-types --test
+          --test-name-pattern="notification storage rejects unexpected filenames and symbolic links before I/O|notification storage rejects final links when Windows cannot rely on O_NOFOLLOW|notification storage keeps ordinary Windows storage files usable|notification storage rejects a linked repository root without touching its target|notification storage rejects a different regular file while the reviewed descriptor remains open"
+          test/notification.test.ts
+
   validate:
     name: validate
     runs-on: ubuntu-latest

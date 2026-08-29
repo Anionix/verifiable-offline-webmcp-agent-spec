@@ -46,7 +46,7 @@ jobs:
         working-directory: src/typescript
         run: >-
           node --experimental-strip-types --test
-          --test-name-pattern="notification storage rejects unexpected filenames and symbolic links before I/O|notification storage rejects final links when Windows cannot rely on O_NOFOLLOW|notification storage rejects dangling final links before Windows creation|audit I/O rejects a dangling replacement without creating its target|notification storage creates truly absent Windows files through exclusive guards|Windows publication refuses dangling links inserted after absence|notification storage keeps ordinary Windows storage files usable|notification storage rejects a linked repository root without touching its target|notification storage rejects a different regular file while the reviewed descriptor remains open"
+          --test-name-pattern="notification storage rejects unexpected filenames and symbolic links before I/O|notification storage rejects final links when Windows cannot rely on O_NOFOLLOW|notification storage rejects dangling final links before Windows creation|audit I/O rejects a dangling replacement without creating its target|notification storage creates truly absent Windows files through exclusive guards|Windows publication refuses dangling links inserted after absence|notification storage keeps ordinary Windows storage files usable|notification storage rejects a linked repository root without touching its target|notification storage rejects a different regular file while the reviewed descriptor remains open|notification storage rejects a replaced parent before audit or SQLite I/O|notification storage rejects a different regular parent before I/O"
           test/notification.test.ts
 
   validate:

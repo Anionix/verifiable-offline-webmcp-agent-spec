@@ -18,6 +18,8 @@ npm run typecheck
 
 `notification/` separates control state from external-effect state, persists intent/attempt/effect rows in SQLite, and appends a SHA-256 hash-chained JSON Lines record for every transition. UUIDv5 identifies the logical notification intent and UUIDv7 identifies each attempt and transition.
 
+Audit and SQLite paths retain the parent directory identity captured at construction and recheck it before later file reads, appends, or SQLite startup. Replacing that parent with a link or another directory is rejected before bytes or SQLite sidecars can be written.
+
 ```bash
 npm run benchmark:notification
 npm run demo:notification

@@ -40,6 +40,10 @@
 // event_uuid_v7=01a04d5a-11db-7e3a-b13e-96c11c361add
 // state_transition=WINDOWS_CREATE_NEW_FOLLOWS_REPARSE_POINT -> RANDOM_STAGE_HARDLINK_PUBLISH occurred_at=2026-08-29T11:49:03.579Z
 // machine-contract: Windows never applies O_CREAT to the caller-selected final name; a 128-bit random staging file is opened first, then link publishes it only if the final directory entry is absent, and the open descriptor is identity-bound after the staging name is removed.
+// information_uuid_v5=80129980-2b52-5f15-9419-2e7d8ecc4436
+// event_uuid_v7=01a04d46-6a82-75a1-8ee4-fd9364c93d58
+// state_transition=PARENT_IDENTITY_UNBOUND -> PARENT_IDENTITY_RECHECKED occurred_at=2026-08-29T14:45:00.000Z
+// machine-contract: every caller that retained a canonical storage path must also retain its parent device/inode identity; a later link or directory replacement fails before file I/O.
 import { randomBytes } from "node:crypto";
 import { closeSync, constants, fchmodSync, fstatSync, linkSync, lstatSync, mkdirSync, openSync, realpathSync, statSync, unlinkSync } from "node:fs";
 import type { Stats } from "node:fs";
@@ -54,8 +58,15 @@ export interface StoragePathOptions {
   platform?: NodeJS.Platform;
 }
 
+export interface StorageParentIdentity {
+  readonly path: string;
+  readonly dev: number;
+  readonly ino: number;
+}
+
 export interface StorageDescriptorOptions {
   platform?: NodeJS.Platform;
+  expectedParent?: StorageParentIdentity;
   /** Deterministic test seam at the final-name absence/publication boundary. */
   afterStorageAbsenceObserved?: (path: string) => void;
 }
@@ -171,6 +182,62 @@ function openStorageRootDescriptor(path: string, platform: NodeJS.Platform): num
   return openSync(path, constants.O_RDONLY | constants.O_DIRECTORY | noFollowFlag(platform));
 }
 
+function openStorageParentDescriptor(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): number {
+  try {
+    return openSync(dirname(path), constants.O_RDONLY | constants.O_DIRECTORY | noFollowFlag(platform));
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ELOOP" || code === "ENOTDIR") {
+      const named = lstatSync(dirname(path), { throwIfNoEntry: false });
+      if (named?.isSymbolicLink()) throw new TypeError(`${kind} parent must not be a symbolic link`, { cause: error });
+      throw new TypeError(`${kind} parent changed during validation`, { cause: error });
+    }
+    throw error;
+  }
+}
+
+function readStorageParentIdentity(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): StorageParentIdentity {
+  const descriptor = openStorageParentDescriptor(path, kind, platform);
+  try {
+    const guarded = fstatSync(descriptor);
+    const named = lstatSync(dirname(path));
+    if (!guarded.isDirectory() || !named.isDirectory() || named.isSymbolicLink()) {
+      throw new TypeError(`${kind} parent must be a non-link directory`);
+    }
+    if (guarded.dev !== named.dev || guarded.ino !== named.ino) {
+      throw new TypeError(`${kind} parent changed during validation`);
+    }
+    return Object.freeze({ path: dirname(path), dev: guarded.dev, ino: guarded.ino });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new TypeError(`${kind} parent changed during validation`, { cause: error });
+    }
+    throw error;
+  } finally {
+    closeSync(descriptor);
+  }
+}
+
+export function captureNotificationStorageParent(
+  path: string,
+  kind: NotificationStorageKind,
+  options: Pick<StorageDescriptorOptions, "platform"> = {},
+): StorageParentIdentity {
+  return readStorageParentIdentity(path, kind, options.platform ?? process.platform);
+}
+
+export function assertNotificationStorageParent(
+  path: string,
+  expected: StorageParentIdentity,
+  kind: NotificationStorageKind,
+  options: Pick<StorageDescriptorOptions, "platform"> = {},
+): void {
+  const actual = readStorageParentIdentity(path, kind, options.platform ?? process.platform);
+  if (actual.path !== expected.path || actual.dev !== expected.dev || actual.ino !== expected.ino) {
+    throw new TypeError(`${kind} parent changed during operation`);
+  }
+}
+
 export function assertNotificationStorageDescriptor(
   path: string,
   descriptor: number,
@@ -178,6 +245,7 @@ export function assertNotificationStorageDescriptor(
   options: StorageDescriptorOptions = {},
 ): void {
   const platform = options.platform ?? process.platform;
+  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
   const namedDescriptor = openExistingStorageDescriptor(path, kind, platform);
   if (namedDescriptor === null) throw new TypeError(`${kind} path changed during open`);
   try {
@@ -201,6 +269,7 @@ export function assertNotificationStorageDescriptor(
 
 export function openExistingNotificationStorageGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number | null {
   const platform = options.platform ?? process.platform;
+  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
   const descriptor = openExistingStorageDescriptor(path, kind, platform);
   if (descriptor === null) return null;
   try {
@@ -214,6 +283,7 @@ export function openExistingNotificationStorageGuard(path: string, kind: Notific
 
 function openWritableNotificationStorageGuard(path: string, kind: NotificationStorageKind, accessFlags: number, options: StorageDescriptorOptions): number {
   const platform = options.platform ?? process.platform;
+  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
   const noFollow = noFollowFlag(platform);
   let descriptor: number | null = null;
   try {
@@ -338,5 +408,6 @@ export function containedNotificationStoragePath(candidate: string, kind: Notifi
   const existingDescriptor = openExistingNotificationStorageGuard(safePath, kind, { platform });
   // The guard already binds an existing file to its reviewed final name. A missing name remains safe only because every later writer uses exclusive creation.
   if (existingDescriptor !== null) closeSync(existingDescriptor);
+  captureNotificationStorageParent(safePath, kind, { platform });
   return safePath;
 }

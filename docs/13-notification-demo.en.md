@@ -27,6 +27,8 @@ This local reference implementation prevents a second visible notification for t
 
 `NotificationEngine` owns normalization, UUIDv5 intent identity, approval checks, and transitions. `NotificationStore` owns three SQLite tables and the unique logical-operation constraint. `AuditLog` records UUIDv7 events in a SHA-256 hash-chained JSON Lines file. An adapter exposes only `preview`, `execute`, and `reconcile`.
 
+Each constructed audit or SQLite path retains the parent directory's device/inode identity and rechecks it before later reads, appends, or SQLite startup. Replacing that parent with a link or another directory fails closed before bytes or SQLite sidecars can be written. Disk-backed `NotificationStore` remains POSIX-only because Windows `DatabaseSync` has no bindable file handle; `:memory:` remains available on Windows.
+
 ```text
 DISCOVERED -> PROPOSED -> DRY_RUN -> USER_APPROVED -> EXECUTING -> VERIFIED
                     |             |                 |-> ABORTED

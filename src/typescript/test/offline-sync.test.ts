@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -72,6 +72,10 @@ import { uuidV5, uuidV7 } from "../uuid.ts";
 // event_uuid_v7=01a04d10-b64b-79db-8311-644ee54d3524
 // state_transition=ROLLBACK_SPLIT -> REGRESSION_PROOF occurred_at=2026-08-29T10:30:33.868Z
 // machine-contract: caught SQLite failure restores the prior anchor before unlock, and failed lock initialization may clean only its original directory identity and never a replacement owner's live lock.
+// information_uuid_v5=bc645fff-7535-58d2-80c0-9a6bd3a721ee
+// event_uuid_v7=01a04d19-f9ee-7e63-a9fe-8b74c23514c6
+// state_transition=PATH_SWAP_RISK -> DESCRIPTOR_BOUND_REGRESSION_PROOF occurred_at=2026-08-29T10:40:43.886Z
+// machine-contract: missing owner remains recoverable, while symbolic-link and nonregular owner entries never become lock authority; live and dead regular-file owners keep their existing behavior.
 
 function clock(start = Date.UTC(2026, 7, 28, 17, 0, 0, 0)): () => number {
   let value = start;
@@ -670,6 +674,42 @@ test("failed lock initialization preserves a replacement live owner's directory"
     rmSync(lockPath, { recursive: true, force: false });
     ledger.registerDevice(identity, log.publicKeyPem());
     assert.equal(existsSync(lockPath), false);
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("lock-owner reads reject symbolic links and nonregular entries before trusting bytes", () => {
+  const item = fixture("lock-owner-descriptor-boundary");
+  const now = clock();
+  const identity = createDeviceIdentity("lock-owner-descriptor-boundary");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const ownerPath = join(lockPath, "owner.json");
+  const outsideOwnerPath = join(item.directory, "outside-owner.json");
+  try {
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 40 });
+    const outsideText = '{"not":"lock authority"}\n';
+    writeFileSync(outsideOwnerPath, outsideText, { encoding: "utf8", mode: 0o600 });
+
+    mkdirSync(lockPath, { mode: 0o700 });
+    symlinkSync(outsideOwnerPath, ownerPath);
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /trusted device key anchor lock owner must be a regular file/);
+    assert.equal(readFileSync(outsideOwnerPath, "utf8"), outsideText);
+    assert.equal(existsSync(anchorPath), false);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    mkdirSync(lockPath, { mode: 0o700 });
+    mkdirSync(ownerPath, { mode: 0o700 });
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /trusted device key anchor lock owner must be a regular file/);
+    assert.equal(existsSync(anchorPath), false);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+    assert.equal(existsSync(anchorPath), true);
     ledger.close();
   } finally {
     item.close();

@@ -27,7 +27,21 @@
 // machine-contract: audit and SQLite candidates with multiple links fail before storage writes; external victim bytes, SHA-256, and mode remain identical, including an audit-path replacement after construction.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { chmodSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  closeSync,
+  linkSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -36,7 +50,7 @@ import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-ve
 import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
-import { containedNotificationStoragePath } from "../notification/storage-path.ts";
+import { assertNotificationStorageDescriptor, containedNotificationStoragePath, openNotificationStorageGuard } from "../notification/storage-path.ts";
 import { NotificationStore } from "../notification/store.ts";
 import type { NotificationIntent } from "../notification/types.ts";
 import { uuidV7 } from "../uuid.ts";
@@ -232,6 +246,20 @@ test("audit I/O rejects a hard-link replacement after construction without chang
   } finally {
     rmSync(directory, { recursive: true, force: true });
     rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a different regular file while the reviewed descriptor remains open", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-descriptor-swap-"));
+  const path = join(directory, "queue.sqlite");
+  const guard = openNotificationStorageGuard(path, "database");
+  try {
+    renameSync(path, join(directory, "reviewed.sqlite"));
+    writeFileSync(path, "replacement", { mode: 0o600 });
+    assert.throws(() => assertNotificationStorageDescriptor(path, guard, "database"), /changed during open/);
+  } finally {
+    closeSync(guard);
+    rmSync(directory, { recursive: true, force: true });
   }
 });
 

@@ -50,6 +50,10 @@
 // event_uuid_v7=01a04d10-b64b-7db3-b253-c3d1551dffac
 // state_transition=ROLLBACK_SPLIT -> RESTORED | CRASH_RECOVERABLE occurred_at=2026-08-29T10:30:33.867Z
 // machine-contract: BOOTSTRAP_ANCHOR_WRITTEN -> SQLITE_COMMITTED advances both stores; a caught rollback restores the verified prior anchor, while a process death leaves only a fail-closed same-checkpoint recovery path.
+// information_uuid_v5=4d626686-1080-5bdd-99c8-0db45b28a429
+// event_uuid_v7=01a04d19-f9ee-7c91-8f32-123033bb1b34
+// state_transition=PATH_CHECK_THEN_OPEN -> DESCRIPTOR_VERIFIED_READ occurred_at=2026-08-29T10:40:43.886Z
+// machine-contract: owner.json is opened once with O_NOFOLLOW, classified from that descriptor, and read from that same descriptor; no path observation authorizes later owner bytes.
 import { createPublicKey } from "node:crypto";
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -138,23 +142,17 @@ function filesystemErrorCode(error: unknown): string | null {
 
 function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOwner | null {
   const ownerPath = join(lockPath, TRUST_ANCHOR_LOCK_OWNER_FILE);
-  try {
-    const ownerStats = lstatSync(ownerPath);
-    if (!ownerStats.isFile() || ownerStats.isSymbolicLink()) {
-      throw new Error("trusted device key anchor lock owner must be a regular file");
-    }
-  } catch (error) {
-    if (filesystemErrorCode(error) === "ENOENT") return null;
-    throw error;
-  }
   let descriptor: number | null = null;
   let ownerText: string;
   try {
-    descriptor = openSync(ownerPath, constants.O_RDONLY | constants.O_NOFOLLOW);
+    descriptor = openSync(ownerPath, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
     if (!fstatSync(descriptor).isFile()) throw new Error("trusted device key anchor lock owner must be a regular file");
     ownerText = readFileSync(descriptor, "utf8");
   } catch (error) {
     if (filesystemErrorCode(error) === "ENOENT") return null;
+    if (filesystemErrorCode(error) === "ELOOP") {
+      throw new Error("trusted device key anchor lock owner must be a regular file", { cause: error });
+    }
     throw error;
   } finally {
     if (descriptor !== null) closeSync(descriptor);

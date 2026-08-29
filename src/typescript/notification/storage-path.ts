@@ -8,7 +8,15 @@
 // event_uuid_v7=01a04d0d-7640-7679-856f-27997864efad
 // state_transition=REGULAR_PATH_WITH_UNCHECKED_LINK_COUNT -> SINGLE_LINK_FILE_BOUND_TO_OPEN_DESCRIPTOR occurred_at=2026-08-29T10:25:23.008Z
 // machine-contract: an existing notification file is accepted only when it is a regular file with exactly one link, and descriptor-based callers must prove the opened inode is still the reviewed path before I/O.
-import { closeSync, constants, fchmodSync, fstatSync, lstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
+// information_uuid_v5=43be5738-7807-5976-8f05-5d59070f309d
+// event_uuid_v7=01a04d1a-b461-7163-a623-c21c313cde60
+// state_transition=CODEQL_TEMP_PATH_AMBIGUOUS -> EXCLUSIVE_PRIVATE_STORAGE_CREATION_JUSTIFIED occurred_at=2026-08-29T10:39:50.881Z
+// machine-contract: creation occurs only after fixed-root containment and private-direct-child checks, with O_NOFOLLOW, O_CREAT, O_EXCL, mode 0600, and descriptor identity validation; the narrow CodeQL directive documents this exact false-positive boundary.
+// information_uuid_v5=628ac7e0-de86-53a4-8652-3b4071dee40d
+// event_uuid_v7=01a04d1a-b46a-7604-adfc-a673e5e8350a
+// state_transition=PATH_LSTAT_IDENTITY_CHECK -> TWO_OPEN_DESCRIPTORS_COMPARED occurred_at=2026-08-29T10:39:50.890Z
+// machine-contract: storage identity is decided only from two simultaneously open O_NOFOLLOW descriptors whose device, inode, regular-file type, and single-link count agree.
+import { closeSync, constants, fchmodSync, fstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
@@ -53,14 +61,30 @@ function requireSingleLinkRegularFile(stats: Stats, kind: NotificationStorageKin
   if (stats.nlink !== 1) throw new TypeError(`${kind} path must not have multiple hard links`);
 }
 
+function openExistingStorageDescriptor(path: string, kind: NotificationStorageKind): number | null {
+  try {
+    return openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return null;
+    if (code === "ELOOP") throw new TypeError(`${kind} path must not be a symbolic link`, { cause: error });
+    throw error;
+  }
+}
+
 export function assertNotificationStorageDescriptor(path: string, descriptor: number, kind: NotificationStorageKind): void {
-  const opened = fstatSync(descriptor);
-  requireSingleLinkRegularFile(opened, kind);
-  const named = lstatSync(path);
-  if (named.isSymbolicLink()) throw new TypeError(`${kind} path must not be a symbolic link`);
-  requireSingleLinkRegularFile(named, kind);
-  if (named.dev !== opened.dev || named.ino !== opened.ino) {
-    throw new TypeError(`${kind} path changed during open`);
+  const namedDescriptor = openExistingStorageDescriptor(path, kind);
+  if (namedDescriptor === null) throw new TypeError(`${kind} path changed during open`);
+  try {
+    const guarded = fstatSync(descriptor);
+    const named = fstatSync(namedDescriptor);
+    requireSingleLinkRegularFile(guarded, kind);
+    requireSingleLinkRegularFile(named, kind);
+    if (named.dev !== guarded.dev || named.ino !== guarded.ino) {
+      throw new TypeError(`${kind} path changed during open`);
+    }
+  } finally {
+    closeSync(namedDescriptor);
   }
 }
 
@@ -68,10 +92,12 @@ export function openNotificationStorageGuard(path: string, kind: NotificationSto
   let descriptor: number | null = null;
   try {
     try {
-      descriptor = openSync(path, constants.O_RDWR | constants.O_NOFOLLOW);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      // machine-contract: this path already passed fixed-root containment and private-parent checks; O_EXCL prevents pre-existing or raced aliases.
+      // codeql[js/insecure-temporary-file]
       descriptor = openSync(path, constants.O_RDWR | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      descriptor = openSync(path, constants.O_RDWR | constants.O_NOFOLLOW);
     }
     assertNotificationStorageDescriptor(path, descriptor, kind);
     return descriptor;
@@ -91,34 +117,31 @@ function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStor
     if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
   }
 
-  const before = lstatSync(storageRoot);
-  if (before.isSymbolicLink()) {
-    throw new TypeError(`${kind} storage root must not be a symbolic link`);
-  }
-  if (!before.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);
+  let guardDescriptor: number | null = null;
+  let namedDescriptor: number | null = null;
+  try {
+    const flags = constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW;
+    guardDescriptor = openSync(storageRoot, flags);
+    const guarded = fstatSync(guardDescriptor);
+    if (!guarded.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);
+    if (hasPosixPermissionSemantics(platform)) fchmodSync(guardDescriptor, 0o700);
 
-  if (hasPosixPermissionSemantics(platform)) {
-    let descriptor: number | null = null;
-    try {
-      descriptor = openSync(storageRoot, constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW);
-      const opened = fstatSync(descriptor);
-      if (!opened.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);
-      fchmodSync(descriptor, 0o700);
-      const after = lstatSync(storageRoot);
-      if (after.isSymbolicLink() || !after.isDirectory() || after.dev !== opened.dev || after.ino !== opened.ino) {
-        throw new TypeError(`${kind} storage root changed during validation`);
-      }
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "ELOOP") {
-        throw new TypeError(`${kind} storage root must not be a symbolic link`, { cause: error });
-      }
-      throw error;
-    } finally {
-      if (descriptor !== null) closeSync(descriptor);
+    const canonicalRoot = realpathSync(storageRoot);
+    namedDescriptor = openSync(storageRoot, flags);
+    const named = fstatSync(namedDescriptor);
+    if (!named.isDirectory() || named.dev !== guarded.dev || named.ino !== guarded.ino || named.nlink !== guarded.nlink) {
+      throw new TypeError(`${kind} storage root changed during validation`);
     }
+    return canonicalRoot;
+  } catch (error) {
+    if (["ELOOP", "ENOTDIR"].includes((error as NodeJS.ErrnoException).code ?? "")) {
+      throw new TypeError(`${kind} storage root must not be a symbolic link and must be a directory`, { cause: error });
+    }
+    throw error;
+  } finally {
+    if (namedDescriptor !== null) closeSync(namedDescriptor);
+    if (guardDescriptor !== null) closeSync(guardDescriptor);
   }
-
-  return realpathSync(storageRoot);
 }
 
 export function containedNotificationStoragePath(candidate: string, kind: NotificationStorageKind, options: StoragePathOptions = {}): string {
@@ -161,14 +184,11 @@ export function containedNotificationStoragePath(candidate: string, kind: Notifi
   requirePrivateDirectory(canonicalParent, kind, platform);
 
   const safePath = resolve(canonicalParent, filename);
+  const existingDescriptor = openExistingStorageDescriptor(safePath, kind);
   try {
-    const existing = lstatSync(safePath);
-    if (existing.isSymbolicLink()) {
-      throw new TypeError(`${kind} path must not be a symbolic link`);
-    }
-    requireSingleLinkRegularFile(existing, kind);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    if (existingDescriptor !== null) requireSingleLinkRegularFile(fstatSync(existingDescriptor), kind);
+  } finally {
+    if (existingDescriptor !== null) closeSync(existingDescriptor);
   }
   return safePath;
 }

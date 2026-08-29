@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04b95-2084-76ed-bebb-25d5c01be34b"
-observed_at: "2026-08-29T03:34:19.524Z"
-status: "worktree-candidate-quality-verified-prior-artifact-owner-only-live-verified"
+event_uuid_v7: "01a04ba1-cb16-76ef-bb2e-baa28d4670a6"
+observed_at: "2026-08-29T03:48:09.622Z"
+status: "owner-only-version-3-live-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -52,7 +52,7 @@ status: "worktree-candidate-quality-verified-prior-artifact-owner-only-live-veri
 
 ## 画面に出る検証証拠
 
-作業中の候補画面には、現在の端末内履歴から読む検証パネルがあります。同じ予約条件を表すUUIDv5、履歴件数、最新イベントのUUIDv7、SHA-256連鎖の先頭12文字と連鎖検査結果を表示します。ローカル実画面では履歴件数が`0 → 1 → 3 → 4`と進み、各段階で連鎖が有効であることを確認しました。この表示は端末内履歴の可視化であり、外部予約や公開配備の証明ではありません。
+現行の所有者限定画面には、端末内履歴から読む検証パネルがあります。同じ予約条件を表すUUIDv5、履歴件数、最新イベントのUUIDv7、SHA-256連鎖の先頭12文字と連鎖検査結果を表示します。ChatGPT Sites版3では、履歴4件、連鎖`Valid`、同じ確認番号の再読込復元を確認しました。この表示は端末内履歴の可視化であり、実在する外部予約の証明ではありません。
 
 ## 保存範囲
 
@@ -65,21 +65,21 @@ status: "worktree-candidate-quality-verified-prior-artifact-owner-only-live-veri
 | 言語変更でも同じUUIDv5 | 成功 | Node試験 |
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
-| WebMCP四機能の発見と実行 | 成功（前の公開成果物） | 所有者限定のChatGPT Sites版2。準備後に人間確認ボタンが有効になることも確認。作業中候補は含まない |
+| WebMCP四機能の発見と実行 | 成功（現行版） | 所有者限定のChatGPT Sites版3。準備後に人間確認ボタンが有効になり、確定、決済、取消の機能がないことを確認 |
 | 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites所有者限定実行 | 成功（前の公開成果物） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版2で四機能、2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認。作業中候補は未配備 |
-| 可視証拠パネル | 成功（作業中候補） | UUIDv5、最新UUIDv7、履歴件数、SHA-256連鎖をローカル実画面で確認 |
+| ChatGPT Sites所有者限定実行 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版3で四機能、2試行、1予約、処理開始1、同じ確認番号、取消プレビューの非変更、再読込復元、コンソール記録0件を確認 |
+| 可視証拠パネル | 成功（現行版） | 版3でUUIDv5、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を実画面確認 |
 | ChatGPT Sites一般公開、Vercel更新 | 未計測 | 別承認が必要 |
 
 機械可読の正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)です。
 
 ## 公開、動画、Devpostの現在状態
 
-- 可視証拠パネルを含む成果物は`WORKTREE_CANDIDATE`で、まだ公開版ではありません。所有者限定のChatGPT Sitesは一つ前の成果物を配信しており、この候補を保存、配備、再読込確認するまでは現行公開版とは呼びません。
+- 可視証拠パネルを含むコミット`5f603be2846735256ab1ef87fdb339af8f8d9676`は、ChatGPT Sites版3として所有者限定で配備済みです。保存、配備、四機能、人間確認境界、再送収束、取消プレビュー非変更、再読込復元を実URLで確認しました。一般公開は別承認が必要です。
 - HeyGenの既成音声は148.192625秒と実測済みです。英語と日本語の字幕はこの音声へ時間合わせ済みですが、完成映像への重なり、読みやすさ、総尺はまだ確認していません。
 - Devpost下書きは今回更新していません。この作業場所に`.devpost-hackathon-state.json`がないため、下書き更新の前提を満たしておらず、最終提出も行っていません。
 

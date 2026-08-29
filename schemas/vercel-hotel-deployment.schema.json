@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04be9-59bb-742c-b66f-6f7363138636 state_transition=HISTORICAL_NOTIFICATION_DEPLOYMENT_ONLY -> CURRENT_HOTEL_ARTIFACT_VERIFIED occurred_at=2026-08-29T05:06:19.195Z machine-contract=Vercel claims require provider readback remote file hashes bound to the unique deployment browser execution a post-ready one-hour lookback query and the separately restored notification deployment",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04bf8-0ad7-75c7-b142-83f5e76dfdc7 state_transition=HISTORICAL_NOTIFICATION_DEPLOYMENT_ONLY -> CURRENT_HOTEL_ARTIFACT_VERIFIED occurred_at=2026-08-29T05:22:22.039Z machine-contract=The provider unique URL identifies the deployment but requires authentication so anonymous remote file hashes and browser execution bind the same deployment through its public alias",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,

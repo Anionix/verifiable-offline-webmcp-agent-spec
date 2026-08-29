@@ -491,8 +491,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "e946f6841b56326e6b562dbca402c5f04bad04d332ff02fd49690a1e6a04f513",
-      "bytes": 25650,
+      "sha256": "8812c586f7df18a4162ee466f0d1b00901582e85ef0c34b74297ed3a41fa5c3b",
+      "bytes": 25603,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1783,8 +1783,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "dd40dee600d12d76baf946b92d0d4576801b6bca97d54e2ae9ceb819b654b0a0",
-      "bytes": 13926,
+      "sha256": "d525f5a1dd0359088cdb122313fcfbca9a365fc34c02c4b7efa4c754433724e8",
+      "bytes": 14136,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1802,8 +1802,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "64a853a8a9a1503ae6964e47790e012e6f0e0b2017386a966428014c2ecc6946",
-      "bytes": 8694,
+      "sha256": "d916c4facf0b1de1b34e7f27c5c337ce1e957f374d750f7b32fd69922d1c6ab3",
+      "bytes": 8655,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3703,8 +3703,8 @@
     },
     {
       "path": "metadata/hotel-booking-verification.json",
-      "sha256": "96a585076b4c9b5d479c7ec49ddc0ac750b6f9962c398a55fcda64a8021e9a75",
-      "bytes": 10673,
+      "sha256": "f8ad7beb30420c1fcfeedefda6e02d7a9add25d9e1381c22a4b79d388b7f6f66",
+      "bytes": 10811,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -3931,8 +3931,8 @@
     },
     {
       "path": "metadata/vercel-hotel-deployment.json",
-      "sha256": "1f9e939177f5a56f30585102d04c164c4f79b7da1f8255cb26db61607af1ea5e",
-      "bytes": 6718,
+      "sha256": "4445630ee110866da703484dca524a813a724db0932babe598397035cca24b53",
+      "bytes": 6723,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4634,8 +4634,8 @@
     },
     {
       "path": "schemas/vercel-hotel-deployment.schema.json",
-      "sha256": "ee63c0f70ae2702f8f356ea00fc97d3b56b1b542ee46f8ba4582788124771ffd",
-      "bytes": 13042,
+      "sha256": "6e8c058a3dc359690b1d0f2d6ef93cef6ec48a22970f4c60e5a1b2482af77f0e",
+      "bytes": 13027,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4881,8 +4881,8 @@
     },
     {
       "path": "scripts/validate_service_integrations.mjs",
-      "sha256": "fc7fb4aff1623ffa1de65d79e2c5a49551eb97b2a93d09300687399b4e7088e6",
-      "bytes": 34120,
+      "sha256": "70bb0a95851625ba4d54dadf45a67ba84507e3e3efedc109cbee2eed55de30b3",
+      "bytes": 34118,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

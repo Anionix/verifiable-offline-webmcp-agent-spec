@@ -118,17 +118,17 @@ const EXPECTED_VERCEL_ARTIFACT = {
 const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
-  deploymentId: "dpl_CyYYwVhbugwfLWTKwYhizsNmQ41h",
-  deployedSourceCommit: "5ce64bc9a814200467d384bba9d9de364df6fcf6",
-  uniqueUrl: "https://kyoto-booking-retry-proof-pascji816-aniotajp-1978s-projects.vercel.app",
+  deploymentId: "dpl_8mKodVM7QYitgsfcWdcdGtN6QvDu",
+  deployedSourceCommit: "34eaed29c397d383cff264a7b86a7ff72a28c083",
+  uniqueUrl: "https://kyoto-booking-retry-proof-iu3d76hg9-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
   state: "READY",
   target: "production",
   source: "cli",
-  createdAtUnixMs: 1787979546470,
-  createdAt: "2026-08-29T04:59:06.470Z",
-  readyAtUnixMs: 1787979557329,
-  readyAt: "2026-08-29T04:59:17.329Z",
+  createdAtUnixMs: 1787980561871,
+  createdAt: "2026-08-29T05:16:01.871Z",
+  readyAtUnixMs: 1787980570412,
+  readyAt: "2026-08-29T05:16:10.412Z",
 };
 
 const EXPECTED_REMOTE_ARTIFACTS = [
@@ -164,8 +164,8 @@ const EXPECTED_VERCEL_HTTP = {
 };
 
 const EXPECTED_VERCEL_BROWSER_FLOW = {
-  testedUrl: "https://kyoto-booking-retry-proof-pascji816-aniotajp-1978s-projects.vercel.app",
-  deploymentId: "dpl_CyYYwVhbugwfLWTKwYhizsNmQ41h",
+  testedUrl: "https://kyoto-booking-retry-proof.vercel.app",
+  deploymentId: "dpl_8mKodVM7QYitgsfcWdcdGtN6QvDu",
   stateSequence: ["PREPARED", "COMMITTED", "RETRY_RECOGNIZED"],
   humanConfirmationRequired: true,
   attempts: 2,
@@ -173,10 +173,10 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
   effectStarts: 1,
   confirmationNumber: "FKR-1852E0269A",
   reservationUuidV5: "4181074b-ce92-5b97-9eef-964a6f8f064b",
-  latestEventUuidV7: "01a04be3-c7cf-70bf-b76a-d870ee1ba2a3",
+  latestEventUuidV7: "01a04bf5-e9da-7e49-917c-d193c319ec01",
   auditEvents: 4,
   chainValid: true,
-  chainHeadPrefix: "58fcb989f045",
+  chainHeadPrefix: "52e25c1b0e27",
   reloadRestored: true,
   errors: 0,
   warnings: 0,
@@ -186,9 +186,9 @@ const EXPECTED_VERCEL_OBSERVABILITY = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   environment: "production",
   queryMode: "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY",
-  queryExecutedAt: "2026-08-29T05:06:19.195Z",
-  windowStart: "2026-08-29T04:06:19.195Z",
-  windowEnd: "2026-08-29T05:06:19.195Z",
+  queryExecutedAt: "2026-08-29T05:20:36.214Z",
+  windowStart: "2026-08-29T04:20:36.214Z",
+  windowEnd: "2026-08-29T05:20:36.214Z",
   queriedLevels: ["error", "warning"],
   runtimeErrorClusters: 0,
   matchingLogEntries: 0,
@@ -458,7 +458,7 @@ if (vercelDeployment && vercelDeploymentSchema) {
   record(isDeepStrictEqual(vercelDeployment.deployment, EXPECTED_VERCEL_DEPLOYMENT), "Vercel receipt project, deployment, URLs, state, source, or timestamps differ from provider readback");
   const remoteArtifacts = vercelDeployment.remoteArtifacts ?? {};
   record(remoteArtifacts.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel remote artifacts differ from the deployment ID");
-  record(remoteArtifacts.baseUrl === vercelDeployment.deployment?.uniqueUrl, "Vercel remote artifacts must use the unique deployment URL");
+  record(remoteArtifacts.baseUrl === vercelDeployment.deployment?.publicAlias, "Vercel remote artifacts must use the anonymously accessible public alias");
   const remoteArtifactRows = Array.isArray(remoteArtifacts.artifacts) ? remoteArtifacts.artifacts : [];
   record(
     isDeepStrictEqual(
@@ -486,7 +486,7 @@ if (vercelDeployment && vercelDeploymentSchema) {
   }
   record(isDeepStrictEqual(vercelDeployment.anonymousHttp, EXPECTED_VERCEL_HTTP), "Vercel receipt anonymous HTTP, browser request, or service-worker evidence differs from readback");
   record(isDeepStrictEqual(vercelDeployment.browserFlow, EXPECTED_VERCEL_BROWSER_FLOW), "Vercel receipt browser flow differs from the verified retry sequence and counters");
-  record(vercelDeployment.browserFlow?.testedUrl === vercelDeployment.deployment?.uniqueUrl, "Vercel browser flow was not tested on the unique deployment URL");
+  record(vercelDeployment.browserFlow?.testedUrl === vercelDeployment.deployment?.publicAlias, "Vercel browser flow was not tested on the anonymously accessible public alias");
   record(vercelDeployment.browserFlow?.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel browser flow deployment ID differs from provider readback");
   record(isDeepStrictEqual(vercelDeployment.postDeployObservability, EXPECTED_VERCEL_OBSERVABILITY), "Vercel receipt bounded post-deploy error scan differs from provider readback");
   record(

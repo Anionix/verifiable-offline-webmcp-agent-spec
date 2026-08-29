@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04be5-0163-7712-b7f0-d6bd1bf74767"
-observed_at: "2026-08-29T05:01:34.435Z"
-state_transition: "PUBLIC_SITE_VERSION_6_LIVE_VERIFIED -> SITES_AND_VERCEL_CURRENT_VERIFIED"
+event_uuid_v7: "01a04bf8-0ad7-70d1-885c-b2282c88ad31"
+observed_at: "2026-08-29T05:22:22.039Z"
+state_transition: "SITES_AND_VERCEL_CURRENT_VERIFIED -> VERSION_7_AND_VERCEL_RELEASE_READ_BACK"
 ---
 
 # サービス連携状態の読み方
@@ -39,11 +39,11 @@ state_transition: "PUBLIC_SITE_VERSION_6_LIVE_VERIFIED -> SITES_AND_VERCEL_CURRE
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日5時1分34秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日5時22分22秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の版6を実行済み、同じ機能の版5を画面録画済み |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の版7を実行済み、同じ機能の版5を画面録画済み |
 | Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 予備公開先。ホテル専用プロジェクトを匿名実行済み |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -54,9 +54,9 @@ state_transition: "PUBLIC_SITE_VERSION_6_LIVE_VERIFIED -> SITES_AND_VERCEL_CURRE
 
 DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未定`、説明・動画URLが空、最終提出前であることを確認しました。名称は利用者が決めるため変更していません。
 
-ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`ef35bdec624e660db0cd1849fb3be3e33a6e0cd6`を版6として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版6で未ログイン表示、通常再送との比較、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の実画面部分は、同じ機能要約値を持つ直前の公開版5を収録しています。
+ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`を版7として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版7で未ログイン表示、現在のSites・Vercel状態表、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の実画面部分は、同じ機能要約値を持つ版5を収録しています。
 
-Vercelでは、確定コミット`5ce64bc9a814200467d384bba9d9de364df6fcf6`をホテル専用プロジェクトへ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名200応答を確認しました。実ブラウザーで`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回、同じ確認番号、再読込復元、履歴4件、SHA-256連鎖`Valid`、ブラウザーの誤り・警告0件を確認しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
+Vercelでは、Sites版7と同じ確定コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`をホテル専用プロジェクトへ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名200応答を確認しました。新しいブラウザー保存領域で`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回、同じ確認番号、再読込復元、履歴4件、SHA-256連鎖`Valid`、ブラウザーの誤り・警告0件を確認しました。さらに公開別名から五ファイルをキャッシュ回避で読み戻し、端末内の確定構築物と一バイトずつ一致する要約値を記録しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
 ホテル版は新しいVercelプロジェクトへ分離しました。既存の通知実演プロジェクトは元の配置`8e0191c3a9ea7b1e64a954cc20fd8e5e357f34d2`へ戻し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)を維持しています。両プロジェクトともGit自動配置ではなく、確定コミットだけを含む隔離作業場所から手動配置しました。
 

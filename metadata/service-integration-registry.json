@@ -1,353 +1,414 @@
 {
   "$schema": "../schemas/service-integration-registry.schema.json",
+  "version": "1.0.0",
   "identity": {
-    "informationUuidV5": "88f53c77-5b36-5dd4-9e32-6ac5d8668626",
-    "eventUuidV7": "01a04a91-72e3-77a1-934f-5d3b5f2edaef"
+    "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
+    "evidenceEventId": "01a04b38-0e40-7595-81ae-fd2db303c4ae",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "observedAt": "2026-08-29T01:52:40.000Z"
   },
-  "temporal": {
-    "observedAt": "2026-08-28T22:50:41.000Z",
-    "epochMs": 1787957441000,
-    "timeZone": "UTC"
-  },
-  "stateTransition": "RESOURCE_REVIEWED -> INTEGRATION_CATALOGUED",
-  "commonArtifact": {
-    "buildCommand": "npm run build:web",
-    "outputDirectory": "dist",
-    "sameOriginApiRequired": false,
-    "dynamicBackendIncluded": false,
-    "offlineAfterFirstVisit": true,
-    "toolName": "notify_once"
-  },
-  "summary": {
-    "totalServices": 8,
-    "statusCounts": {
-      "VERIFIED": 0,
-      "CONFIGURED": 4,
-      "INCONCLUSIVE": 2,
-      "BOUNDARY_ONLY": 1,
-      "RESOURCE_CONFIRMED": 1
-    }
-  },
-  "localVerification": {
-    "identity": {
-      "informationUuidV5": "f7bf74af-23e0-5f55-aed0-b47702251250",
-      "eventUuidV7": "01a04aa6-0a41-749e-b9d0-dd06d3e9c665"
-    },
-    "observedAt": "2026-08-28T23:13:10.721Z",
-    "stateTransition": "INTEGRATION_CATALOGUED -> LOCAL_DUPLICATE_CHECK_VERIFIED",
-    "environment": "Codex in-app browser at http://127.0.0.1:4178",
-    "toolName": "notify_once",
-    "toolCalls": 2,
-    "logicalOperationId": "browser-double-send-001",
-    "intentId": "25a2b087-84df-545f-b744-b177d12dab05",
-    "payloadDigest": "5a9e2240c5ecadd41476b3d130000f3badedb20a2b5150363db3b3a63b0e5fd6",
-    "sameIntent": true,
-    "controlState": "DRY_RUN",
-    "effectState": "NOT_STARTED",
-    "effectStartCount": 0,
-    "approvalButtonClicks": 0,
-    "serviceCardCount": 8,
-    "viewportWidth": 320,
-    "horizontalOverflow": false,
-    "browserWarningErrorCount": 0,
-    "pageModelContext": "ABSENT",
-    "nativeWebMcpConformance": "INCONCLUSIVE",
-    "unexpectedApiStatus": 404
+  "stateTransition": {
+    "from": "DEVPOST_DRAFT_READ",
+    "to": "APPROVAL_GATES_ENFORCED",
+    "eventId": "01a04b38-0e40-7595-81ae-fd2db303c4ae",
+    "occurredAt": "2026-08-29T01:52:40.000Z",
+    "machineContract": "External publication, final submission, and commerce writes require the exact recorded authority state for the named action."
   },
   "services": [
     {
-      "serviceId": "openai",
-      "displayName": "OpenAI",
-      "identity": {
-        "informationUuidV5": "72f3dcc6-f038-5723-96c4-2f758d5f926d",
-        "eventUuidV7": "01a04a91-7323-711e-8251-75caf8e23e62"
+      "serviceId": "chatgpt-sites",
+      "displayName": "ChatGPT Sites",
+      "integrationSurfaceId": "58dcb1cc-e3a8-5329-836d-11299b1ee1e7",
+      "evidenceEventId": "01a04b2c-f2e7-7084-845b-2db465ecd88a",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "sites@openai-bundled",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "sites@openai-bundled",
+        "localPluginVersion": "0.1.46",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 23,
+        "restartState": "NOT_REQUIRED"
       },
-      "status": "INCONCLUSIVE",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: after a response disappears, an agent repeats the same notification or request and the recipient receives it twice.",
-      "preventedOutcome": "One operation identity can reduce recipient confusion, trust loss, and cancellation work.",
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
+        {
+          "action": "OWNER_ONLY_DEPLOYMENT",
+          "state": "AUTHORIZED_BY_PLAN"
+        },
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "REQUIRES_SEPARATE_APPROVAL"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_sites",
+        "WRITE:create_site"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "CURRENT_ARTIFACT_AWAITS_PRIVATE_DEPLOYMENT",
       "roles": [
-        "ChatGPT Sites publication target",
-        "ChatGPT desktop site-tool runtime"
+        "Primary publication target for the hotel duplicate-booking demo.",
+        "Package the shared client with the ChatGPT Sites worker entry point."
+      ],
+      "limitations": [
+        "The current hotel artifact has not been deployed, even privately.",
+        "Authentication proves the named site operations only; it does not prove publication."
       ],
       "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://help.openai.com/en/articles/20001423-using-site-tools-in-the-chatgpt-desktop-app",
         "https://learn.chatgpt.com/docs/sites"
-      ],
-      "artifacts": [
-        "examples/vercel-notification-demo/index.html",
-        "examples/vercel-notification-demo/webmcp-adapter.js"
-      ],
-      "evidence": [
-        {
-          "kind": "RUNTIME_OBSERVATION",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The portable static artifact is ready, but publication through ChatGPT Sites and execution inside the ChatGPT desktop app were not measured.",
-          "artifact": "examples/vercel-notification-demo/webmcp-adapter.js"
-        }
-      ],
-      "limitations": [
-        "No ChatGPT Sites publication receipt or ChatGPT desktop runtime observation is recorded."
-      ],
-      "approvalRequired": true,
-      "nextAction": "After explicit approval, publish the same static artifact with ChatGPT Sites and record a desktop runtime observation."
-    },
-    {
-      "serviceId": "cloudflare",
-      "displayName": "Cloudflare",
-      "identity": {
-        "informationUuidV5": "ff1096a4-9d71-5ad1-8535-2bd1caa5ee83",
-        "eventUuidV7": "01a04a91-735e-7624-88c5-f780ea374674"
-      },
-      "status": "CONFIGURED",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: after a mobile-network switch, an action from a Cloudflare-hosted page is retried and the same alert or webhook arrives twice.",
-      "preventedOutcome": "One effect ledger can reduce duplicate downstream work, cost, and cleanup.",
-      "roles": [
-        "Workers Static Assets host",
-        "Browser Run testing lane"
-      ],
-      "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://developers.cloudflare.com/workers/static-assets/get-started/",
-        "https://developers.cloudflare.com/browser-run/features/webmcp/"
-      ],
-      "artifacts": [
-        "wrangler.jsonc"
-      ],
-      "evidence": [
-        {
-          "kind": "CONFIGURATION",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The checked-in Workers Static Assets configuration points at the portable dist directory.",
-          "artifact": "wrangler.jsonc"
-        }
-      ],
-      "limitations": [
-        "Cloudflare publication and Browser Run execution are not measured."
-      ],
-      "approvalRequired": true,
-      "nextAction": "After explicit approval and account selection, deploy the static artifact and record the public response and Browser Run result."
+      ]
     },
     {
       "serviceId": "vercel",
       "displayName": "Vercel",
-      "identity": {
-        "informationUuidV5": "4d851e24-7abb-5e4a-b85e-30a86de728b1",
-        "eventUuidV7": "01a04a91-739e-7ae7-9c91-f44b6aa3a79d"
+      "integrationSurfaceId": "55a56d54-713f-524f-98de-ac3da90e3310",
+      "evidenceEventId": "01a04b2c-f2e7-7999-a2a0-d4ebf8831950",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "vercel@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "vercel@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 24,
+        "restartState": "NOT_REQUIRED"
       },
-      "status": "CONFIGURED",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: a double click or page reload on a Vercel-hosted page sends the same notification twice.",
-      "preventedOutcome": "Blocking a repeated effect can reduce confusion and preserve user trust.",
-      "roles": [
-        "Live baseline static host with a pending update"
-      ],
-      "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://vercel.com/docs/deployments/overview"
-      ],
-      "artifacts": [
-        "vercel.json"
-      ],
-      "evidence": [
+      "authenticationState": "CONFIRMED",
+      "publicationState": "BASELINE_ONLY",
+      "runtimeState": "BASELINE_ONLY",
+      "approvalGates": [
         {
-          "kind": "DEPLOYMENT",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The previous production deployment was observed ready; the current registry-bearing build is locally verified but has not been redeployed.",
-          "url": "https://verifiable-offline-webmcp-agent-spe.vercel.app",
-          "artifact": "vercel.json"
+          "action": "PRODUCTION_DEPLOYMENT",
+          "state": "REQUIRES_SEPARATE_APPROVAL"
         }
       ],
-      "limitations": [
-        "The live URL is baseline evidence for the previous build, not proof that the current registry-bearing build is deployed."
+      "verifiedAuthOperations": [
+        "READ:list_teams"
       ],
-      "approvalRequired": true,
-      "nextAction": "After explicit approval, deploy the current build and repeat response, browser-state, header, and artifact-hash checks.",
-      "liveUrl": "https://verifiable-offline-webmcp-agent-spe.vercel.app",
-      "deploymentId": "dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE"
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "HISTORICAL_DEPLOYMENT_ONLY",
+      "roles": [
+        "Backup public host for the same static client artifact.",
+        "Provide an anonymous-access fallback for judges."
+      ],
+      "limitations": [
+        "Only an older notification-demo deployment was observed; it does not identify the current hotel artifact.",
+        "An anonymous 200 response for the current artifact has not been verified."
+      ],
+      "sources": [
+        "https://vercel.com/docs/deployments"
+      ]
     },
     {
-      "serviceId": "shopify",
-      "displayName": "Shopify",
-      "identity": {
-        "informationUuidV5": "40bcf448-d2a0-51b2-9e10-0eaac034f632",
-        "eventUuidV7": "01a04a91-73d9-7486-b0c0-265d5854d543"
+      "serviceId": "cloudflare",
+      "displayName": "Cloudflare",
+      "integrationSurfaceId": "09ea90ae-2124-5a5b-8785-32207039c516",
+      "evidenceEventId": "01a04b2c-f2e7-7227-a2b9-f479f2462acf",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "cloudflare@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "cloudflare@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 3,
+        "restartState": "NOT_REQUIRED"
       },
-      "status": "BOUNDARY_ONLY",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: the same cart add runs twice, leaving two items when the shopper intended one.",
-      "preventedOutcome": "A single-operation guard can reduce cart correction, excess cost, refunds, and support work.",
-      "roles": [
-        "Commerce-tool integration boundary"
-      ],
-      "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://shopify.dev/docs/api/web-mcp"
-      ],
-      "artifacts": [
-        "schemas/notification-tool-input.schema.json"
-      ],
-      "evidence": [
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
         {
-          "kind": "BOUNDARY",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The current notify_once journey has no store, catalog, cart, or checkout authority and therefore does not claim a Shopify integration.",
-          "artifact": "schemas/notification-tool-input.schema.json"
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
         }
       ],
-      "limitations": [
-        "No Shopify store authorization, catalog read, cart mutation, or checkout action is included."
+      "verifiedAuthOperations": [
+        "READ:get_account"
       ],
-      "approvalRequired": true,
-      "nextAction": "Define a separate commerce journey, least-authority store scope, and dry-run contract before adding any Shopify tool."
-    },
-    {
-      "serviceId": "google-chrome",
-      "displayName": "Google Chrome",
-      "identity": {
-        "informationUuidV5": "ea0a2054-55b8-5745-bf4e-5a810d5b1794",
-        "eventUuidV7": "01a04a91-741e-7abe-be36-24bb86ccb666"
-      },
-      "status": "INCONCLUSIVE",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: a browser agent retry submits the same form or notification twice.",
-      "preventedOutcome": "A visible effect count can reduce duplicate requests, confusion, and correction work.",
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "CURRENT_ARTIFACT_NOT_DEPLOYED",
       "roles": [
-        "Native WebMCP runtime",
-        "WebMCP evaluation environment"
+        "Supply the worker-compatible build format used by ChatGPT Sites.",
+        "Remain a possible future publication host."
+      ],
+      "limitations": [
+        "No current hotel artifact has been deployed to a Cloudflare account.",
+        "The account read proves authentication only; no hotel artifact was deployed."
       ],
       "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://developer.chrome.com/docs/ai/webmcp"
-      ],
-      "artifacts": [
-        "examples/vercel-notification-demo/webmcp-adapter.js",
-        "examples/vercel-notification-demo/webmcp-evals.json",
-        "metadata/notification-demo-live-verification.json"
-      ],
-      "evidence": [
-        {
-          "kind": "RUNTIME_OBSERVATION",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The tested browser did not expose document.modelContext, so native WebMCP conformance remains inconclusive.",
-          "artifact": "metadata/notification-demo-live-verification.json"
-        }
-      ],
-      "limitations": [
-        "Adapter and evaluation files are present, but a supported native runtime result is not recorded."
-      ],
-      "approvalRequired": true,
-      "nextAction": "Run the public artifact in a supported Chrome WebMCP environment and preserve both selection and deterministic contract results."
-    },
-    {
-      "serviceId": "render",
-      "displayName": "Render",
-      "identity": {
-        "informationUuidV5": "917ce3a1-7409-5451-9c43-f8219bffed37",
-        "eventUuidV7": "01a04a91-745a-79bf-8ae3-5aa95e8f3651"
-      },
-      "status": "CONFIGURED",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: a future workflow restarts after work finishes but before acknowledgement, repeating the same email or job.",
-      "preventedOutcome": "A durable operation identity can reduce repeated work, cost, and recipient distrust.",
-      "roles": [
-        "Static host"
-      ],
-      "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://render.com/docs/static-sites",
-        "https://render.com/docs/workflows"
-      ],
-      "artifacts": [
-        "render.yaml"
-      ],
-      "evidence": [
-        {
-          "kind": "CONFIGURATION",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The checked-in Render static-site configuration builds and publishes the portable dist directory.",
-          "artifact": "render.yaml"
-        }
-      ],
-      "limitations": [
-        "Render publication and public runtime behavior are not measured."
-      ],
-      "approvalRequired": true,
-      "nextAction": "After explicit approval and account selection, create the static site and record the public response and headers."
+        "https://developers.cloudflare.com/workers/vite-plugin/"
+      ]
     },
     {
       "serviceId": "netlify",
       "displayName": "Netlify",
-      "identity": {
-        "informationUuidV5": "d692a11f-b8f1-5fee-b0ca-f41e8a9a3f3b",
-        "eventUuidV7": "01a04a91-7493-7fd3-986d-7544bb6793de"
+      "integrationSurfaceId": "51b6046b-7f07-5b65-8540-d485c604dd73",
+      "evidenceEventId": "01a04b2c-f2e7-7ecb-b42a-80409928ec15",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "netlify@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "netlify@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 9,
+        "restartState": "REQUIRED_AFTER_INSTALL"
       },
-      "status": "CONFIGURED",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: on a Netlify-hosted form, a weak connection causes the same booking or contact request to be submitted twice.",
-      "preventedOutcome": "Duplicate suppression can reduce scheduling conflicts, follow-up work, and confusion.",
-      "roles": [
-        "Static host"
-      ],
-      "sources": [
-        "https://webmcp.devpost.com/resources",
-        "https://docs.netlify.com/build/configure-builds/file-based-configuration/",
-        "https://docs.netlify.com/manage/forms/setup/"
-      ],
-      "artifacts": [
-        "netlify.toml"
-      ],
-      "evidence": [
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
         {
-          "kind": "CONFIGURATION",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The checked-in Netlify configuration builds and publishes the portable dist directory.",
-          "artifact": "netlify.toml"
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
         }
       ],
-      "limitations": [
-        "Netlify publication and public runtime behavior are not measured."
+      "verifiedAuthOperations": [
+        "READ:get_projects"
       ],
-      "approvalRequired": true,
-      "nextAction": "After explicit approval and account selection, deploy the static site and record the public response and headers."
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "STATIC_CONFIGURATION_ONLY",
+      "roles": [
+        "Check that the portable static client can be configured for Netlify."
+      ],
+      "limitations": [
+        "Only the repository publish path and bounded configuration syntax were checked; no provider-side configuration validation was run.",
+        "No Netlify deployment or runtime check was performed; external-service verification remains NOT_RUN."
+      ],
+      "sources": [
+        "https://docs.netlify.com/deploy/create-deploys/"
+      ]
+    },
+    {
+      "serviceId": "render",
+      "displayName": "Render",
+      "integrationSurfaceId": "8b31e6c4-5e59-5c7a-9bb4-46e98effe450",
+      "evidenceEventId": "01a04b2c-f2e7-71ad-98a1-3c3b3a8886d2",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "app-6a624c56bfe081918f7544f7d58f6faf@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "render@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 22,
+        "restartState": "REQUIRED_AFTER_INSTALL"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_workspaces"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "STATIC_CONFIGURATION_ONLY",
+      "roles": [
+        "Check that the portable static client can be configured as a Render static site."
+      ],
+      "limitations": [
+        "Only the repository publish path and bounded configuration syntax were checked; no provider-side configuration validation was run.",
+        "No Render deployment or runtime check was performed; external-service verification remains NOT_RUN, and no credential value is stored."
+      ],
+      "sources": [
+        "https://render.com/docs/static-sites"
+      ]
+    },
+    {
+      "serviceId": "shopify",
+      "displayName": "Shopify",
+      "integrationSurfaceId": "8c25b751-b30b-5b44-9af6-be825955f1e6",
+      "evidenceEventId": "01a04b2c-f2e7-7d78-83c2-4fe0cb2811db",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "shopify@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "shopify@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 27,
+        "restartState": "REQUIRED_AFTER_INSTALL"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_APPLICABLE",
+      "runtimeState": "NOT_APPLICABLE",
+      "approvalGates": [
+        {
+          "action": "COMMERCE_WRITE",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:get_shop_info"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "HOTEL_BOOKING_OUTSIDE_COMMERCE_SCOPE",
+      "roles": [
+        "Explain the boundary between hotel booking and Shopify commerce tools."
+      ],
+      "limitations": [
+        "The hotel demo does not call Shopify catalog, cart, checkout, or order-history tools.",
+        "No hotel booking capability is claimed for Shopify WebMCP."
+      ],
+      "sources": [
+        "https://shopify.dev/docs/api/web-mcp"
+      ]
+    },
+    {
+      "serviceId": "google-chrome",
+      "displayName": "Google Chrome",
+      "integrationSurfaceId": "7968f6bc-3ff9-5700-be56-7e1e04c3392d",
+      "evidenceEventId": "01a04b2c-f2e7-72db-8c5c-9e594476ebf6",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "chrome@openai-bundled",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "chrome@openai-bundled",
+        "localPluginVersion": "26.825.32147",
+        "taskAttachmentState": "NOT_ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 1,
+        "restartState": "NOT_REQUIRED"
+      },
+      "authenticationState": "NOT_APPLICABLE",
+      "publicationState": "NOT_APPLICABLE",
+      "runtimeState": "INCONCLUSIVE",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "NOT_APPLICABLE"
+        }
+      ],
+      "verifiedAuthOperations": [],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "NATIVE_WEBMCP_RUNTIME_NOT_EXPOSED",
+      "roles": [
+        "Inspect WebMCP tool discovery, execution, and history in a browser."
+      ],
+      "limitations": [
+        "The Chrome page flow preserved one booking through prepare, commit, retry, and reload.",
+        "The native WebMCP runtime was not exposed in this Chrome session, so tool discovery remains inconclusive."
+      ],
+      "sources": [
+        "https://developer.chrome.com/docs/ai/webmcp",
+        "https://developer.chrome.com/docs/devtools/application/webmcp"
+      ]
     },
     {
       "serviceId": "devpost",
       "displayName": "Devpost",
-      "identity": {
-        "informationUuidV5": "5e517bb6-5f1c-596c-b789-a8db1c321a57",
-        "eventUuidV7": "01a04a91-74d2-75a5-a2e4-4d8c1f27fb66"
+      "integrationSurfaceId": "3e8ffb12-0a3e-5c18-9dc4-81d59d91ef48",
+      "evidenceEventId": "01a04b30-112e-7687-a596-0f32ac6721f5",
+      "observedAt": "2026-08-29T01:43:56.462Z",
+      "pluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "NOT_INSTALLED",
+        "localPluginRef": null,
+        "localPluginVersion": null,
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 21,
+        "restartState": "NOT_APPLICABLE"
       },
-      "status": "RESOURCE_CONFIRMED",
-      "scenarioStatus": "ILLUSTRATIVE_NOT_OBSERVED",
-      "duplicateRisk": "Illustrative, not observed: a team's submission helper repeats a version-update notice, leaving the latest version unclear.",
-      "preventedOutcome": "One ordered update can reduce team and reviewer confusion and trust loss.",
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_APPLICABLE",
+      "approvalGates": [
+        {
+          "action": "DRAFT_UPDATE",
+          "state": "AUTHORIZED_BY_PLAN"
+        },
+        {
+          "action": "FINAL_SUBMISSION",
+          "state": "REQUIRES_SEPARATE_APPROVAL"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_my_projects",
+        "READ:get_project"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "SUBMISSION_DRAFT_READ_NOT_PUBLISHED",
       "roles": [
-        "Official resource authority",
-        "Hackathon submission platform"
+        "Provide the challenge resources and hold the submission draft.",
+        "Receive final public links only after separate approval."
+      ],
+      "limitations": [
+        "The existing WebMCP Challenge draft was read and its undecided name remains unchanged; it is not a final submitted project.",
+        "No draft write or final submission is claimed by this repository record."
       ],
       "sources": [
         "https://webmcp.devpost.com/resources"
-      ],
-      "artifacts": [
-        "docs/22-service-integrations.ja.md",
-        "metadata/service-integration-registry.json"
-      ],
-      "evidence": [
-        {
-          "kind": "RESOURCE",
-          "observedAt": "2026-08-28T22:50:41.000Z",
-          "statement": "The eight service categories in this registry were taken from the official hackathon Resources page.",
-          "url": "https://webmcp.devpost.com/resources"
-        }
-      ],
-      "limitations": [
-        "Resource confirmation does not prove project registration, submission completion, or judging acceptance."
-      ],
-      "approvalRequired": true,
-      "nextAction": "After the implementation evidence is complete, prepare the public repository, hosted project, and short demonstration video for a separate submission approval."
+      ]
     }
-  ]
+  ],
+  "summary": {
+    "totalServices": 8,
+    "pluginState": {
+      "ACTIVE": 8,
+      "INSTALLED_INACTIVE": 0,
+      "NOT_INSTALLED": 0,
+      "NOT_APPLICABLE": 0
+    },
+    "authenticationState": {
+      "CONFIRMED": 7,
+      "UNVERIFIED": 0,
+      "REJECTED": 0,
+      "NOT_APPLICABLE": 1
+    },
+    "publicationState": {
+      "CURRENT_ARTIFACT": 0,
+      "BASELINE_ONLY": 1,
+      "NOT_PUBLISHED": 5,
+      "UNVERIFIED": 0,
+      "NOT_APPLICABLE": 2
+    },
+    "runtimeState": {
+      "CURRENT_ARTIFACT_VERIFIED": 0,
+      "BASELINE_ONLY": 1,
+      "INCONCLUSIVE": 1,
+      "NOT_RUN": 4,
+      "NOT_APPLICABLE": 2
+    }
+  },
+  "artifacts": {
+    "required": [
+      "metadata/service-integration-registry.json",
+      "schemas/service-integration-registry.schema.json",
+      "scripts/validate_service_integrations.mjs",
+      "docs/22-service-integrations.ja.md"
+    ],
+    "optionalClientCopy": "dist/client/service-integrations.json"
+  }
 }

@@ -5,11 +5,22 @@
   "type": "module",
   "description": "Verifiable Offline WebMCP Agent Architecture",
   "scripts": {
+    "dev": "vite",
     "build:web": "node scripts/build_web_site.mjs",
     "build:vercel": "node scripts/build_vercel_site.mjs",
+    "validate:hotel": "npm run build:web && npm run validate:hotel:portable && npm run validate:hotel:sites",
+    "validate:hotel:portable": "node scripts/validate_hotel_portable_validator.mjs",
+    "validate:hotel:sites": "node scripts/validate_hotel_sites_validator.mjs",
     "validate:integrations": "npm run build:web && node scripts/validate_service_integrations.mjs",
     "validate:vercel": "npm run build:web && node scripts/validate_vercel_site.mjs && node scripts/validate_service_integrations.mjs",
     "validate": "make validate",
     "test": "make validate"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@openai/sites-vite-plugin": "0.2.0",
+    "fake-indexeddb": "6.2.4",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
   }
 }

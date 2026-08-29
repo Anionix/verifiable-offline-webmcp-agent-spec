@@ -13,3 +13,4 @@ dist/
 .tlc/
 states/
 .playwright-mcp/
+.wrangler/

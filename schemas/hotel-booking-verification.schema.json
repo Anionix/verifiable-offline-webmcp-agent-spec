@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04b41-fd38-7ede-968b-57d58df07311 state_transition=ONE_AMBIGUOUS_DIGEST -> THREE_SCOPED_DIGESTS occurred_at=2026-08-29T02:03:31.000Z machine-contract=functional client full client and full Sites package receipts have explicit roots exclusions ordering and separators",
+  "title": "Hotel booking demo verification record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "observedAt", "sourceCommit", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "checks", "designFidelity"],
+  "properties": {
+    "$schema": { "const": "../schemas/hotel-booking-verification.schema.json" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
+    "artifactDigest": { "$ref": "#/$defs/sha256" },
+    "artifactDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist/client",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": [".assetsignore", "service-integrations.json"]
+      }
+    },
+    "fullClientArtifactDigest": { "$ref": "#/$defs/sha256" },
+    "fullClientArtifactDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist/client",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": []
+      }
+    },
+    "fullSitesPackageDigest": { "$ref": "#/$defs/sha256" },
+    "fullSitesPackageDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": []
+      }
+    },
+    "stateTransition": { "type": "string", "minLength": 3 },
+    "scope": { "type": "string", "minLength": 3 },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["checkId", "name", "status", "evidence"],
+        "properties": {
+          "checkId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+          "name": { "type": "string", "minLength": 3 },
+          "status": { "enum": ["PASS", "FAIL", "UNMEASURED", "INCONCLUSIVE"] },
+          "evidence": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "designFidelity": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pointId", "concept", "implementation", "status"],
+        "properties": {
+          "pointId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+          "concept": { "type": "string", "minLength": 3 },
+          "implementation": { "type": "string", "minLength": 3 },
+          "status": { "enum": ["MATCHED", "INTENTIONAL_DEVIATION"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    }
+  }
+}

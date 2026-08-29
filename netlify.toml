@@ -1,9 +1,10 @@
 # information_uuid_v5=90befe4d-8827-5dd7-b7d2-c482e737243b
 # event_uuid_v7=01a04a96-683f-7903-ac62-5457271bf17e state_transition=PORTABLE_STATIC_BUILD -> NETLIFY_STATIC_SITE_READY occurred_at=2026-08-28T22:56:06Z
-# machine-contract: publish only dist; unmatched paths stay missing and must never be rewritten to index.html.
+# event_uuid_v7=01a04bd0-b895-7cb3-b913-666439176aca state_transition=PORTABLE_STATIC_BUILD -> HOTEL_CLIENT_BUILD occurred_at=2026-08-29T01:00:00Z
+# machine-contract: publish only dist/client; unmatched paths stay missing and must never be rewritten to index.html.
 [build]
 command = "npm run build:web"
-publish = "dist"
+publish = "dist/client"
 
 [[headers]]
 for = "/*"

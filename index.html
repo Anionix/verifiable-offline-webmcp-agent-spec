@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f4ee" />
+    <meta
+      name="description"
+      content="A fictional, device-local hotel booking demo that recognizes retries instead of creating duplicate bookings."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Did my hotel booking go through?</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#booking-form">Skip to booking details</a>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Fictional Kyoto booking · WebMCP demo</p>
+          <h1 id="page-title">Did my hotel booking go through?</h1>
+          <p class="lead">
+            The booking reached this device, but the success response disappeared.
+            A safe retry finds the first result instead of making a second booking.
+          </p>
+          <p class="jp" lang="ja">
+            予約は端末に届いたのに、成功画面だけ消えた——そんな再送を、二重予約にしないデモです。
+          </p>
+        </div>
+        <div class="status-card" aria-labelledby="current-status-title">
+          <div class="status-heading">
+            <p id="current-status-title">Current status</p>
+            <span id="connection-state" aria-label="Browser connection state">Online</span>
+          </div>
+          <p class="state-name" id="state-name">EMPTY</p>
+          <p id="state-explanation">No simulated booking has been prepared on this device.</p>
+          <dl class="status-metrics">
+            <div><dt>Attempts</dt><dd id="attempt-count">0</dd></div>
+            <div><dt>Bookings</dt><dd id="booking-count">0</dd></div>
+            <div><dt>Effect starts</dt><dd id="effect-count">0</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Booking demo">
+        <form id="booking-form" class="booking-panel">
+          <div class="section-heading">
+            <div>
+              <p class="step-label">01 · Booking details</p>
+              <h2>Fictional Kyoto Ryokan</h2>
+            </div>
+            <p class="plan-name">Standard Flexible</p>
+          </div>
+
+          <div class="date-grid">
+            <label>
+              <span>Check in</span>
+              <input id="check-in" name="checkInDate" type="date" required />
+            </label>
+            <label>
+              <span>Check out</span>
+              <input id="check-out" name="checkOutDate" type="date" required />
+            </label>
+          </div>
+
+          <div class="guest-grid">
+            <label>
+              <span>Adults</span>
+              <select id="adults" name="adults">
+                <option value="1">1 adult</option>
+                <option value="2" selected>2 adults</option>
+                <option value="3">3 adults</option>
+                <option value="4">4 adults</option>
+              </select>
+            </label>
+            <label>
+              <span>Rooms</span>
+              <select id="rooms" name="rooms">
+                <option value="1" selected>1 room</option>
+                <option value="2">2 rooms</option>
+              </select>
+            </label>
+            <label>
+              <span>Support language</span>
+              <select id="preferred-language" name="preferredLanguage">
+                <option value="en" selected>English</option>
+                <option value="ja">日本語</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="price-row" aria-live="polite">
+            <div>
+              <span>Room rate</span>
+              <strong>¥12,000</strong>
+              <span>per room / night</span>
+            </div>
+            <div class="price-total">
+              <span>Simulated total</span>
+              <strong id="price-total">—</strong>
+            </div>
+          </div>
+
+          <div class="policy-note">
+            <strong>Cancellation preview</strong>
+            <p id="cancellation-copy">
+              Free until 72 hours before 3:00 PM on check-in day. Later: one night per room.
+            </p>
+          </div>
+
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+          <div class="actions">
+            <button id="prepare" class="button button-secondary" type="submit">
+              1. Check and prepare
+            </button>
+            <button id="approve" class="button button-primary" type="button" disabled>
+              2. Confirm booking — human action only
+            </button>
+          </div>
+          <p class="approval-note">
+            Preparation expires after 120 seconds. Confirmation, payment, and cancellation are never exposed as WebMCP tools.
+          </p>
+        </form>
+
+        <aside class="evidence-panel" aria-labelledby="evidence-title">
+          <p class="step-label">02 · Lost response</p>
+          <h2 id="evidence-title">Retry without guessing</h2>
+          <div id="lost-response" class="lost-response" hidden>
+            <span aria-hidden="true">!</span>
+            <p><strong>Success response lost.</strong> The simulated booking remains on this device.</p>
+          </div>
+          <button id="retry" class="button button-retry" type="button" disabled>
+            Retry the same booking
+          </button>
+
+          <div class="result-box" aria-live="polite" aria-atomic="true">
+            <p id="result-summary">Prepare a booking to begin.</p>
+            <p id="confirmation-number" class="confirmation-number"></p>
+          </div>
+
+          <details>
+            <summary>Why this stays one booking</summary>
+            <ol class="proof-list">
+              <li>Dates, guests, rooms, hotel, and plan form one stable UUIDv5 identity.</li>
+              <li>The browser database rejects a second record with the same identity.</li>
+              <li>Every state change has a UUIDv7 event and a SHA-256 link to the prior event.</li>
+            </ol>
+          </details>
+
+          <div class="scope-note">
+            <strong>This device + this deployment only</strong>
+            <p>ChatGPT Sites and Vercel do not share browser storage. All bookings here are fictional.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="contract-section" aria-labelledby="tools-title">
+        <div class="section-heading contract-heading">
+          <div>
+            <p class="step-label">03 · Agent boundary</p>
+            <h2 id="tools-title">Four safe WebMCP tools</h2>
+          </div>
+          <p id="tool-status">Checking browser support…</p>
+        </div>
+        <div class="tool-grid">
+          <article><code>check_existing_hotel_booking</code><p>Read whether this booking already exists.</p></article>
+          <article><code>prepare_hotel_booking</code><p>Validate details and create a short-lived preparation.</p></article>
+          <article><code>get_hotel_booking_status</code><p>Recover the same status and confirmation after a lost response.</p></article>
+          <article><code>preview_hotel_cancellation</code><p>Read the deadline and possible fee without changing anything.</p></article>
+        </div>
+        <p class="boundary-line">No WebMCP tool can confirm, pay for, or cancel a booking.</p>
+      </section>
+
+      <section class="service-section" aria-labelledby="services-title">
+        <div>
+          <p class="step-label">04 · Honest integration record</p>
+          <h2 id="services-title">Connected does not mean verified</h2>
+          <p>Installation, sign-in, deployment, and live execution are recorded separately.</p>
+        </div>
+        <div id="service-grid" class="service-grid" aria-live="polite">
+          <p>Loading the machine-readable service record…</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Fictional booking · No payment · No real hotel · No personal information</p>
+      <a href="/webmcp-evals.json">WebMCP evaluation cases</a>
+    </footer>
+    <script type="module" src="/examples/hotel-booking-demo/app.js"></script>
+  </body>
+</html>

@@ -21,6 +21,10 @@
 # event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
 # state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:56:11.012Z
 # machine-contract: scalar schema lower bounds never exceed upper bounds and all numeric bounds fit JavaScript safe integers.
+# information_uuid_v5=8d79ed21-27ce-52d4-9513-e2b024ae670a
+# event_uuid_v7=01a04b38-0e40-7ae1-8778-eb130910efa5
+# state_transition=HOST_STATE_UNCHECKED -> HOST_STATE_EXCLUDED occurred_at=2026-08-29T01:52:40.000Z
+# machine-contract: generated integrity records never include mutable host state from .wrangler, .local, dist, or node_modules.
 from __future__ import annotations
 
 import argparse
@@ -42,7 +46,11 @@ from referencing import Registry, Resource
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
 JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
-IGNORED_PARTS = {".git", ".jj", ".local", ".venv", "node_modules", "__pycache__"}
+IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".wrangler", "dist", "node_modules", "__pycache__"}
+
+
+def is_ignored(path: Path):
+    return any(part in IGNORED_PARTS for part in path.relative_to(ROOT).parts)
 
 
 def load_json(path: Path):
@@ -191,17 +199,50 @@ def main():
 
     # Parse JSON, NDJSON, and YAML.
     for p in ROOT.rglob("*.json"):
+        if is_ignored(p):
+            continue
         try: load_json(p)
         except Exception as e: errors.append(f"JSON {p.relative_to(ROOT)}: {e}")
     for p in ROOT.rglob("*.ndjson"):
+        if is_ignored(p):
+            continue
         for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
             if line.strip():
                 try: json.loads(line)
                 except Exception as e: errors.append(f"NDJSON {p.relative_to(ROOT)}:{n}: {e}")
     for p in [*ROOT.rglob("*.yaml"), *ROOT.rglob("*.yml")]:
+        if is_ignored(p):
+            continue
         try: yaml.safe_load(p.read_text(encoding="utf-8"))
         except Exception as e: errors.append(f"YAML {p.relative_to(ROOT)}: {e}")
     checks["structured_parse"] = not errors
+
+    # Host-local caches and generated deploy state are intentionally outside the
+    # portable repository receipt. Check both generated integrity records so a
+    # future manifest regeneration cannot silently publish machine-specific data.
+    host_generated_start = len(errors)
+    host_generated_parts = {".wrangler", ".local", "dist", "node_modules"}
+    try:
+        catalog = load_json(ROOT / "metadata/file-catalog.json")
+        catalog_paths = [record["path"] for record in catalog["files"]]
+        manifest_paths = []
+        for line_number, line in enumerate((ROOT / "MANIFEST.sha256").read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            fields = line.split(maxsplit=1)
+            if len(fields) != 2:
+                errors.append(f"MANIFEST.sha256:{line_number}: expected digest and repository path")
+                continue
+            manifest_paths.append(fields[1])
+        for source, paths in (("metadata/file-catalog.json", catalog_paths), ("MANIFEST.sha256", manifest_paths)):
+            for repository_path in paths:
+                parts = set(repository_path.replace("\\", "/").split("/"))
+                forbidden = sorted(parts & host_generated_parts)
+                if forbidden:
+                    errors.append(f"{source}: host-generated path is forbidden: {repository_path} ({', '.join(forbidden)})")
+    except Exception as exc:
+        errors.append(f"host-generated state exclusion check: {exc}")
+    checks["host_generated_state_excluded"] = len(errors) == host_generated_start
 
     # Live browser-notification evidence: independently bind the public summary
     # to the captured transition stream without trusting the local SQLite file.
@@ -269,6 +310,8 @@ def main():
     # and are intentionally not fetched by the offline validator.
     broken_links = []
     for p in ROOT.rglob("*.md"):
+        if is_ignored(p):
+            continue
         text = p.read_text(encoding="utf-8", errors="replace")
         text = re.sub(r"```.*?```", "", text, flags=re.S)
         for target in re.findall(r"\]\(([^)]+)\)", text):
@@ -411,6 +454,60 @@ def main():
     )
     for e in review_reconciliation_validator.iter_errors(review_reconciliation):
         errors.append(f"schema metadata/review-thread-reconciliation.json: {e.message}")
+    hotel_evidence = load_json(ROOT / "metadata/hotel-booking-verification.json")
+    hotel_evidence_validator = Draft202012Validator(
+        schemas["hotel-booking-verification"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in hotel_evidence_validator.iter_errors(hotel_evidence):
+        errors.append(f"schema metadata/hotel-booking-verification.json: {e.message}")
+    video_production = load_json(ROOT / "metadata/demo-video-production.json")
+    video_production_validator = Draft202012Validator(
+        schemas["demo-video-production"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in video_production_validator.iter_errors(video_production):
+        errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    video_start = len(errors)
+    try:
+        media_capabilities = video_production["mediaCapabilities"]
+        expected_media_services = {"Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva"}
+        if {record["service"] for record in media_capabilities} != expected_media_services:
+            errors.append("video media capability inventory must contain the exact six authorized services")
+        for record in media_capabilities:
+            if record["authenticationState"] == "CONFIRMED" and not record["verifiedOperations"]:
+                errors.append(f"confirmed media authentication lacks a verified operation: {record['service']}")
+            if record["authenticationState"] != "CONFIRMED" and record["verifiedOperations"]:
+                errors.append(f"unverified media authentication lists a successful operation: {record['service']}")
+        used_services = {record["service"] for record in media_capabilities if record["productionUseState"] == "USED"}
+        asset_services = {record["service"] for record in video_production["assets"] if record["status"] == "COMPLETED"}
+        if used_services != asset_services:
+            errors.append("used media capability services differ from completed production asset services")
+        production_files = video_production["productionFiles"]
+        expected_video_kinds = {"STORYBOARD", "NARRATION_EN", "SUBTITLES_EN", "SUBTITLES_JA"}
+        if {record["kind"] for record in production_files} != expected_video_kinds:
+            errors.append("video production files must contain exactly the storyboard, narration, and two subtitle drafts")
+        for record in production_files:
+            path = ROOT / record["path"]
+            if not path.is_file():
+                errors.append(f"video production file is missing: {record['path']}")
+                continue
+            if sha256(path.read_bytes()) != record["sha256"]:
+                errors.append(f"video production file digest mismatch: {record['path']}")
+        plan = video_production["productionPlan"]
+        planned_permille = round(
+            1000 * plan["plannedActualSiteRecordingSeconds"] / plan["plannedDurationSeconds"]
+        )
+        if planned_permille != plan["plannedActualSiteRecordingPermille"]:
+            errors.append("video production planned site-recording ratio is inconsistent")
+        if plan["plannedActualSiteRecordingPermille"] < 700:
+            errors.append("video production plan does not reserve at least 70 percent for actual site recording")
+        subtitle_records = [record for record in production_files if record["kind"].startswith("SUBTITLES_")]
+        if plan["captionTimingState"] == "PROVISIONAL" and not all(
+            record["requiresAudioRetiming"] is True for record in subtitle_records
+        ):
+            errors.append("provisional subtitles must require retiming from final audio")
+    except Exception as exc:
+        errors.append(f"video production evidence structure: {exc}")
+    checks["video_production_files"] = len(errors) == video_start
     review_findings = review_reconciliation["findings"]
     review_ids = [finding["informationUuidV5"] for finding in review_findings]
     review_urls = [finding["reviewUrl"] for finding in review_findings]
@@ -872,7 +969,7 @@ def main():
     # No private key material.
     private_markers = ["BEGIN " + "PRIVATE KEY", "BEGIN OPENSSH " + "PRIVATE KEY", "PRIVATE " + "KEY-----"]
     for p in ROOT.rglob("*"):
-        if any(part in IGNORED_PARTS for part in p.parts):
+        if is_ignored(p):
             continue
         if p.is_file() and p.suffix.lower() not in {".zip", ".png", ".jpg"}:
             try: text = p.read_text(encoding="utf-8")

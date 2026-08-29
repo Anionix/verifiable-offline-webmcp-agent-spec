@@ -1,12 +1,13 @@
 # information_uuid_v5=f04748b8-7978-518b-b82c-9fafecba25c7
 # event_uuid_v7=01a04a96-683f-7976-b031-99d97ce3bfe7 state_transition=PORTABLE_STATIC_BUILD -> RENDER_STATIC_SITE_READY occurred_at=2026-08-28T22:56:06Z
-# machine-contract: publish only ./dist as a static site; unmatched paths stay missing and must never be rewritten to index.html.
+# event_uuid_v7=01a04bd0-b895-7b25-b116-1b4d78226fc4 state_transition=PORTABLE_STATIC_BUILD -> HOTEL_CLIENT_BUILD occurred_at=2026-08-29T01:00:00Z
+# machine-contract: publish only ./dist/client as a static site; unmatched paths stay missing and must never be rewritten to index.html.
 services:
   - type: web
     name: verifiable-offline-webmcp-agent-spec
     runtime: static
     buildCommand: npm run build:web
-    staticPublishPath: ./dist
+    staticPublishPath: ./dist/client
     headers:
       - path: /*
         name: Content-Security-Policy

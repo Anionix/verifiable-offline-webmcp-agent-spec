@@ -1,0 +1,141 @@
+{
+  "$schema": "../schemas/hotel-booking-verification.schema.json",
+  "identity": {
+    "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
+    "observationUuidV7": "01a04b49-2944-7032-bc74-7ff8be1caabc"
+  },
+  "observedAt": "2026-08-29T02:11:21.028Z",
+  "sourceCommit": "WORKTREE",
+  "artifactDigest": "435dc83c2a5d880a31b990970eef4d7b71112b66876bb7919795e16b167f28a6",
+  "artifactDigestScope": {
+    "algorithm": "SHA-256",
+    "root": "dist/client",
+    "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+    "excludedPaths": [
+      ".assetsignore",
+      "service-integrations.json"
+    ]
+  },
+  "fullClientArtifactDigest": "4dfbe9d78872f7464229f2dc0728dcb48f75cbb572f14b41191aa43a53de71e7",
+  "fullClientArtifactDigestScope": {
+    "algorithm": "SHA-256",
+    "root": "dist/client",
+    "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+    "excludedPaths": []
+  },
+  "fullSitesPackageDigest": "fb087c3ebaa880d5dd82b62a132b45b83f335b70e7465d6bcd42dd156c8e6b2f",
+  "fullSitesPackageDigestScope": {
+    "algorithm": "SHA-256",
+    "root": "dist",
+    "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+    "excludedPaths": []
+  },
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED",
+  "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
+  "checks": [
+    {
+      "checkId": "60f8e686-7399-5a51-9d99-3b4dc14aa437",
+      "name": "Language-neutral UUIDv5 identity",
+      "status": "PASS",
+      "evidence": "Node test proves English and Japanese presentation inputs derive the same fixed-namespace UUIDv5."
+    },
+    {
+      "checkId": "311a96f7-7859-5b7f-baf2-17e39b83502d",
+      "name": "Two attempts remain one booking",
+      "status": "PASS",
+      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. The final in-app browser run reports attempts=2, bookings=1, effectStartCount=1, and one stable confirmation number after reload."
+    },
+    {
+      "checkId": "8982f898-c1da-55cd-834b-211099bc82ca",
+      "name": "Exactly four non-destructive WebMCP tools",
+      "status": "PASS",
+      "evidence": "For the artifact identified above, the in-app browser discovered and called exactly the four named tools at http://127.0.0.1:4184. WebMCP preparation changed the visible state to PREPARED and enabled the separate human confirmation button; no confirmation, payment, or cancellation tool was present."
+    },
+    {
+      "checkId": "28fd6207-3a34-5294-9a4a-305b0ac2e96d",
+      "name": "Production build restores offline after first visit",
+      "status": "PASS",
+      "evidence": "At http://127.0.0.1:4184, a forced network-offline reload restored RETRY_RECOGNIZED, the non-default 2026-11-02 to 2026-11-07 stay, four adults, two rooms, Japanese presentation, the same confirmation, attempts=2, bookings=1, and effects=1."
+    },
+    {
+      "checkId": "df4afa56-2019-50aa-bfec-cb5524e665f1",
+      "name": "Expired preparation becomes one durable event",
+      "status": "PASS",
+      "evidence": "The 120-second boundary is derived as EXPIRED on a read. Page timer, restoration, or repeated preparation then persists PREPARED -> EXPIRED exactly once without a booking row or effect start."
+    },
+    {
+      "checkId": "83cf27de-768e-5288-8496-91c52c33d0cb",
+      "name": "Current price rule is rechecked before commit",
+      "status": "PASS",
+      "evidence": "A regression test changes both the stored quote and its stored approval digest to a 13,000-yen rule. Human confirmation rejects it against the current 12,000-yen calculation before a booking row or effect start exists."
+    },
+    {
+      "checkId": "f29a9daa-57b2-55e3-9d87-6f518426cb5d",
+      "name": "Responsive widths and control target sizes",
+      "status": "PASS",
+      "evidence": "Browser checks at 320, 375, 390, and 768 CSS pixels found no horizontal overflow; all tested form controls were at least 44 by 44 CSS pixels."
+    },
+    {
+      "checkId": "6b9f51ca-d29a-572c-8544-948ef70a2c58",
+      "name": "Keyboard focus traversal",
+      "status": "INCONCLUSIVE",
+      "evidence": "The browser-control backend focused native form elements but did not advance focus when sending Tab. Source uses native links, labels, inputs, selects, buttons, details, headings, and a skip link; an independent physical-keyboard run is still required."
+    },
+    {
+      "checkId": "4a3b9f53-f5da-563e-89a9-8ef65a6f4d62",
+      "name": "Screen-reader announcement",
+      "status": "INCONCLUSIVE",
+      "evidence": "ARIA labels, alert, live regions, heading order, and native controls are present; no VoiceOver or other assistive-technology session was recorded."
+    },
+    {
+      "checkId": "6f65cf02-40eb-51c3-bdbc-4d532082fe0e",
+      "name": "Google Chrome page and WebMCP runtime",
+      "status": "INCONCLUSIVE",
+      "evidence": "For the artifact at http://127.0.0.1:4184, Chrome restored the non-default 2026-11-10 to 2026-11-13 stay, three adults, two rooms, and Japanese presentation after PREPARED, COMMITTED, RETRY_RECOGNIZED, and reload with attempts=2, bookings=1, effects=1. The native WebMCP runtime was not exposed, so Chrome tool discovery and execution remain inconclusive."
+    },
+    {
+      "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
+      "name": "ChatGPT Sites live execution",
+      "status": "UNMEASURED",
+      "evidence": "No owner-only Sites deployment or live execution receipt exists yet."
+    }
+  ],
+  "designFidelity": [
+    {
+      "pointId": "dd0f5b7f-1dd8-5380-800d-244d04d1cc66",
+      "concept": "Warm white paper surface with deep indigo and restrained vermilion accents.",
+      "implementation": "The browser view keeps the same three-color hierarchy without decorative imagery that competes with the content.",
+      "status": "MATCHED"
+    },
+    {
+      "pointId": "09f52ef5-5556-540a-b449-a8024bffb3af",
+      "concept": "Editorial serif question paired with compact sans-serif operational text.",
+      "implementation": "The question and section headings use a system serif stack; state, labels, and evidence use a system sans-serif stack.",
+      "status": "MATCHED"
+    },
+    {
+      "pointId": "ed09c089-305d-5b71-b6e4-5fb6709223fa",
+      "concept": "Question and current state appear together before the detailed workflow.",
+      "implementation": "Desktop uses a two-column opening; mobile stacks the same title and state before the booking form starts.",
+      "status": "MATCHED"
+    },
+    {
+      "pointId": "b2aa107a-e914-5bf4-9499-b0c16841818f",
+      "concept": "Square evidence cards with fine borders and quiet shadows.",
+      "implementation": "Status, booking, retry, tool, and service evidence use square bordered cards and one restrained shadow token.",
+      "status": "MATCHED"
+    },
+    {
+      "pointId": "a870ff0c-eb5d-5efd-b5fa-6159be866085",
+      "concept": "A compact booking path remains readable on a phone.",
+      "implementation": "At 320 through 390 pixels the fields and proof cards stack without horizontal overflow and keep 44-pixel controls.",
+      "status": "MATCHED"
+    },
+    {
+      "pointId": "9a552634-7b78-5485-9c35-e1bf3e03e9af",
+      "concept": "The generated concept pictured a commit_booking agent tool.",
+      "implementation": "That tool was intentionally removed: only the visible human button imports the commit function, while WebMCP exposes four non-payment, non-cancellation functions.",
+      "status": "INTENTIONAL_DEVIATION"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+1
+00:00:00,000 --> 00:00:03,500
+Unstable signal
+
+2
+00:00:03,500 --> 00:00:06,500
+Booking sent
+
+3
+00:00:06,500 --> 00:00:10,000
+Response lost
+
+4
+00:00:10,000 --> 00:00:13,000
+Did it work?
+
+5
+00:00:13,000 --> 00:00:16,000
+Retry risk
+
+6
+00:00:16,000 --> 00:00:20,000
+Two bookings
+
+7
+00:00:20,000 --> 00:00:25,000
+One question
+
+8
+00:00:25,000 --> 00:00:30,000
+Fictional only
+
+9
+00:00:30,000 --> 00:00:35,000
+No real booking
+
+10
+00:00:35,000 --> 00:00:40,000
+Choose dates
+
+11
+00:00:40,000 --> 00:00:45,000
+Check capacity
+
+12
+00:00:45,000 --> 00:00:50,000
+Fixed price
+
+13
+00:00:50,000 --> 00:00:55,000
+Check existing
+
+14
+00:00:55,000 --> 00:01:00,000
+Prepare safely
+
+15
+00:01:00,000 --> 00:01:05,000
+Not confirmed
+
+16
+00:01:05,000 --> 00:01:10,000
+Human action
+
+17
+00:01:10,000 --> 00:01:15,000
+Four tools
+
+18
+00:01:15,000 --> 00:01:20,000
+No cancel tool
+
+19
+00:01:20,000 --> 00:01:25,000
+Stored once
+
+20
+00:01:25,000 --> 00:01:30,000
+Response hidden
+
+21
+00:01:30,000 --> 00:01:35,000
+Reload safely
+
+22
+00:01:35,000 --> 00:01:38,000
+Retry safely
+
+23
+00:01:38,000 --> 00:01:41,000
+Same number
+
+24
+00:01:41,000 --> 00:01:45,000
+One booking
+
+25
+00:01:45,000 --> 00:01:50,000
+One UUIDv5
+
+26
+00:01:50,000 --> 00:01:55,000
+Same identity
+
+27
+00:01:55,000 --> 00:02:00,000
+Unique records
+
+28
+00:02:00,000 --> 00:02:05,000
+One result
+
+29
+00:02:05,000 --> 00:02:10,000
+UUIDv7 events
+
+30
+00:02:10,000 --> 00:02:13,000
+SHA-256 chain
+
+31
+00:02:13,000 --> 00:02:15,000
+Start count: 1
+
+32
+00:02:15,000 --> 00:02:20,000
+Separate states
+
+33
+00:02:20,000 --> 00:02:25,000
+No false claims
+
+34
+00:02:25,000 --> 00:02:30,000
+Sites: intended
+
+35
+00:02:30,000 --> 00:02:35,000
+Vercel: backup
+
+36
+00:02:35,000 --> 00:02:40,000
+One safe answer
+
+37
+00:02:40,000 --> 00:02:45,000
+Never duplicate
+
+NOTE
+information_uuid_v5=20ff126f-6bbe-505c-a0fb-8de04ef0491d
+event_uuid_v7=01a04b22-da4f-738f-b79e-0e2320e61a23
+occurred_at=2026-08-29T01:29:30Z
+state_transition=NOT_AUTHORED -> WORDING_DRAFTED
+machine-contract=These are provisional visual windows, not final speech timing; retime from the final audio before burning and preserve the short authored wording.

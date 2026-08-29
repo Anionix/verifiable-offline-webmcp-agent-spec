@@ -1,0 +1,175 @@
+{
+  "$schema": "../schemas/demo-video-production.schema.json",
+  "identity": {
+    "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
+    "observationUuidV7": "01a04b30-aa9a-7de0-814e-7a2f6be7ffee"
+  },
+  "updatedAt": "2026-08-29T01:44:35.738Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED",
+  "billingBoundary": {
+    "additionalPurchaseAuthorized": false,
+    "subscriptionChangeAuthorized": false,
+    "higgsfieldTrialStateSource": "User report and current Higgsfield account readback; remaining time is not inferred.",
+    "startingCredits": 100,
+    "estimatedCredits": 67.5,
+    "unlimitedAllowanceAvailable": false
+  },
+  "mediaCapabilities": [
+    {
+      "capabilityId": "c92c7f99-c82a-5d1a-8fdc-0b8aa99832b5",
+      "service": "Higgsfield",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 46,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:balance", "WRITE:generate_video"],
+      "productionUseState": "USED",
+      "reasonCode": "TWO_SOURCE_SCENES_PRESERVED"
+    },
+    {
+      "capabilityId": "0d325ce9-7a64-5be5-b436-c4c889c88f33",
+      "service": "OpenArt",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 16,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:get_account", "WRITE:generate_reference_image"],
+      "productionUseState": "USED",
+      "reasonCode": "REFERENCE_IMAGE_PRESERVED"
+    },
+    {
+      "capabilityId": "93b37586-ca08-5981-8879-2e136843dbe4",
+      "service": "Magnific",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 70,
+      "authenticationState": "UNVERIFIED",
+      "verifiedOperations": [],
+      "productionUseState": "NOT_USED",
+      "reasonCode": "AUTHENTICATION_RETRY_DID_NOT_COMPLETE"
+    },
+    {
+      "capabilityId": "6e837fcb-0eb9-59fa-bb2c-4c155b92f150",
+      "service": "vidIQ",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 52,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:balance"],
+      "productionUseState": "NOT_USED",
+      "reasonCode": "PUBLICATION_REVIEW_DEFERRED"
+    },
+    {
+      "capabilityId": "b30ec6ce-a80f-5319-be12-a1c59c34f826",
+      "service": "HeyGen",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 38,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:list_voices"],
+      "productionUseState": "NOT_USED",
+      "reasonCode": "VOICE_GENERATION_DEFERRED_UNTIL_SITE_RECORDING"
+    },
+    {
+      "capabilityId": "e8c065e6-5f6d-50cc-95a9-46e44f85f7a3",
+      "service": "Canva",
+      "localPluginState": "INSTALLED_ENABLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 32,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:search"],
+      "productionUseState": "NOT_USED",
+      "reasonCode": "THUMBNAIL_DEFERRED_UNTIL_FINAL_VIDEO"
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "f48d8156-7356-5214-8e9e-e426757cbb57",
+      "service": "OpenArt",
+      "kind": "REFERENCE_IMAGE",
+      "status": "COMPLETED",
+      "prompt": "Realistic cinematic reference image of a fictional adult international traveler at a generic Japanese airport, navy jacket, muted vermilion scarf, smartphone in hand, calm but concerned expression, no logos, no readable personal information, no real hotel or airline branding, 16:9.",
+      "createdAt": "2026-08-29T00:21:07Z",
+      "remoteId": "oaFI2L4uldBbTUKpxIoN",
+      "localPath": ".local/video-production/openart-traveler-reference.png",
+      "sha256": "e0e8a63b7645ab9616c0e925ade051c4ac03052631d73796b91dec194a6398cd",
+      "disclosure": "AI-generated fictional adult and generic airport; no real person, hotel, airline, or personal information."
+    },
+    {
+      "assetId": "90b68cc3-d891-501d-a996-a43de1ca8497",
+      "service": "Higgsfield",
+      "kind": "VIDEO_SCENE",
+      "status": "COMPLETED",
+      "prompt": "Same fictional traveler in a generic Japanese airport; unstable Wi-Fi freezes a generic Japanese hotel booking page immediately after submit; restrained acting; no brands or personal information.",
+      "createdAt": "2026-08-29T01:05:11Z",
+      "remoteId": "d789caa7-f08a-4722-a29c-6e10cad63457",
+      "localPath": ".local/video-production/higgsfield-scene-01-lost-response.mp4",
+      "sha256": "4aeaeb5ff946bf3d75bcadd7778197e40884b2ddb19c9fddfe8b4b4c9a953dff",
+      "disclosure": "AI-generated dramatization / Fictional booking"
+    },
+    {
+      "assetId": "da5ddae0-5134-5daa-9f39-9dd225ff79da",
+      "service": "Higgsfield",
+      "kind": "VIDEO_SCENE",
+      "status": "COMPLETED",
+      "prompt": "Same fictional traveler sees two generic hotel confirmation notifications and looks mildly worried; restrained acting; no brands or personal information.",
+      "createdAt": "2026-08-29T01:05:11Z",
+      "remoteId": "84c531ad-4530-4223-b047-9056e6f9410b",
+      "localPath": ".local/video-production/higgsfield-scene-02-duplicate-alert.mp4",
+      "sha256": "6ca61f5392c4f1a3a022de216b64793cd02ae1f999ecd6311bbc8c1e8617bcca",
+      "disclosure": "AI-generated dramatization / Fictional booking"
+    }
+  ],
+  "productionFiles": [
+    {
+      "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
+      "kind": "STORYBOARD",
+      "path": "media/demo-video/storyboard.md",
+      "sha256": "5d9595052152655c09c940ecd752dbd1f25ea97d3087ebe28a19811d425dc106",
+      "status": "DRAFT",
+      "requiresAudioRetiming": false
+    },
+    {
+      "fileId": "f3efcb83-4fa6-5f89-a55e-4cb921cd2ea8",
+      "kind": "NARRATION_EN",
+      "path": "media/demo-video/narration.en.txt",
+      "sha256": "7a3ce59a405ecdabebade43c5e908b360809de74117934e01a4506603f67ffb7",
+      "status": "DRAFT",
+      "requiresAudioRetiming": false
+    },
+    {
+      "fileId": "4a96147c-83db-5c87-b46d-b1fc4afd2d4a",
+      "kind": "SUBTITLES_EN",
+      "path": "media/demo-video/subtitles.en.srt",
+      "sha256": "8f737c25d1ee86c6c2ea4c79437c461a36c09655c6cdcdd099e10ffbc0f773c7",
+      "status": "DRAFT",
+      "requiresAudioRetiming": true
+    },
+    {
+      "fileId": "8e3b3333-ca44-59e3-902a-276d8fb3bf8f",
+      "kind": "SUBTITLES_JA",
+      "path": "media/demo-video/subtitles.ja.srt",
+      "sha256": "8024f751854f4340c95d23c896020a5eb5df5433fc8a55ff02e92fe8d300acb5",
+      "status": "DRAFT",
+      "requiresAudioRetiming": true
+    }
+  ],
+  "productionPlan": {
+    "plannedDurationSeconds": 165,
+    "plannedActualSiteRecordingSeconds": 145,
+    "plannedActualSiteRecordingPermille": 879,
+    "voiceState": "NOT_GENERATED",
+    "captionTimingState": "PROVISIONAL"
+  },
+  "publication": {
+    "youtubeUrl": null,
+    "status": "NOT_STARTED",
+    "requiresSeparateApproval": true
+  }
+}

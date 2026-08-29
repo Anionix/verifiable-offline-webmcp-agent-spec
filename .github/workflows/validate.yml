@@ -50,10 +50,14 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-          cache-dependency-path: src/typescript/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            src/typescript/package-lock.json
 
       - name: Install locked Node.js dependencies
-        run: npm ci --prefix src/typescript
+        run: |
+          npm ci
+          npm ci --prefix src/typescript
 
       - name: Run the read-only verification pipeline
         run: make validate

@@ -179,10 +179,46 @@
         </aside>
       </section>
 
+      <!-- information_uuid_v5=ec3c429b-acbf-5f60-91f9-39095663586a event_uuid_v7=01a04ba9-559b-7c55-b381-904bd855e250 occurred_at=2026-08-29T03:56:23.835Z state_transition=UNEXPLAINED_RETRY -> VISUAL_COMPARISON -> SAME_BOOKING_RECOVERED machine-contract=The comparison must show that WebMCP checks named page capabilities before retrying and never exposes confirmation, payment, or cancellation mutation. -->
+      <section class="why-webmcp" aria-labelledby="why-webmcp-title">
+        <div class="why-webmcp-heading">
+          <p class="step-label">03 · What WebMCP changes</p>
+          <h2 id="why-webmcp-title">The assistant can check before it retries</h2>
+          <p>
+            WebMCP is a small, named contract between this page and an assistant. It exposes four safe actions, so the assistant can read the booking state instead of guessing from pixels or sending the form again.
+          </p>
+        </div>
+        <div class="retry-comparison">
+          <article class="retry-path retry-path-risk">
+            <p class="path-kicker">Ordinary form retry</p>
+            <h3>Uncertainty can become a duplicate</h3>
+            <ol>
+              <li><span>1</span>Send booking</li>
+              <li><span>2</span>Success response disappears</li>
+              <li><span>3</span>Send the whole form again</li>
+            </ol>
+            <p class="path-outcome">Possible result: 2 bookings</p>
+          </article>
+          <article class="retry-path retry-path-safe">
+            <p class="path-kicker">WebMCP safe retry</p>
+            <h3>Named tools recover the first result</h3>
+            <ol>
+              <li><span>1</span>Check the same UUIDv5</li>
+              <li><span>2</span>Read the stored status</li>
+              <li><span>3</span>Return the same confirmation</li>
+            </ol>
+            <p class="path-outcome">Verified result: 2 attempts → 1 booking</p>
+          </article>
+        </div>
+        <p class="plain-answer">
+          The useful part is simple: the assistant gets a safer question to ask—<strong>“Does this exact booking already exist?”</strong>—before anything is sent again.
+        </p>
+      </section>
+
       <section class="contract-section" aria-labelledby="tools-title">
         <div class="section-heading contract-heading">
           <div>
-            <p class="step-label">03 · Agent boundary</p>
+            <p class="step-label">04 · Agent boundary</p>
             <h2 id="tools-title">Four safe WebMCP tools</h2>
           </div>
           <p id="tool-status">Checking browser support…</p>
@@ -198,7 +234,7 @@
 
       <section class="service-section" aria-labelledby="services-title">
         <div>
-          <p class="step-label">04 · Honest integration record</p>
+          <p class="step-label">05 · Honest integration record</p>
           <h2 id="services-title">Connected does not mean verified</h2>
           <p>Installation, sign-in, deployment, and live execution are recorded separately.</p>
         </div>

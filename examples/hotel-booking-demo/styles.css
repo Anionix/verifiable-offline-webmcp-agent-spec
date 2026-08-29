@@ -19,6 +19,8 @@
 
 * { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -108,7 +110,7 @@ h2 { font-size: clamp(1.55rem, 3vw, 2.25rem); }
   line-height: 1.8;
 }
 
-.status-card, .booking-panel, .evidence-panel, .contract-section, .service-section {
+.status-card, .booking-panel, .evidence-panel, .why-webmcp, .contract-section, .service-section {
   border: 1px solid var(--line);
   background: rgba(255, 254, 250, 0.92);
   box-shadow: var(--shadow);
@@ -143,7 +145,7 @@ h2 { font-size: clamp(1.55rem, 3vw, 2.25rem); }
   margin: 0 0 1.2rem;
 }
 
-.booking-panel, .evidence-panel, .contract-section, .service-section { padding: clamp(1.25rem, 4vw, 2.5rem); }
+.booking-panel, .evidence-panel, .why-webmcp, .contract-section, .service-section { padding: clamp(1.25rem, 4vw, 2.5rem); }
 .plan-name { margin: 0; color: var(--muted); }
 
 .date-grid, .guest-grid {
@@ -216,7 +218,22 @@ summary { cursor: pointer; font-weight: 800; }
 .chain-state[data-state="invalid"] { color: var(--warning); }
 .chain-state[data-state="pending"], .chain-state[data-state="unknown"] { color: var(--muted); }
 
-.contract-section, .service-section { margin-bottom: 1.2rem; }
+.why-webmcp, .contract-section, .service-section { margin-bottom: 1.2rem; }
+.why-webmcp-heading { max-width: 760px; }
+.why-webmcp-heading > p:last-child { margin: 0.9rem 0 0; color: var(--muted); line-height: 1.65; }
+.retry-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.6rem; }
+.retry-path { min-width: 0; padding: 1.25rem; border-top: 4px solid; background: var(--paper-soft); }
+.retry-path-risk { border-color: var(--warning); }
+.retry-path-safe { border-color: var(--success); }
+.retry-path .path-kicker { margin: 0; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+.retry-path-risk .path-kicker, .retry-path-risk .path-outcome { color: var(--warning); }
+.retry-path-safe .path-kicker, .retry-path-safe .path-outcome { color: var(--success); }
+.retry-path h3 { margin: 0.45rem 0 0; color: var(--indigo-deep); font-size: 1.05rem; }
+.retry-path ol { display: grid; gap: 0.55rem; margin: 1rem 0; padding: 0; list-style: none; }
+.retry-path li { display: flex; gap: 0.65rem; align-items: center; color: #45485a; line-height: 1.45; }
+.retry-path li span { display: grid; flex: 0 0 1.65rem; place-items: center; width: 1.65rem; height: 1.65rem; border: 1px solid currentColor; border-radius: 50%; font-size: 0.72rem; font-weight: 850; }
+.retry-path .path-outcome { margin: 0; padding-top: 0.8rem; border-top: 1px solid var(--line); font-weight: 850; }
+.plain-answer { margin: 1rem 0 0; padding: 1rem 1.1rem; color: var(--indigo-deep); border-left: 3px solid var(--indigo); background: #f0f1f7; line-height: 1.6; }
 .contract-heading { align-items: end; }
 #tool-status { margin: 0; color: var(--muted); font-size: 0.85rem; }
 .tool-grid, .service-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 1.6rem; }
@@ -249,7 +266,7 @@ footer a { color: var(--indigo); }
   main, footer { width: min(100% - 1.25rem, 1180px); }
   .hero { padding-top: 4.5rem; }
   h1 { font-size: clamp(2.75rem, 12vw, 3.6rem); }
-  .date-grid, .guest-grid, .tool-grid, .service-grid { grid-template-columns: 1fr; }
+  .date-grid, .guest-grid, .retry-comparison, .tool-grid, .service-grid { grid-template-columns: 1fr; }
   .section-heading, .price-row, .actions, footer { align-items: stretch; flex-direction: column; }
   .price-total { text-align: left; }
   .status-metrics { gap: 0.5rem; }

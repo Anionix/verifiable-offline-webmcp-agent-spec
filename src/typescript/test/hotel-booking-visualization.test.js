@@ -35,8 +35,25 @@ test("the booking explanation contains an accessible, current audit proof", asyn
 
 test("the audit proof preserves readable wrapping and a one-column mobile layout", async () => {
   const styles = await readFile(paths.styles, "utf8");
+  assert.match(styles, /\[hidden\] \{ display: none !important; \}/u);
   assert.match(styles, /\.audit-proof-grid code \{[^}]*overflow-wrap: anywhere;/su);
   assert.match(styles, /@media \(max-width: 600px\)[\s\S]*\.audit-proof-grid \{ grid-template-columns: 1fr; \}/u);
   assert.match(styles, /\.chain-state\[data-state="valid"\] \{ color: var\(--success\); \}/u);
   assert.match(styles, /\.chain-state\[data-state="invalid"\] \{ color: var\(--warning\); \}/u);
+});
+
+test("the page explains the practical difference between an ordinary retry and WebMCP", async () => {
+  const [html, styles] = await Promise.all([readFile(paths.html, "utf8"), readFile(paths.styles, "utf8")]);
+  const comparison = html.match(/<section class="why-webmcp"[\s\S]*?<\/section>/u)?.[0] ?? "";
+
+  assert.match(comparison, /WebMCP is a small, named contract/u);
+  assert.match(comparison, /Ordinary form retry/u);
+  assert.match(comparison, /Possible result: 2 bookings/u);
+  assert.match(comparison, /WebMCP safe retry/u);
+  assert.match(comparison, /Verified result: 2 attempts → 1 booking/u);
+  assert.match(comparison, /Does this exact booking already exist\?/u);
+  assert.match(comparison, /class="retry-comparison"/u);
+  assert.match(styles, /\.retry-path-risk \{ border-color: var\(--warning\); \}/u);
+  assert.match(styles, /\.retry-path-safe \{ border-color: var\(--success\); \}/u);
+  assert.match(styles, /@media \(max-width: 600px\)[\s\S]*\.retry-comparison[\s\S]*grid-template-columns: 1fr;/u);
 });

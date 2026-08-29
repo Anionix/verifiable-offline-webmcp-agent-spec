@@ -59,7 +59,7 @@ NOT_STARTED -> AMBIGUOUS -> RECONCILING -> CONFIRMED_PRESENT
 <!-- event_uuid_v7=01a04cf4-5c1a-740e-bf0b-21652882816d state_transition=PLATFORM_AMBIGUOUS_STORAGE -> PLATFORM_BOUND_STORAGE occurred_at=2026-08-29T09:57:57.921Z -->
 <!-- machine-contract=Every platform enforces fixed roots, canonical containment, simple filenames, and link rejection; POSIX ownership and mode checks run only where those bits represent access control. -->
 
-監査ログとSQLiteのファイルは、リポジトリ内の固定`.local`か、試験用一時領域の直下一階層だけへ置けます。`.local`自体がシンボリックリンクなら、リンク先をたどる前、書き込む前、権限を変える前に拒否します。macOSとLinuxでは所有者と`0700`相当の権限も確認します。Windowsでは意味の異なるUnix形式の権限ビットを判定材料にせず、固定領域、実体パス包含、単純なファイル名、リンク拒否を維持します。Windows分岐は自動試験済みですが、Windows実機でのアクセス制御読み戻しは`UNMEASURED`です。
+監査ログとSQLiteのファイルは、リポジトリ内の固定`.local`か、試験用一時領域の直下一階層だけへ置けます。`.local`自体がシンボリックリンクなら、リンク先をたどる前、書き込む前、権限を変える前に拒否します。macOSとLinuxでは所有者と`0700`相当の権限も確認します。Windowsでは意味の異なるUnix形式の権限ビットを判定材料にせず、固定領域、実体パス包含、単純なファイル名、リンク拒否を維持します。構築時に親ディレクトリーのデバイス番号と inode 番号を保持し、後続の読み取り、追記、SQLite開始の前に毎回照合するため、親の差し替えは安全側で停止します。Windows分岐は自動試験済みですが、Windows実機でのアクセス制御読み戻しは`UNMEASURED`です。
 
 ## 実行方法
 

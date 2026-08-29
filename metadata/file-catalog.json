@@ -186,8 +186,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "b5d27ab9651f53060443998a951aca1ed9d7526fbcfe40446dd72f1bc6d8ed97",
-      "bytes": 4512,
+      "sha256": "f36a38acecd566a998565828881b5a8603ccf95e64e6b31768627d6a5031727f",
+      "bytes": 4653,
       "mediaType": "application/yaml",
       "category": ".github",
       "identity": {
@@ -1631,8 +1631,8 @@
     },
     {
       "path": "docs/13-notification-demo.en.md",
-      "sha256": "7673cfee63765aa64ee9bad2dc0e8e4e8044feab71fa0ec546bca728cc6437f2",
-      "bytes": 7454,
+      "sha256": "23fb6608b6fd19259e45d3bc2efa24c627d0c6a12af73aae1412fa85eea2c892",
+      "bytes": 7878,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1650,8 +1650,8 @@
     },
     {
       "path": "docs/13-notification-demo.ja.md",
-      "sha256": "cfa63a30bd4d3caeb30bf7915257909245868af82639d8cee62a11781ebec2b6",
-      "bytes": 10347,
+      "sha256": "82e41740afa0fa69a8895627915c04412269721db5b7a69523da0aa0a4f60e36",
+      "bytes": 10567,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -5394,8 +5394,8 @@
     },
     {
       "path": "src/typescript/README.md",
-      "sha256": "3dd86ba5e9f183dc3b4338e89612fb92528ea87204dec5a130b456330b3f3711",
-      "bytes": 3043,
+      "sha256": "38ed32f245e6bd7b698531966c56a2baf44621934acdcf0a0c0d64b39ecfd179",
+      "bytes": 3312,
       "mediaType": "text/markdown",
       "category": "src",
       "identity": {
@@ -5603,8 +5603,8 @@
     },
     {
       "path": "src/typescript/notification/audit-log.ts",
-      "sha256": "436389eaa886570e1fa23579ad3dd0f462540826a23eb10d3c736c85035be27e",
-      "bytes": 5082,
+      "sha256": "b2d5bd34a2c7ebf5345260954eb81d85ecbf773b8dda229cf0f7f77ae00c604a",
+      "bytes": 5474,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -5755,8 +5755,8 @@
     },
     {
       "path": "src/typescript/notification/storage-path.ts",
-      "sha256": "5ad5a43932a0c65dd0854808062fe4b3f1b8c26ab514a630271bb47d4ff48af6",
-      "bytes": 17763,
+      "sha256": "b49cb84ad840eb3f06b1aca230eef356c598ed997bdd709f32a3620d709b5689",
+      "bytes": 22170,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -5774,8 +5774,8 @@
     },
     {
       "path": "src/typescript/notification/store.ts",
-      "sha256": "d4b6db4d605b45f568b95325addf908a450df9d4f4389b33b991dada31230c2b",
-      "bytes": 26418,
+      "sha256": "b0bacbc8dd4ceda735e6dfd9de12de8299ca292def16c9817bce748f8ddf4361",
+      "bytes": 27117,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6287,8 +6287,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "36c9aa5a10b16fa8c598939dd8113971528f2c9ad2c9de26e6ddefe873694484",
-      "bytes": 38514,
+      "sha256": "1ddc0280627c2c91054afafd2cbb3820d7c1633a0b5051588f5d3650a70147be",
+      "bytes": 45721,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

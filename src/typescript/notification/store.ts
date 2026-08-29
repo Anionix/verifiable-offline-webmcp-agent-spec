@@ -32,7 +32,13 @@ import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import type { EffectStartStatus } from "../governance/replay-verification.ts";
 import { provenanceDetails, provenanceFromDetails, type InputProvenance } from "./input-provenance.ts";
-import { assertNotificationStorageDescriptor, containedNotificationStoragePath, openNotificationStorageGuard } from "./storage-path.ts";
+import {
+  assertNotificationStorageDescriptor,
+  captureNotificationStorageParent,
+  containedNotificationStoragePath,
+  openNotificationStorageGuard,
+  type StorageParentIdentity,
+} from "./storage-path.ts";
 import type { ClaimResult, ControlState, EffectState, NotificationIntent, NotificationTarget, TransitionRecord } from "./types.ts";
 import { StateConflictError } from "./types.ts";
 
@@ -80,20 +86,30 @@ export interface StoredEffectClaimEvidence {
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const repositoryStorageRoot = join(repositoryRoot, ".local");
 
-function containedDatabasePath(candidate: string): string {
-  if (candidate === ":memory:") return candidate;
-  return containedNotificationStoragePath(candidate, "database", { repositoryStorageRoot });
+export interface NotificationStoreOptions {
+  platform?: NodeJS.Platform;
+  /** Deterministic test seam between parent capture and the first SQLite open. */
+  afterParentIdentityCaptured?: (path: string) => void;
 }
 
-function openContainedDatabase(candidate: string): DatabaseSync {
-  const path = containedDatabasePath(candidate);
+function containedDatabasePath(candidate: string, platform: NodeJS.Platform): string {
+  if (candidate === ":memory:") return candidate;
+  return containedNotificationStoragePath(candidate, "database", { repositoryStorageRoot, platform });
+}
+
+function openContainedDatabase(candidate: string, options: NotificationStoreOptions): DatabaseSync {
+  const platform = options.platform ?? process.platform;
+  const path = containedDatabasePath(candidate, platform);
   if (path === ":memory:") return new DatabaseSync(path);
 
-  const guard = openNotificationStorageGuard(path, "database");
+  const expectedParent: StorageParentIdentity = captureNotificationStorageParent(path, "database", { platform });
+  options.afterParentIdentityCaptured?.(path);
+
+  const guard = openNotificationStorageGuard(path, "database", { platform, expectedParent });
   let database: DatabaseSync | null = null;
   try {
     database = new DatabaseSync(path);
-    assertNotificationStorageDescriptor(path, guard, "database");
+    assertNotificationStorageDescriptor(path, guard, "database", { platform, expectedParent });
     return database;
   } catch (error) {
     database?.close();
@@ -106,8 +122,8 @@ function openContainedDatabase(candidate: string): DatabaseSync {
 export class NotificationStore {
   readonly database: DatabaseSync;
 
-  constructor(path: string) {
-    this.database = openContainedDatabase(path);
+  constructor(path: string, options: NotificationStoreOptions = {}) {
+    this.database = openContainedDatabase(path, options);
     this.database.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL;");
     this.database.exec(`
       CREATE TABLE IF NOT EXISTS intents (

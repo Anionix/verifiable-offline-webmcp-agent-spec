@@ -3,24 +3,24 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1",
+    "evidenceEventId": "01a04bce-e62c-70e3-8983-07f9e6dcebea",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T04:06:39.087Z"
+    "observedAt": "2026-08-29T04:37:25.000Z"
   },
   "stateTransition": {
-    "from": "OWNER_ONLY_SITE_LIVE_VERIFIED",
-    "to": "PUBLIC_SITE_VERSION_4_VERIFIED",
-    "eventId": "01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1",
-    "occurredAt": "2026-08-29T04:06:39.087Z",
-    "machineContract": "The user authorized public Sites access. Vercel production, video publication, and final Devpost submission remain separate actions."
+    "from": "PUBLIC_SITE_VERSION_4_VERIFIED",
+    "to": "PUBLIC_SITE_CURRENT_VERIFIED",
+    "eventId": "01a04bce-e62c-70e3-8983-07f9e6dcebea",
+    "occurredAt": "2026-08-29T04:37:25.000Z",
+    "machineContract": "The user authorized public Sites access and local video assembly. Vercel production, video publication, and final Devpost submission remain separate actions."
   },
   "services": [
     {
       "serviceId": "chatgpt-sites",
       "displayName": "ChatGPT Sites",
       "integrationSurfaceId": "58dcb1cc-e3a8-5329-836d-11299b1ee1e7",
-      "evidenceEventId": "01a04bb2-b8ef-7c84-aa63-2eb47ea1c2c2",
-      "observedAt": "2026-08-29T04:06:39.087Z",
+      "evidenceEventId": "01a04bce-e62c-70e3-8983-07fa829542f3",
+      "observedAt": "2026-08-29T04:37:25.000Z",
       "pluginRef": "sites@openai-bundled",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -58,13 +58,13 @@
       ],
       "artifactCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
       "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-      "reasonCode": "PUBLIC_SITE_VERSION_4_VERIFIED",
+      "reasonCode": "PUBLIC_SITE_CURRENT_VERIFIED",
       "roles": [
         "Primary publication target for the hotel duplicate-booking demo.",
         "Package the shared client with the ChatGPT Sites worker entry point."
       ],
       "limitations": [
-        "Version 4 is live at https://kyoto-booking-retry-proof.anionix.chatgpt.site with public access and an anonymous page load verified.",
+        "The current artifact is live at https://kyoto-booking-retry-proof.anionix.chatgpt.site with public access, anonymous loading, and the full fictional retry flow screen-recorded.",
         "Public Sites access does not authorize Vercel production, video publication, or final Devpost submission."
       ],
       "sources": [
@@ -292,8 +292,8 @@
       "serviceId": "google-chrome",
       "displayName": "Google Chrome",
       "integrationSurfaceId": "7968f6bc-3ff9-5700-be56-7e1e04c3392d",
-      "evidenceEventId": "01a04bb2-b8ef-7441-82d2-9af0c0908385",
-      "observedAt": "2026-08-29T04:06:39.087Z",
+      "evidenceEventId": "01a04bce-e62c-70e3-8983-07fbaa9f6212",
+      "observedAt": "2026-08-29T04:37:25.000Z",
       "pluginRef": "chrome@openai-bundled",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -322,7 +322,7 @@
         "Inspect WebMCP tool discovery, execution, and history in a browser."
       ],
       "limitations": [
-        "Google Chrome loaded the public version 4 page without sign-in and displayed EMPTY, the retry comparison, and four safe tool cards.",
+        "Google Chrome loaded the current public page without sign-in and displayed EMPTY, the retry comparison, and four safe tool cards.",
         "document.modelContext was undefined in that Chrome page, so native WebMCP discovery and execution remain inconclusive."
       ],
       "sources": [

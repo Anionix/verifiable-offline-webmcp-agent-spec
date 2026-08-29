@@ -1,10 +1,10 @@
 ---
 title: "Fictional Kyoto booking retry — review video storyboard"
 information_uuid_v5: "acd0a98e-d1f7-56d8-b71b-04a260ea0b74"
-event_uuid_v7: "01a04b7b-bfbc-775b-adc3-b7da30d8b353"
-occurred_at: "2026-08-29T03:06:36Z"
-state: "DRAFT"
-state_transition: "NOT_AUTHORED -> SCRIPT_DRAFTED -> AUDIO_GENERATED -> SUBTITLES_AUDIO_TIMED -> VIDEO_ASSEMBLY_PENDING"
+event_uuid_v7: "01a04bcc-cd86-72c0-ae81-152d7c74d51d"
+occurred_at: "2026-08-29T04:35:08Z"
+state: "FINAL"
+state_transition: "NOT_AUTHORED -> SCRIPT_DRAFTED -> AUDIO_GENERATED -> SUBTITLES_AUDIO_TIMED -> VIDEO_ASSEMBLY_PENDING -> PUBLIC_SITE_RECORDED -> FINAL_VIDEO_VERIFIED"
 ---
 
 # Review video storyboard
@@ -14,10 +14,10 @@ state_transition: "NOT_AUTHORED -> SCRIPT_DRAFTED -> AUDIO_GENERATED -> SUBTITLE
 ## Current measured plan
 
 - Measured English narration: **148.192625 seconds**.
-- Planned final length: **150 seconds (2 minutes 30 seconds)**. The final video has not been assembled or measured.
+- Measured final length: **150 seconds (2 minutes 30 seconds)**.
 - Generated dramatization: **20 seconds (13.3%)**, from 0:00 through 0:20.
-- Planned actual site recording: **130 seconds (86.7%)**, from 0:20 through 2:30. The actual site recording has not been captured yet, so this percentage remains planned rather than measured from an export.
-- English and Japanese subtitle timing has been aligned to the measured narration. It has not yet been checked against a final assembled video.
+- Measured actual public-site recording: **130 seconds (86.7%)**, from 0:20 through 2:30, assembled from a 70-second interaction take and a 60-second proof-table take.
+- English and Japanese subtitle timing is aligned to the measured narration. The English captions are burned into the final video; the Japanese SubRip file remains separate for the video host.
 - Canvas: 16:9 at 1920 by 1080 pixels.
 - Language: English narration and short burned-in English captions. The separate Japanese subtitle file is for the video host.
 - The actual site recording must not pass through a generated-video or image-enlargement service.
@@ -44,7 +44,7 @@ state_transition: "NOT_AUTHORED -> SCRIPT_DRAFTED -> AUDIO_GENERATED -> SUBTITLE
 
 ## Recording order
 
-1. The actual site recording is not captured yet. Start from a clean browser profile and record the page before creating any local booking.
+1. The actual public Site was recorded from an empty origin before creating the fictional local booking.
 2. Keep the browser address, deployment scope notice, four tool names, state, attempt count, booking count, and effect-start count readable at 1080 pixels.
 3. Use the visible human button for the only simulated commit. Do not invoke a hidden function or edit browser storage.
 4. Record the live service table only after its same-session status check. If ChatGPT Sites, Vercel, or another service has not been verified, leave it visibly unmeasured.
@@ -52,8 +52,8 @@ state_transition: "NOT_AUTHORED -> SCRIPT_DRAFTED -> AUDIO_GENERATED -> SUBTITLE
 
 ## Assembly gates
 
-- English and Japanese subtitle timing is aligned to the measured narration. Confirm every cue against the assembled video before burning captions or upload; current timing alone is not final-video evidence.
+- English and Japanese subtitle timing is aligned to the measured narration. English cues were rendered into the assembled video; Japanese cues remain a separate upload file.
 - Keep burned-in captions to one short line, at most three words and fifteen characters where practical, near the bottom without covering controls.
-- Verify the final duration is below 180 seconds, audio is present, the planned 130 seconds of site recording survived the edit, the actual site-recording share is at least 70 percent, and the first 20 seconds retain the exact generated-scene disclosure.
-- The final video is not assembled, exported, or reviewed. Do not promote any planned value in this storyboard to a completed result.
+- Verified: 150 seconds, audible stereo audio, 130 seconds of actual public-site recording, 86.7 percent actual-site share, and the exact generated-scene disclosure throughout the first 20 seconds.
+- The final video is assembled and locally verified at 1920 by 1080 pixels. It is intentionally not uploaded or published yet.
 - Keep publication at `NOT_STARTED`, `DRAFT`, or `PRIVATE` until the owner separately approves a public video. Do not upload from this workflow.

@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04b8d-00b5-7583-86fc-d4e7a75d3edf"
+    "observationUuidV7": "01a04bcc-aa72-7226-9787-1c0a20bef2e8"
   },
-  "updatedAt": "2026-08-29T03:25:27.093Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED",
+  "updatedAt": "2026-08-29T04:34:59Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -163,7 +163,7 @@
       "remoteId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
       "localPath": "media/demo-video/subtitles.en.srt",
       "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
-      "disclosure": "The exact remote creation time was not returned. observedAt records this evidence update. Timing came from the preserved audio; final-video timing remains unverified until the completed cut is analyzed.",
+      "disclosure": "The exact remote creation time was not returned. Timing came from the preserved audio, and the English cues were verified in the completed 150-second cut.",
       "subtitleEvidence": {
         "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
         "timingMethod": "FASTER_WHISPER_LOCAL",
@@ -172,8 +172,8 @@
         "timedWords": 325,
         "captionCount": 184,
         "remoteMediaId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
-        "observedAt": "2026-08-29T03:01:26.992Z",
-        "finalVideoVerified": false
+        "observedAt": "2026-08-29T04:34:59Z",
+        "finalVideoVerified": true
       }
     },
     {
@@ -186,7 +186,7 @@
       "remoteId": null,
       "localPath": "media/demo-video/subtitles.ja.srt",
       "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
-      "disclosure": "Locally authored Japanese subtitle draft aligned to the preserved narration clock. No remote generation ID exists; final-video timing and readability remain unverified.",
+      "disclosure": "Locally authored Japanese subtitles aligned to the preserved narration clock and verified to end before the completed video; retained separately for the video host.",
       "subtitleEvidence": {
         "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
         "timingMethod": "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES",
@@ -195,8 +195,77 @@
         "timedWords": null,
         "captionCount": 28,
         "remoteMediaId": null,
-        "observedAt": "2026-08-29T03:21:17.650Z",
-        "finalVideoVerified": false
+        "observedAt": "2026-08-29T04:34:59Z",
+        "finalVideoVerified": true
+      }
+    },
+    {
+      "assetId": "68efaedc-f21a-5545-9ee3-d92a88cb3b87",
+      "service": "LOCAL",
+      "kind": "SCREEN_RECORDING",
+      "status": "COMPLETED",
+      "prompt": "Record the public ChatGPT Site from EMPTY through preparation, human confirmation, reload restoration, and RETRY_RECOGNIZED without generated-image processing.",
+      "createdAt": "2026-08-29T04:30:19Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-recording-public-v5-onscreen.mov",
+      "sha256": "620694856c71aa58093a285046ca7df1c5a0a1f29ba16cc146ab112c3ad4c229",
+      "disclosure": "Actual public ChatGPT Sites screen recording. The booking is fictional; no personal information, payment, real hotel, or external reservation is present.",
+      "videoEvidence": {
+        "durationSeconds": 130.013333,
+        "width": 2892,
+        "height": 1716,
+        "frameRate": 60,
+        "hasAudio": false,
+        "englishCaptionsBurned": false,
+        "siteRecordingSeconds": 130.013333,
+        "actualSiteRecordingPermille": 1000,
+        "verifiedAt": "2026-08-29T04:34:59Z"
+      }
+    },
+    {
+      "assetId": "13808dd2-96b3-5153-801c-cd9b6ea57cc2",
+      "service": "LOCAL",
+      "kind": "SCREEN_RECORDING",
+      "status": "COMPLETED",
+      "prompt": "Record the public Site proof panel, ordinary-versus-WebMCP retry comparison, four safe tools, and honest service-state table without generated-image processing.",
+      "createdAt": "2026-08-29T04:32:20Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-recording-public-v5-proof.mov",
+      "sha256": "81742df21b13b6e3c5234cca33d825b3227c989a982ec2ee722800bea2ec6e5e",
+      "disclosure": "Actual public ChatGPT Sites screen recording of local proof and integration states; unknown service results remain visibly unknown.",
+      "videoEvidence": {
+        "durationSeconds": 60.033333,
+        "width": 2892,
+        "height": 1716,
+        "frameRate": 60,
+        "hasAudio": false,
+        "englishCaptionsBurned": false,
+        "siteRecordingSeconds": 60.033333,
+        "actualSiteRecordingPermille": 1000,
+        "verifiedAt": "2026-08-29T04:34:59Z"
+      }
+    },
+    {
+      "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
+      "service": "LOCAL",
+      "kind": "FINAL_VIDEO",
+      "status": "COMPLETED",
+      "prompt": "Assemble two disclosed fictional Higgsfield scenes, 130 seconds of unmodified public Site recording, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
+      "createdAt": "2026-08-29T04:34:09Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/webmcp-hotel-demo-final.mp4",
+      "sha256": "2ceed7bf417dd29a56902276ed9384a5ed9e87734ca66336022f78a1bd0ee12a",
+      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds; the remaining 130 seconds are actual public Site recording of a fictional booking.",
+      "videoEvidence": {
+        "durationSeconds": 150,
+        "width": 1920,
+        "height": 1080,
+        "frameRate": 30,
+        "hasAudio": true,
+        "englishCaptionsBurned": true,
+        "siteRecordingSeconds": 130,
+        "actualSiteRecordingPermille": 867,
+        "verifiedAt": "2026-08-29T04:34:59Z"
       }
     }
   ],
@@ -205,8 +274,8 @@
       "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
       "kind": "STORYBOARD",
       "path": "media/demo-video/storyboard.md",
-      "sha256": "af34d4ab58bcf90ee9c5021eb0681a2b11306fb9c44e8838e36b8f6daae2b259",
-      "status": "DRAFT",
+      "sha256": "c64174f4a5c85e14b93f227b4909e4591f10176199d31edeb12de02eb47cd88a",
+      "status": "FINAL",
       "requiresAudioRetiming": false
     },
     {
@@ -214,7 +283,7 @@
       "kind": "NARRATION_EN",
       "path": "media/demo-video/narration.en.txt",
       "sha256": "cb8b88c6dead055790b2477f8ef135694a4ed42d48be7d52066c44a9f519119b",
-      "status": "DRAFT",
+      "status": "FINAL",
       "requiresAudioRetiming": false
     },
     {
@@ -222,7 +291,7 @@
       "kind": "SUBTITLES_EN",
       "path": "media/demo-video/subtitles.en.srt",
       "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
-      "status": "TIMED_DRAFT",
+      "status": "FINAL",
       "requiresAudioRetiming": false
     },
     {
@@ -230,7 +299,7 @@
       "kind": "SUBTITLES_JA",
       "path": "media/demo-video/subtitles.ja.srt",
       "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
-      "status": "TIMED_DRAFT",
+      "status": "FINAL",
       "requiresAudioRetiming": false
     }
   ],
@@ -239,7 +308,7 @@
     "plannedActualSiteRecordingSeconds": 130,
     "plannedActualSiteRecordingPermille": 867,
     "voiceState": "MEASURED",
-    "captionTimingState": "AUDIO_TIMED_PENDING_FINAL_VIDEO"
+    "captionTimingState": "FINAL_VIDEO_VERIFIED"
   },
   "publication": {
     "youtubeUrl": null,

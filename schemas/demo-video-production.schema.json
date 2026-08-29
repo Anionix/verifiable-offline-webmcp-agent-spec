@@ -49,7 +49,7 @@
         "plannedActualSiteRecordingSeconds": { "type": "integer", "minimum": 1, "maximum": 179 },
         "plannedActualSiteRecordingPermille": { "type": "integer", "minimum": 700, "maximum": 1000 },
         "voiceState": { "enum": ["NOT_GENERATED", "GENERATED", "MEASURED"] },
-        "captionTimingState": { "enum": ["PROVISIONAL", "AUDIO_TIMED_PENDING_FINAL_VIDEO"] }
+        "captionTimingState": { "enum": ["PROVISIONAL", "AUDIO_TIMED_PENDING_FINAL_VIDEO", "FINAL_VIDEO_VERIFIED"] }
       }
     },
     "publication": {
@@ -80,7 +80,7 @@
       "properties": {
         "assetId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "service": { "enum": ["Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva", "LOCAL"] },
-        "kind": { "enum": ["REFERENCE_IMAGE", "VIDEO_SCENE", "VOICE", "SUBTITLE", "THUMBNAIL", "SCREEN_RECORDING"] },
+        "kind": { "enum": ["REFERENCE_IMAGE", "VIDEO_SCENE", "VOICE", "SUBTITLE", "THUMBNAIL", "SCREEN_RECORDING", "FINAL_VIDEO"] },
         "status": { "enum": ["PLANNED", "SUBMITTED", "COMPLETED", "FAILED", "SKIPPED", "UNMEASURED"] },
         "prompt": { "type": ["string", "null"] },
         "createdAt": { "type": ["string", "null"], "format": "date-time" },
@@ -89,7 +89,8 @@
         "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
         "disclosure": { "type": "string", "minLength": 3 },
         "voiceEvidence": { "$ref": "#/$defs/voiceEvidence" },
-        "subtitleEvidence": { "$ref": "#/$defs/subtitleEvidence" }
+        "subtitleEvidence": { "$ref": "#/$defs/subtitleEvidence" },
+        "videoEvidence": { "$ref": "#/$defs/videoEvidence" }
       },
       "allOf": [
         {
@@ -101,6 +102,46 @@
           "if": { "properties": { "kind": { "const": "SUBTITLE" } }, "required": ["kind"] },
           "then": { "required": ["subtitleEvidence"] },
           "else": { "not": { "required": ["subtitleEvidence"] } }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": { "enum": ["SCREEN_RECORDING", "FINAL_VIDEO"] },
+              "status": { "const": "COMPLETED" }
+            },
+            "required": ["kind", "status"]
+          },
+          "then": {
+            "required": ["videoEvidence"],
+            "properties": {
+              "localPath": { "type": "string", "minLength": 1 },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          },
+          "else": { "not": { "required": ["videoEvidence"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "FINAL_VIDEO" } }, "required": ["kind"] },
+          "then": {
+            "properties": {
+              "service": { "const": "LOCAL" },
+              "status": { "const": "COMPLETED" },
+              "remoteId": { "const": null },
+              "videoEvidence": {
+                "allOf": [
+                  { "$ref": "#/$defs/videoEvidence" },
+                  {
+                    "properties": {
+                      "width": { "const": 1920 },
+                      "height": { "const": 1080 },
+                      "hasAudio": { "const": true },
+                      "englishCaptionsBurned": { "const": true }
+                    }
+                  }
+                ]
+              }
+            }
+          }
         },
         {
           "if": { "properties": { "service": { "const": "LOCAL" } }, "required": ["service"] },
@@ -166,6 +207,22 @@
           }
         }
       ]
+    },
+    "videoEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["durationSeconds", "width", "height", "frameRate", "hasAudio", "englishCaptionsBurned", "siteRecordingSeconds", "actualSiteRecordingPermille", "verifiedAt"],
+      "properties": {
+        "durationSeconds": { "type": "number", "minimum": 1, "maximum": 179 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "frameRate": { "type": "number", "exclusiveMinimum": 0 },
+        "hasAudio": { "type": "boolean" },
+        "englishCaptionsBurned": { "type": "boolean" },
+        "siteRecordingSeconds": { "type": "number", "minimum": 1, "maximum": 179 },
+        "actualSiteRecordingPermille": { "type": "integer", "minimum": 700, "maximum": 1000 },
+        "verifiedAt": { "type": "string", "format": "date-time" }
+      }
     },
     "productionFile": {
       "type": "object",

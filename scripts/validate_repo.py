@@ -25,6 +25,10 @@
 # event_uuid_v7=01a04b38-0e40-7ae1-8778-eb130910efa5
 # state_transition=HOST_STATE_UNCHECKED -> HOST_STATE_EXCLUDED occurred_at=2026-08-29T01:52:40.000Z
 # machine-contract: generated integrity records never include mutable host state from .wrangler, .local, dist, or node_modules.
+# information_uuid_v5=8ef00763-b59a-5f86-b841-bf5cee364100
+# event_uuid_v7=01a04bc8-7f33-7fe3-8877-477e7f8b995a
+# state_transition=AUDIO_TIMED_PENDING_FINAL_VIDEO -> FINAL_VIDEO_VERIFIED occurred_at=2026-08-29T04:30:26.100Z
+# machine-contract: every completed screen or final video carries measured video evidence; a verified final cut is local, 1920x1080, audible, English-captioned, under three minutes, and at least 70 percent actual site recording.
 from __future__ import annotations
 
 import argparse
@@ -548,6 +552,42 @@ def main():
         }
         if used_services != asset_services:
             errors.append("used media capability services differ from completed production asset services")
+        video_assets = [
+            record for record in video_production["assets"]
+            if record["kind"] in {"SCREEN_RECORDING", "FINAL_VIDEO"}
+        ]
+        completed_video_assets = [record for record in video_assets if record["status"] == "COMPLETED"]
+        for record in completed_video_assets:
+            evidence = record.get("videoEvidence")
+            if evidence is None:
+                errors.append(f"completed {record['kind']} asset lacks measured video evidence")
+                continue
+            duration_seconds = evidence["durationSeconds"]
+            site_recording_seconds = evidence["siteRecordingSeconds"]
+            if site_recording_seconds > duration_seconds:
+                errors.append(f"{record['kind']} site-recording seconds exceed its duration")
+                continue
+            actual_permille = round(1000 * site_recording_seconds / duration_seconds)
+            if actual_permille != evidence["actualSiteRecordingPermille"]:
+                errors.append(f"{record['kind']} actual site-recording ratio is inconsistent")
+
+        final_video_assets = [record for record in video_assets if record["kind"] == "FINAL_VIDEO"]
+        for record in final_video_assets:
+            evidence = record.get("videoEvidence", {})
+            if (
+                record["service"] != "LOCAL"
+                or record["status"] != "COMPLETED"
+                or record["remoteId"] is not None
+                or evidence.get("width") != 1920
+                or evidence.get("height") != 1080
+                or evidence.get("hasAudio") is not True
+                or evidence.get("englishCaptionsBurned") is not True
+                or not isinstance(evidence.get("durationSeconds"), (int, float))
+                or evidence["durationSeconds"] >= 180
+                or not isinstance(evidence.get("actualSiteRecordingPermille"), int)
+                or evidence["actualSiteRecordingPermille"] < 700
+            ):
+                errors.append("final video must be a completed local 1920x1080 cut with audio, burned English captions, duration under 180 seconds, and at least 70 percent actual site recording")
         production_files = video_production["productionFiles"]
         expected_video_kinds = {"STORYBOARD", "NARRATION_EN", "SUBTITLES_EN", "SUBTITLES_JA"}
         if {record["kind"] for record in production_files} != expected_video_kinds:
@@ -638,6 +678,18 @@ def main():
                 record["subtitleEvidence"]["finalVideoVerified"] is not False for record in subtitle_assets
             ):
                 errors.append("pending final-video captions must remain marked final-video unverified")
+        if plan["captionTimingState"] == "FINAL_VIDEO_VERIFIED":
+            if not all(
+                record["status"] == "FINAL" and record["requiresAudioRetiming"] is False
+                for record in subtitle_records
+            ):
+                errors.append("final-video-verified captions must be final and must not require audio retiming")
+            if not subtitle_assets or any(
+                record["subtitleEvidence"]["finalVideoVerified"] is not True for record in subtitle_assets
+            ):
+                errors.append("final-video-verified subtitle assets must be marked verified against the final cut")
+            if len(final_video_assets) != 1:
+                errors.append("final-video-verified production must contain exactly one final-video asset")
     except Exception as exc:
         errors.append(f"video production evidence structure: {exc}")
     checks["video_production_files"] = len(errors) == video_start

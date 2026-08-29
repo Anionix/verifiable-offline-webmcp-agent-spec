@@ -657,9 +657,7 @@
           "$ref": "#/$defs/millisecondDateTime"
         },
         "url": {
-          "type": "string",
-          "format": "uri",
-          "pattern": "^https://[^/]*devpost\\.com/"
+          "const": "https://devpost.com/software/project-y79pb23hj1mz"
         },
         "evidenceBoundary": {
           "$ref": "#/$defs/nonEmptyText"

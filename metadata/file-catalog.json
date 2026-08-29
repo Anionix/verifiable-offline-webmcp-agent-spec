@@ -4482,8 +4482,8 @@
     },
     {
       "path": "schemas/devpost-public-readback.schema.json",
-      "sha256": "1770792c6be9251fabccfeb1e1cd21dbe186e9987da4e9fcc724e6940e3e5748",
-      "bytes": 20346,
+      "sha256": "bde39b2f04378dbd5ee7f3d744ea32c545fd87299e3be7a240a4ba6f23db7af8",
+      "bytes": 20310,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5014,8 +5014,8 @@
     },
     {
       "path": "scripts/build_manifest.py",
-      "sha256": "fc1c8cfb15ebe95ca6056da4835f8366cf5bbb2edd532b0e7be5370d79f7e9f7",
-      "bytes": 9265,
+      "sha256": "fe81fbbc8a72b34cd95bb701854f2f28cd303f4e85545a026004963f4c4001e6",
+      "bytes": 9620,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {
@@ -5261,8 +5261,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "7c6b725147a16227ca1a35dc842d27a9858a8262a8574b6ccdc2953c85485d3f",
-      "bytes": 129127,
+      "sha256": "04af65f21da40ef86c46783fa3629be1d60d046f0f390e55b907f865c0346c00",
+      "bytes": 129813,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

@@ -56,6 +56,10 @@
 # event_uuid_v7=01a04d89-72ed-735c-a675-2a8ebac80f49
 # state_transition=DEVPOST_CLAIMS_PATH_ONLY -> DEVPOST_CLAIMS_DIGEST_BOUND occurred_at=2026-08-29T12:40:48.621Z
 # machine-contract: each observed Devpost claim resolves through one UUIDv5 context to a repository path, source commit, and recomputed SHA-256 while pending and submitted terminal states remain mutually exclusive.
+# information_uuid_v5=a172bd2d-7872-534d-af8d-b1a5515b9f16
+# event_uuid_v7=01a04dc7-1d90-73c1-b1f4-5f035c55caab
+# state_transition=GENERATED_RELEASE_PRESENT -> SOURCE_VALIDATION_SCOPE_PRESERVED occurred_at=2026-08-29T13:48:10.000Z
+# machine-contract: generated release files are validated by their own manifest and Gitleaks gate, never reinterpreted as repository source files.
 from __future__ import annotations
 
 import argparse
@@ -79,7 +83,7 @@ from referencing import Registry, Resource
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
 JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
-IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "__pycache__"}
+IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "release", "__pycache__"}
 SRT_TIMING = re.compile(
     r"(?P<start_h>\d{2}):(?P<start_m>\d{2}):(?P<start_s>\d{2}),(?P<start_ms>\d{3})"
     r" --> "
@@ -1156,6 +1160,7 @@ def main():
             "verified state with uploaded image absent": json.loads(json.dumps(verified_provider)),
             "verified state with default Open Graph image": json.loads(json.dumps(verified_provider)),
             "pending state with current Open Graph image": json.loads(json.dumps(pending_provider)),
+            "verified state with a lookalike Devpost hostname": json.loads(json.dumps(verified_provider)),
         }
         schema_contradictions["verified state with uploaded image absent"]["anonymousPublicHtml"][
             "uploadedAssetReference"
@@ -1166,6 +1171,9 @@ def main():
         schema_contradictions["pending state with current Open Graph image"]["anonymousPublicHtml"][
             "openGraph"
         ]["image"] = verified_provider["anonymousPublicHtml"]["openGraph"]["image"]
+        schema_contradictions["verified state with a lookalike Devpost hostname"]["submissionReceipt"][
+            "url"
+        ] = "https://evildevpost.com/software/project-y79pb23hj1mz"
         for label, contradictory_record in schema_contradictions.items():
             if not list(devpost_public_validator.iter_errors(contradictory_record)):
                 errors.append(f"Devpost public-readback schema accepted {label}")

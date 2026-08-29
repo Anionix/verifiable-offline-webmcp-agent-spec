@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb")
 MANIFEST_NAME = "MANIFEST.sha256"
 CATALOG_PATH = "metadata/file-catalog.json"
-EXCLUDED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "__pycache__"}
+EXCLUDED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "release", "__pycache__"}
 EXCLUDED_FILES = {".DS_Store", "results.sarif"}
 # information_uuid_v5=50ced5c7-92a0-5047-b4c0-aafb22a1edcb
 # event_uuid_v7=01a048ca-67e3-7b0f-9c74-2f7092340b03
@@ -21,6 +21,9 @@ EXCLUDED_FILES = {".DS_Store", "results.sarif"}
 # event_uuid_v7=01a04a6f-c8b1-744f-b991-fae38fe1d803 state_transition=PUBLIC_SITE_BUILT->GENERATED_DIST_EXCLUDED occurred_at=2026-08-28T22:06:43Z
 # event_uuid_v7=01a04b33-fcac-7667-afd1-01da71a4131b state_transition=HOST_RUNTIME_CREATED->WRANGLER_STATE_EXCLUDED occurred_at=2026-08-29T01:48:13.356Z
 # event_uuid_v7=01a04bdb-34bf-766c-b47a-d92e201fd28f state_transition=VERCEL_PROJECT_LINKED->VERCEL_HOST_STATE_EXCLUDED occurred_at=2026-08-29T04:50:55.000Z
+# information_uuid_v5=e6771705-b37b-52e9-a7eb-1ef9eb094ad0
+# event_uuid_v7=01a04dc7-6bb0-75ca-b54e-4ee5da76b646 state_transition=GENERATED_RELEASE_CREATED->SOURCE_CATALOG_SCOPE_PRESERVED occurred_at=2026-08-29T13:48:30.000Z
+# machine-contract: release output is authenticated by its own manifest and never enters the repository source catalog.
 EXCLUDED_PATHS = {".impeccable/hook.cache.json"}
 MEDIA_TYPES = {
     ".css": "text/css",

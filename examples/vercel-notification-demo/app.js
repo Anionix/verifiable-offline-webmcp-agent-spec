@@ -6,11 +6,19 @@
 
 import { projectNotificationToolInput } from "/input-projection.js";
 import {
+  approvalBindingFromIntent,
+  assertIntentMatchesApprovalBinding,
+  assertVisibleInputMatchesApproval,
+  requestPermissionForApproval,
+} from "/approval-contract.js";
+import {
   abortBeforeEffect,
   approveIntent,
   claimEffectStart,
   confirmEffectPresent,
   createOrReadDryRun,
+  deriveIntentId,
+  digestPayload,
   getIntent,
   getIntentByLogicalOperation,
   listIntentEvents,
@@ -51,6 +59,7 @@ const elements = {
 };
 
 let currentIntentId = null;
+let currentApprovalBinding = null;
 let serviceWorkerRegistration = null;
 
 function formValue() {
@@ -140,6 +149,7 @@ async function renderEvents(intentId) {
 async function renderIntent(intent, message, inputEvidence) {
   if (!intent) throw new TypeError("Persisted intent is unavailable / 保存されたIntentがありません");
   currentIntentId = intent.intentId;
+  currentApprovalBinding = null;
   const safe = stateInvariant(intent);
   elements.intentId.textContent = intent.intentId;
   elements.controlState.textContent = intent.controlState;
@@ -149,9 +159,18 @@ async function renderIntent(intent, message, inputEvidence) {
   elements.provenance.textContent = inputEvidence
     ? `${inputEvidence.channel} · ${inputEvidence.storageKind} · ${inputEvidence.matchesPersisted ? "MATCH" : `FIRST=${inputEvidence.persistedChannel}`}`
     : "IndexedDB readback / 端末内読み戻し";
-  elements.approve.disabled = intent.controlState !== "DRY_RUN";
-  elements.retry.disabled = intent.controlState !== "VERIFIED";
-  elements.reconcile.disabled = !(intent.controlState === "EXECUTING" && intent.effectState === "AMBIGUOUS");
+  if (safe && intent.controlState === "DRY_RUN") {
+    currentApprovalBinding = approvalBindingFromIntent(intent);
+  } else if (safe && intent.controlState === "USER_APPROVED" && intent.effectState === "NOT_STARTED") {
+    try {
+      currentApprovalBinding = assertIntentMatchesApprovalBinding(intent, intent, { requirePersistedApproval: true });
+    } catch {
+      currentApprovalBinding = null;
+    }
+  }
+  elements.approve.disabled = currentApprovalBinding === null;
+  elements.retry.disabled = !safe || intent.controlState !== "VERIFIED";
+  elements.reconcile.disabled = !safe || !(intent.controlState === "EXECUTING" && intent.effectState === "AMBIGUOUS");
   elements.resultCard.dataset.state = safe
     ? intent.controlState === "VERIFIED" ? "verified" : intent.controlState === "EXECUTING" ? "warning" : "ready"
     : "violation";
@@ -169,6 +188,9 @@ async function renderIntent(intent, message, inputEvidence) {
 
 async function previewLocal() {
   const projected = projectNotificationToolInput(formValue());
+  elements.logicalOperation.value = projected.logicalOperationId;
+  elements.title.value = projected.title;
+  elements.body.value = projected.body;
   const envelope = await createOrReadDryRun(projected, { channel: "LOCAL_FORM" });
   await renderIntent(
     envelope.status.intent,
@@ -189,23 +211,51 @@ async function readyRegistration() {
 }
 
 async function approveAndNotify() {
-  if (!currentIntentId) throw new TypeError("Run the dry run first / 先に乾式実行してください");
+  if (!currentIntentId || !currentApprovalBinding) {
+    throw new TypeError("Store the visible dry run before approval / 表示中の内容で乾式実行してください");
+  }
+  const clickedBinding = currentApprovalBinding;
+  const intentId = clickedBinding.intentId;
+  const visibleInput = projectNotificationToolInput(formValue());
+  const [visibleIntentId, visiblePayloadDigest] = await Promise.all([
+    deriveIntentId(visibleInput.logicalOperationId),
+    digestPayload(visibleInput),
+  ]);
+  assertVisibleInputMatchesApproval(clickedBinding, visibleInput, visibleIntentId, visiblePayloadDigest);
+  elements.approve.disabled = true;
   if (!("Notification" in window) || !("serviceWorker" in navigator)) {
     throw new TypeError("This browser cannot verify notifications / このブラウザーでは通知を確認できません");
   }
 
-  const permission = await Notification.requestPermission();
-  const before = await getIntent(currentIntentId);
-  if (!before || before.controlState !== "DRY_RUN") throw new TypeError("Intent is not waiting for approval / 承認待ち状態ではありません");
+  const permissionResult = await requestPermissionForApproval(
+    clickedBinding,
+    () => Notification.requestPermission(),
+  );
+  const capturedBinding = permissionResult.binding;
+  const permission = permissionResult.permission;
+  const before = await getIntent(intentId);
+  if (!before || !["DRY_RUN", "USER_APPROVED"].includes(before.controlState) || before.effectState !== "NOT_STARTED") {
+    throw new TypeError("Intent is not waiting for approval or safe resume / 承認または安全な再開を待つ状態ではありません");
+  }
+  assertIntentMatchesApprovalBinding(before, capturedBinding, {
+    requirePersistedApproval: before.controlState === "USER_APPROVED",
+  });
   if (permission !== "granted") {
-    const stopped = await abortBeforeEffect(currentIntentId, `NOTIFICATION_PERMISSION_${permission.toUpperCase()}`);
+    const stopped = await abortBeforeEffect(intentId, `NOTIFICATION_PERMISSION_${permission.toUpperCase()}`);
     await renderIntent(stopped.intent, "Stopped before any effect because permission was not granted. / 許可されなかったため外部効果の前で停止しました。");
     return;
   }
 
-  const approved = await approveIntent(currentIntentId);
-  await renderIntent(approved.intent, "Human approval bound to this payload. / この内容への人の承認を結び付けました。");
-  const claimed = await claimEffectStart(currentIntentId);
+  const approved = before.controlState === "DRY_RUN"
+    ? await approveIntent(intentId, capturedBinding)
+    : { intent: before };
+  await renderIntent(
+    approved.intent,
+    before.controlState === "DRY_RUN"
+      ? "Human approval bound to this payload. / この内容への人の承認を結び付けました。"
+      : "Resuming the same approved payload before any effect. / 同じ承認内容を外部効果の前から再開します。",
+  );
+  const claimed = await claimEffectStart(intentId, capturedBinding);
   await renderIntent(claimed.intent, "Effect start claimed conservatively; checking the browser. / 開始を保守的に1件計上し、ブラウザーで確認中です。");
 
   try {
@@ -219,15 +269,15 @@ async function approveAndNotify() {
     const active = await registration.getNotifications({ tag: claimed.intent.intentId });
     if (!active.some((notification) => notification.tag === claimed.intent.intentId)) {
       await renderIntent(
-        await getIntent(currentIntentId),
+        await getIntent(intentId),
         "Result is unknown. Automatic retry is blocked. / 結果不明です。自動再送を停止しました。",
       );
       return;
     }
-    const verified = await confirmEffectPresent(currentIntentId);
+    const verified = await confirmEffectPresent(intentId);
     await renderIntent(verified.intent, "One notification was read back and verified. / 通知1件を読み戻して確認しました。");
   } catch (error) {
-    const current = await getIntent(currentIntentId);
+    const current = await getIntent(intentId);
     await renderIntent(
       current,
       `Result is unknown; retry remains blocked. / 結果不明のため再送停止: ${error instanceof Error ? error.message : String(error)}`,
@@ -237,15 +287,17 @@ async function approveAndNotify() {
 
 async function retrySameOperation() {
   if (!currentIntentId) throw new TypeError("No intent to retry / 再試行するIntentがありません");
-  const current = await getIntent(currentIntentId);
+  const intentId = currentIntentId;
+  const current = await getIntent(intentId);
   if (!current || current.controlState !== "VERIFIED") throw new TypeError("Only a verified intent can prove duplicate suppression / 確認済みIntentだけが重複停止を証明できます");
-  const suppressed = await suppressVerifiedDuplicate(currentIntentId);
+  const suppressed = await suppressVerifiedDuplicate(intentId);
   await renderIntent(suppressed.intent, "Duplicate stopped. The effect count is still one. / 重複を停止しました。外部効果は1件のままです。");
 }
 
 async function reconcileUnknown() {
   if (!currentIntentId) throw new TypeError("No intent to reconcile / 照合するIntentがありません");
-  const current = await getIntent(currentIntentId);
+  const intentId = currentIntentId;
+  const current = await getIntent(intentId);
   if (!current || current.controlState !== "EXECUTING" || current.effectState !== "AMBIGUOUS") {
     throw new TypeError("Intent is not ambiguous / 結果不明状態ではありません");
   }
@@ -323,6 +375,13 @@ elements.preview.addEventListener("click", () => void handle(previewLocal));
 elements.approve.addEventListener("click", () => void handle(approveAndNotify));
 elements.retry.addEventListener("click", () => void handle(retrySameOperation));
 elements.reconcile.addEventListener("click", () => void handle(reconcileUnknown));
+for (const input of [elements.logicalOperation, elements.title, elements.body]) {
+  input.addEventListener("input", () => {
+    currentApprovalBinding = null;
+    elements.approve.disabled = true;
+    setMessage("Visible content changed. Store a new dry run before approval. / 表示内容が変わりました。承認前に乾式実行をやり直してください。", "warning");
+  });
+}
 
 if ("serviceWorker" in navigator) {
   try {

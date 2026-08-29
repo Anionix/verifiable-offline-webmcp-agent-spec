@@ -202,9 +202,17 @@ test("TEST-SEC-006 rejects secret-shaped planner context", () => {
   assert.throws(() => projectPlannerContext({ note: "sk-abcdefghijklmnopqrstuvwxyz" }), /secret-like planner value/);
   assert.throws(() => projectPlannerContext({ note: "Basic dXNlcjpwYXNzd29yZA==" }), /secret-like planner value/);
   assert.throws(() => projectPlannerContext({ authorization: "public-looking" }), /secret-like planner field/);
+  for (const field of ["refresh_token", "REFRESH-TOKEN", "client_secret", "clientSecret", "privateKey", "APIKeyValue"]) {
+    assert.throws(
+      () => projectPlannerContext({ [field]: "opaque-public-looking-value" }),
+      /secret-like planner field/,
+      `${field} must be recognized as a complete credential identifier`,
+    );
+  }
   assert.doesNotThrow(() => projectPlannerContext({
     tokenCount: 3,
     secretaryName: "public role",
+    secretiveLabel: "ordinary adjective",
     authorizationStatus: "not-requested",
   }));
 });

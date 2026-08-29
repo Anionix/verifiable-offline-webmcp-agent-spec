@@ -50,6 +50,7 @@ import {
   assertPersistedIntentMatchesPreview,
   createInputBoundaryState,
   createVisualState,
+  notificationControlAvailability,
   REPLAY_GATE_KEYS,
   reduceInputBoundaryState,
   reduceVisualState,
@@ -115,7 +116,7 @@ const elements = {
 let currentIntentId = null;
 let visualState = createVisualState();
 let inputBoundaryState = createInputBoundaryState();
-const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
+await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
 
 const phaseLabels = {
   idle: "実行前",
@@ -128,6 +129,7 @@ const phaseLabels = {
   absent: "表示なしを確認済み",
   "replay-ready": "6項目を確認済み",
   "replay-blocked": "再送を停止済み",
+  "approval-expired": "承認期限切れ",
   violation: "安全条件違反",
   error: "停止",
 };
@@ -135,6 +137,12 @@ const phaseLabels = {
 function syncNode(node, status, state, text) {
   node.dataset.state = state;
   status.textContent = text;
+}
+
+function disableEffectControls() {
+  elements.approve.disabled = true;
+  elements.retry.disabled = true;
+  elements.reconcile.disabled = true;
 }
 
 function renderVisualState(state) {
@@ -162,6 +170,7 @@ function renderVisualState(state) {
   const spokenCount = state.notificationCount === null ? "件数は不明" : `${state.notificationCount}件`;
   elements.countCard.setAttribute("aria-label", `${state.countLabel} ${spokenCount}。${state.countText}`);
   elements.flowAnnouncer.textContent = state.announcement;
+  if (state.phase === "violation") disableEffectControls();
 }
 
 function updateVisual(event) {
@@ -222,16 +231,20 @@ function formValue() {
   };
 }
 
-function render(result, message) {
+function render(result, message, effectStartCount) {
   const intent = result.intent ?? result;
   if (intent?.intentId) {
     currentIntentId = intent.intentId;
     elements.intent.textContent = intent.intentId;
     elements.control.textContent = intent.controlState;
     elements.effect.textContent = intent.effectState;
-    elements.approve.disabled = !["DRY_RUN", "USER_APPROVED", "VERIFIED"].includes(intent.controlState);
-    elements.retry.disabled = intent.controlState !== "VERIFIED";
-    elements.reconcile.disabled = intent.effectState !== "AMBIGUOUS";
+    disableEffectControls();
+    if (Number.isSafeInteger(effectStartCount) && effectStartCount >= 0) {
+      const availability = notificationControlAvailability(intent, effectStartCount);
+      elements.approve.disabled = !availability.approve;
+      elements.retry.disabled = !availability.retry;
+      elements.reconcile.disabled = !availability.reconcile;
+    }
   }
   elements.log.textContent = message + "\n\n" + JSON.stringify(result, null, 2);
 }
@@ -336,6 +349,7 @@ async function preview(values = formValue(), signal) {
     restored
       ? `既存状態を読み戻しました: ${status.intent.controlState} / ${status.intent.effectState}`
       : "乾式実行が完了しました。内容を確認してから承認してください。",
+    status.effectStartCount,
   );
   renderInputEvidence(result.inputEvidence);
   updateVisual(event);
@@ -344,12 +358,13 @@ async function preview(values = formValue(), signal) {
 
 async function approveAndNotify(mode = "initial") {
   if (!currentIntentId) throw new Error("先に乾式実行してください");
+  const intentId = currentIntentId;
   if (mode === "retry") updateVisual({ type: "RETRY_STARTED" });
   const permission = await Notification.requestPermission();
   if (permission !== "granted") throw new Error(`通知権限が許可されませんでした: ${permission}`);
-  const claim = await request("/api/approve-and-claim", { intentId: currentIntentId });
+  const claim = await request("/api/approve-and-claim", { intentId });
   if (claim.status !== "COMMAND") {
-    const status = await readStatus();
+    const status = await readStatus(intentId);
     if (claim.status === "ALREADY_VERIFIED") {
       updateVisual({ type: "DUPLICATE_SUPPRESSED", effectStartCount: status.effectStartCount });
     } else if (claim.status === "RECONCILE_REQUIRED") {
@@ -357,7 +372,7 @@ async function approveAndNotify(mode = "initial") {
     } else {
       updateVisual({ type: "FAILED", message: `外部効果は開始しませんでした: ${claim.status}` });
     }
-    render(claim.intent, `外部効果は開始しませんでした: ${claim.status}`);
+    render(claim.intent, `外部効果は開始しませんでした: ${claim.status}`, status.effectStartCount);
     return claim;
   }
   updateVisual({ type: "EXECUTION_CLAIMED" });
@@ -366,23 +381,22 @@ async function approveAndNotify(mode = "initial") {
     body: claim.command.body,
     tag: claim.command.tag,
     renotify: false,
-    data: { intentId: currentIntentId },
+    data: { intentId },
   });
   const active = await ready.getNotifications({ tag: claim.command.tag });
   if (active.length < 1) {
-    const status = await readStatus();
+    const status = await readStatus(intentId);
     updateVisual({ type: "AMBIGUOUS", effectStartCount: status.effectStartCount });
-    render(claim.intent, "通知表示後の読み戻しができません。状態はAMBIGUOUSのままです。");
-    elements.reconcile.disabled = false;
+    render(claim.intent, "通知表示後の読み戻しができません。状態はAMBIGUOUSのままです。", status.effectStartCount);
     return claim;
   }
   const receipt = await request("/api/receipt", {
-    intentId: currentIntentId,
+    intentId,
     activeTags: active.map((notification) => notification.tag),
   });
-  const status = await readStatus();
+  const status = await readStatus(intentId);
   updateVisual({ type: "PRESENT_CONFIRMED", effectStartCount: status.effectStartCount });
-  render(receipt.intent, "通知を1件表示し、サービスワーカーから読み戻してVERIFIEDになりました。");
+  render(receipt.intent, "通知を1件表示し、サービスワーカーから読み戻してVERIFIEDになりました。", status.effectStartCount);
   return receipt;
 }
 
@@ -402,7 +416,7 @@ async function reconcile() {
   } else {
     updateVisual({ type: "AMBIGUOUS", effectStartCount: status.effectStartCount });
   }
-  render(result.intent, `照合結果: ${result.status}`);
+  render(result.intent, `照合結果: ${result.status}`, status.effectStartCount);
 }
 
 async function handle(action) {
@@ -410,6 +424,7 @@ async function handle(action) {
   catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     updateVisual({ type: "FAILED", message });
+    disableEffectControls();
     elements.log.textContent = `停止: ${message}`;
   }
 }
@@ -451,6 +466,7 @@ async function registerWebMcp() {
           restored
             ? `WebMCPから既存状態を読み戻しました: ${status.intent.controlState} / ${status.intent.effectState}`
             : "WebMCP入力の由来をSQLiteと監査記録から読み戻しました。実通知は開始していません。",
+          status.effectStartCount,
         );
         renderInputEvidence(completion.inputEvidence);
         updateVisual({

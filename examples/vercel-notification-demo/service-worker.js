@@ -7,7 +7,7 @@
 // machine-contract: only same-origin static assets are cached; notification tags remain UUIDv5 intent IDs and no background retry is registered.
 // machine-contract: service-integrations.json is cached as evidence metadata; it cannot authorize or trigger an external deployment.
 
-const CACHE_NAME = "verifiable-offline-webmcp-v3";
+const CACHE_NAME = "verifiable-offline-webmcp-v4";
 const ASSETS = Object.freeze([
   "/",
   "/index.html",
@@ -15,6 +15,7 @@ const ASSETS = Object.freeze([
   "/styles.css",
   "/app.js",
   "/browser-store.js",
+  "/approval-contract.js",
   "/webmcp-adapter.js",
   "/input-projection.js",
   "/webmcp-evals.json",

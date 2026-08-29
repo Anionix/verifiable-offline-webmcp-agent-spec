@@ -340,6 +340,73 @@ test("expired approval aborts before the adapter is called", async () => {
   }
 });
 
+test("an expired approval is explicitly reprepared, reapproved, and started with a new receipt", async () => {
+  const item = fixture("expired-reapproval");
+  try {
+    const intent = item.engine.createIntent({
+      logicalOperationId: "expired-reapproval-case",
+      title: "期限",
+      body: "再承認",
+    });
+    await item.engine.preview(intent.intentId);
+    const expiredReceipt = item.engine.approve(intent.intentId, 1_000);
+    item.now.value += 1_001;
+
+    const reprepared = await item.engine.preview(intent.intentId);
+    const afterReprepare = item.engine.getIntent(intent.intentId)!;
+    assert.equal(afterReprepare.controlState, "DRY_RUN");
+    assert.equal(afterReprepare.effectState, "NOT_STARTED");
+    assert.equal(afterReprepare.approvalEventId, null);
+    assert.equal(afterReprepare.approvalPayloadDigest, null);
+    assert.equal(afterReprepare.approvalExpiresAt, null);
+    assert.equal(reprepared.payloadDigest, intent.payloadDigest);
+
+    const renewedReceipt = item.engine.approve(intent.intentId, 120_000);
+    assert.notEqual(renewedReceipt.eventId, expiredReceipt.eventId);
+    assert.ok(renewedReceipt.expiresAt > expiredReceipt.expiresAt);
+    const claimed = item.engine.claimBrowserExecution(intent.intentId);
+    assert.equal(claimed.status, "COMMAND");
+    assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
+    const kinds = item.store.database
+      .prepare("SELECT kind FROM attempts WHERE intent_id = ? ORDER BY rowid")
+      .all(intent.intentId)
+      .map((row) => (row as { kind: string }).kind);
+    assert.deepEqual(kinds, [
+      "intent-created",
+      "dry-run-reviewed",
+      "user-approved",
+      "expired-approval-reprepared",
+      "user-approved",
+      "execution-claimed",
+    ]);
+  } finally {
+    item.close();
+  }
+});
+
+test("approval and execution fail closed when persisted state contradicts the effect ledger", async () => {
+  const item = fixture("persisted-safety-invariant");
+  try {
+    const intent = item.engine.createIntent({
+      logicalOperationId: "persisted-safety-invariant-case",
+      title: "安全条件",
+      body: "不整合を停止",
+    });
+    await item.engine.preview(intent.intentId);
+    item.store.database.prepare(`
+      INSERT INTO effects (effect_event_id, intent_id, started_at, start_status, outcome, receipt_json)
+      VALUES (?, ?, ?, 'UNKNOWN', 'AMBIGUOUS', NULL)
+    `).run(uuidV7(item.now.value), intent.intentId, item.now.value);
+    assert.throws(
+      () => item.engine.approve(intent.intentId),
+      /approval safety invariant requires zero prior effect starts/,
+    );
+    assert.equal(item.engine.getIntent(intent.intentId)?.controlState, "DRY_RUN");
+  } finally {
+    item.close();
+  }
+});
+
 test("100 healthy simulated notifications have p95 latency below two seconds", async () => {
   const item = fixture("latency");
   try {

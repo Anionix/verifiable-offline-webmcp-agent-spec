@@ -93,17 +93,22 @@ export interface UntrustedData {
 }
 
 const SHA_256 = /^[0-9a-f]{64}$/;
-const SECRET_FIELD_NAME = new RegExp(`^(?:${[
-  "password",
-  "passphrase",
+// information_uuid_v5=de4ed93a-1559-5e48-96fa-edb87540be21
+// event_uuid_v7=01a04c92-0d35-7d8e-99ea-d70457570d18
+// state_transition=COMPOUND_CREDENTIAL_UNRECOGNIZED -> COMPOUND_CREDENTIAL_REJECTED occurred_at=2026-08-29T08:14:35.189Z
+// machine-contract: case, common separators, and camel case are normalized into complete identifier tokens; unrelated words and the two reviewed metadata names remain allowed.
+const SECRET_FIELD_TOKENS = new Set([
   "authorization",
   "credential",
+  "passphrase",
+  "password",
   "secret",
   "token",
-  "access[-_ ]?token",
-  "api[-_ ]?key",
-  ["private", "key"].join("[-_ ]?"),
-].join("|")})$`, "iu");
+]);
+const ALLOWED_SECRET_METADATA_NAMES = new Set([
+  "authorization:status",
+  "token:count",
+]);
 const SECRET_VALUE_MARKERS = [
   ["BEGIN", "PRIVATE", "KEY"].join(" "),
   "BEARER ",
@@ -113,6 +118,27 @@ const MANDATE_DOMAIN = Buffer.from("GOVERNED-MANDATE-v1\0", "utf8");
 
 function digest(value: CanonicalValue): string {
   return createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
+}
+
+function identifierTokens(value: string): readonly string[] {
+  return value
+    .normalize("NFKC")
+    .replace(/([\p{Lu}]+)([\p{Lu}][\p{Ll}])/gu, "$1 $2")
+    .replace(/([\p{Ll}\p{N}])([\p{Lu}])/gu, "$1 $2")
+    .split(/[\s_-]+/u)
+    .filter(Boolean)
+    .map((part) => part.toLocaleLowerCase("en-US"));
+}
+
+function isSecretFieldName(value: string): boolean {
+  const tokens = identifierTokens(value);
+  if (tokens.length === 0) return false;
+  const normalizedName = tokens.join(":");
+  if (ALLOWED_SECRET_METADATA_NAMES.has(normalizedName)) return false;
+  if (tokens.some((token) => SECRET_FIELD_TOKENS.has(token))) return true;
+  return tokens.some((token, index) => {
+    return ["api", "private"].includes(token) && tokens[index + 1] === "key";
+  });
 }
 
 function sameDigest(left: string, right: string): boolean {
@@ -277,7 +303,7 @@ function inspectPlannerValue(value: unknown, path: string): void {
   }
   if (value && typeof value === "object") {
     for (const [key, item] of Object.entries(value)) {
-      if (SECRET_FIELD_NAME.test(key)) throw new TypeError(`secret-like planner field rejected at ${path}.${key}`);
+      if (isSecretFieldName(key)) throw new TypeError(`secret-like planner field rejected at ${path}.${key}`);
       inspectPlannerValue(item, `${path}.${key}`);
     }
   }

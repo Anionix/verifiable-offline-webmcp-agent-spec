@@ -3,6 +3,12 @@
 // event_uuid_v7=01a04a5f-510e-790e-9ea9-95ebbc0de7c5
 // state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T22:05:45.742Z
 // machine-contract: one UUIDv5 intent owns one logical operation; IndexedDB commits the intent and its UUIDv7 hash-chain event together before readback is reported.
+// information_uuid_v5=052d7341-5d48-55ba-befc-f265cf493e8f
+// event_uuid_v7=01a04c92-0d3b-734f-8e7f-2d48e2020c85
+// state_transition=USER_APPROVED_NOT_STARTED -> EXECUTING_ONCE occurred_at=2026-08-29T08:14:35.195Z
+// machine-contract: a persisted approval carries its intent and payload digest, and only that same binding may claim the single effect start after reload.
+
+import { assertIntentMatchesApprovalBinding } from "./approval-contract.js";
 
 const DATABASE_NAME = "verifiable-offline-webmcp-notification-v1";
 const DATABASE_VERSION = 1;
@@ -216,7 +222,7 @@ async function hashEvent(eventWithoutHash) {
 
 /**
  * @param {Record<string, any>} current
- * @param {{ kind: string, toControl: string, toEffect: string, effectStartCount: number, details?: Record<string, unknown> }} change
+ * @param {{ kind: string, toControl: string, toEffect: string, effectStartCount: number, details?: Record<string, unknown>, intentPatch?: Record<string, unknown> }} change
  */
 async function nextMutation(current, change) {
   if (!Number.isSafeInteger(change.effectStartCount) || change.effectStartCount < 0 || change.effectStartCount > 1) {
@@ -226,6 +232,7 @@ async function nextMutation(current, change) {
   const transitionKey = `${change.kind}:${current.controlState}/${current.effectState}->${change.toControl}/${change.toEffect}`;
   const allowed = new Set([
     "human-approved:DRY_RUN/NOT_STARTED->USER_APPROVED/NOT_STARTED",
+    "unbound-approval-reprepared:USER_APPROVED/NOT_STARTED->DRY_RUN/NOT_STARTED",
     "stopped-before-effect:DRY_RUN/NOT_STARTED->ABORTED/NOT_STARTED",
     "stopped-before-effect:USER_APPROVED/NOT_STARTED->ABORTED/NOT_STARTED",
     "effect-start-claimed:USER_APPROVED/NOT_STARTED->EXECUTING/AMBIGUOUS",
@@ -238,6 +245,7 @@ async function nextMutation(current, change) {
   const sequence = current.revision + 1;
   const next = {
     ...current,
+    ...(change.intentPatch ?? {}),
     controlState: change.toControl,
     effectState: change.toEffect,
     effectStartCount: change.effectStartCount,
@@ -316,6 +324,22 @@ export async function createOrReadDryRun(input, context) {
       if (!persistedEvent || persistedEvent.hash !== existing.provenanceEventHash) {
         throw new TypeError("persisted provenance event is unavailable");
       }
+      if (existing.controlState === "USER_APPROVED" && existing.effectState === "NOT_STARTED") {
+        try {
+          assertIntentMatchesApprovalBinding(existing, existing, { requirePersistedApproval: true });
+        } catch {
+          const mutation = await nextMutation(existing, {
+            kind: "unbound-approval-reprepared",
+            toControl: "DRY_RUN",
+            toEffect: "NOT_STARTED",
+            effectStartCount: 0,
+            intentPatch: { approvalIntentId: null, approvalPayloadDigest: null },
+            details: { reason: "LEGACY_OR_MISMATCHED_APPROVAL_BINDING" },
+          });
+          const reset = await putAndReadBack(mutation.intent, mutation.event);
+          return dryRunEnvelope(reset.intent, invocation, persistedEvent);
+        }
+      }
       return dryRunEnvelope(existing, invocation, persistedEvent);
     }
 
@@ -331,6 +355,8 @@ export async function createOrReadDryRun(input, context) {
       controlState: "DRY_RUN",
       effectState: "NOT_STARTED",
       effectStartCount: 0,
+      approvalIntentId: null,
+      approvalPayloadDigest: null,
       revision: 1,
       createdAt: now,
       updatedAt: now,
@@ -364,26 +390,37 @@ export async function createOrReadDryRun(input, context) {
 
 /**
  * @param {string} intentId
- * @param {{ kind: string, toControl: string, toEffect: string, effectStartCount: number, details?: Record<string, unknown> }} change
+ * @param {{ kind: string, toControl: string, toEffect: string, effectStartCount: number, details?: Record<string, unknown>, intentPatch?: Record<string, unknown> }} change
+ * @param {Record<string, any>} [approvalBinding]
+ * @param {{ requirePersistedApproval?: boolean }} [bindingOptions]
  */
-async function transition(intentId, change) {
+async function transition(intentId, change, approvalBinding, bindingOptions) {
   return withLedgerLock(async () => {
     const current = await getIntent(intentId);
     if (!current) throw new TypeError("notification intent does not exist");
+    if (approvalBinding) assertIntentMatchesApprovalBinding(current, approvalBinding, bindingOptions);
     const mutation = await nextMutation(current, change);
     return putAndReadBack(mutation.intent, mutation.event);
   });
 }
 
-/** @param {string} intentId */
-export function approveIntent(intentId) {
+/** @param {string} intentId @param {Record<string, any>} approvalBinding */
+export function approveIntent(intentId, approvalBinding) {
   return transition(intentId, {
     kind: "human-approved",
     toControl: "USER_APPROVED",
     toEffect: "NOT_STARTED",
     effectStartCount: 0,
-    details: { approvalSurface: "VISIBLE_BUTTON" },
-  });
+    intentPatch: {
+      approvalIntentId: approvalBinding?.intentId,
+      approvalPayloadDigest: approvalBinding?.payloadDigest,
+    },
+    details: {
+      approvalSurface: "VISIBLE_BUTTON",
+      approvalIntentId: approvalBinding?.intentId,
+      approvalPayloadDigest: approvalBinding?.payloadDigest,
+    },
+  }, approvalBinding);
 }
 
 /** @param {string} intentId @param {string} reason */
@@ -397,15 +434,19 @@ export function abortBeforeEffect(intentId, reason) {
   });
 }
 
-/** @param {string} intentId */
-export function claimEffectStart(intentId) {
+/** @param {string} intentId @param {Record<string, any>} approvalBinding */
+export function claimEffectStart(intentId, approvalBinding) {
   return transition(intentId, {
     kind: "effect-start-claimed",
     toControl: "EXECUTING",
     toEffect: "AMBIGUOUS",
     effectStartCount: 1,
-    details: { startStatus: "UNKNOWN" },
-  });
+    details: {
+      startStatus: "UNKNOWN",
+      approvalIntentId: approvalBinding?.intentId,
+      approvalPayloadDigest: approvalBinding?.payloadDigest,
+    },
+  }, approvalBinding, { requirePersistedApproval: true });
 }
 
 /** @param {string} intentId */

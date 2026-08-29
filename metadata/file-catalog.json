@@ -472,8 +472,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1edeb10f01d55c163989b47f7355b3cfa8abecfa8e52a0d762c1d2844d393d05",
-      "bytes": 25202,
+      "sha256": "af5fea2f2c5aaf83a8553a69112db840d731f2e73c53bceff8fd892f43986f3f",
+      "bytes": 25306,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1764,8 +1764,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "679c933f393fe378f28ad382b63b495d70d3e1387d5839092e2ef28cbdfcaa0c",
-      "bytes": 12998,
+      "sha256": "d9a1ea54b98fd756a73d6222d0e997d4866b67a07eb0b7147a2c7e63b54e99c9",
+      "bytes": 13072,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1783,8 +1783,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "e6146cafe9937d92ae9a8787393b9d80f9676eb796cadaeabd11940b58ad0eb2",
-      "bytes": 7968,
+      "sha256": "86aa0aa380f2f44d7d047304d63466823f9743153bfd55f0d763f93d6040535d",
+      "bytes": 8003,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3684,8 +3684,8 @@
     },
     {
       "path": "metadata/hotel-booking-verification.json",
-      "sha256": "68dc953ab32a3a29cedfd1175afaae70b73b1008768824b186732b4f1e297f01",
-      "bytes": 10504,
+      "sha256": "96a585076b4c9b5d479c7ec49ddc0ac750b6f9962c398a55fcda64a8021e9a75",
+      "bytes": 10673,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {

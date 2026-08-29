@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04bcf-65d6-72dd-a8dd-23a082646575"
-observed_at: "2026-08-29T04:37:58Z"
-state_transition: "PUBLIC_SITE_VERSION_4_VERIFIED -> PUBLIC_SITE_CURRENT_VERIFIED"
+event_uuid_v7: "01a04bd6-e952-73ae-9204-26af0331d1c7"
+observed_at: "2026-08-29T04:46:10Z"
+state_transition: "PUBLIC_SITE_CURRENT_VERIFIED -> PUBLIC_SITE_VERSION_6_LIVE_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -39,11 +39,11 @@ state_transition: "PUBLIC_SITE_VERSION_4_VERIFIED -> PUBLIC_SITE_CURRENT_VERIFIE
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日4時37分58秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日4時46分10秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の本番URLで版5を実行・画面録画済み |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の版6を実行済み、同じ機能の版5を画面録画済み |
 | Vercel | `ACTIVE` | `CONFIRMED` | `BASELINE_ONLY` | `BASELINE_ONLY` | 予備公開先。確認済みなのは古い通知実演だけ |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -54,7 +54,7 @@ state_transition: "PUBLIC_SITE_VERSION_4_VERIFIED -> PUBLIC_SITE_CURRENT_VERIFIE
 
 DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未定`、説明・動画URLが空、最終提出前であることを確認しました。名称は利用者が決めるため変更していません。
 
-ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`9b3c798fa4bcd80b48c2726be36c9f7e48bc9493`を版5として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。未ログイン表示を確認し、通常の再送とWebMCPの安全な再送を並べた比較、準備、人間の画面操作による確定、安全な再送、再読込復元を実行して画面録画しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。
+ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`ef35bdec624e660db0cd1849fb3be3e33a6e0cd6`を版6として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版6で未ログイン表示、通常再送との比較、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の実画面部分は、同じ機能要約値を持つ直前の公開版5を収録しています。
 
 Vercelの`BASELINE_ONLY`は、過去の通知実演を見たという意味です。現在のホテル成果物が公開済み、匿名で閲覧可能、または正常動作するという意味ではありません。
 
@@ -79,7 +79,7 @@ NetlifyとRenderは、リポジトリ内の公開先パスと限定した設定�
 
 Shopifyは商品検索、買い物かご、購入画面、注文履歴に関する商取引の境界を説明するだけです。ホテル予約の操作機能として接続しません。
 
-Google Chromeでは一般公開の版5を未ログインで表示し、初期状態、再送比較、四つの安全な機能カードを確認しました。ただし`document.modelContext`は未定義で、ChromeのWebMCP実行機能はページへ露出しませんでした。したがって、画面表示は確認済みですが、Chromeでの四機能の発見・実行は`INCONCLUSIVE`のままです。
+Google Chromeでは一般公開の版6を未ログインで表示し、初期状態、再送比較、四つの安全な機能カードを確認しました。ただし`document.modelContext`は未定義で、ChromeのWebMCP実行機能はページへ露出しませんでした。したがって、画面表示は確認済みですが、Chromeでの四機能の発見・実行は`INCONCLUSIVE`のままです。
 
 ## 外部操作の承認境界
 

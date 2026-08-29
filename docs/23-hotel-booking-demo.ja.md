@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04bcf-65d6-72dd-a8dd-23a13d067824"
-observed_at: "2026-08-29T04:37:58Z"
-status: "public-version-5-screen-recorded-and-final-video-verified"
+event_uuid_v7: "01a04bd6-e952-73ae-9204-26b090c7d975"
+observed_at: "2026-08-29T04:46:10Z"
+status: "public-version-6-live-verified-and-final-video-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -65,21 +65,21 @@ status: "public-version-5-screen-recorded-and-final-video-verified"
 | 言語変更でも同じUUIDv5 | 成功 | Node試験 |
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
-| WebMCP四機能の発見と実行 | 成功（現行版） | 一般公開前の版3で発見と実行を確認。版5は同じ四機能を維持し、通常の再送との比較を追加 |
+| WebMCP四機能の発見と実行 | 成功（現行版） | 一般公開前の版3で発見と実行を確認。版6は同じ四機能を維持し、通常の再送との比較を追加 |
 | 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites一般公開実行 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版5を未ログインで表示。2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認 |
-| 可視証拠パネル | 成功（現行版） | 版5でUUIDv5、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を実画面録画 |
+| ChatGPT Sites一般公開実行 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版6を未ログインで表示。2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認 |
+| 可視証拠パネル | 成功（現行版） | 版6でUUIDv5、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版5の同じ機能を実画面録画 |
 | Vercel更新 | 未計測 | 別承認が必要 |
 
 機械可読の正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)です。
 
 ## 公開、動画、Devpostの現在状態
 
-- WebMCP比較画面を含む機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`と証拠更新を含むコミット`9b3c798fa4bcd80b48c2726be36c9f7e48bc9493`は、ChatGPT Sites版5として一般公開済みです。未ログイン表示、人間確認境界、再送収束、再読込復元を実URLで確認しました。
+- WebMCP比較画面を含む機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`と動画証拠契約を含むコミット`ef35bdec624e660db0cd1849fb3be3e33a6e0cd6`は、ChatGPT Sites版6として一般公開済みです。未ログイン表示、人間確認境界、再送収束、再読込復元を実URLで確認しました。
 - 最終動画は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、残り130秒（86.7%）は実際の公開Site録画です。日本語字幕は別のSubRipファイルとして保持しています。動画公開はまだ行っていません。
 - Devpost下書きは今回更新していません。この作業場所に`.devpost-hackathon-state.json`がないため、下書き更新の前提を満たしておらず、最終提出も行っていません。
 

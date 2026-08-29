@@ -1,0 +1,262 @@
+{
+  "format": {
+    "name": "OpenKnowledgeFormat-inspired evidence record",
+    "version": "0.2",
+    "profile": "devpost-hotel-submission"
+  },
+  "identity": {
+    "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "informationUuidV5": "faef02a2-712f-5fd3-b88f-dc44bc45db1f",
+    "recordEventUuidV7": "01a04dab-38f1-7c24-92ec-322d89263c16"
+  },
+  "recordedAt": "2026-08-29T13:17:42.001Z",
+  "preparedFromCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  "subject": {
+    "projectId": "1405191",
+    "slug": "project-y79pb23hj1mz",
+    "name": "Kyoto Booking Retry Proof",
+    "tagline": "WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.",
+    "hackathon": "WebMCP Challenge",
+    "hackathonSlug": "webmcp",
+    "scope": "Fictional, device-local Kyoto hotel duplicate-booking prevention demo"
+  },
+  "machineContract": {
+    "stateSequence": [
+      {
+        "eventUuidV7": "01a04d7a-091e-7630-b535-4247e0e581a1",
+        "occurredAt": "2026-08-29T12:23:58.494Z",
+        "from": "MISMATCH_DETECTED",
+        "to": "PUBLIC_PROJECT_ALIGNED",
+        "evidence": "Devpost version 11 saved the Kyoto hotel retry title, description, public links, four-step test, and 153-test marker; authenticated readback confirmed the saved fields."
+      },
+      {
+        "eventUuidV7": "01a04d7a-8fe7-74fa-bb75-24485ec16f18",
+        "occurredAt": "2026-08-29T12:24:32.999Z",
+        "from": "PUBLIC_PROJECT_ALIGNED",
+        "to": "SUBMISSION_PREPARED",
+        "evidence": "The local draft and workflow state contain the owner-confirmed answers, the four bounded WebMCP tools, public URLs, and explicit uncertainty boundaries."
+      },
+      {
+        "eventUuidV7": "01a04d95-8640-7d6e-aca3-4fee9941e100",
+        "occurredAt": "2026-08-29T12:54:00.000Z",
+        "from": "SUBMISSION_PREPARED",
+        "to": "FINAL_SUBMISSION_PENDING",
+        "evidence": "Authenticated Devpost readback returned submittedAt null; final challenge submission remained pending."
+      },
+      {
+        "eventUuidV7": "01a04dab-38f1-7c24-92ec-322d89263c16",
+        "occurredAt": "2026-08-29T13:17:42.001Z",
+        "from": "FINAL_SUBMISSION_PENDING",
+        "to": "FINAL_SUBMISSION_VERIFIED",
+        "evidence": "Devpost submit-project returned submission 1158722 with status Submitted, authenticated readback confirmed submittedAt 2026-08-29T13:14:00.129Z, and later anonymous HTML exposed the current hotel title and uploaded image; the three final local records are SHA-256-bound in the tracked checkout tree."
+      }
+    ],
+    "invariants": [
+      "Only a Devpost-owned readback with non-null submitted_at proves final challenge submission.",
+      "The local workflow state records preparation progress but does not persist Devpost-owned submission truth.",
+      "Every observed claim resolves through one contextIdUuidV5 to a tracked checkout path and its recorded SHA-256 digest; it never requires an off-history commit object.",
+      "Every observed, unmeasured, and not-applicable claim remains in a separate collection.",
+      "WebMCP exposes check, prepare, status, and cancellation preview only; confirmation, payment, and cancellation mutation remain unavailable.",
+      "The running demo never represents a real booking, payment, hotel, email, cancellation, or personal record."
+    ]
+  },
+  "sources": [
+    {
+      "sourceIdUuidV5": "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
+      "kind": "DEVPOST_PROJECT",
+      "url": "https://devpost.com/software/project-y79pb23hj1mz"
+    },
+    {
+      "sourceIdUuidV5": "464580d5-0ea4-5898-8ed6-2208b9f3ae6f",
+      "kind": "PRIMARY_LIVE_DEMO",
+      "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site"
+    },
+    {
+      "sourceIdUuidV5": "d0dc5255-be16-5a0c-93c4-3b2a13c4ac4c",
+      "kind": "BACKUP_LIVE_DEMO",
+      "url": "https://kyoto-booking-retry-proof.vercel.app"
+    },
+    {
+      "sourceIdUuidV5": "686e1eeb-063b-5c79-be95-3d91d416f7e3",
+      "kind": "PUBLIC_VIDEO",
+      "url": "https://youtu.be/tdSvJw4ghX8"
+    },
+    {
+      "sourceIdUuidV5": "e39792a3-66de-541e-9a82-0acf980a61e8",
+      "kind": "PUBLIC_REPOSITORY",
+      "url": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec"
+    },
+    {
+      "sourceIdUuidV5": "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa",
+      "kind": "PUBLIC_THUMBNAIL_READBACK",
+      "url": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png"
+    },
+    {
+      "sourceIdUuidV5": "62e5273b-3b77-567a-818c-d375e5e238e7",
+      "kind": "OFFICIAL_CHALLENGE_RESOURCE",
+      "url": "https://webmcp.devpost.com/resources"
+    },
+    {
+      "sourceIdUuidV5": "58548cc1-9435-51ef-a9df-c39e61625e06",
+      "kind": "LOCAL_VERIFICATION_RECORD",
+      "path": "metadata/hotel-booking-verification.json"
+    }
+  ],
+  "observationContexts": [
+    {
+      "contextIdUuidV5": "198fed6c-23d7-5e3a-acc0-e048397f1819",
+      "path": "metadata/devpost-public-readback.json",
+      "sourceCommit": "CHECKOUT_TREE",
+      "artifactSha256": "72ab2ddd9f21eb1fd0a538c8e2fd501f3ce828729f2368cac06b924bf9040a7c"
+    },
+    {
+      "contextIdUuidV5": "ca688e1d-e973-55e5-ba31-c9d7b10b304b",
+      "path": "devpost-submission.md",
+      "sourceCommit": "CHECKOUT_TREE",
+      "artifactSha256": "3f3071ed1894752623e52fc95fdaecf81e234d4f288bd6967588b24e37d7fbc9"
+    },
+    {
+      "contextIdUuidV5": "bb838f07-e9de-58c7-9838-9b366356bde9",
+      "path": ".devpost-hackathon-state.json",
+      "sourceCommit": "CHECKOUT_TREE",
+      "artifactSha256": "0e410d9307d396eb5820a2f41b613b6e20ee31ff519235fb9e8fc0404d0feb5c"
+    }
+  ],
+  "observed": [
+    {
+      "claimIdUuidV5": "b81a224a-1259-5632-b90c-241a7e7fddaa",
+      "observationEventUuidV7": "01a04dab-38f0-7bfc-a376-f9208a3dcdd4",
+      "observedAt": "2026-08-29T13:17:42.000Z",
+      "state": "OBSERVED",
+      "contextIdUuidV5": "198fed6c-23d7-5e3a-acc0-e048397f1819",
+      "claim": "The final provider receipt, authenticated project readback, and anonymous public HTML prove Devpost submission 1158722, non-null submittedAt 2026-08-29T13:14:00.129Z, the current hotel title, and the uploaded image association.",
+      "evidenceBoundary": "The authenticated readback agrees on project, challenge, and submittedAt; the receipt alone supplies submission URL and status, while the anonymous HTML separately proves the current Open Graph title and exact image URL.",
+      "sourceIds": [
+        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
+        "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa"
+      ]
+    },
+    {
+      "claimIdUuidV5": "5424525f-3020-5441-9578-f36537ed1247",
+      "observationEventUuidV7": "01a04da9-0f6d-7b62-bdaf-a8b883e55183",
+      "observedAt": "2026-08-29T13:15:20.301Z",
+      "state": "OBSERVED",
+      "contextIdUuidV5": "ca688e1d-e973-55e5-ba31-c9d7b10b304b",
+      "claim": "The final Devpost record is hotel-specific, lists the four bounded WebMCP tools, preserves uncertainty limits, and records submission 1158722 as verified.",
+      "evidenceBoundary": "This committed record summarizes the provider evidence; it does not replace the Devpost-owned receipt and authenticated readback.",
+      "sourceIds": [
+        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
+        "58548cc1-9435-51ef-a9df-c39e61625e06"
+      ]
+    },
+    {
+      "claimIdUuidV5": "1f595ed3-ddb7-5529-86ac-2b0bcefb24d0",
+      "observationEventUuidV7": "01a04dab-38f0-7bf5-9ede-086859e6beef",
+      "observedAt": "2026-08-29T13:17:42.000Z",
+      "state": "OBSERVED",
+      "contextIdUuidV5": "bb838f07-e9de-58c7-9838-9b366356bde9",
+      "claim": "The local workflow records project version 11, submission 1158722, status submitted, and FINAL_SUBMISSION_VERIFIED.",
+      "evidenceBoundary": "This local workflow mirrors the provider result and keeps any later resubmission outside the current action.",
+      "sourceIds": [
+        "3aea8b81-0fc6-530a-a9d9-8fa2733838bd"
+      ]
+    }
+  ],
+  "unmeasured": [
+    {
+      "claimIdUuidV5": "5f9d6ae8-3729-5cfd-be33-76d07eb08a29",
+      "state": "INCONCLUSIVE",
+      "claim": "Native WebMCP discovery and execution in the connected Google Chrome session.",
+      "reason": "document.modelContext was unavailable in the observed Chrome page scope.",
+      "sourceIds": [
+        "58548cc1-9435-51ef-a9df-c39e61625e06"
+      ]
+    },
+    {
+      "claimIdUuidV5": "f89c88b3-f0a6-51fe-89da-69f3889326f9",
+      "state": "INCONCLUSIVE",
+      "claim": "Independent physical-keyboard focus traversal.",
+      "reason": "The browser-control backend did not reproduce Tab traversal.",
+      "sourceIds": [
+        "58548cc1-9435-51ef-a9df-c39e61625e06"
+      ]
+    },
+    {
+      "claimIdUuidV5": "a713d6dd-8ef4-5fad-88c9-650eda58d842",
+      "state": "INCONCLUSIVE",
+      "claim": "Screen-reader operation.",
+      "reason": "No VoiceOver or equivalent assistive-technology run was recorded.",
+      "sourceIds": [
+        "58548cc1-9435-51ef-a9df-c39e61625e06"
+      ]
+    },
+    {
+      "claimIdUuidV5": "a6919f3c-bc61-5e46-af7e-194bebce5dd8",
+      "state": "UNMEASURED",
+      "claim": "Byte identity between the locally verified final video and the public YouTube video.",
+      "reason": "No independent upload-operation receipt was retained.",
+      "sourceIds": [
+        "686e1eeb-063b-5c79-be95-3d91d416f7e3",
+        "e39792a3-66de-541e-9a82-0acf980a61e8"
+      ]
+    }
+  ],
+  "notApplicable": [
+    {
+      "claimIdUuidV5": "17e1061c-7e04-5626-8693-e379e427eaa2",
+      "state": "NOT_APPLICABLE",
+      "claim": "Real hotel booking, payment, email, external cancellation, or personal-data handling.",
+      "reason": "The demo is intentionally fictional and device-local.",
+      "sourceIds": [
+        "464580d5-0ea4-5898-8ed6-2208b9f3ae6f",
+        "58548cc1-9435-51ef-a9df-c39e61625e06"
+      ]
+    }
+  ],
+  "thumbnail": {
+    "assetIdUuidV5": "b498d498-d38e-5ede-8826-d431f3800164",
+    "localPath": "docs/assets/devpost-hotel-thumbnail.png",
+    "sha256": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10",
+    "width": 1672,
+    "height": 941,
+    "contentType": "image/png",
+    "publicUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+    "publicationState": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_VERIFIED",
+    "content": "AI-edited crop-and-reframe derivative of a public fictional-hotel demo screenshot in RETRY_RECOGNIZED, showing two attempts, one booking, and one effect start.",
+    "provenance": {
+      "sourceUrl": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
+      "captureMethod": "Chrome DevTools screenshot",
+      "transformationTool": "OpenAI imagegen",
+      "transformation": "CROP_AND_REFRAME_ONLY",
+      "prompt": "Crop and reframe the supplied real public-site screenshot as a clean 16:9 Devpost project thumbnail. Preserve the existing hotel-demo interface, wording, counts, colors, and pixels; do not invent, replace, or synthesize interface content.",
+      "fileObservedAt": "2026-08-29T11:58:26.824Z",
+      "syntheticUiAllowed": false,
+      "sourceScreenshotRepositoryState": "NOT_RETAINED"
+    }
+  },
+  "submission": {
+    "draftFile": "devpost-submission.md",
+    "workflowStateFile": ".devpost-hackathon-state.json",
+    "localStatus": "SUBMITTED",
+    "devpostSubmittedAt": "2026-08-29T13:14:00.129Z",
+    "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
+    "finalEvidenceSourceCommit": "CHECKOUT_TREE",
+    "requiredOwnerAnswers": [],
+    "confirmedAnswers": {
+      "informationUuidV5": "38c68b77-906e-5988-9869-76a4caceb8a5",
+      "confirmationEventUuidV7": "01a04d6a-f3a0-732f-96c3-c484365ac2d2",
+      "confirmedAt": "2026-08-29T12:07:29.952Z",
+      "values": {
+        "28249": "Individual",
+        "28250": "Japan",
+        "28259": "Significant",
+        "28260": "Yes"
+      }
+    },
+    "optionalOwnerAnswers": [],
+    "nextCommand": "hackathon-map",
+    "devpostSubmissionId": 1158722,
+    "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+    "devpostSubmitToolStatus": "SUBMITTED"
+  }
+}

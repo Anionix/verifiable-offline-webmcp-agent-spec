@@ -1,0 +1,461 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/devpost-hotel-submission.schema.json",
+  "$comment": "information_uuid_v5=5be1512f-df3b-592e-9e4b-91dff94f99db event_uuid_v7=01a04dab-38f1-7c24-92ec-322d89263c16 state_transition=FINAL_SUBMISSION_PENDING -> FINAL_SUBMISSION_VERIFIED occurred_at=2026-08-29T13:17:42.001Z machine-contract=the Devpost hotel packet binds every observed claim through a UUIDv5 context to an exact SHA-256 source; CHECKOUT_TREE means the current tracked checkout and avoids a dependency on an off-history commit",
+  "title": "Devpost hotel submission evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "identity",
+    "recordedAt",
+    "preparedFromCommit",
+    "subject",
+    "machineContract",
+    "sources",
+    "observationContexts",
+    "observed",
+    "unmeasured",
+    "notApplicable",
+    "thumbnail",
+    "submission"
+  ],
+  "properties": {
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "profile"],
+      "properties": {
+        "name": { "const": "OpenKnowledgeFormat-inspired evidence record" },
+        "version": { "const": "0.2" },
+        "profile": { "const": "devpost-hotel-submission" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaceUuidV5", "informationUuidV5", "recordEventUuidV7"],
+      "properties": {
+        "namespaceUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "recordEventUuidV7": { "$ref": "#/$defs/uuidV7" }
+      }
+    },
+    "recordedAt": { "$ref": "#/$defs/dateTime" },
+    "preparedFromCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "slug", "name", "tagline", "hackathon", "hackathonSlug", "scope"],
+      "properties": {
+        "projectId": { "const": "1405191" },
+        "slug": { "const": "project-y79pb23hj1mz" },
+        "name": { "const": "Kyoto Booking Retry Proof" },
+        "tagline": { "type": "string", "minLength": 3 },
+        "hackathon": { "const": "WebMCP Challenge" },
+        "hackathonSlug": { "const": "webmcp" },
+        "scope": { "type": "string", "minLength": 3 }
+      }
+    },
+    "machineContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stateSequence", "invariants"],
+      "properties": {
+        "stateSequence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/stateEvent" }
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "observationContexts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/observationContext" }
+    },
+    "observed": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/observedClaim" }
+    },
+    "unmeasured": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/unmeasuredClaim" }
+    },
+    "notApplicable": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/notApplicableClaim" }
+    },
+    "thumbnail": { "$ref": "#/$defs/thumbnail" },
+    "submission": { "$ref": "#/$defs/submission" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "submission": {
+            "properties": { "devpostOwnedStatus": { "const": "FINAL_SUBMISSION_PENDING" } },
+            "required": ["devpostOwnedStatus"]
+          }
+        },
+        "required": ["submission"]
+      },
+      "then": {
+        "properties": {
+          "machineContract": {
+            "properties": { "stateSequence": { "$ref": "#/$defs/pendingStateSequence" } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "machineContract": {
+            "properties": { "stateSequence": { "$ref": "#/$defs/submittedStateSequence" } }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stateEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventUuidV7", "occurredAt", "from", "to", "evidence"],
+      "properties": {
+        "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "occurredAt": { "$ref": "#/$defs/dateTime" },
+        "from": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "to": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "evidence": { "type": "string", "minLength": 3 }
+      }
+    },
+    "pendingStateSequence": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        { "$ref": "#/$defs/mismatchToAlignedEvent" },
+        { "$ref": "#/$defs/alignedToPreparedEvent" },
+        { "$ref": "#/$defs/preparedToPendingEvent" }
+      ],
+      "items": false
+    },
+    "submittedStateSequence": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        { "$ref": "#/$defs/mismatchToAlignedEvent" },
+        { "$ref": "#/$defs/alignedToPreparedEvent" },
+        { "$ref": "#/$defs/preparedToPendingEvent" },
+        { "$ref": "#/$defs/pendingToVerifiedEvent" }
+      ],
+      "items": false
+    },
+    "mismatchToAlignedEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/stateEvent" },
+        { "properties": { "from": { "const": "MISMATCH_DETECTED" }, "to": { "const": "PUBLIC_PROJECT_ALIGNED" } } }
+      ]
+    },
+    "alignedToPreparedEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/stateEvent" },
+        { "properties": { "from": { "const": "PUBLIC_PROJECT_ALIGNED" }, "to": { "const": "SUBMISSION_PREPARED" } } }
+      ]
+    },
+    "preparedToPendingEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/stateEvent" },
+        { "properties": { "from": { "const": "SUBMISSION_PREPARED" }, "to": { "const": "FINAL_SUBMISSION_PENDING" } } }
+      ]
+    },
+    "pendingToVerifiedEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/stateEvent" },
+        { "properties": { "from": { "const": "FINAL_SUBMISSION_PENDING" }, "to": { "const": "FINAL_SUBMISSION_VERIFIED" } } }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceIdUuidV5", "kind"],
+      "properties": {
+        "sourceIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "kind": {
+          "enum": [
+            "DEVPOST_PROJECT",
+            "PRIMARY_LIVE_DEMO",
+            "BACKUP_LIVE_DEMO",
+            "PUBLIC_VIDEO",
+            "PUBLIC_REPOSITORY",
+            "PUBLIC_THUMBNAIL_READBACK",
+            "OFFICIAL_CHALLENGE_RESOURCE",
+            "LOCAL_VERIFICATION_RECORD"
+          ]
+        },
+        "url": { "type": "string", "format": "uri" },
+        "path": { "type": "string", "minLength": 1 }
+      },
+      "oneOf": [
+        {
+          "required": ["url"],
+          "properties": { "path": false }
+        },
+        {
+          "required": ["path"],
+          "properties": { "url": false }
+        }
+      ]
+    },
+    "observationContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contextIdUuidV5", "path", "sourceCommit", "artifactSha256"],
+      "properties": {
+        "contextIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "path": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE)$" },
+        "artifactSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "observedClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimIdUuidV5",
+        "observationEventUuidV7",
+        "observedAt",
+        "state",
+        "contextIdUuidV5",
+        "claim",
+        "evidenceBoundary",
+        "sourceIds"
+      ],
+      "properties": {
+        "claimIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationEventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/dateTime" },
+        "state": { "const": "OBSERVED" },
+        "contextIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "claim": { "type": "string", "minLength": 3 },
+        "evidenceBoundary": { "type": "string", "minLength": 3 },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuidV5" }
+        }
+      }
+    },
+    "unmeasuredClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimIdUuidV5", "state", "claim", "reason", "sourceIds"],
+      "properties": {
+        "claimIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "state": { "enum": ["UNMEASURED", "INCONCLUSIVE"] },
+        "claim": { "type": "string", "minLength": 3 },
+        "reason": { "type": "string", "minLength": 3 },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuidV5" }
+        }
+      }
+    },
+    "notApplicableClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimIdUuidV5", "state", "claim", "reason", "sourceIds"],
+      "properties": {
+        "claimIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "state": { "const": "NOT_APPLICABLE" },
+        "claim": { "type": "string", "minLength": 3 },
+        "reason": { "type": "string", "minLength": 3 },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuidV5" }
+        }
+      }
+    },
+    "thumbnail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assetIdUuidV5",
+        "localPath",
+        "sha256",
+        "width",
+        "height",
+        "contentType",
+        "publicUrl",
+        "publicationState",
+        "content",
+        "provenance"
+      ],
+      "properties": {
+        "assetIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "localPath": { "const": "docs/assets/devpost-hotel-thumbnail.png" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "contentType": { "const": "image/png" },
+        "publicUrl": { "type": "string", "format": "uri" },
+        "publicationState": { "const": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_VERIFIED" },
+        "content": { "type": "string", "minLength": 3 },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sourceUrl",
+            "captureMethod",
+            "transformationTool",
+            "transformation",
+            "prompt",
+            "fileObservedAt",
+            "syntheticUiAllowed",
+            "sourceScreenshotRepositoryState"
+          ],
+          "properties": {
+            "sourceUrl": { "type": "string", "format": "uri" },
+            "captureMethod": { "const": "Chrome DevTools screenshot" },
+            "transformationTool": { "const": "OpenAI imagegen" },
+            "transformation": { "const": "CROP_AND_REFRAME_ONLY" },
+            "prompt": { "type": "string", "minLength": 3 },
+            "fileObservedAt": { "$ref": "#/$defs/dateTime" },
+            "syntheticUiAllowed": { "const": false },
+            "sourceScreenshotRepositoryState": { "const": "NOT_RETAINED" }
+          }
+        }
+      }
+    },
+    "confirmedAnswers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "confirmationEventUuidV7", "confirmedAt", "values"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "confirmationEventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "confirmedAt": { "$ref": "#/$defs/dateTime" },
+        "values": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["28249", "28250", "28259", "28260"],
+          "properties": {
+            "28249": { "const": "Individual" },
+            "28250": { "const": "Japan" },
+            "28259": { "const": "Significant" },
+            "28260": { "const": "Yes" }
+          }
+        }
+      }
+    },
+    "submission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draftFile",
+        "workflowStateFile",
+        "localStatus",
+        "devpostSubmittedAt",
+        "devpostOwnedStatus",
+        "requiredOwnerAnswers",
+        "confirmedAnswers",
+        "optionalOwnerAnswers",
+        "nextCommand"
+      ],
+      "properties": {
+        "draftFile": { "const": "devpost-submission.md" },
+        "workflowStateFile": { "const": ".devpost-hackathon-state.json" },
+        "localStatus": { "enum": ["READY", "SUBMITTED"] },
+        "devpostSubmittedAt": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/dateTime" }
+          ]
+        },
+        "devpostOwnedStatus": { "enum": ["FINAL_SUBMISSION_PENDING", "FINAL_SUBMISSION_VERIFIED"] },
+        "finalEvidenceSourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE)$" },
+        "requiredOwnerAnswers": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "confirmedAnswers": { "$ref": "#/$defs/confirmedAnswers" },
+        "optionalOwnerAnswers": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "nextCommand": { "enum": ["submit-project", "hackathon-map"] },
+        "devpostSubmissionId": { "type": "integer", "minimum": 1 },
+        "devpostSubmissionUrl": { "type": "string", "format": "uri" },
+        "devpostSubmitToolStatus": { "const": "SUBMITTED" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["devpostOwnedStatus"],
+            "properties": { "devpostOwnedStatus": { "const": "FINAL_SUBMISSION_PENDING" } }
+          },
+          "then": {
+            "properties": {
+              "localStatus": { "const": "READY" },
+              "devpostSubmittedAt": { "type": "null" },
+              "nextCommand": { "const": "submit-project" },
+              "finalEvidenceSourceCommit": false,
+              "devpostSubmissionId": false,
+              "devpostSubmissionUrl": false,
+              "devpostSubmitToolStatus": false
+            }
+          },
+          "else": {
+            "required": [
+              "finalEvidenceSourceCommit",
+              "devpostSubmissionId",
+              "devpostSubmissionUrl",
+              "devpostSubmitToolStatus"
+            ],
+            "properties": {
+              "localStatus": { "const": "SUBMITTED" },
+              "devpostSubmittedAt": { "$ref": "#/$defs/dateTime" },
+              "devpostOwnedStatus": { "const": "FINAL_SUBMISSION_VERIFIED" },
+              "nextCommand": { "const": "hackathon-map" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

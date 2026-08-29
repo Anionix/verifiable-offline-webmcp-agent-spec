@@ -1,5 +1,5 @@
 ---
-title: "Verifiable Offline WebMCP Agent Architecture / 検証可能なオフライン WebMCP エージェント設計"
+title: "Kyoto Booking Retry Proof — WebMCP duplicate-booking demo / 京都ホテル二重予約防止デモ"
 language: "ja-en"
 stable_uuid_v5: "5c98b5f4-c536-532d-a8ac-e2d88397a006"
 event_uuid_v7: "01a04291-b452-750e-a9e5-19fbca156cb5"
@@ -22,15 +22,38 @@ publication_state_event_uuid_v7: "01a04c90-5270-7592-8a9a-66a94266b2d7"
 video_identity_boundary_event_uuid_v7: "01a04cf7-edba-71cd-b1c5-c8271758d1b4"
 void_integration_event_uuid_v7: "01a04cfc-c4d5-73b4-8ef0-f22de3c54e65"
 devpost_approval_contract_event_uuid_v7: "01a04cfc-c4d6-71b3-8624-f9e37f1008f2"
+devpost_hotel_project_event_uuid_v7: "01a04d6e-ed77-7880-b30c-e9aa01302856"
+devpost_judge_entry_event_uuid_v7: "01a04d7b-5316-71e2-b97f-08e852417885"
+vercel_current_deployment_event_uuid_v7: "01a04d83-094a-7e10-9c02-bbd127d1ff30"
+hotel_readme_navigation_event_uuid_v7: "01a04dad-8523-76d5-aa03-19d403aff6d3"
+hotel_release_event_uuid_v7: "01a04dc2-1480-7d3e-af00-248a96cb4e8f"
+sites_version_12_event_uuid_v7: "01a04dcb-8678-79b7-a47d-aa87346680c3"
 security_remediation_event_uuid_v7: "01a04cdc-3b33-7720-9567-66e1e046e0ea"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T10:07:09.014Z"
+updated_at: "2026-08-29T13:52:59.000Z"
 version: "0.1.0"
 status: "design-specification"
 ---
 
-# Verifiable Offline WebMCP Agent Architecture
-# 検証可能なオフライン WebMCP エージェント設計
+# Kyoto Booking Retry Proof
+
+**A WebMCP demo that stops one fictional Kyoto hotel booking from becoming two when the success response disappears.**
+
+**通信が切れても、京都の架空ホテル予約を二重にしない実演です。**
+
+> **What it saves:** no second charge risk, no foreign-language cancellation hunt, and no guessing whether the first booking worked.
+>
+> **Visible result:** `2 attempts → 1 simulated booking → 1 confirmation number`
+
+**WebMCP, plainly:** the website exposes small named actions with checked inputs and structured results, so an assistant can ask what happened instead of reading pixels or blindly resending. **The agent checks; only the traveler confirms.** There is no agent-facing confirmation, payment, or cancellation action.
+
+**60-second test:** **1. Check and prepare** → **2. Confirm booking — human action only** → **Retry the same booking** → verify `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the same confirmation number.
+
+**Open:** [Public ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site) · [2-minute-30-second video](https://youtu.be/tdSvJw4ghX8) · [Devpost](https://devpost.com/software/project-y79pb23hj1mz) · [Vercel backup](https://kyoto-booking-retry-proof.vercel.app) · [Release instructions](docs/24-hotel-release-package.ja.md)
+
+[![Kyoto Booking Retry Proof showing RETRY_RECOGNIZED, two attempts, one booking, and one effect start](docs/assets/devpost-hotel-thumbnail.png)](https://kyoto-booking-retry-proof.anionix.chatgpt.site)
+
+## Verifiable Offline WebMCP Agent Architecture / 検証可能なオフライン WebMCP エージェント設計
 
 **Version:** `0.1.0` · **Generated:** `2026-08-27T09:34:00Z` · **Root UUID namespace:** `47f3e535-0e27-559a-9556-aa79a84f95eb`
 
@@ -42,7 +65,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 
 このリポジトリは、モバイル優先・オフライン対応・検証可能なエージェント設計を、英日併記、JSON-LD、PROV-O、DCAT風catalog、JSON Schema、UUIDv5/v7、形式仕様、実行可能な参照コードでまとめたものです。「Open Knowledge Format」という単一の公式標準への適合を主張するものではありません。
 
-> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、[ChatGPT Sites](https://kyoto-booking-retry-proof.anionix.chatgpt.site)と[Vercel](https://kyoto-booking-retry-proof.vercel.app)で一般公開し、四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。審査向け[YouTube動画](https://youtu.be/tdSvJw4ghX8)も一般公開済みです。Devpostの一般プロジェクトページへ動画URLまで反映しましたが、WebMCP Challengeの最終提出は行っていません。実ホテル予約、決済、取消は一切行いません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
+> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、[ChatGPT Sites](https://kyoto-booking-retry-proof.anionix.chatgpt.site)と[Vercel](https://kyoto-booking-retry-proof.vercel.app)で一般公開し、四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。審査向け[YouTube動画](https://youtu.be/tdSvJw4ghX8)も一般公開済みです。[Devpostの提出ページ](https://devpost.com/software/project-y79pb23hj1mz)は`Kyoto Booking Retry Proof`として最終提出済みです。匿名公開HTMLは同じ題名、60秒の試し方、153件のNode.js試験、ホテル画面のOpen Graph画像を返し、提出記録`1158722`と認証済み読取は提出時刻`2026-08-29T13:14:00.129Z`で一致しました。実ホテル予約、決済、取消は一切行いません。通知デモの既存証拠は変更せず保存しています。
 
 ## Architectural stance / 設計の立場
 
@@ -213,7 +236,7 @@ Confirmation, payment, and cancellation mutation are deliberately absent. Indexe
 
 Local evidence currently passes 153 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one.
 
-Public ChatGPT Sites version 11 uses exact source commit `51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf` in version `appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d` and deployment `appgdep_6a92a1cf0bb08191bbd00064ac2cdd12` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The current URL returned anonymous HTTP 200 and its delivered `service-integrations.json` matched the local release. A fresh version 10 browser run on dependency-patched commit `5ac1fe51a29800eb052f9a63e7311559b7c01e45` directly proved `PREPARED → COMMITTED → RETRY_RECOGNIZED`, two attempts, one booking, one effect start, four WebMCP tools, and confirmation `FKR-7EF2A00FA2`; version 11 has the same functional digest and restored that result after reload. The current [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) and its [deployment-specific URL](https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app) use the same final source commit in deployment `dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe`. The fresh retry run belongs to immediately preceding deployment `dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`; the final deployment has the identical functional digest, restored the result after reload, returned anonymous HTTP 200, and matched five local file hashes.
+Public ChatGPT Sites version 12 uses exact source commit `f832cc611ed43613035a8735ca97d4bc1a0a8efc` in version `appgprj_6a923239002081918896546134a7dc8f~appgver_feeff1aa402c8191a02e0945d9cdd04e` and deployment `appgdep_6a92e425bbdc8191ac9ca35d524f61a0` at the [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). Anonymous requests returned HTTP 200; the JavaScript, style sheet, service worker, and service registry matched the local bytes. Cloudflare appended a challenge script to the root HTML, so root-byte identity is not claimed. A fresh version 10 browser run directly proved `PREPARED → COMMITTED → RETRY_RECOGNIZED`, two attempts, one booking, one effect start, four WebMCP tools, and confirmation `FKR-7EF2A00FA2`; version 12 keeps the same functional digest, so that runtime proof is carried forward without claiming a new browser run. The current [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) is deployment `dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`, published from clean commit `e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb` and `READY` at `2026-08-29T13:35:38.108Z`. Its [deployment-specific URL](https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app) and alias expose five anonymously fetched files that match the expected artifacts, with provider warning and error readbacks both zero. Its functional source commit `5ac1fe51a29800eb052f9a63e7311559b7c01e45` and digest `06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132` match the directly exercised deployment `dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`; that earlier retry proof is carried forward and is not described as a new browser run on the current deployment.
 
 One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
 
@@ -224,7 +247,7 @@ The locally verified 150-second 1920×1080 review video version 10 contains 20 d
 
 端末内で検査した150秒・1920×1080の動画版10は、架空の生成映像20秒と実際の公開Site画面録画113.2秒（75.5%）を含み、端末内SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。これとは別に、公開YouTubeの読み戻しでは、匿名再生、150秒の再生時間、処理完了、著作権問題なし、英語音声・字幕、日本語字幕トラックを確認しました。独立したアップロード操作の受領記録は保存されていないため、端末内ファイルと公開動画の同一性は`UNMEASURED`であり、時間の一致や編集可能な自己記録だけでは同一成果物と断定しません。
 
-The owner-selected Canva thumbnail is ready locally, but the browser file chooser failed, so the public video currently uses a YouTube-generated thumbnail. The Devpost update operation returned version 6, and a subsequent readback of the [public project page](https://devpost.com/software/project-y79pb23hj1mz) confirmed this YouTube URL, the unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`. Final challenge submission has therefore not occurred. Keyboard traversal, screen-reader behavior, and Chrome-native WebMCP execution remain `INCONCLUSIVE`; the custom thumbnail remains prepared but not applied. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
+The owner-selected Canva thumbnail is ready locally, but the public YouTube video still uses a YouTube-generated thumbnail. This is separate from Devpost: the visible page title, heading, Open Graph title, and Open Graph image of its [public project page](https://devpost.com/software/project-y79pb23hj1mz) now identify `Kyoto Booking Retry Proof` and the uploaded hotel screenshot. Version 8 aligned the description to 153 Node tests, version 9 unified the technologies, links, and video, version 10 improved the opening formula and retry-result list, and version 11 added the four-step 60-second test. Devpost submission `1158722` has status `Submitted`; the submit response and authenticated project readback agree on `submitted_at: 2026-08-29T09:14:00.129-04:00`. Keyboard traversal, screen-reader behavior, and Chrome-native WebMCP execution remain `INCONCLUSIVE`. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

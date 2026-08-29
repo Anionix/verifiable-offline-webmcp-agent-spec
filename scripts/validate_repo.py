@@ -741,6 +741,53 @@ def main():
         if unused_context_ids:
             errors.append(f"Devpost observation contexts are not used by observed claims: {sorted(unused_context_ids)}")
 
+        def devpost_final_context_consistency(local_record: dict[str, Any]):
+            consistency_errors: list[str] = []
+            local_submission = local_record["submission"]
+            if local_submission["devpostOwnedStatus"] != "FINAL_SUBMISSION_VERIFIED":
+                return consistency_errors
+            final_commit = local_submission.get("finalEvidenceSourceCommit")
+            if not isinstance(final_commit, str):
+                return ["verified Devpost evidence lacks finalEvidenceSourceCommit"]
+            try:
+                submitted_ms = rfc3339_ms(local_submission["devpostSubmittedAt"])
+            except Exception as exc:
+                return [f"verified Devpost evidence has an invalid submission time: {exc}"]
+            final_contexts = {
+                context["contextIdUuidV5"]: context
+                for context in local_record["observationContexts"]
+                if context["sourceCommit"] == final_commit
+            }
+            required_paths = {
+                "metadata/devpost-public-readback.json",
+                "devpost-submission.md",
+                ".devpost-hackathon-state.json",
+            }
+            for path in sorted(required_paths):
+                context_ids = {
+                    context_id
+                    for context_id, context in final_contexts.items()
+                    if context["path"] == path
+                }
+                if len(context_ids) != 1:
+                    consistency_errors.append(
+                        f"verified Devpost evidence requires one final context for {path} at {final_commit}"
+                    )
+                    continue
+                matching_claims = [
+                    claim
+                    for claim in local_record["observed"]
+                    if claim["contextIdUuidV5"] in context_ids
+                    and rfc3339_ms(claim["observedAt"]) >= submitted_ms
+                ]
+                if not matching_claims:
+                    consistency_errors.append(
+                        f"verified Devpost evidence lacks a post-submission claim for final context {path}"
+                    )
+            return consistency_errors
+
+        errors.extend(devpost_final_context_consistency(devpost_evidence))
+
         public_project = devpost_public_readback["authenticatedReadback"]["project"]
         public_html = devpost_public_readback["anonymousPublicHtml"]
         visible = public_html["visibleEvidence"]
@@ -1008,6 +1055,28 @@ def main():
         if devpost_provider_consistency(verified_local, verified_provider):
             errors.append("matching Devpost provider receipts do not verify the submitted state")
 
+        stale_final_context = json.loads(json.dumps(verified_local))
+        stale_final_context["submission"]["finalEvidenceSourceCommit"] = stale_final_context[
+            "preparedFromCommit"
+        ]
+        if not devpost_final_context_consistency(stale_final_context):
+            errors.append("verified Devpost evidence accepted pre-submission contexts as final evidence")
+
+        missing_final_claim = json.loads(json.dumps(verified_local))
+        final_readback_context = next(
+            context["contextIdUuidV5"]
+            for context in missing_final_claim["observationContexts"]
+            if context["sourceCommit"] == missing_final_claim["submission"]["finalEvidenceSourceCommit"]
+            and context["path"] == "metadata/devpost-public-readback.json"
+        )
+        missing_final_claim["observed"] = [
+            claim
+            for claim in missing_final_claim["observed"]
+            if claim["contextIdUuidV5"] != final_readback_context
+        ]
+        if not devpost_final_context_consistency(missing_final_claim):
+            errors.append("verified Devpost evidence accepted a final context without an observed claim")
+
         pending_local = json.loads(json.dumps(verified_local))
         pending_local["machineContract"]["stateSequence"].pop()
         pending_event = pending_local["machineContract"]["stateSequence"][-1]
@@ -1020,6 +1089,7 @@ def main():
             "devpostOwnedStatus": "FINAL_SUBMISSION_PENDING",
             "nextCommand": "submit-project",
         })
+        pending_submission.pop("finalEvidenceSourceCommit", None)
         for field in ("devpostSubmissionId", "devpostSubmissionUrl", "devpostSubmitToolStatus"):
             pending_submission.pop(field, None)
         if list(devpost_validator.iter_errors(pending_local)):

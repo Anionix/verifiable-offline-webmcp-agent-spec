@@ -20,13 +20,18 @@ import {
 } from "./hotel-validator-common.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const releaseRoot = resolve(repositoryRoot, "dist/release/kyoto-booking-retry-proof");
+const releaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
 const namespaceUuidV5 = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const informationUuidV5 = "55e8dd64-ba47-5c26-897d-aa6893eb5ec5";
 const forbiddenExtensions = new Set([".avi", ".m4v", ".mkv", ".mov", ".mp4", ".webm"]);
 
 function command(name, args) {
   return execFileSync(name, args, { cwd: repositoryRoot, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim();
+}
+
+function assertCleanSource(sourceCommit) {
+  assert.equal(command("git", ["status", "--porcelain=v1", "--untracked-files=all"]), "", "release requires a clean committed source");
+  assert.equal(command("git", ["rev-parse", "HEAD"]), sourceCommit, "release source commit changed during generation");
 }
 
 function sha256(bytes) {
@@ -81,9 +86,9 @@ async function fileReceipt(path) {
   return { path: relativePath, bytes: bytes.length, sha256: sha256(bytes) };
 }
 
-assert.equal(command("git", ["status", "--porcelain=v1", "--untracked-files=all"]), "", "release requires a clean committed source");
 const sourceCommit = command("git", ["rev-parse", "HEAD"]);
 assert.match(sourceCommit, /^[0-9a-f]{40}$/u);
+assertCleanSource(sourceCommit);
 const commitSeconds = Number(command("git", ["show", "-s", "--format=%ct", sourceCommit]));
 assert(Number.isSafeInteger(commitSeconds), "source commit time is invalid");
 const occurredAt = new Date(commitSeconds * 1000).toISOString();
@@ -157,6 +162,8 @@ const manifest = {
 await writeFile(resolve(releaseRoot, "release-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 const allReceipts = await Promise.all((await filesUnder(releaseRoot)).map(fileReceipt));
 await writeFile(resolve(releaseRoot, "SHA256SUMS"), `${allReceipts.map((entry) => `${entry.sha256}  ${entry.path}`).join("\n")}\n`);
+command("gitleaks", ["dir", releaseRoot, "--redact", "--no-banner"]);
+assertCleanSource(sourceCommit);
 
 console.log(
   JSON.stringify({
@@ -167,6 +174,6 @@ console.log(
     fullClientDigest,
     fullSitesDigest,
     fileCount: allReceipts.length + 1,
-    sha256Sums: "dist/release/kyoto-booking-retry-proof/SHA256SUMS",
+    sha256Sums: "release/kyoto-booking-retry-proof/SHA256SUMS",
   }),
 );

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/devpost-hotel-submission.schema.json",
-  "$comment": "information_uuid_v5=5be1512f-df3b-592e-9e4b-91dff94f99db event_uuid_v7=01a04d95-8640-7d6e-aca3-4fee9941e100 state_transition=DIGEST_BOUND_WORKTREE_CONTEXT -> DIGEST_BOUND_COMMITTED_BLOB_CONTEXT occurred_at=2026-08-29T12:54:00.000Z machine-contract=the Devpost hotel packet must bind each observed claim through a UUIDv5 context to a repository path an existing descendant Git commit containing that exact SHA-256 blob and the matching current file while preserving the exact mismatch-to-pending sequence and requiring an appended provider-verified terminal event for submission",
+  "$comment": "information_uuid_v5=5be1512f-df3b-592e-9e4b-91dff94f99db event_uuid_v7=01a04dab-38f1-7c24-92ec-322d89263c16 state_transition=FINAL_SUBMISSION_PENDING -> FINAL_SUBMISSION_VERIFIED occurred_at=2026-08-29T13:17:42.001Z machine-contract=the Devpost hotel packet binds every observed claim through a UUIDv5 context to an exact SHA-256 Git blob and requires final readback draft and workflow claims from finalEvidenceSourceCommit",
   "title": "Devpost hotel submission evidence record",
   "type": "object",
   "additionalProperties": false,
@@ -408,6 +408,7 @@
           ]
         },
         "devpostOwnedStatus": { "enum": ["FINAL_SUBMISSION_PENDING", "FINAL_SUBMISSION_VERIFIED"] },
+        "finalEvidenceSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "requiredOwnerAnswers": {
           "type": "array",
           "maxItems": 0
@@ -433,13 +434,19 @@
               "localStatus": { "const": "READY" },
               "devpostSubmittedAt": { "type": "null" },
               "nextCommand": { "const": "submit-project" },
+              "finalEvidenceSourceCommit": false,
               "devpostSubmissionId": false,
               "devpostSubmissionUrl": false,
               "devpostSubmitToolStatus": false
             }
           },
           "else": {
-            "required": ["devpostSubmissionId", "devpostSubmissionUrl", "devpostSubmitToolStatus"],
+            "required": [
+              "finalEvidenceSourceCommit",
+              "devpostSubmissionId",
+              "devpostSubmissionUrl",
+              "devpostSubmitToolStatus"
+            ],
             "properties": {
               "localStatus": { "const": "SUBMITTED" },
               "devpostSubmittedAt": { "$ref": "#/$defs/dateTime" },

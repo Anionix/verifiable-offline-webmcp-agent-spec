@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
-  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04d81-12de-78aa-8949-ca8aa113566e state_transition=VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED occurred_at=2026-08-29T12:31:39.742Z machine-contract=the current worktree full package is validated as a candidate while the separately identified Sites version 11 remains the previous exact full package; identical functional digest does not promote the changed full package to live",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04dc2-1868-72b5-9621-f3275923df90 state_transition=DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED -> DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE occurred_at=2026-08-29T13:42:41.000Z machine-contract=the current worktree full package is validated as a candidate while the separately identified Sites version 11 remains the previous exact full package; identical functional digest does not promote the changed full package to live",
   "title": "Hotel booking demo verification record",
   "type": "object",
   "additionalProperties": false,

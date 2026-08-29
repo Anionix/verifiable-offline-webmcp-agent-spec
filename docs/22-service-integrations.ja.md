@@ -39,12 +39,12 @@ state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -
 
 ## 現在の記録
 
-公開サービス状態の基準観測は2026年8月29日9時14分31秒（協定世界時）です。後続のセキュリティ検査は9時31分36秒に記録しました。Vercelの現行配置は12時30分35秒に`READY`となり、12時33分48秒までに提供元状態、二つの公開URL、五つの匿名配信ファイル、警告・エラーを読み戻しました。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+公開サービス状態の基準観測は2026年8月29日9時14分31秒（協定世界時）です。後続のセキュリティ検査は9時31分36秒に記録しました。Vercelの現行配置は13時35分38秒に`READY`となり、13時37分6秒までに提供元状態、二つの公開URL、五つの匿名配信ファイル、警告・エラーを読み戻しました。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
 | ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は動作版11。安全版依存を使う版10で実操作し、同一機能の版11で再読込復元を確認。Devpost版11を含む新しい状態表は未公開候補として分離 |
-| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 現行配置`dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL`で匿名5ファイル一致と警告・エラー0件を確認。実操作証拠は同じ機能要約値の直前配置から引き継ぎ |
+| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | クリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`の現行配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`で匿名5ファイル一致と警告・エラー0件を確認。実操作証拠は同じ機能要約値の直前配置から引き継ぎ |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -77,7 +77,7 @@ YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しま
 
 ChatGPT Sitesでは、安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`を版10へ配置し、新しい予約条件で準備、人間の画面操作による確定、安全な再送を実行しました。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、WebMCP四機能、確認番号`FKR-7EF2A00FA2`を直接確認しています。サービス状態表だけを更新した最終コミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`は、版11として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d`、配置識別子`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`です。版10と版11の機能要約値は同一で、版11の再読込後も同じ結果を復元しました。現行URLの匿名HTTP 200応答と、配信された`service-integrations.json`の端末内成果物との一致も確認しました。
 
-Vercelでは、機能コミットをホテル専用配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`へ配置し、新しい保存領域から同じ再送収束を実測しました。現行配置`dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL`は未確定の作業場所から公開され、提供元のGit情報はコミット`037496f6db7281b7b1a9ecd9b3dfc71d407feeb6`と未確定差分ありを示します。そのため、同コミットだけから公開物全体を再現できるとは主張しません。`READY`到達時刻は`2026-08-29T12:30:35.535Z`です。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-4p3pru70s-aniotajp-1978s-projects.vercel.app)から取得した五つのファイルは端末内成果物と一致し、提供元の警告・エラー読み戻しはともに0件でした。機能ソースコミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`の要約値`06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132`は実操作済みの直前配置と同一なので、その実操作証拠を引き継ぎます。現行配置で新しい実操作を行ったとは主張しません。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
+Vercelでは、機能コミットをホテル専用配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`へ配置し、新しい保存領域から同じ再送収束を実測しました。現行配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`はクリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`から公開され、`2026-08-29T13:35:38.108Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app)から取得した五つのファイルは端末内成果物と一致し、`2026-08-29T13:37:06.000Z`の提供元読み戻しで警告・エラーはともに0件でした。機能ソースコミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`の要約値`06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132`は実操作済みの直前配置と同一なので、その実操作証拠を引き継ぎます。現行配置で新しい実操作を行ったとは主張しません。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
 配置操作の途中で、旧通知実演プロジェクトを誤って対象にしました。その本番別名は直ちに配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)の匿名HTTP 200応答と通知実演表示を確認しました。ホテル版と通知実演版は引き続き別プロジェクトです。
 

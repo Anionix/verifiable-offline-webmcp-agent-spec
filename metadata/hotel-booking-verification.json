@@ -2,9 +2,9 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04d81-12de-78aa-8949-ca8aa113566e"
+    "observationUuidV7": "01a04dc2-1868-72b5-9621-f3275923df90"
   },
-  "observedAt": "2026-08-29T12:31:39.742Z",
+  "observedAt": "2026-08-29T13:42:41.000Z",
   "sourceCommit": "WORKTREE",
   "sourceState": "WORKTREE_CANDIDATE",
   "artifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
@@ -17,21 +17,21 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "116fe8f079014fae5d1571aed7bd429929d2063e9db36f595b7b1115da76a1ea",
+  "fullClientArtifactDigest": "5789e135ecaa7fe0ebb080058f58ab535749bf0624969d04fda388b00409bdd7",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "1d888c7d37f1f16874b61bc4102b988772be595727ba5820f9b4c951bb9cfa9c",
+  "fullSitesPackageDigest": "221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED -> DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING -> DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED -> DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING -> DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED -> DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
@@ -46,7 +46,7 @@
     "accessMode": "PUBLIC",
     "status": "PREVIOUS_ARTIFACT_VERIFIED",
     "observedAt": "2026-08-29T09:09:43.704Z",
-    "evidence": "Sites version 11 and deployment readback identify commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf as the exact source of the previously verified live package d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. Anonymous requests to the public root and service-integrations.json returned HTTP 200, and the published service record matched SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c. A fresh version 10 browser run proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 11 kept functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132 and restored that result after reload. The current worktree changes only the public service record and Devpost evidence; its functional digest remains identical, but its new full Sites package digest is a local candidate and has not been published to ChatGPT Sites."
+      "evidence": "Sites version 11 and deployment readback identify commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf as the exact source of the previously verified live package d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. Anonymous requests to the public root and service-integrations.json returned HTTP 200. A fresh version 10 browser run proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. The current worktree records Devpost final submission and clean Vercel deployment dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2 while retaining functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132. Its new full Sites package digest is a local candidate and has not yet been published to ChatGPT Sites."
   },
   "checks": [
     {
@@ -59,7 +59,7 @@
       "checkId": "311a96f7-7859-5b7f-baf2-17e39b83502d",
       "name": "Two attempts remain one booking",
       "status": "PASS",
-      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; Sites version 11 and current Vercel deployment dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL retain the same functional digest, and the Vercel alias matched five local files."
+      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; Sites version 11 and current Vercel deployment dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2 retain the same functional digest, and the Vercel alias matched five local files."
     },
     {
       "checkId": "8982f898-c1da-55cd-834b-211099bc82ca",

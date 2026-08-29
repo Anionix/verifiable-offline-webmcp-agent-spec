@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c63-a6eb-787f-bebc-81c56d1c5045"
-observed_at: "2026-08-29T07:19:54.347Z"
-state_transition: "SITES_VERSION_8_RETRY_VERIFIED -> YOUTUBE_PUBLIC_WITH_JAPANESE_SUBTITLES -> DEVPOST_VERSION_6_VIDEO_ATTACHED -> FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04c71-bf6f-7c14-b932-4f4496137bfb"
+observed_at: "2026-08-29T07:35:18.127Z"
+state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> FINAL_SUBMISSION_PENDING"
 ---
 
 # サービス連携状態の読み方
@@ -39,12 +39,12 @@ state_transition: "SITES_VERSION_8_RETRY_VERIFIED -> YOUTUBE_PUBLIC_WITH_JAPANES
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日7時19分54秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日7時35分18秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。版8を新しい保存領域から再送・再読込まで実行。動画の操作録画は同じ機能の版5 |
-| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 予備公開先。ホテル専用プロジェクトを匿名実行済み |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は版9。現行配信を検査し、実操作は機能要約値が同じ直前の版8で確認 |
+| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 現行配信を匿名検査し、実操作は機能要約値が同じ直前配置で確認 |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -56,9 +56,9 @@ Devpostでは、[プロジェクトページ](https://devpost.com/software/proje
 
 YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しました。公開プレーヤーの表示時間は2分30秒です。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声と画面へ焼き込んだ英語字幕に加え、日本語字幕トラックも公開済みです。Canvaで選んだ専用サムネイルは端末内に準備済みですが、ブラウザーのファイル選択が失敗したため未反映で、現在はYouTubeが自動生成したサムネイルを使っています。この失敗から専用サムネイルの外部公開成功は推測しません。
 
-ChatGPT Sitesでは、正確な配置元コミット`370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6`を版8として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは配置識別子`appgdep_6a928039357c8191947ea3a0115e91a7`です。新しいブラウザー保存領域から、準備、人間の画面操作による確定、安全な再送、再読込復元を実行し、2試行、架空予約1件、処理開始1回を保持しました。完成動画版10の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
+ChatGPT Sitesでは、正確な配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`を版9として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16`、配置識別子`appgdep_6a928af2553c8191a6943104aa937eef`です。現行URLの匿名HTTP 200応答と、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。ただし版9では新しい保存領域からの実操作を再試験していません。準備、人間の画面操作による確定、安全な再送、再読込復元から2試行、架空予約1件、処理開始1回へ収束した直接証拠は、直前の版8の実測です。完成動画版10の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
 
-Vercelでは、同じ配置元コミット`370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6`をホテル専用配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`へ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名HTTP 200応答を確認しました。新しいブラウザー保存領域で`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回へ収束し、再読込後も同じ結果を保持しました。公開先から読み戻した五つの配信ファイルも端末内構築物と一致しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
+Vercelでは、同じ配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`をホテル専用配置`dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`へ配置しました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200応答、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。ただし現行配置では新しい保存領域からの実操作を再試験していません。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、再読込復元の直接証拠は、直前配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`の実測です。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
 配置操作の途中で、旧通知実演プロジェクトを誤って対象にしました。その本番別名は直ちに配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)の匿名HTTP 200応答と通知実演表示を確認しました。ホテル版と通知実演版は引き続き別プロジェクトです。
 
@@ -140,7 +140,7 @@ node scripts/validate_service_integrations.mjs
 9. `dist/client/service-integrations.json`が生成済みなら、正本と完全一致すること。
 10. 八サービスの承認門が、上表の操作と承認状態に完全一致すること。
 11. 今回成果物の実行成功は今回成果物の公開に、過去成果物の実行証拠は過去成果物の公開に対応すること。
-12. Vercelの成功表示が、専用プロジェクト、READY配置、匿名200応答、実ブラウザーの再送収束、旧通知配置の復元証拠と一致すること。
+12. Vercelの成功表示が、専用プロジェクト、現行READY配置、匿名200応答、配信一致、機能要約値が同じ直前配置での実ブラウザー再送収束、旧通知配置の復元証拠と一致すること。
 
 生成前は配布用写しがなくても成功します。生成後は写しが存在するため、不一致を失敗にします。
 

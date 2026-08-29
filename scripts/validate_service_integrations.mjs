@@ -15,6 +15,9 @@
 // event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
 // state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
 // machine-contract: the current Vercel receipt binds exact committed source, five anonymous remote hashes, a fresh-storage retry flow, and explicit recovery from an accidental notification-project deployment.
+// event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
+// state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
+// machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -121,19 +124,19 @@ const EXPECTED_VERCEL_ARTIFACT = {
 const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
-  deploymentId: "dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN",
-  deployedSourceCommit: "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
-  uniqueUrl: "https://kyoto-booking-retry-proof-6a6vc6mk1-aniotajp-1978s-projects.vercel.app",
+  deploymentId: "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
+  deployedSourceCommit: "285127fecb3d0395e9a773909b79e5c08a865987",
+  uniqueUrl: "https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
   state: "READY",
   target: "production",
   source: "cli",
-  createdAtUnixMs: 1787986091440,
-  createdAt: "2026-08-29T06:48:11.440Z",
-  buildingAtUnixMs: 1787986092469,
-  buildingAt: "2026-08-29T06:48:12.469Z",
-  readyAtUnixMs: 1787986097630,
-  readyAt: "2026-08-29T06:48:17.630Z",
+  createdAtUnixMs: 1787988723407,
+  createdAt: "2026-08-29T07:32:03.407Z",
+  buildingAtUnixMs: 1787988724416,
+  buildingAt: "2026-08-29T07:32:04.416Z",
+  readyAtUnixMs: 1787988732236,
+  readyAt: "2026-08-29T07:32:12.236Z",
   aliasError: null,
 };
 
@@ -172,6 +175,10 @@ const EXPECTED_VERCEL_HTTP = {
 const EXPECTED_VERCEL_BROWSER_FLOW = {
   testedUrl: "https://kyoto-booking-retry-proof.vercel.app",
   deploymentId: "dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN",
+  evidenceState: "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
+  testedFunctionalDigest: "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+  appliesToDeploymentId: "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
+  appliesToDeployedSourceCommit: "285127fecb3d0395e9a773909b79e5c08a865987",
   storageState: "FRESH",
   input: {
     checkIn: "2026-09-28",
@@ -199,15 +206,16 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
 
 const EXPECTED_VERCEL_OBSERVABILITY = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+  readyBoundaryDeploymentId: "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
   environment: "production",
-  queryMode: "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY",
-  queryExecutedAt: "2026-08-29T06:53:23.217Z",
-  windowStart: "2026-08-29T05:53:23.217Z",
-  windowEnd: "2026-08-29T06:53:23.217Z",
+  queryMode: "READY_TO_QUERY_BOUNDED_MAX_ONE_HOUR",
+  queryExecutedAt: "2026-08-29T07:36:02.000Z",
+  windowStart: "2026-08-29T07:32:12.236Z",
+  windowEnd: "2026-08-29T07:36:02.000Z",
   queriedLevels: ["error", "warning"],
   runtimeErrorClusters: 0,
   matchingLogEntries: 0,
-  conclusion: "ONE_HOUR_LOOKBACK_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS",
+  conclusion: "BOUNDED_READY_TO_QUERY_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS",
 };
 
 const EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT = {
@@ -222,7 +230,7 @@ const EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT = {
   restorationAction: "PROMOTE_SAVED_ORIGINAL_DEPLOYMENT_IMMEDIATELY",
   anonymousStatusCode: 200,
   verifiedContent: "NOTIFICATION_DEMO",
-  recoveryObservedAt: "2026-08-29T06:54:39.527Z",
+  recoveryObservedAt: "2026-08-29T07:36:02.000Z",
 };
 
 const VERCEL_EVIDENCE_SOURCE_NAMES = {
@@ -507,7 +515,22 @@ if (vercelDeployment && vercelDeploymentSchema) {
   record(isDeepStrictEqual(vercelDeployment.anonymousHttp, EXPECTED_VERCEL_HTTP), "Vercel receipt anonymous HTTP, browser request, or service-worker evidence differs from readback");
   record(isDeepStrictEqual(vercelDeployment.browserFlow, EXPECTED_VERCEL_BROWSER_FLOW), "Vercel receipt browser flow differs from the verified retry sequence and counters");
   record(vercelDeployment.browserFlow?.testedUrl === vercelDeployment.deployment?.publicAlias, "Vercel browser flow was not tested on the anonymously accessible public alias");
-  record(vercelDeployment.browserFlow?.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel browser flow deployment ID differs from provider readback");
+  record(
+    vercelDeployment.browserFlow?.deploymentId !== vercelDeployment.deployment?.deploymentId,
+    "Carried Vercel browser evidence must retain the deployment that was actually tested",
+  );
+  record(
+    vercelDeployment.browserFlow?.appliesToDeploymentId === vercelDeployment.deployment?.deploymentId,
+    "Carried Vercel browser evidence does not name the current deployment",
+  );
+  record(
+    vercelDeployment.browserFlow?.appliesToDeployedSourceCommit === vercelDeployment.deployment?.deployedSourceCommit,
+    "Carried Vercel browser evidence does not name the current deployed source",
+  );
+  record(
+    vercelDeployment.browserFlow?.testedFunctionalDigest === vercelDeployment.artifact?.functionalDigest,
+    "Carried Vercel browser evidence and current functional artifact digests differ",
+  );
   record(isDeepStrictEqual(vercelDeployment.postDeployObservability, EXPECTED_VERCEL_OBSERVABILITY), "Vercel receipt bounded post-deploy error scan differs from provider readback");
   record(
     isDeepStrictEqual(vercelDeployment.restoredNotificationDeployment, EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT),
@@ -538,8 +561,9 @@ if (vercelDeployment && vercelDeploymentSchema) {
 
   const observability = vercelDeployment.postDeployObservability ?? {};
   record(
-    Date.parse(observability.windowEnd) - Date.parse(observability.windowStart) === 60 * 60 * 1000,
-    "Vercel receipt post-deploy observation window is not exactly one hour",
+    Date.parse(observability.windowEnd) > Date.parse(observability.windowStart) &&
+      Date.parse(observability.windowEnd) - Date.parse(observability.windowStart) <= 60 * 60 * 1000,
+    "Vercel receipt post-deploy observation window is not a positive period of at most one hour",
   );
   record(
     observability.windowEnd === observability.queryExecutedAt,
@@ -548,6 +572,14 @@ if (vercelDeployment && vercelDeploymentSchema) {
   record(
     Date.parse(observability.queryExecutedAt) >= Date.parse(deployment.readyAt),
     "Vercel one-hour lookback query was executed before deployment READY",
+  );
+  record(
+    observability.windowStart === deployment.readyAt,
+    "Vercel bounded observation does not start at the current deployment READY boundary",
+  );
+  record(
+    observability.readyBoundaryDeploymentId === deployment.deploymentId,
+    "Vercel bounded observation is not anchored to the current deployment ID",
   );
 
   const evidenceSources = Array.isArray(vercelDeployment.evidenceSources) ? vercelDeployment.evidenceSources : [];

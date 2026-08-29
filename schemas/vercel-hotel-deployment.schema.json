@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d state_transition=LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY -> CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z machine-contract=Exact committed source requires provider READY readback five anonymous remote hashes a fresh-storage retry flow and a post-ready lookback while accidental notification-project deployment and immediate restoration remain explicit",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f state_transition=CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z machine-contract=Provider READY and five matching anonymous files verify the exact publication-record redeploy while an unchanged functional digest binds the separately identified prior fresh-browser run without claiming a new run",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,
@@ -23,7 +23,7 @@
   ],
   "properties": {
     "$schema": { "const": "../schemas/vercel-hotel-deployment.schema.json" },
-    "receiptVersion": { "const": "1.1.0" },
+    "receiptVersion": { "const": "1.2.0" },
     "identity": { "$ref": "#/$defs/identity" },
     "stateTransition": { "$ref": "#/$defs/stateTransition" },
     "provider": { "$ref": "#/$defs/provider" },
@@ -89,8 +89,8 @@
       "additionalProperties": false,
       "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
-        "from": { "const": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY" },
-        "to": { "const": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED" },
+        "from": { "const": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED" },
+        "to": { "const": "PUBLICATION_RECORD_REDEPLOY_VERIFIED" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
         "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }
@@ -242,6 +242,10 @@
       "required": [
         "testedUrl",
         "deploymentId",
+        "evidenceState",
+        "testedFunctionalDigest",
+        "appliesToDeploymentId",
+        "appliesToDeployedSourceCommit",
         "storageState",
         "input",
         "stateSequence",
@@ -263,6 +267,10 @@
       "properties": {
         "testedUrl": { "type": "string", "format": "uri" },
         "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "evidenceState": { "const": "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST" },
+        "testedFunctionalDigest": { "$ref": "#/$defs/sha256" },
+        "appliesToDeploymentId": { "$ref": "#/$defs/deploymentId" },
+        "appliesToDeployedSourceCommit": { "$ref": "#/$defs/sourceCommit" },
         "storageState": { "const": "FRESH" },
         "input": {
           "type": "object",
@@ -304,6 +312,7 @@
       "additionalProperties": false,
       "required": [
         "projectId",
+        "readyBoundaryDeploymentId",
         "environment",
         "queryMode",
         "queryExecutedAt",
@@ -316,8 +325,9 @@
       ],
       "properties": {
         "projectId": { "$ref": "#/$defs/projectId" },
+        "readyBoundaryDeploymentId": { "$ref": "#/$defs/deploymentId" },
         "environment": { "const": "production" },
-        "queryMode": { "const": "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY" },
+        "queryMode": { "const": "READY_TO_QUERY_BOUNDED_MAX_ONE_HOUR" },
         "queryExecutedAt": { "$ref": "#/$defs/observedAt" },
         "windowStart": { "$ref": "#/$defs/observedAt" },
         "windowEnd": { "$ref": "#/$defs/observedAt" },
@@ -330,7 +340,7 @@
         },
         "runtimeErrorClusters": { "type": "integer", "minimum": 0 },
         "matchingLogEntries": { "type": "integer", "minimum": 0 },
-        "conclusion": { "const": "ONE_HOUR_LOOKBACK_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS" }
+        "conclusion": { "const": "BOUNDED_READY_TO_QUERY_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS" }
       }
     },
     "restoredNotificationDeployment": {

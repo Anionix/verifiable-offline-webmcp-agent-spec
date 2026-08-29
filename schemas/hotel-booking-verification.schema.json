@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
-  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04c6b-5e20-7c43-a068-3c1f63bf2a57 state_transition=YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE occurred_at=2026-08-29T07:28:20.000Z machine-contract=the previous deployment stays verified while the rebuilt publication record remains a candidate until provider deployment and readback",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04c71-d19b-7e53-a611-687ba87e3eb8 state_transition=WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED occurred_at=2026-08-29T07:35:22.779Z machine-contract=the exact publication-record commit is current only after Sites and Vercel provider readback anonymous HTTP 200 and matching public service-record bytes while unchanged functional bytes retain the prior fresh-browser execution proof",
   "title": "Hotel booking demo verification record",
   "type": "object",
   "additionalProperties": false,

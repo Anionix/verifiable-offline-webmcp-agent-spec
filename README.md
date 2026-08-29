@@ -18,9 +18,9 @@ final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
 source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
-publication_state_event_uuid_v7: "01a04c63-a6db-752d-8b87-cd0c38748887"
+publication_state_event_uuid_v7: "01a04c71-bf66-788b-8a8e-74e9459ac233"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T07:19:54.331Z"
+updated_at: "2026-08-29T07:35:18.118Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -149,7 +149,7 @@ Confirmation, payment, and cancellation mutation are deliberately absent. Indexe
 
 Local evidence currently passes 135 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one.
 
-Public ChatGPT Sites version 8 uses exact source commit `370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6` in deployment `appgdep_6a928039357c8191947ea3a0115e91a7` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). A fresh browser-storage run on version 8 reached `PREPARED → COMMITTED → RETRY_RECOGNIZED` with two attempts, one booking, one effect start, and the same result after reload. The anonymous [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) independently uses the same source commit in deployment `dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`: it returned HTTP 200, five delivered files matched the local release, and its own fresh browser-storage run produced the same retry-safe result.
+Public ChatGPT Sites version 9 uses exact source commit `285127fecb3d0395e9a773909b79e5c08a865987` in version `appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16` and deployment `appgdep_6a928af2553c8191a6943104aa937eef` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The current URL returned anonymous HTTP 200 and its delivered `service-integrations.json` matched the local release. The feature digest did not change. A fresh browser-storage retry run was not repeated on version 9: the direct `PREPARED → COMMITTED → RETRY_RECOGNIZED` evidence belongs to immediately preceding version 8 and reached two attempts, one booking, one effect start, and the same result after reload. The current [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) and its [deployment-specific URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app) use the same exact source commit in deployment `dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`; both the anonymous HTTP 200 result and delivered `service-integrations.json` match were confirmed. Its feature digest is also unchanged, while the direct fresh-storage retry run remains the immediately preceding deployment `dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN` evidence rather than a new run on the current deployment.
 
 One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
 

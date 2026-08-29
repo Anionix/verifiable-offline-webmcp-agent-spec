@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -76,6 +76,10 @@ import { uuidV5, uuidV7 } from "../uuid.ts";
 // event_uuid_v7=01a04d19-f9ee-7e63-a9fe-8b74c23514c6
 // state_transition=PATH_SWAP_RISK -> DESCRIPTOR_BOUND_REGRESSION_PROOF occurred_at=2026-08-29T10:40:43.886Z
 // machine-contract: missing owner remains recoverable, while symbolic-link and nonregular owner entries never become lock authority; live and dead regular-file owners keep their existing behavior.
+// information_uuid_v5=f57b26f1-6a41-5927-8a5d-5599e3b91d1e
+// event_uuid_v7=01a04d4d-b6af-73c6-a2ac-cc8f0ae2fc0f
+// state_transition=STALE_RECOVERY_OBSERVATION -> REPLACEMENT_OWNER_PRESERVED occurred_at=2026-08-29T14:55:01.000Z
+// machine-contract: recovery claims and the main lock are deleted only when the quarantined directory still has the observed identity and owner fingerprint; a replacement never becomes an old observer's deletion target.
 
 function clock(start = Date.UTC(2026, 7, 28, 17, 0, 0, 0)): () => number {
   let value = start;
@@ -676,6 +680,103 @@ test("failed lock initialization preserves a replacement live owner's directory"
     assert.equal(existsSync(lockPath), false);
     ledger.close();
   } finally {
+    item.close();
+  }
+});
+
+test("a replaced recovery claim survives the stale observer's quarantine attempt", () => {
+  const item = fixture("recovery-claim-replacement");
+  const now = clock();
+  const identity = createDeviceIdentity("recovery-claim-replacement");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const replacementEpochMs = Date.now();
+  const replacementOwner = {
+    schemaVersion: 1,
+    ownerProcessId: process.pid,
+    acquiredAtEpochMs: replacementEpochMs,
+    ownerEventId: uuidV7(replacementEpochMs),
+  };
+  let recoveryClaimPath = "";
+  let replacementInstalled = false;
+  let ledger: LocalSyncLedger | null = null;
+  try {
+    mkdirSync(lockPath, { mode: 0o700 });
+    const expired = new Date(Date.now() - 60_000);
+    utimesSync(lockPath, expired, expired);
+    const directoryIdentity = `${statSync(lockPath).dev}-${statSync(lockPath).ino}`;
+    recoveryClaimPath = `${lockPath}.recovery-${sha256Hex(directoryIdentity)}`;
+    mkdirSync(recoveryClaimPath, { mode: 0o700 });
+    utimesSync(recoveryClaimPath, expired, expired);
+
+    ledger = new LocalSyncLedger(item.database, {
+      now,
+      trustAnchorLockTimeoutMs: 40,
+      afterTrustAnchorRecoveryObservation: (observedPath) => {
+        if (observedPath !== recoveryClaimPath || replacementInstalled) return;
+        replacementInstalled = true;
+        rmSync(observedPath, { recursive: true, force: false });
+        mkdirSync(observedPath, { mode: 0o700 });
+        writeFileSync(join(observedPath, "owner.json"), `${JSON.stringify(replacementOwner)}\n`, {
+          encoding: "utf8",
+          mode: 0o600,
+          flag: "wx",
+        });
+      },
+    });
+    assert.throws(() => ledger!.registerDevice(identity, log.publicKeyPem()), /timed out waiting for the trusted device key anchor lock/);
+    assert.equal(replacementInstalled, true);
+    assert.equal(existsSync(recoveryClaimPath), true);
+    assert.deepEqual(JSON.parse(readFileSync(join(recoveryClaimPath, "owner.json"), "utf8")), replacementOwner);
+    assert.equal(existsSync(lockPath), true);
+  } finally {
+    ledger?.close();
+    item.close();
+  }
+});
+
+test("a replaced main lock survives a stale recovery observer", () => {
+  const item = fixture("main-lock-replacement");
+  const now = clock();
+  const identity = createDeviceIdentity("main-lock-replacement");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const replacementEpochMs = Date.now();
+  const replacementOwner = {
+    schemaVersion: 1,
+    ownerProcessId: process.pid,
+    acquiredAtEpochMs: replacementEpochMs,
+    ownerEventId: uuidV7(replacementEpochMs),
+  };
+  let replacementInstalled = false;
+  let ledger: LocalSyncLedger | null = null;
+  try {
+    mkdirSync(lockPath, { mode: 0o700 });
+    const expired = new Date(Date.now() - 60_000);
+    utimesSync(lockPath, expired, expired);
+    ledger = new LocalSyncLedger(item.database, {
+      now,
+      trustAnchorLockTimeoutMs: 40,
+      afterTrustAnchorRecoveryObservation: (observedPath) => {
+        if (observedPath !== lockPath || replacementInstalled) return;
+        replacementInstalled = true;
+        rmSync(observedPath, { recursive: true, force: false });
+        mkdirSync(observedPath, { mode: 0o700 });
+        writeFileSync(join(observedPath, "owner.json"), `${JSON.stringify(replacementOwner)}\n`, {
+          encoding: "utf8",
+          mode: 0o600,
+          flag: "wx",
+        });
+      },
+    });
+    assert.throws(() => ledger!.registerDevice(identity, log.publicKeyPem()), /timed out waiting for the trusted device key anchor lock/);
+    assert.equal(replacementInstalled, true);
+    assert.deepEqual(JSON.parse(readFileSync(join(lockPath, "owner.json"), "utf8")), replacementOwner);
+    assert.equal(existsSync(`${lockPath}.recovery-${sha256Hex(`${statSync(lockPath).dev}-${statSync(lockPath).ino}`)}`), false);
+  } finally {
+    ledger?.close();
     item.close();
   }
 });

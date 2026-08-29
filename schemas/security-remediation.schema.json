@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/security-remediation.schema.json",
+  "$comment": "information_uuid_v5=a337c993-332d-5256-b2b8-c6bac2f1593d event_uuid_v7=01a04cdc-3b33-770e-a586-a0de4a275d5d state_transition=CODE_SCANNING_UNMEASURED -> LOCAL_PATCH_VALIDATED_AWAITING_GITHUB_RESCAN occurred_at=2026-08-29T09:31:36.627Z machine-contract=thirteen alerts require thirteen issues and a later main-branch CodeQL readback before closure",
+  "title": "Security remediation evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "stateTransition", "codeql", "dependencyAudits", "uuidDependencyEvidence", "sources", "secretsIncluded"],
+  "properties": {
+    "$schema": { "const": "../schemas/security-remediation.schema.json" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "namespace", "observedAt"],
+      "properties": {
+        "informationUuidV5": { "const": "635084d9-008d-5c4a-a521-89614026e586" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "namespace": { "const": "47f3e535-0e27-559a-9556-aa79a84f95eb" },
+        "observedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "through", "to", "eventId", "occurredAt", "machineContract"],
+      "properties": {
+        "from": { "const": "CODE_SCANNING_UNMEASURED" },
+        "through": {
+          "const": ["DEFAULT_SETUP_CONFIGURED", "INITIAL_ANALYSIS_COMPLETED", "THIRTEEN_ALERTS_ISSUE_TRACKED", "LOCAL_PATCH_VALIDATED", "TWO_AUDIT_SCOPES_ZERO"]
+        },
+        "to": { "const": "LOCAL_PATCH_VALIDATED_AWAITING_GITHUB_RESCAN" },
+        "eventId": { "$ref": "#/$defs/uuidV7" },
+        "occurredAt": { "$ref": "#/$defs/observedAt" },
+        "machineContract": { "type": "string", "minLength": 120 }
+      }
+    },
+    "codeql": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["configuration", "initialAnalysis", "alerts", "fixCategories", "mainRescan"],
+      "properties": {
+        "configuration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "apiLanguageTokens",
+            "normalizedAnalysisLanguages",
+            "querySuite",
+            "threatModel",
+            "runnerType",
+            "runnerLabel",
+            "scanSchedule",
+            "scanScheduleState"
+          ],
+          "properties": {
+            "state": { "const": "configured" },
+            "apiLanguageTokens": { "const": ["actions", "javascript", "javascript-typescript", "python", "typescript"] },
+            "normalizedAnalysisLanguages": { "const": ["actions", "javascript-typescript", "python"] },
+            "querySuite": { "const": "extended" },
+            "threatModel": { "const": "remote_and_local" },
+            "runnerType": { "const": "standard" },
+            "runnerLabel": { "const": "" },
+            "scanSchedule": { "type": "null" },
+            "scanScheduleState": { "const": "PROVIDER_DEFAULT_NOT_EXPLICIT_IN_API" }
+          }
+        },
+        "initialAnalysis": { "$ref": "#/$defs/initialAnalysis" },
+        "alerts": {
+          "type": "array",
+          "minItems": 13,
+          "maxItems": 13,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/alert" }
+        },
+        "fixCategories": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/fixCategory" }
+        },
+        "mainRescan": { "$ref": "#/$defs/mainRescan" }
+      }
+    },
+    "dependencyAudits": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/dependencyAudit" }
+    },
+    "uuidDependencyEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest",
+        "lockfile",
+        "package",
+        "requestedVersion",
+        "resolvedVersion",
+        "integrity",
+        "transitiveDependencyCount",
+        "lockEntryHasDependenciesField",
+        "purpose"
+      ],
+      "properties": {
+        "manifest": { "const": "src/typescript/package.json" },
+        "lockfile": { "const": "src/typescript/package-lock.json" },
+        "package": { "const": "uuid" },
+        "requestedVersion": { "const": "14.0.2" },
+        "resolvedVersion": { "const": "14.0.2" },
+        "integrity": { "const": "sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==" },
+        "transitiveDependencyCount": { "const": 0 },
+        "lockEntryHasDependenciesField": { "const": false },
+        "purpose": { "const": "RFC_9562_UUID_V5_NON_SECURITY_IDENTIFIERS_ONLY" }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "secretsIncluded": { "const": false }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analysisId", "category", "createdAt", "results", "rules", "tool", "toolVersion"],
+      "properties": {
+        "analysisId": { "type": "integer", "minimum": 1 },
+        "category": { "enum": ["/language:actions", "/language:python", "/language:javascript-typescript"] },
+        "createdAt": { "$ref": "#/$defs/observedAt" },
+        "results": { "type": "integer", "minimum": 0 },
+        "rules": { "type": "integer", "minimum": 1 },
+        "tool": { "const": "CodeQL" },
+        "toolVersion": { "const": "2.26.4" }
+      }
+    },
+    "initialAnalysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "observedAt",
+        "runId",
+        "runUrl",
+        "name",
+        "event",
+        "ref",
+        "commit",
+        "status",
+        "conclusion",
+        "createdAt",
+        "startedAt",
+        "updatedAt",
+        "analyses"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "2e2ab483-f3f3-5a31-af2d-be1459b52e85" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "runId": { "const": 33244513119 },
+        "runUrl": { "const": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/actions/runs/33244513119" },
+        "name": { "const": "CodeQL Setup" },
+        "event": { "const": "dynamic" },
+        "ref": { "const": "refs/heads/main" },
+        "commit": { "const": "586b566d96eff4762a91a0db488bb83b781ae591" },
+        "status": { "const": "completed" },
+        "conclusion": { "const": "success" },
+        "createdAt": { "$ref": "#/$defs/observedAt" },
+        "startedAt": { "$ref": "#/$defs/observedAt" },
+        "updatedAt": { "$ref": "#/$defs/observedAt" },
+        "analyses": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/analysis" }
+        }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alert", "issue", "rule", "severity", "path", "line", "codeScanningAlertUuidV5", "observationUuidV7", "observedAt", "fixCategory", "state"],
+      "properties": {
+        "alert": { "type": "integer", "minimum": 1, "maximum": 13 },
+        "issue": { "type": "integer", "minimum": 91, "maximum": 103 },
+        "rule": {
+          "enum": ["js/regex-injection", "js/command-line-injection", "js/path-injection", "js/weak-cryptographic-algorithm", "js/remote-property-injection"]
+        },
+        "severity": { "enum": ["CRITICAL", "HIGH"] },
+        "path": {
+          "enum": [
+            "scripts/validate_void_integration.mjs",
+            "scripts/validate_service_integrations.mjs",
+            "src/typescript/notification/audit-log.ts",
+            "src/typescript/notification/store.ts",
+            "src/typescript/uuid.ts",
+            "src/typescript/test/evaluator.test.ts"
+          ]
+        },
+        "line": { "type": "integer", "minimum": 1 },
+        "codeScanningAlertUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "fixCategory": {
+          "enum": [
+            "FIXED_SCHEMA_PATTERN_ALLOWLIST",
+            "FIXED_EXECUTABLE_ARGUMENT_BOUNDARY",
+            "AUDIT_LOG_CONTAINED_NOFOLLOW_IO",
+            "SQLITE_CONTAINED_PRIVATE_PATH",
+            "FIXED_UUID_V5_IDENTITY_LEDGER",
+            "STANDARD_UUID_V5_LIBRARY_BOUNDARY",
+            "FIXED_GATE_ASSIGNMENT_CASES"
+          ]
+        },
+        "state": { "const": "LOCAL_PATCH_VALIDATED_AWAITING_GITHUB_RESCAN" }
+      }
+    },
+    "fixCategory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "alerts"],
+      "properties": {
+        "category": {
+          "enum": [
+            "FIXED_SCHEMA_PATTERN_ALLOWLIST",
+            "FIXED_EXECUTABLE_ARGUMENT_BOUNDARY",
+            "AUDIT_LOG_CONTAINED_NOFOLLOW_IO",
+            "SQLITE_CONTAINED_PRIVATE_PATH",
+            "FIXED_UUID_V5_IDENTITY_LEDGER",
+            "STANDARD_UUID_V5_LIBRARY_BOUNDARY",
+            "FIXED_GATE_ASSIGNMENT_CASES"
+          ]
+        },
+        "alerts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 1, "maximum": 13 } }
+      }
+    },
+    "mainRescan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "state", "ref", "latestVerifiedMainCommit", "patchCommit", "requiredOutcome", "separateFromLocalValidation"],
+      "properties": {
+        "informationUuidV5": { "const": "130fcd5f-b7e0-59be-b739-cfba36b6de2e" },
+        "state": { "const": "AWAITING_MAIN_BRANCH_ANALYSIS_AFTER_PATCH" },
+        "ref": { "const": "refs/heads/main" },
+        "latestVerifiedMainCommit": { "const": "586b566d96eff4762a91a0db488bb83b781ae591" },
+        "patchCommit": { "type": "null" },
+        "requiredOutcome": { "const": "ALL_THIRTEEN_ALERTS_FIXED_OR_EXPLICITLY_DISMISSED_AND_READ_BACK" },
+        "separateFromLocalValidation": { "const": true }
+      }
+    },
+    "dependencyAudit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "observedAt",
+        "scope",
+        "command",
+        "status",
+        "low",
+        "moderate",
+        "high",
+        "critical",
+        "total",
+        "automaticFixApplied"
+      ],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "scope": { "enum": ["ROOT_PACKAGE_LOCK_ENTIRE_DEPENDENCY_GRAPH", "SRC_TYPESCRIPT_PACKAGE_LOCK_ENTIRE_DEPENDENCY_GRAPH"] },
+        "command": { "enum": ["npm audit --audit-level=low", "npm audit --prefix src/typescript --audit-level=low"] },
+        "status": { "const": "NO_KNOWN_VULNERABILITIES" },
+        "low": { "const": 0 },
+        "moderate": { "const": 0 },
+        "high": { "const": 0 },
+        "critical": { "const": 0 },
+        "total": { "const": 0 },
+        "automaticFixApplied": { "const": false }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "title", "url", "supports"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/uuidV5" },
+        "title": { "type": "string", "minLength": 8 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "supports": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 8 } }
+      }
+    }
+  }
+}

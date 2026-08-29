@@ -5,6 +5,10 @@
 // machine-contract: this validator may execute only `void --version`; it never authenticates, links a project, or deploys.
 // event_uuid_v7=01a04c82-7268-7de3-b005-ca9c6de8d65d state_transition=VOID_TRANSITIVE_PEER_CONFLICT -> VOID_COMPATIBILITY_SET_PINNED occurred_at=2026-08-29T07:53:32.520Z
 // machine-contract: Void 0.10.12 must retain the Cloudflare plugin and Wrangler versions whose workers-types ranges intersect; force and legacy-peer bypasses are forbidden.
+// event_uuid_v7=01a04cb2-3f0b-7892-bd37-f806bd1512f5 state_transition=DEPENDENCY_ALERTS_TRACKED -> DEPENDENCY_GRAPH_PATCHED occurred_at=2026-08-29T08:45:45.099Z
+// machine-contract: every tracked Dependabot advisory must resolve to a patched package version without force or legacy-peer bypasses; publication state remains separate.
+// event_uuid_v7=01a04cd1-2d20-795f-907d-b2a323d46fc0 state_transition=DYNAMIC_SCHEMA_AND_EXECUTABLE -> FIXED_VALIDATOR_BOUNDARY occurred_at=2026-08-29T09:19:32.128Z
+// machine-contract: only reviewed Void schema patterns may execute, and the version check uses the current Node executable with one fixed local module path; package metadata never selects a command.
 
 import { constants, accessSync, existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
@@ -14,16 +18,200 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_VERSION = "0.10.12";
-const EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION = "1.43.0";
-const EXPECTED_VOID_WRANGLER_VERSION = "4.107.0";
+const EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION = "1.54.2";
+const EXPECTED_VOID_WRANGLER_VERSION = "4.127.1";
 const EXPECTED_VOID_WORKERS_TYPES_VERSION = "4.20260702.1";
+const EXPECTED_VITE_VERSION = "8.2.2";
+const EXPECTED_UNDICI_VERSION = "7.29.0";
+const EXPECTED_SHARP_VERSION = "0.35.2";
+const EXPECTED_WS_VERSION = "8.21.0";
+const EXPECTED_ESBUILD_OVERRIDE_VERSION = "0.25.12";
+const EXPECTED_ESBUILD_GRAPH = [
+  ["node_modules/@esbuild-kit/core-utils/node_modules/esbuild", "0.25.12"],
+  ["node_modules/drizzle-kit/node_modules/esbuild", "0.25.12"],
+  ["node_modules/esbuild", "0.28.1"],
+  ["node_modules/tsx/node_modules/esbuild", "0.28.2"],
+];
 const EXPECTED_SCHEMA_REF = "./node_modules/void/schema.json";
 const EXPECTED_OUTPUT_DIR = "dist/client";
 const EXPECTED_BUILD_COMMAND = "npm run build:web";
 const EXPECTED_COMPATIBILITY_DATE = "2026-05-22";
+const EXPECTED_VOID_BIN_RELATIVE = "dist/cli/cli.mjs";
 const EXPECTED_INFORMATION_UUID_V5 = "22fa5437-e104-5ea2-acfe-fe57cc2553f2";
 const EXPECTED_UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const EXPECTED_BINDINGS = ["ai", "db", "kv", "storage"];
+const EXPECTED_DEPENDABOT_ALERTS = [
+  {
+    dependabotAlert: 27,
+    issue: 73,
+    advisory: "GHSA-67mh-4wv8-2f99",
+    package: "esbuild",
+    severity: "medium",
+    firstPatchedVersion: "0.25.0",
+    resolvedVersion: "0.25.12",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 26,
+    issue: 74,
+    advisory: "GHSA-m8rv-5g2x-5cg5",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 25,
+    issue: 75,
+    advisory: "GHSA-jr45-8vmc-qm54",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 24,
+    issue: 76,
+    advisory: "GHSA-v3r7-h72x-cjcm",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 23,
+    issue: 77,
+    advisory: "GHSA-8xcm-r25x-g524",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 22,
+    issue: 78,
+    advisory: "GHSA-4cwx-7wf7-3272",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 21,
+    issue: 79,
+    advisory: "GHSA-f88m-g3jw-g9cj",
+    package: "sharp",
+    severity: "high",
+    firstPatchedVersion: "0.35.0",
+    resolvedVersion: "0.35.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 20,
+    issue: 80,
+    advisory: "GHSA-g8m3-5g58-fq7m",
+    package: "undici",
+    severity: "low",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 19,
+    issue: 81,
+    advisory: "GHSA-p88m-4jfj-68fv",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 17,
+    issue: 82,
+    advisory: "GHSA-hm92-r4w5-c3mj",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 16,
+    issue: 83,
+    advisory: "GHSA-35p6-xmwp-9g52",
+    package: "undici",
+    severity: "low",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 15,
+    issue: 84,
+    advisory: "GHSA-vmh5-mc38-953g",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 14,
+    issue: 85,
+    advisory: "GHSA-pr7r-676h-xcf6",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 13,
+    issue: 86,
+    advisory: "GHSA-v6wh-96g9-6wx3",
+    package: "vite",
+    severity: "medium",
+    firstPatchedVersion: "8.0.16",
+    resolvedVersion: "8.2.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 12,
+    issue: 87,
+    advisory: "GHSA-fx2h-pf6j-xcff",
+    package: "vite",
+    severity: "high",
+    firstPatchedVersion: "8.0.16",
+    resolvedVersion: "8.2.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 11,
+    issue: 88,
+    advisory: "GHSA-96hv-2xvq-fx4p",
+    package: "ws",
+    severity: "high",
+    firstPatchedVersion: "8.21.0",
+    resolvedVersion: "8.21.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 10,
+    issue: 89,
+    advisory: "GHSA-g7r4-m6w7-qqqr",
+    package: "esbuild",
+    severity: "low",
+    firstPatchedVersion: "0.28.1",
+    resolvedVersion: "0.28.1",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+];
 const EXPECTED_PACKAGE_SCRIPTS = {
   "mcp:void": "void mcp",
   "validate:void": "node scripts/validate_void_integration.mjs",
@@ -31,9 +219,19 @@ const EXPECTED_PACKAGE_SCRIPTS = {
   "deploy:void:static": "npm run build:void:static && void deploy --dir dist/client",
 };
 const SAFE_SCRIPT_PATTERN = /^node scripts\/[a-z0-9_-]+\.mjs$/u;
+const SCHEMA_PATTERN_MATCHERS = new Map([
+  [
+    String.raw`^(?!/)(?!\.\.?$)(?!\./$)(?!\.\./)(?!.*(?:^|/)\.\.(?:/|$))(?!.*\s$)(?!\s).+$`,
+    /^(?!\/)(?!\.\.?$)(?!\.\/$)(?!\.\.\/)(?!.*(?:^|\/)\.\.(?:\/|$))(?!.*\s$)(?!\s).+$/u,
+  ],
+  ["^/", /^\//u],
+  ["^/(?!/)[^?]*$", /^\/(?!\/)[^?]*$/u],
+  [String.raw`^(\/|\*$)`, /^(\/|\*)$/u],
+  ["^(/|https://)", /^(\/|https:\/\/)/u],
+]);
 const SECRET_KEY_PATTERN = /(?:^|[_-])(api[_-]?key|credential|password|private[_-]?key|secret|token)(?:$|[_-])/iu;
 const SECRET_VALUE_PATTERNS = [
-  new RegExp(["-{5}BEGIN [A-Z ]*", "PRIVATE", " KEY-{5}"].join(""), "u"),
+  /-{5}BEGIN [A-Z ]*PRIVATE KEY-{5}/u,
   /\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})\b/u,
   /(?:password|secret|token)\s*[:=]\s*[^\s]+/iu,
   /https?:\/\/[^/@:\s]+:[^/@\s]+@/iu,
@@ -76,6 +274,36 @@ function jsonTypeMatches(value, expectedType) {
   }
 }
 
+function approvedSchemaPattern(pattern) {
+  return SCHEMA_PATTERN_MATCHERS.get(pattern) ?? null;
+}
+
+function schemaPatternContractErrors(value, pointer = "$schema") {
+  const errors = [];
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => errors.push(...schemaPatternContractErrors(item, `${pointer}[${index}]`)));
+    return errors;
+  }
+  if (value === null || typeof value !== "object") return errors;
+
+  if (Object.hasOwn(value, "pattern") && (typeof value.pattern !== "string" || !approvedSchemaPattern(value.pattern))) {
+    errors.push(`${pointer}.pattern is outside the fixed validator contract`);
+  }
+  if (Object.hasOwn(value, "patternProperties")) {
+    if (value.patternProperties === null || typeof value.patternProperties !== "object" || Array.isArray(value.patternProperties)) {
+      errors.push(`${pointer}.patternProperties must be an object`);
+    } else {
+      for (const pattern of Object.keys(value.patternProperties)) {
+        if (!approvedSchemaPattern(pattern)) errors.push(`${pointer}.patternProperties has an unreviewed key`);
+      }
+    }
+  }
+  for (const [key, child] of Object.entries(value)) {
+    errors.push(...schemaPatternContractErrors(child, `${pointer}.${key}`));
+  }
+  return errors;
+}
+
 function schemaErrors(value, schema, pointer = "$") {
   const errors = [];
 
@@ -99,8 +327,13 @@ function schemaErrors(value, schema, pointer = "$") {
     errors.push(`${pointer} must be one of ${schema.enum.map(String).join(", ")}`);
   }
 
-  if (typeof value === "string" && typeof schema.pattern === "string" && !new RegExp(schema.pattern, "u").test(value)) {
-    errors.push(`${pointer} does not match ${schema.pattern}`);
+  if (typeof value === "string" && typeof schema.pattern === "string") {
+    const matcher = approvedSchemaPattern(schema.pattern);
+    if (!matcher) {
+      errors.push(`${pointer} uses a JSON Schema pattern outside the fixed validator contract`);
+    } else if (!matcher.test(value)) {
+      errors.push(`${pointer} does not match ${schema.pattern}`);
+    }
   }
 
   if (typeof value === "number" && typeof schema.minimum === "number" && value < schema.minimum) {
@@ -127,7 +360,15 @@ function schemaErrors(value, schema, pointer = "$") {
 
   if (value !== null && typeof value === "object" && !Array.isArray(value)) {
     const properties = schema.properties ?? {};
-    const patternProperties = Object.entries(schema.patternProperties ?? {}).map(([pattern, childSchema]) => [new RegExp(pattern, "u"), childSchema]);
+    const patternProperties = [];
+    for (const [pattern, childSchema] of Object.entries(schema.patternProperties ?? {})) {
+      const matcher = approvedSchemaPattern(pattern);
+      if (!matcher) {
+        errors.push(`${pointer} uses a patternProperties key outside the fixed validator contract`);
+      } else {
+        patternProperties.push([matcher, childSchema]);
+      }
+    }
 
     for (const requiredKey of schema.required ?? []) {
       if (!Object.hasOwn(value, requiredKey)) {
@@ -204,31 +445,62 @@ record(schemaPath === resolve(ROOT, EXPECTED_SCHEMA_REF), "Void JSON Schema must
 record(existsSync(schemaPath), "the Void package JSON Schema is missing");
 const schema = readJson(schemaPath, "Void package JSON Schema");
 record(schema.$schema === "http://json-schema.org/draft-07/schema#", "Void schema must declare JSON Schema draft 7");
+record(
+  schemaPatternContractErrors({ pattern: "^(a+)+$", patternProperties: { "^(.+)+$": {} } }).length === 2,
+  "unreviewed JSON Schema value and property patterns must remain rejected",
+);
+const schemaPatternErrors = schemaPatternContractErrors(schema);
+record(schemaPatternErrors.length === 0, `Void schema contains an unreviewed pattern: ${schemaPatternErrors.join("; ")}`);
 const validationErrors = schemaErrors(config, schema);
 record(validationErrors.length === 0, `void.json violates its package schema: ${validationErrors.join("; ")}`);
 
 record(packageJson.devDependencies?.void === EXPECTED_VERSION, `package.json must pin void exactly to ${EXPECTED_VERSION}`);
 record(packageLock.packages?.[""]?.devDependencies?.void === EXPECTED_VERSION, `package-lock.json root must pin void exactly to ${EXPECTED_VERSION}`);
 record(packageLock.packages?.["node_modules/void"]?.version === EXPECTED_VERSION, `package-lock.json installed Void version must be ${EXPECTED_VERSION}`);
+record(packageJson.devDependencies?.vite === EXPECTED_VITE_VERSION, `Vite must be pinned to ${EXPECTED_VITE_VERSION}`);
 record(
-  isDeepStrictEqual(packageJson.overrides?.[`void@${EXPECTED_VERSION}`], {
-    "@cloudflare/vite-plugin": EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
-    wrangler: EXPECTED_VOID_WRANGLER_VERSION,
-  }),
-  "Void must pin the compatible Cloudflare plugin and Wrangler pair without force or legacy-peer bypasses",
+  packageJson.devDependencies?.["@cloudflare/vite-plugin"] === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
+  `Cloudflare Vite plugin must be pinned to ${EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION}`,
 );
+record(packageJson.devDependencies?.wrangler === EXPECTED_VOID_WRANGLER_VERSION, `Wrangler must be pinned to ${EXPECTED_VOID_WRANGLER_VERSION}`);
 record(
-  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/vite-plugin"]?.version === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
+  packageJson.overrides?.["@esbuild-kit/core-utils"]?.esbuild === EXPECTED_ESBUILD_OVERRIDE_VERSION,
+  "the legacy esbuild consumer must resolve to a patched version",
+);
+record(packageJson.overrides?.[`void@${EXPECTED_VERSION}`] === undefined, "Void must share the patched root Cloudflare and Wrangler versions");
+record(
+  packageLock.packages?.["node_modules/@cloudflare/vite-plugin"]?.version === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
   `Void must resolve @cloudflare/vite-plugin ${EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION}`,
 );
 record(
-  packageLock.packages?.["node_modules/void/node_modules/wrangler"]?.version === EXPECTED_VOID_WRANGLER_VERSION,
+  packageLock.packages?.["node_modules/wrangler"]?.version === EXPECTED_VOID_WRANGLER_VERSION,
   `Void must resolve Wrangler ${EXPECTED_VOID_WRANGLER_VERSION}`,
 );
 record(
-  packageLock.packages?.["node_modules/@cloudflare/workers-types"]?.version === EXPECTED_VOID_WORKERS_TYPES_VERSION,
+  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/workers-types"]?.version === EXPECTED_VOID_WORKERS_TYPES_VERSION,
   `Void must resolve workers-types ${EXPECTED_VOID_WORKERS_TYPES_VERSION}`,
 );
+record(packageLock.packages?.["node_modules/vite"]?.version === EXPECTED_VITE_VERSION, `Vite must resolve ${EXPECTED_VITE_VERSION}`);
+record(packageLock.packages?.["node_modules/undici"]?.version === EXPECTED_UNDICI_VERSION, `Undici must resolve ${EXPECTED_UNDICI_VERSION}`);
+record(packageLock.packages?.["node_modules/miniflare/node_modules/sharp"]?.version === EXPECTED_SHARP_VERSION, `Sharp must resolve ${EXPECTED_SHARP_VERSION}`);
+record(packageLock.packages?.["node_modules/ws"]?.version === EXPECTED_WS_VERSION, `ws must resolve ${EXPECTED_WS_VERSION}`);
+const installedEsbuildGraph = Object.entries(packageLock.packages)
+  .filter(([installedPath]) => installedPath.endsWith("node_modules/esbuild"))
+  .map(([installedPath, packageEntry]) => [installedPath, packageEntry.version])
+  .sort(([left], [right]) => left.localeCompare(right));
+record(
+  isDeepStrictEqual(installedEsbuildGraph, EXPECTED_ESBUILD_GRAPH),
+  "every installed esbuild path and resolved version must match the reviewed Dependabot graph",
+);
+record(
+  packageLock.packages?.["node_modules/@esbuild-kit/core-utils/node_modules/esbuild"]?.version === EXPECTED_ESBUILD_OVERRIDE_VERSION,
+  `legacy esbuild must resolve ${EXPECTED_ESBUILD_OVERRIDE_VERSION}`,
+);
+record(
+  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/vite-plugin"] === undefined,
+  "Void must not retain a vulnerable nested Cloudflare plugin",
+);
+record(packageLock.packages?.["node_modules/void/node_modules/wrangler"] === undefined, "Void must not retain a vulnerable nested Wrangler");
 const installedPackage = readJson(resolve(ROOT, "node_modules/void/package.json"), "installed Void package");
 record(installedPackage.version === EXPECTED_VERSION, `installed Void package must be ${EXPECTED_VERSION}`);
 
@@ -287,10 +559,12 @@ record(
 record(evidence.dependencyCompatibility?.forceInstallUsed === false, "Void evidence cannot allow force installation");
 record(evidence.dependencyCompatibility?.legacyPeerDependenciesUsed === false, "Void evidence cannot allow legacy peer bypasses");
 const audit = evidence.dependencyAudit ?? {};
-record(audit.moderate + audit.high + audit.critical === audit.total, "Void recorded vulnerability counts do not sum to the total");
+record(audit.low + audit.moderate + audit.high + audit.critical === audit.total, "recorded vulnerability counts do not sum to the total");
+record(audit.status === "NO_KNOWN_VULNERABILITIES" && audit.total === 0, "the validated dependency graph must record zero known vulnerabilities");
+record(audit.automaticFixApplied === false, "the evidence must distinguish the reviewed update from npm audit fix");
 record(
-  audit.status === "KNOWN_RISKS_REMAIN" && audit.automaticFixApplied === false,
-  "Void dependency risks must remain explicit without an automatic breaking fix",
+  isDeepStrictEqual(audit.trackedAlerts, EXPECTED_DEPENDABOT_ALERTS),
+  "Dependabot alert, issue, advisory, package, severity, patched version, resolved version, or state differs from the reviewed mapping",
 );
 record(Array.isArray(evidence.sources) && evidence.sources.length === 4, "Void evidence must cite the four fixed primary sources");
 record(
@@ -329,16 +603,16 @@ record(/\bcloudflare\s*\(/u.test(viteConfig), "existing Cloudflare Vite integrat
 record(/\bsites\s*\(/u.test(viteConfig), "existing ChatGPT Sites Vite integration must remain present");
 record(!/\bvoidPlugin\b|from\s+["']void["']/u.test(viteConfig), "Void must not be layered into the existing Vite plugin graph");
 
-const voidBinRelative = installedPackage.bin?.void;
-record(voidBinRelative === "dist/cli/cli.mjs", "installed package must expose the expected Void command entry point");
-const voidBinPath = resolve(ROOT, "node_modules/void", voidBinRelative);
+record(installedPackage.bin?.void === EXPECTED_VOID_BIN_RELATIVE, "installed package must expose the expected Void command entry point");
+const voidBinPath = resolve(ROOT, "node_modules/void", EXPECTED_VOID_BIN_RELATIVE);
 record(existsSync(voidBinPath), "Void command entry point is missing");
-accessSync(voidBinPath, constants.X_OK);
+accessSync(voidBinPath, constants.R_OK);
 checks += 1;
-const cliResult = spawnSync(voidBinPath, ["--version"], {
+const cliResult = spawnSync(process.execPath, [voidBinPath, "--version"], {
   cwd: ROOT,
   encoding: "utf8",
-  env: { ...process.env, NO_COLOR: "1" },
+  env: { NO_COLOR: "1" },
+  shell: false,
   timeout: 10_000,
 });
 record(cliResult.error === undefined, `Void version command failed to start: ${cliResult.error?.message ?? "unknown error"}`);

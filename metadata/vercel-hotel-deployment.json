@@ -3,24 +3,24 @@
   "receiptVersion": "1.2.0",
   "identity": {
     "informationUuidV5": "b5e254dc-08a3-59e9-a4dd-f2215b184964",
-    "observationUuidV7": "01a04c72-6ad0-75c6-9e90-10988cd6d33f",
+    "observationUuidV7": "01a04cc9-7198-7cbb-8b04-9cb8ec2900e8",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T07:36:02.000Z"
+    "observedAt": "2026-08-29T09:11:05.368Z"
   },
   "stateTransition": {
-    "from": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED",
-    "to": "PUBLICATION_RECORD_REDEPLOY_VERIFIED",
-    "eventId": "01a04c72-6ad0-75c6-9e90-10988cd6d33f",
-    "occurredAt": "2026-08-29T07:36:02.000Z",
-    "machineContract": "The publication-record commit is current only after provider READY readback and five anonymous remote hashes match local files. The unchanged functional digest binds the prior fresh-storage retry run to this packaging-only redeploy without claiming a new browser run."
+    "from": "DEPENDENCY_PATCH_BROWSER_RUN_VERIFIED",
+    "to": "DEPENDENCY_PATCH_CURRENT_ARTIFACT_REDEPLOY_VERIFIED",
+    "eventId": "01a04cc9-7198-7cbb-8b04-9cb8ec2900e8",
+    "occurredAt": "2026-08-29T09:11:05.368Z",
+    "machineContract": "The dependency-patched artifact is current only after the first deployment passes a fresh browser retry run, the second deployment retains the same functional digest, provider READY is read back, and five anonymous remote hashes match local files."
   },
   "provider": {
     "name": "Vercel",
     "teamId": "team_npJWoj9cpy54Q7B3fpGdBCCX"
   },
   "artifact": {
-    "sourceCommit": "5ce64bc9a814200467d384bba9d9de364df6fcf6",
-    "functionalDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+    "sourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
+    "functionalDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
     "functionalDigestScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
@@ -31,32 +31,32 @@
   "deployment": {
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
-    "deployedSourceCommit": "285127fecb3d0395e9a773909b79e5c08a865987",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app",
+    "deploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
+    "deployedSourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
+    "uniqueUrl": "https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app",
     "publicAlias": "https://kyoto-booking-retry-proof.vercel.app",
     "state": "READY",
     "target": "production",
     "source": "cli",
-    "createdAtUnixMs": 1787988723407,
-    "createdAt": "2026-08-29T07:32:03.407Z",
-    "buildingAtUnixMs": 1787988724416,
-    "buildingAt": "2026-08-29T07:32:04.416Z",
-    "readyAtUnixMs": 1787988732236,
-    "readyAt": "2026-08-29T07:32:12.236Z",
+    "createdAtUnixMs": 1787994594530,
+    "createdAt": "2026-08-29T09:09:54.530Z",
+    "buildingAtUnixMs": 1787994595509,
+    "buildingAt": "2026-08-29T09:09:55.509Z",
+    "readyAtUnixMs": 1787994601421,
+    "readyAt": "2026-08-29T09:10:01.421Z",
     "aliasError": null
   },
   "remoteArtifacts": {
-    "deploymentId": "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
+    "deploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
     "baseUrl": "https://kyoto-booking-retry-proof.vercel.app",
     "hashEvidenceState": "REMOTE_HASHES_READ_BACK_AND_MATCHED",
-    "remoteHashReadbackAt": "2026-08-29T07:36:02.000Z",
+    "remoteHashReadbackAt": "2026-08-29T09:10:26.248Z",
     "artifacts": [
       { "name": "document", "requestPath": "/", "localPath": "dist/client/index.html", "statusCode": 200, "sha256": "6091acbce2127ded26bc1e03d98dcdd22296f8c4be91271711d68f739a2e2d01" },
-      { "name": "application-script", "requestPath": "/assets/app.js", "localPath": "dist/client/assets/app.js", "statusCode": 200, "sha256": "14974a0f0109aa759895547049b2d40b846a9b271aa89dbaa03e570f5874ddc9" },
+      { "name": "application-script", "requestPath": "/assets/app.js", "localPath": "dist/client/assets/app.js", "statusCode": 200, "sha256": "a72d09c3cd0f34c15f674ef1bc809a513b6fe8f299c2998a3552ae3042115755" },
       { "name": "application-style", "requestPath": "/assets/index.css", "localPath": "dist/client/assets/index.css", "statusCode": 200, "sha256": "18d4ffe7171923260be7503842a8e0faf1a2b66e7e1e1606a506c58e8d4bd9ec" },
       { "name": "service-worker", "requestPath": "/service-worker.js", "localPath": "dist/client/service-worker.js", "statusCode": 200, "sha256": "9fdc8252d772e71cc462c00fe29d9ee9294460c67d46105335a1b98f4de6e610" },
-      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "6b1aa9711398d0f8a027346e18a0c1e2f512a0e7f597b4e426f3055e637c23e4" }
+      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c" }
     ]
   },
   "anonymousHttp": {
@@ -80,15 +80,15 @@
   },
   "browserFlow": {
     "testedUrl": "https://kyoto-booking-retry-proof.vercel.app",
-    "deploymentId": "dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN",
+    "deploymentId": "dpl_4uthDyjgSi1KxbssW9t5u18xJbLs",
     "evidenceState": "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
-    "testedFunctionalDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-    "appliesToDeploymentId": "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
-    "appliesToDeployedSourceCommit": "285127fecb3d0395e9a773909b79e5c08a865987",
+    "testedFunctionalDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
+    "appliesToDeploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
+    "appliesToDeployedSourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
     "storageState": "FRESH",
     "input": {
-      "checkIn": "2026-09-28",
-      "checkOut": "2026-09-30",
+      "checkIn": "2026-12-10",
+      "checkOut": "2026-12-12",
       "adults": 2,
       "rooms": 1,
       "language": "en"
@@ -98,25 +98,25 @@
     "attempts": 2,
     "bookings": 1,
     "effectStarts": 1,
-    "confirmationNumber": "FKR-1852E0269A",
-    "reservationUuidV5": "4181074b-ce92-5b97-9eef-964a6f8f064b",
-    "latestEventUuidV7": "01a04c4a-2e6c-7fb9-bc37-c4fd25e81b3d",
+    "confirmationNumber": "FKR-7EF2A00FA2",
+    "reservationUuidV5": "64ccc2dc-0404-5566-b296-92d0eb7ed00f",
+    "latestEventUuidV7": "01a04cc6-a382-7274-9476-f8b9c37af3d7",
     "auditEvents": 4,
     "chainValid": true,
-    "chainHeadSha256": "98c53884000495b1ec8cddf09d2f252c5ed4dd5cfc5ad65e3afd1f95b53f7b65",
-    "chainHeadPrefix": "98c538840004",
+    "chainHeadSha256": "2aa0854fdc8950698b1bb89c98076edd394c3074c7d70771b767975ed437a8b0",
+    "chainHeadPrefix": "2aa0854fdc89",
     "reloadRestored": true,
     "errors": 0,
     "warnings": 0
   },
   "postDeployObservability": {
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
-    "readyBoundaryDeploymentId": "dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp",
+    "readyBoundaryDeploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
     "environment": "production",
     "queryMode": "READY_TO_QUERY_BOUNDED_MAX_ONE_HOUR",
-    "queryExecutedAt": "2026-08-29T07:36:02.000Z",
-    "windowStart": "2026-08-29T07:32:12.236Z",
-    "windowEnd": "2026-08-29T07:36:02.000Z",
+    "queryExecutedAt": "2026-08-29T09:10:40.000Z",
+    "windowStart": "2026-08-29T09:10:01.421Z",
+    "windowEnd": "2026-08-29T09:10:40.000Z",
     "queriedLevels": ["error", "warning"],
     "runtimeErrorClusters": 0,
     "matchingLogEntries": 0,

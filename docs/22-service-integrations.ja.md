@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c90-5270-772e-ba7d-ec64df571f99"
-observed_at: "2026-08-29T08:08:41.840Z"
-state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> VOID_LOCAL_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN -> DEVPOST_DRAFT_APPROVAL_RECONCILED -> FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04cdc-3b33-7720-9567-66e1e046e0ea"
+observed_at: "2026-08-29T09:31:36.627Z"
+state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_FINAL_SUBMISSION_PENDING"
 ---
 
 # サービス連携状態の読み方
@@ -39,12 +39,12 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日8時8分41秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+公開サービス状態の最新観測は2026年8月29日9時14分31秒（協定世界時）です。後続のセキュリティ検査は9時31分36秒に記録しました。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は版9。現行配信を検査し、実操作は機能要約値が同じ直前の版8で確認 |
-| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 現行配信を匿名検査し、実操作は機能要約値が同じ直前配置で確認 |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は版11。安全版依存を使う版10で実操作し、同一機能の版11で再読込復元を確認 |
+| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 安全版依存を使う直前配置で実操作し、同一機能の現行配置で匿名5ファイル一致と再読込復元を確認 |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -60,7 +60,7 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 
 Voidは、上の八サービスとは別の端末内開発補助として導入しました。端末内の開発依存は`0.10.12`へ完全一致で固定しています。Codex全体では`npx -y void@0.10.12 mcp`を有効化済みで、現在の処理へ途中から読み込ませず、Codex再起動後に利用します。
 
-`void.json`は`dist/client`を対象にした静的アダプターです。データベース、キーと値、保管、人工知能の各結合をすべて無効にしています。既存のVite構成`cloudflare()`と`sites()`へ`voidPlugin`を追加しません。Void配下で併用するCloudflare Vite plug-inは`1.43.0`、Wranglerは`4.107.0`に固定しています。
+`void.json`は`dist/client`を対象にした静的アダプターです。データベース、キーと値、保管、人工知能の各結合をすべて無効にしています。既存のVite構成`cloudflare()`と`sites()`へ`voidPlugin`を追加しません。Voidは安全版へ更新したルート依存を共有し、Cloudflare Vite plug-inは`1.54.2`、Wranglerは`4.127.1`、Viteは`8.2.2`です。Dependabot警告17件は課題#73〜#89、CodeQL初回警告13件は課題#91〜#103へ、それぞれ一件ずつ結び付けました。CodeQL修正で使う推移依存のない標準UUID実装`14.0.2`は、実際に使うTypeScript参照パッケージへ固定しています。ルートとTypeScript参照パッケージの依存関係検査は、どちらも既知の脆弱性0件です。GitHub上で警告が閉じることは、修正を`main`へ統合した後に別途読み戻します。
 
 ```sh
 npm run validate:void
@@ -75,9 +75,9 @@ Devpostでは、[プロジェクトページ](https://devpost.com/software/proje
 
 YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しました。公開プレーヤーの表示時間は2分30秒です。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声と画面へ焼き込んだ英語字幕に加え、日本語字幕トラックも公開済みです。Canvaで選んだ専用サムネイルは端末内に準備済みですが、ブラウザーのファイル選択が失敗したため未反映で、現在はYouTubeが自動生成したサムネイルを使っています。この失敗から専用サムネイルの外部公開成功は推測しません。
 
-ChatGPT Sitesでは、正確な配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`を版9として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16`、配置識別子`appgdep_6a928af2553c8191a6943104aa937eef`です。現行URLの匿名HTTP 200応答と、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。ただし版9では新しい保存領域からの実操作を再試験していません。準備、人間の画面操作による確定、安全な再送、再読込復元から2試行、架空予約1件、処理開始1回へ収束した直接証拠は、直前の版8の実測です。完成動画版10の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
+ChatGPT Sitesでは、安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`を版10へ配置し、新しい予約条件で準備、人間の画面操作による確定、安全な再送を実行しました。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、WebMCP四機能、確認番号`FKR-7EF2A00FA2`を直接確認しています。サービス状態表だけを更新した最終コミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`は、版11として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d`、配置識別子`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`です。版10と版11の機能要約値は同一で、版11の再読込後も同じ結果を復元しました。現行URLの匿名HTTP 200応答と、配信された`service-integrations.json`の端末内成果物との一致も確認しました。
 
-Vercelでは、同じ配置元コミット`285127fecb3d0395e9a773909b79e5c08a865987`をホテル専用配置`dpl_Hfkko3ZijUwXUVkyeXWr9ekQmVXp`へ配置しました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-8lo6k6xuw-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200応答、配信された`service-integrations.json`の端末内成果物との一致を確認しました。機能要約値は変わっていません。ただし現行配置では新しい保存領域からの実操作を再試験していません。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、再読込復元の直接証拠は、直前配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`の実測です。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
+Vercelでは、同じ機能コミットをホテル専用配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`へ配置し、新しい保存領域から同じ再送収束を実測しました。状態表だけを更新した最終コミットは現行配置`dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe`です。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app)の匿名HTTP 200応答、配信された5ファイルのSHA-256と端末内成果物との一致、再読込復元、配置成功後の警告・エラー0件を確認しました。二配置の機能要約値は同一です。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
 配置操作の途中で、旧通知実演プロジェクトを誤って対象にしました。その本番別名は直ちに配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)の匿名HTTP 200応答と通知実演表示を確認しました。ホテル版と通知実演版は引き続き別プロジェクトです。
 

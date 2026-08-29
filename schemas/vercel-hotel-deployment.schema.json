@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f state_transition=CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z machine-contract=Provider READY and five matching anonymous files verify the exact publication-record redeploy while an unchanged functional digest binds the separately identified prior fresh-browser run without claiming a new run",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04cc9-7198-7cbb-8b04-9cb8ec2900e8 state_transition=DEPENDENCY_PATCH_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_CURRENT_ARTIFACT_REDEPLOY_VERIFIED occurred_at=2026-08-29T09:11:05.368Z machine-contract=The dependency-patched artifact is current only after a fresh browser retry run a same-functional-digest redeploy provider READY readback and five matching anonymous files",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,
@@ -89,8 +89,8 @@
       "additionalProperties": false,
       "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
-        "from": { "const": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED" },
-        "to": { "const": "PUBLICATION_RECORD_REDEPLOY_VERIFIED" },
+        "from": { "const": "DEPENDENCY_PATCH_BROWSER_RUN_VERIFIED" },
+        "to": { "const": "DEPENDENCY_PATCH_CURRENT_ARTIFACT_REDEPLOY_VERIFIED" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
         "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }

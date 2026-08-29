@@ -9,6 +9,10 @@
 // information_uuid_v5=43ec07f2-3321-504a-8481-6358beea3856
 // event_uuid_v7=01a04984-7ca1-717d-a8bb-4eceafaedc31
 // machine-contract: WebMCP tools use the draft specification's default self allowlist; unsupported browsers receive no unknown tools directive.
+// information_uuid_v5=86a5edfe-a906-5771-8c0f-4dadad5aaebf
+// event_uuid_v7=01a04cd1-5eaa-70e9-aa80-545fb4d96d5d
+// state_transition=ENVIRONMENT_SELECTED_STORAGE -> FIXED_REPOSITORY_LOCAL_STORAGE occurred_at=2026-08-29T09:19:44.810Z
+// machine-contract: environment input may select the local port only; it can never select a SQLite or audit-log path.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -24,8 +28,8 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(moduleDirectory, "../../..");
 const publicDirectory = join(repositoryRoot, "examples/notification-demo");
 const localDirectory = join(repositoryRoot, ".local");
-const databasePath = process.env.NOTIFICATION_DEMO_DATABASE ?? join(localDirectory, "notification-demo.sqlite");
-const auditPath = process.env.NOTIFICATION_DEMO_AUDIT ?? join(localDirectory, "notification-audit.ndjson");
+const databasePath = join(localDirectory, "notification-demo.sqlite");
+const auditPath = join(localDirectory, "notification-audit.ndjson");
 const port = Number(process.env.NOTIFICATION_DEMO_PORT ?? "4173");
 const host = "127.0.0.1";
 const expectedOrigin = `http://${host}:${port}`;

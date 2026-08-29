@@ -9,10 +9,18 @@
 // information_uuid_v5=5b3dd6c4-39fd-57b2-98bc-842b8d7f88bc
 // event_uuid_v7=01a0498b-5662-7094-9bef-88e9b2f13a10
 // machine-contract: confirmed pre-effect absence keeps measured effect starts at zero; a later successful replay raises it to one, never two.
+// information_uuid_v5=4a133fe5-d18c-597f-abcc-328e2d816f10
+// event_uuid_v7=01a04cd1-5eac-7d0d-b48d-64008648a762
+// state_transition=UNTRUSTED_STORAGE_PATH -> REJECTED occurred_at=2026-08-29T09:19:44.812Z
+// machine-contract: traversal, unexpected extensions, and symbolic links are rejected before audit or SQLite I/O begins.
+// information_uuid_v5=c82fc322-fc96-5ce1-aa03-ba374d074d0e
+// event_uuid_v7=01a04ce0-0e78-72d0-a80a-bc3fc49c7256
+// state_transition=CONSTRUCTOR_ONLY_SYMLINK_CHECK -> PER_IO_NOFOLLOW_AND_PRIVATE_PARENT occurred_at=2026-08-29T09:35:47.320Z
+// machine-contract: replacing an audit path after construction remains rejected, and a shared temporary root never qualifies as a storage parent.
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-verification.ts";
@@ -55,6 +63,78 @@ function fixture(name: string): Fixture {
     },
   };
 }
+
+test("notification storage rejects paths outside its fixed local and test roots", () => {
+  const outsideTemporaryRoot = join(dirname(tmpdir()), "notification-outside.sqlite");
+  assert.throws(() => new NotificationStore(outsideTemporaryRoot), /outside the allowed storage roots/);
+  assert.throws(
+    () => new AuditLog(outsideTemporaryRoot.replace(/\.sqlite$/, ".ndjson")),
+    /outside the allowed storage roots/,
+  );
+});
+
+test("notification storage rejects unexpected filenames and symbolic links before I/O", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-path-boundary-"));
+  try {
+    assert.throws(() => new NotificationStore(join(directory, "queue.db")), /simple \.sqlite filename/);
+    assert.throws(() => new AuditLog(join(directory, "audit.log")), /simple \.ndjson filename/);
+
+    const databaseTarget = join(directory, "database-target.sqlite");
+    const databaseLink = join(directory, "queue.sqlite");
+    writeFileSync(databaseTarget, "", { mode: 0o600 });
+    symlinkSync(databaseTarget, databaseLink);
+    assert.throws(() => new NotificationStore(databaseLink), /must not be a symbolic link/);
+
+    const auditTarget = join(directory, "audit-target.ndjson");
+    const auditLink = join(directory, "audit.ndjson");
+    writeFileSync(auditTarget, "", { mode: 0o600 });
+    symlinkSync(auditTarget, auditLink);
+    assert.throws(() => new AuditLog(auditLink), /must not be a symbolic link/);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a shared parent and audit symlink replacement after construction", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-private-parent-"));
+  try {
+    chmodSync(directory, 0o755);
+    assert.throws(() => new NotificationStore(join(directory, "queue.sqlite")), /private to the current user/);
+    assert.throws(() => new AuditLog(join(directory, "audit.ndjson")), /private to the current user/);
+
+    chmodSync(directory, 0o700);
+    const nested = join(directory, "nested");
+    mkdirSync(nested, { mode: 0o700 });
+    assert.throws(() => new NotificationStore(join(nested, "queue.sqlite")), /one direct private child/);
+    assert.throws(() => new AuditLog(join(nested, "audit.ndjson")), /one direct private child/);
+
+    const auditPath = join(directory, "audit.ndjson");
+    const audit = new AuditLog(auditPath);
+    symlinkSync(join(process.cwd(), "package.json"), auditPath);
+    assert.throws(() => audit.verify(), /must not be a symbolic link/);
+    assert.throws(() => audit.append({} as never), /must not be a symbolic link/);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a parent symlink that escapes an allowed root", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-parent-link-"));
+  try {
+    const link = join(directory, "outside");
+    symlinkSync(process.cwd(), link, "dir");
+    assert.throws(
+      () => new NotificationStore(join(link, "queue.sqlite")),
+      /resolves outside its allowed storage root/,
+    );
+    assert.throws(
+      () => new AuditLog(join(link, "audit.ndjson")),
+      /resolves outside its allowed storage root/,
+    );
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 test("engine length limits count astral Unicode characters like the input projector", () => {
   const item = fixture("unicode-length");

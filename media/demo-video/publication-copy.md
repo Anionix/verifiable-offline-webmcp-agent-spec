@@ -1,21 +1,23 @@
 ---
 title: "Publication copy for the fictional Kyoto booking retry demo"
 information_uuid_v5: "22ea7511-834f-5b4f-b08b-9d6e95328540"
-event_uuid_v7: "01a04c37-7a64-70b3-874f-848ada24fba2"
-occurred_at: "2026-08-29T06:31:43Z"
-state: "DEVPOST_PROJECT_PAGE_PUBLISHED"
-state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED"
+event_uuid_v7: "01a04c63-6328-755b-8203-403c69022f3a"
+occurred_at: "2026-08-29T07:19:37.000Z"
+state: "YOUTUBE_PUBLIC_DEVPOST_VIDEO_LINKED"
+state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED -> THUMBNAIL_SAVED_AND_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING"
 ---
 
 # Publication copy
 
-<!-- machine-contract: This file is publication preparation, not evidence that YouTube publication or Devpost submission occurred. Keep the project name, country, public video URL, and final submission state unresolved until the owner confirms them. -->
+<!-- machine-contract: This file records the public YouTube video and the Devpost project-page readback. It is not evidence of final challenge submission. Keep the project name and owner-only submission answers unresolved, and never cross the final-submit boundary without a new owner confirmation. -->
 
 ## YouTube
 
 ### Title
 
 WebMCP vs Duplicate Bookings: A Live Demo
+
+Public video: https://youtu.be/tdSvJw4ghX8
 
 The title was one of five candidates generated in a single vidIQ call. Its returned score was 86. The higher-scoring “Never Double Book Again” candidate was rejected because it overstates the demonstrated scope.
 
@@ -72,6 +74,14 @@ The first 20 seconds are labeled artificial-intelligence-generated dramatization
 ### Search terms
 
 WebMCP, safe retry, duplicate booking, artificial-intelligence agent, hotel booking, offline web application, ChatGPT Sites, Vercel, WebMCP Challenge
+
+### Thumbnail
+
+The owner selected Canva candidate 4. It is saved as editable Canva design `DAHTp751k_A`: https://www.canva.com/d/2fXzKdOp48h88cO
+
+The upload-ready local derivative is `.local/video-production/youtube-thumbnail-v1.png`: 1280×720, 148,053 bytes, SHA-256 `14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef`. It contains no person, real hotel, personal information, or external-booking claim.
+
+The in-app browser could not open YouTube's custom-thumbnail file chooser after three bounded attempts, so the public video currently uses an automatically generated YouTube thumbnail. The Canva design and upload-ready derivative remain preserved; no phone or identity verification was started.
 
 ## Devpost
 
@@ -167,11 +177,13 @@ WebMCP, JavaScript, TypeScript, Vite, IndexedDB, Service Worker, ChatGPT Sites, 
 | Artificial-intelligence tools | OpenAI Codex and ChatGPT, Higgsfield, OpenArt, HeyGen, Canva, and vidIQ. | READY |
 | Learning | Significant | NEEDS_OWNER_CONFIRMATION |
 | Career value | Yes | NEEDS_OWNER_CONFIRMATION |
-| Public video URL | Not created | BLOCKED_BY_PUBLICATION_REVIEW |
+| Public video URL | https://youtu.be/tdSvJw4ghX8 | READY_AND_LINKED |
 
 ## Current publication boundary
 
-- Canva generated four temporary thumbnail candidates. Candidate 4 is the clearest, but no candidate has been saved to the Canva account.
-- The final video exists locally and passed technical review.
-- No YouTube upload has occurred.
-- The Devpost project page is publicly readable with the current description and live links. Its name remains `未定`, its video URL is empty, and its WebMCP Challenge `submitted_at` value is null, so it has not been finally submitted.
+- Canva candidate 4 was owner-selected and saved as editable design `DAHTp751k_A`; the 1280×720 derivative is preserved, but YouTube's custom-thumbnail chooser did not open in the connected browser. The public video therefore uses an automatically generated thumbnail.
+- The exact 150-second local video, SHA-256 `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`, is public at https://youtu.be/tdSvJw4ghX8. An anonymous request returned HTTP 200 and YouTube's public metadata returned the expected title. Upload processing and copyright checks completed without an issue.
+- English narration and short English captions remain in the video. The separate Japanese SubRip file was uploaded and YouTube Studio reported the Japanese subtitle track as published.
+- The Devpost update for project `1405191` returned version 6. A subsequent readback confirmed the attached YouTube URL, unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`; the read tool itself does not expose a version field.
+- Final Devpost submission has not occurred. The next allowed action is owner review of unresolved submission answers; the final-submit action remains outside this run.
+- Pull request 53 was merged into `main`, so the public repository root now contains the hotel demo and its verification evidence.

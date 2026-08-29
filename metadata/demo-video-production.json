@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04c37-78f9-7972-b402-46d5ee4909a9"
+    "observationUuidV7": "01a04c63-6328-7c4a-9bbd-ce632b271792"
   },
-  "updatedAt": "2026-08-29T06:31:43.000Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED",
+  "updatedAt": "2026-08-29T07:19:37.000Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED -> THUMBNAIL_SELECTED_AND_SAVED -> PUBLIC_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -83,9 +83,9 @@
       "taskCallable": true,
       "callableToolCount": 32,
       "authenticationState": "CONFIRMED",
-      "verifiedOperations": ["READ:search", "WRITE:generate_design"],
+      "verifiedOperations": ["READ:search", "WRITE:generate_design", "WRITE:create_design_from_candidate", "READ:get_design"],
       "productionUseState": "USED",
-      "reasonCode": "THUMBNAIL_CANDIDATES_GENERATED_SELECTION_PENDING"
+      "reasonCode": "THUMBNAIL_SELECTED_SAVED_AND_VERIFIED"
     }
   ],
   "assets": [
@@ -186,7 +186,7 @@
       "remoteId": null,
       "localPath": "media/demo-video/subtitles.ja.srt",
       "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
-      "disclosure": "Locally authored Japanese subtitles aligned to the preserved narration clock and verified to end before the completed video; retained separately for the video host.",
+      "disclosure": "Locally authored Japanese subtitles aligned to the preserved narration clock and verified to end before the completed video. The exact SubRip file was uploaded to YouTube, and YouTube Studio reported the Japanese track as published.",
       "subtitleEvidence": {
         "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
         "timingMethod": "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES",
@@ -195,7 +195,7 @@
         "timedWords": null,
         "captionCount": 28,
         "remoteMediaId": null,
-        "observedAt": "2026-08-29T06:20:27.000Z",
+        "observedAt": "2026-08-29T07:19:37.000Z",
         "finalVideoVerified": true
       }
     },
@@ -278,7 +278,7 @@
       "createdAt": null,
       "remoteId": null,
       "localPath": "media/demo-video/publication-copy.md",
-      "sha256": "6939d21cd001cd7ae17968f924ec1259401ad765e5b4bbcc0ac7a3fe5ba5a496",
+      "sha256": "3aa3cb16c97afe94268666f7fae14589852e3a8b73441187ae71969fb9b8ac77",
       "disclosure": "One vidIQ call returned five scored candidates and used five credits. The selected title scored 86; a score-90 candidate was rejected because its wording overstated the demonstrated scope."
     },
     {
@@ -287,11 +287,11 @@
       "kind": "THUMBNAIL",
       "status": "COMPLETED",
       "prompt": "Generate a clean 16:9 YouTube thumbnail candidate showing two attempts converging into one fictional booking, using large ivory, navy, vermilion, and green typography without people, brands, or invented product screenshots.",
-      "createdAt": null,
-      "remoteId": "dg-9b48aa63-51c6-4a59-81aa-3e79675256bf",
-      "localPath": ".local/video-production/canva-thumbnail-candidate-4.png",
-      "sha256": "54a6f4242642af85aa863ea8fa814b9df271cda19e15927b53f2d3c5271d3e4c",
-      "disclosure": "Temporary Canva candidate 4. It is not yet selected, saved to the Canva account, uploaded to Devpost, or used on a public video."
+      "createdAt": "2026-08-29T07:04:45Z",
+      "remoteId": "DAHTp751k_A",
+      "localPath": ".local/video-production/youtube-thumbnail-v1.png",
+      "sha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
+      "disclosure": "Owner-selected Canva candidate 4 was saved as editable design DAHTp751k_A. The local 1280x720 derivative is preserved and contains no person, personal information, real hotel, or external-booking claim. Three bounded attempts to open YouTube's custom-thumbnail file chooser timed out, so this Canva asset was not applied; the public video uses an automatically generated YouTube thumbnail."
     },
     {
       "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
@@ -359,8 +359,53 @@
     "captionTimingState": "FINAL_VIDEO_VERIFIED"
   },
   "publication": {
-    "youtubeUrl": null,
-    "status": "NOT_STARTED",
-    "requiresSeparateApproval": true
+    "publicationId": "5cdeb2f8-45fa-5b7f-a99a-980c0858af77",
+    "observationUuidV7": "01a04c63-6328-75fe-8afb-06954b2765b3",
+    "youtubeUrl": "https://youtu.be/tdSvJw4ghX8",
+    "videoId": "tdSvJw4ghX8",
+    "channelId": "UCe6hnuH57zMobuLUArBz4qg",
+    "status": "PUBLIC_VERIFIED",
+    "visibility": "PUBLIC",
+    "publishedAt": "2026-08-29T07:17:40.000Z",
+    "observedAt": "2026-08-29T07:19:37.000Z",
+    "requiresSeparateApproval": true,
+    "approvalState": "GRANTED",
+    "anonymousReadback": {
+      "httpStatus": 200,
+      "oEmbedTitle": "WebMCP vs Duplicate Bookings: A Live Demo",
+      "playabilityStatus": "OK",
+      "playableInEmbed": true,
+      "isPrivate": false,
+      "isUnlisted": false,
+      "durationSeconds": 150
+    },
+    "subtitles": {
+      "englishAutomatic": "PUBLISHED",
+      "japaneseAuthored": "PUBLISHED"
+    },
+    "thumbnail": {
+      "canvaAssetSha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
+      "customApplicationState": "NOT_APPLIED_TOOL_TIMEOUT",
+      "failureReason": "YOUTUBE_FILE_CHOOSER_TIMEOUT",
+      "publicState": "AUTO_GENERATED_PUBLIC_VERIFIED",
+      "publicUrl": "https://i.ytimg.com/vi/tdSvJw4ghX8/maxresdefault.jpg",
+      "publicSha256": "fa4250c3d9b712b45d0c7f47b938a996335947543a0a857825262398a7ffea3b",
+      "publicWidth": 1280,
+      "publicHeight": 720
+    },
+    "devpostReadback": {
+      "informationUuidV5": "31436b48-0f88-5f9c-8525-184b8d33d32b",
+      "observationUuidV7": "01a04c63-6328-76ca-a8da-419b1641cb44",
+      "observedAt": "2026-08-29T07:19:37.000Z",
+      "projectId": 1405191,
+      "projectSlug": "project-y79pb23hj1mz",
+      "projectState": "published",
+      "projectName": "未定",
+      "videoUrl": "https://youtu.be/tdSvJw4ghX8",
+      "updateResponseVersion": 6,
+      "challengeSlug": "webmcp",
+      "submittedAt": null,
+      "finalSubmissionState": "NOT_SUBMITTED"
+    }
   }
 }

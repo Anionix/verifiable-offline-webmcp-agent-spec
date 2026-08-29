@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
-  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04c37-8898-746a-b87b-4a4beb6cbf29 state_transition=SITES_AND_VERCEL_CURRENT_VERIFIED -> DEVPOST_PROJECT_PAGE_PUBLISHED occurred_at=2026-08-29T06:31:43.000Z machine-contract=Sites and Vercel remain current-artifact verified; the Devpost project page is public with current links while video publication and final submission remain separate gates",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04c63-e410-75a5-a2bc-3df473bb0757 state_transition=DEVPOST_PROJECT_PAGE_PUBLISHED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED occurred_at=2026-08-29T07:20:10.000Z machine-contract=the public video and Japanese subtitles are linked from Devpost version 6; YouTube is evidence hosting rather than WebMCP execution and final challenge submission remains unperformed",
   "title": "Service integration registry",
   "type": "object",
   "additionalProperties": false,
@@ -57,10 +57,10 @@
       ],
       "properties": {
         "from": {
-          "const": "SITES_AND_VERCEL_CURRENT_VERIFIED"
+          "const": "DEVPOST_PROJECT_PAGE_PUBLISHED"
         },
         "to": {
-          "const": "DEVPOST_PROJECT_PAGE_PUBLISHED"
+          "const": "YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED"
         },
         "eventId": {
           "$ref": "#/$defs/uuidV7"

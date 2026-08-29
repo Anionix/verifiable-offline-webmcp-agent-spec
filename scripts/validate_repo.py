@@ -31,6 +31,10 @@
 # event_uuid_v7=01a04bc8-7f33-7fe3-8877-477e7f8b995a
 # state_transition=AUDIO_TIMED_PENDING_FINAL_VIDEO -> FINAL_VIDEO_VERIFIED occurred_at=2026-08-29T04:30:26.100Z
 # machine-contract: every completed screen or final video carries measured video evidence; a verified final cut is local, 1920x1080, audible, English-captioned, under three minutes, and at least 70 percent actual site recording.
+# information_uuid_v5=befe51ac-d842-523a-83ba-91290fa1301d
+# event_uuid_v7=01a04c63-6328-7ecf-9db0-2d826f35eece
+# state_transition=PUBLICATION_FAIL_CLOSED -> PUBLICATION_READBACK_VERIFIED occurred_at=2026-08-29T07:19:37.000Z
+# machine-contract: a public-video claim requires owner approval, anonymous playback evidence, matching local duration, published Japanese subtitles, explicit thumbnail fallback, and a Devpost readback whose challenge submission remains unsubmitted.
 from __future__ import annotations
 
 import argparse
@@ -602,12 +606,93 @@ def main():
             if sha256(path.read_bytes()) != record["sha256"]:
                 errors.append(f"video production file digest mismatch: {record['path']}")
         plan = video_production["productionPlan"]
-        if video_production["publication"] != {
-            "youtubeUrl": None,
-            "status": "NOT_STARTED",
-            "requiresSeparateApproval": True,
-        }:
-            errors.append("video publication must remain not started until final media and approval evidence exist")
+        publication = video_production["publication"]
+        if publication.get("status") == "NOT_STARTED":
+            if publication != {
+                "youtubeUrl": None,
+                "status": "NOT_STARTED",
+                "requiresSeparateApproval": True,
+            }:
+                errors.append("unstarted video publication has unexpected evidence fields")
+        elif publication.get("status") == "PUBLIC_VERIFIED":
+            try:
+                publication_id = uuid.UUID(publication["publicationId"])
+                publication_event = uuid.UUID(publication["observationUuidV7"])
+                publication_observed_ms = int(datetime.fromisoformat(
+                    publication["observedAt"].replace("Z", "+00:00")
+                ).timestamp() * 1000)
+                published_ms = int(datetime.fromisoformat(
+                    publication["publishedAt"].replace("Z", "+00:00")
+                ).timestamp() * 1000)
+                devpost = publication["devpostReadback"]
+                devpost_id = uuid.UUID(devpost["informationUuidV5"])
+                devpost_event = uuid.UUID(devpost["observationUuidV7"])
+                devpost_observed_ms = int(datetime.fromisoformat(
+                    devpost["observedAt"].replace("Z", "+00:00")
+                ).timestamp() * 1000)
+            except Exception as exc:
+                errors.append(f"published video identity or time is invalid: {exc}")
+            else:
+                if publication_id.version != 5:
+                    errors.append("published video information identifier is not UUIDv5")
+                if publication_event.version != 7 or uuid7_ms(str(publication_event)) != publication_observed_ms:
+                    errors.append("published video observation UUIDv7 does not match observedAt")
+                if published_ms > publication_observed_ms:
+                    errors.append("published video time occurs after its observation")
+                if devpost_id.version != 5:
+                    errors.append("Devpost video readback information identifier is not UUIDv5")
+                if devpost_event.version != 7 or uuid7_ms(str(devpost_event)) != devpost_observed_ms:
+                    errors.append("Devpost video readback UUIDv7 does not match observedAt")
+
+            video_id = publication.get("videoId")
+            anonymous_readback = publication.get("anonymousReadback", {})
+            subtitles_readback = publication.get("subtitles", {})
+            thumbnail_readback = publication.get("thumbnail", {})
+            devpost = publication.get("devpostReadback", {})
+            canva_thumbnails = [
+                record for record in video_production["assets"]
+                if record["service"] == "Canva" and record["kind"] == "THUMBNAIL"
+            ]
+            local_duration = (
+                final_video_assets[0]["videoEvidence"]["durationSeconds"]
+                if len(final_video_assets) == 1 else None
+            )
+            if (
+                publication.get("youtubeUrl") != f"https://youtu.be/{video_id}"
+                or publication.get("visibility") != "PUBLIC"
+                or publication.get("requiresSeparateApproval") is not True
+                or publication.get("approvalState") != "GRANTED"
+                or anonymous_readback.get("httpStatus") != 200
+                or anonymous_readback.get("playabilityStatus") != "OK"
+                or anonymous_readback.get("playableInEmbed") is not True
+                or anonymous_readback.get("isPrivate") is not False
+                or anonymous_readback.get("isUnlisted") is not False
+                or anonymous_readback.get("durationSeconds") != local_duration
+            ):
+                errors.append("public YouTube evidence does not prove approved anonymous playback of the exact final cut")
+            if (
+                subtitles_readback.get("japaneseAuthored") != "PUBLISHED"
+                or subtitles_readback.get("englishAutomatic") != "PUBLISHED"
+            ):
+                errors.append("public YouTube evidence does not preserve both observed subtitle tracks")
+            if (
+                len(canva_thumbnails) != 1
+                or thumbnail_readback.get("canvaAssetSha256") != canva_thumbnails[0].get("sha256")
+                or thumbnail_readback.get("customApplicationState") != "NOT_APPLIED_TOOL_TIMEOUT"
+                or thumbnail_readback.get("failureReason") != "YOUTUBE_FILE_CHOOSER_TIMEOUT"
+                or thumbnail_readback.get("publicState") != "AUTO_GENERATED_PUBLIC_VERIFIED"
+                or thumbnail_readback.get("publicSha256") == thumbnail_readback.get("canvaAssetSha256")
+            ):
+                errors.append("YouTube thumbnail evidence does not preserve the failed custom upload and verified fallback")
+            if (
+                devpost.get("videoUrl") != publication.get("youtubeUrl")
+                or devpost.get("projectState") != "published"
+                or devpost.get("submittedAt") is not None
+                or devpost.get("finalSubmissionState") != "NOT_SUBMITTED"
+            ):
+                errors.append("Devpost video readback crosses or obscures the final-submission boundary")
+        else:
+            errors.append("video publication has an unsupported status")
         planned_permille = round(
             1000 * plan["plannedActualSiteRecordingSeconds"] / plan["plannedDurationSeconds"]
         )

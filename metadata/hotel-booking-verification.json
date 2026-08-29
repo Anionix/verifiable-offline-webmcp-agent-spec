@@ -2,10 +2,10 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04c50-33a1-7536-aa11-e25da967ba60"
+    "observationUuidV7": "01a04c71-d19b-7e53-a611-687ba87e3eb8"
   },
-  "observedAt": "2026-08-29T06:58:39.649Z",
-  "sourceCommit": "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
+  "observedAt": "2026-08-29T07:35:22.779Z",
+  "sourceCommit": "285127fecb3d0395e9a773909b79e5c08a865987",
   "sourceState": "DEPLOYED_CURRENT",
   "artifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
   "artifactDigestScope": {
@@ -17,36 +17,36 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "577e8699bc4032b1eba9f3c2674eb6bb21b092ab571d1607050cdc6cc0d22bc2",
+  "fullClientArtifactDigest": "52ff62480801cd259ecb8408fbfb3e8a5fb84d2528d317f647b9fd7d2fd8429d",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade",
+  "fullSitesPackageDigest": "c964a9584c77dffe1ced96068048a16aadf29c92a877f50ded32df88935bca34",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
-    "deployedVersionSourceCommit": "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
+    "deployedVersionSourceCommit": "285127fecb3d0395e9a773909b79e5c08a865987",
     "functionalArtifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-    "fullSitesPackageDigest": "46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade",
-    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_66f37438eb7881919c755101e638edc9",
-    "versionNumber": 8,
-    "deploymentId": "appgdep_6a928039357c8191947ea3a0115e91a7",
-    "providerArchiveContentHash": "sha256:86faaf6fce3ce2c7c516cb4f41d9398b50cd52e00b701617b5d11954e2161bba",
+    "fullSitesPackageDigest": "c964a9584c77dffe1ced96068048a16aadf29c92a877f50ded32df88935bca34",
+    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_7e9459ae5f008191ab136fbbee8a2f16",
+    "versionNumber": 9,
+    "deploymentId": "appgdep_6a928af2553c8191a6943104aa937eef",
+    "providerArchiveContentHash": "sha256:f9fc0b2513b040d9e0a6d817a67339b5e71cffae15e3152200ad63414c6277f8",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
     "accessMode": "PUBLIC",
     "status": "CURRENT_ARTIFACT_VERIFIED",
-    "observedAt": "2026-08-29T06:58:39.649Z",
-    "evidence": "Sites version 8 and deployment readback identify commit 370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6 as the exact deployed source, retain functional source a628eb9a91d310393a3b69b1130ab92871054d16, and match full Sites package digest 46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade. Anonymous access displayed exactly four safe tool cards and the current state table: ChatGPT Sites, Vercel, and Devpost publish CURRENT ARTIFACT; Sites and Vercel run CURRENT ARTIFACT VERIFIED; Devpost final submission remains a separate approval. A fresh browser-storage run on Sites version 8 reached PREPARED -> COMMITTED -> RETRY_RECOGNIZED, converged two attempts to one booking and one effect start, and restored the same result after reload. The same source commit independently passed the fresh retry flow on Vercel. The public Devpost page is live, but its video URL is empty and submitted_at is null, so neither video publication nor final challenge submission is claimed."
+    "observedAt": "2026-08-29T07:35:22.779Z",
+    "evidence": "Sites version 9 and deployment readback identify commit 285127fecb3d0395e9a773909b79e5c08a865987 as the exact current source and match full Sites package digest c964a9584c77dffe1ced96068048a16aadf29c92a877f50ded32df88935bca34. Anonymous requests to the public root and service-integrations.json returned HTTP 200, and the published service record matched local SHA-256 6b1aa9711398d0f8a027346e18a0c1e2f512a0e7f597b4e426f3055e637c23e4. The retry implementation has the unchanged functional digest 0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470; the fresh version 8 browser run remains the direct functional evidence for PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, and reload restoration. Version 9 adds the verified YouTube and Devpost publication record without changing those functional bytes."
   },
   "checks": [
     {
@@ -125,7 +125,13 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The public production URL loaded Sites version 8 anonymously from exact deployed source commit 370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6 and functional source commit a628eb9a91d310393a3b69b1130ab92871054d16. It displayed exactly four safe tools and the current Sites, Vercel, and Devpost publication states, kept final Devpost submission behind separate approval, and matched the current Sites package digest. A fresh version 8 run required the separate human confirmation, reached PREPARED -> COMMITTED -> RETRY_RECOGNIZED, converged 2 attempts to 1 booking and 1 effect start with confirmation FKR-1852E0269A, and restored the same state after reload."
+      "evidence": "The public production URL loaded Sites version 9 anonymously from exact deployed source commit 285127fecb3d0395e9a773909b79e5c08a865987. Its public root and service-integrations.json returned HTTP 200, the service record matched local SHA-256 6b1aa9711398d0f8a027346e18a0c1e2f512a0e7f597b4e426f3055e637c23e4, and the full Sites package matched digest c964a9584c77dffe1ced96068048a16aadf29c92a877f50ded32df88935bca34. The functional digest remains 0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470, so the fresh version 8 run remains the direct execution proof: separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-1852E0269A, and reload restoration. Version 9 adds publication evidence while final Devpost submission remains pending."
+    },
+    {
+      "checkId": "d81f9523-0616-59e8-8bf5-46339ed98b57",
+      "name": "Public review video and Devpost link",
+      "status": "PASS",
+      "evidence": "https://youtu.be/tdSvJw4ghX8 is public as WebMCP vs Duplicate Bookings: A Live Demo; its public player reports 2:30 and its Japanese subtitle track is published. YouTube hosts review evidence only and is not a WebMCP execution service. The Devpost update for project 1405191 (project-y79pb23hj1mz) returned version 6; the subsequent readback confirmed state published, name 未定, and that URL as video_url. The read tool does not return a version field. WebMCP Challenge submitted_at remains null, so final submission was not performed."
     }
   ],
   "designFidelity": [

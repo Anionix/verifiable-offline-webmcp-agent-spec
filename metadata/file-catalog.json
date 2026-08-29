@@ -5755,8 +5755,8 @@
     },
     {
       "path": "src/typescript/notification/storage-path.ts",
-      "sha256": "d78c02e216953e8bd11b6e928d025693f7d810ae9cf5ea3e911425adc51dfa9b",
-      "bytes": 21089,
+      "sha256": "b49cb84ad840eb3f06b1aca230eef356c598ed997bdd709f32a3620d709b5689",
+      "bytes": 22170,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6287,8 +6287,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "93269dabe65e3a704f1ee80fff73187fb34d93707d7d86e00c09777b41646b3c",
-      "bytes": 43343,
+      "sha256": "1ddc0280627c2c91054afafd2cbb3820d7c1633a0b5051588f5d3650a70147be",
+      "bytes": 45721,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

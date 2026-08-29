@@ -217,8 +217,8 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
     renameSync(auditDirectory, auditMovedDirectory);
     symlinkSync(auditExternal, auditDirectory, "dir");
 
-    assert.throws(() => audit.verify(), /audit parent must not be a symbolic link|audit parent changed during operation/);
-    assert.throws(() => audit.append({} as never), /audit parent must not be a symbolic link|audit parent changed during operation/);
+    assert.throws(() => audit.verify(), /audit parent must not be a symbolic link|audit parent changed during operation|audit parent must be a non-link directory/);
+    assert.throws(() => audit.append({} as never), /audit parent must not be a symbolic link|audit parent changed during operation|audit parent must be a non-link directory/);
     assert.throws(
       () =>
         new NotificationStore(databasePath, {
@@ -227,7 +227,7 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
             symlinkSync(databaseExternal, databaseDirectory, "dir");
           },
         }),
-      /database parent must not be a symbolic link|database parent changed during operation/,
+      /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
     );
 
     assertFileUnchanged(externalAuditPath, auditBefore);

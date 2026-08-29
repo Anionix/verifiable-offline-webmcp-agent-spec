@@ -41,6 +41,10 @@
 // event_uuid_v7=01a04d46-6a82-75a1-8ee4-fd9364c93d58
 // state_transition=PARENT_REPLACEMENT_INJECTED -> AUDIT_AND_SQLITE_IO_REJECTED occurred_at=2026-08-29T14:45:01.000Z
 // machine-contract: a replaced or linked parent cannot redirect audit bytes or SQLite sidecars; every entry point rejects before opening the final file.
+// information_uuid_v5=1c70b4af-8b42-5f0a-8bca-cf80b09ba8bc
+// event_uuid_v7=01a04f52-4a68-7af0-a2ea-6c30b4be7a7a
+// state_transition=ABSENCE_SEAM_PARENT_SWAP -> CREATE_REJECTED_BEFORE_EXTERNAL_ENTRY occurred_at=2026-08-30T00:12:01.000Z
+// machine-contract: when a missing notification file is observed, a parent replacement at the deterministic seam is rejected before POSIX or Windows creation can place a file in the replacement directory.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -70,6 +74,7 @@ import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
 import {
+  captureNotificationStorageParent,
   assertNotificationStorageDescriptor,
   containedNotificationStoragePath,
   openNotificationStorageAppendGuard,
@@ -236,6 +241,43 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
     rmSync(databaseMovedDirectory, { recursive: true, force: true });
     rmSync(auditExternal, { recursive: true, force: true });
     rmSync(databaseExternal, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rechecks a replaced parent before absent-file creation", () => {
+  for (const platform of ["darwin", "win32"] as const) {
+    const directory = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-`));
+    const movedDirectory = `${directory}-moved`;
+    const external = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-target-`));
+    const path = join(directory, "queue.sqlite");
+    const victim = join(external, "queue.sqlite");
+    try {
+      writeFileSync(victim, "external victim\n", { mode: 0o600 });
+      const before = fileSnapshot(victim);
+      const expectedParent = captureNotificationStorageParent(path, "database", { platform });
+
+      assert.throws(
+        () =>
+          openNotificationStorageGuard(path, "database", {
+            platform,
+            expectedParent,
+            afterStorageAbsenceObserved() {
+              renameSync(directory, movedDirectory);
+              symlinkSync(external, directory, "dir");
+            },
+          }),
+        /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
+      );
+      assertFileUnchanged(victim, before);
+      assert.equal(existsSync(join(external, "queue.sqlite-wal")), false);
+      assert.equal(existsSync(join(external, "queue.sqlite-shm")), false);
+      assert.equal(existsSync(join(external, "queue.sqlite-journal")), false);
+    } finally {
+      if (lstatSync(directory, { throwIfNoEntry: false })?.isSymbolicLink()) unlinkSync(directory);
+      rmSync(directory, { recursive: true, force: true });
+      rmSync(movedDirectory, { recursive: true, force: true });
+      rmSync(external, { recursive: true, force: true });
+    }
   }
 });
 

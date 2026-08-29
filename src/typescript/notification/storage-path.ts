@@ -44,6 +44,10 @@
 // event_uuid_v7=01a04d46-6a82-75a1-8ee4-fd9364c93d58
 // state_transition=PARENT_IDENTITY_UNBOUND -> PARENT_IDENTITY_RECHECKED occurred_at=2026-08-29T14:45:00.000Z
 // machine-contract: every caller that retained a canonical storage path must also retain its parent device/inode identity; a later link or directory replacement fails before file I/O.
+// information_uuid_v5=0d5d0a5d-c2ba-53c2-96e1-c6cced7b4a63
+// event_uuid_v7=01a04f51-9e66-7c49-bec5-8bbf7d3ecf2a
+// state_transition=PARENT_ABSENCE_OBSERVED -> PARENT_RECHECKED_BEFORE_CREATE occurred_at=2026-08-30T00:12:00.000Z
+// machine-contract: the absence seam is followed by a fresh parent identity check before POSIX creation or Windows staging/publication; a replaced parent fails before a new named entry is created.
 import { randomBytes } from "node:crypto";
 import { closeSync, constants, fchmodSync, fstatSync, linkSync, lstatSync, mkdirSync, openSync, realpathSync, statSync, unlinkSync } from "node:fs";
 import type { Stats } from "node:fs";
@@ -143,7 +147,14 @@ function openExistingStorageDescriptor(
   }
 }
 
-function createWindowsStorageDescriptor(path: string, kind: NotificationStorageKind, accessFlags: number): number {
+function createWindowsStorageDescriptor(
+  path: string,
+  kind: NotificationStorageKind,
+  accessFlags: number,
+  options: Pick<StorageDescriptorOptions, "expectedParent" | "platform">,
+): number {
+  const platform = options.platform ?? process.platform;
+  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
   const stagingPath = join(dirname(path), `.${basename(path)}.${randomBytes(16).toString("hex")}.tmp`);
   let descriptor: number | null = null;
   let stagingNameExists = false;
@@ -151,6 +162,7 @@ function createWindowsStorageDescriptor(path: string, kind: NotificationStorageK
     descriptor = openSync(stagingPath, accessFlags | constants.O_CREAT | constants.O_EXCL, 0o600);
     stagingNameExists = true;
     requireSingleLinkRegularFile(fstatSync(descriptor), kind);
+    if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
     try {
       linkSync(stagingPath, path);
     } catch (error) {
@@ -290,8 +302,10 @@ function openWritableNotificationStorageGuard(path: string, kind: NotificationSt
     descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
     if (descriptor === null) {
       options.afterStorageAbsenceObserved?.(path);
+      // machine-contract: an absence observation never authorizes creation by itself; bind the next operation to a fresh identity read of the retained parent.
+      if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
       if (platform === "win32") {
-        descriptor = createWindowsStorageDescriptor(path, kind, accessFlags);
+        descriptor = createWindowsStorageDescriptor(path, kind, accessFlags, options);
       } else {
         // machine-contract: this path already passed fixed-root containment and private-parent checks; POSIX O_NOFOLLOW plus O_EXCL prevents pre-existing or raced aliases.
         descriptor = openSync(path, accessFlags | constants.O_CREAT | constants.O_EXCL | noFollow, 0o600);

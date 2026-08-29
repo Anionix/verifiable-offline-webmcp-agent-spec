@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
+    "evidenceEventId": "01a04c63-e410-75a5-a2bc-3df473bb0757",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T06:31:43.000Z"
+    "observedAt": "2026-08-29T07:20:10.000Z"
   },
   "stateTransition": {
-    "from": "SITES_AND_VERCEL_CURRENT_VERIFIED",
-    "to": "DEVPOST_PROJECT_PAGE_PUBLISHED",
-    "eventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
-    "occurredAt": "2026-08-29T06:31:43.000Z",
-    "machineContract": "Sites and Vercel remain current-artifact verified. The Devpost project page now has current live links, while video publication and final hackathon submission remain separate actions."
+    "from": "DEVPOST_PROJECT_PAGE_PUBLISHED",
+    "to": "YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED",
+    "eventId": "01a04c63-e410-75a5-a2bc-3df473bb0757",
+    "occurredAt": "2026-08-29T07:20:10.000Z",
+    "machineContract": "The public 2:30 YouTube video and Japanese subtitle track are linked from Devpost version 6. YouTube is evidence hosting, not WebMCP execution, and final challenge submission remains unperformed."
   },
   "services": [
     {
@@ -340,8 +340,8 @@
       "serviceId": "devpost",
       "displayName": "Devpost",
       "integrationSurfaceId": "3e8ffb12-0a3e-5c18-9dc4-81d59d91ef48",
-      "evidenceEventId": "01a04c37-8898-75c8-843c-d1bf5500d7c9",
-      "observedAt": "2026-08-29T06:31:43.000Z",
+      "evidenceEventId": "01a04c63-e410-7a0c-8363-e72639f9f15d",
+      "observedAt": "2026-08-29T07:20:10.000Z",
       "pluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -375,14 +375,15 @@
       ],
       "artifactCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
       "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-      "reasonCode": "PROJECT_PAGE_CURRENT_FINAL_SUBMISSION_PENDING",
+      "reasonCode": "PROJECT_PAGE_VIDEO_LINKED_FINAL_SUBMISSION_PENDING",
       "roles": [
         "Provide the challenge resources and hold the submission draft.",
-        "Receive final public links only after separate approval."
+        "Link the public demonstration video without performing final challenge submission."
       ],
       "limitations": [
-        "Project page version 5 is publicly readable at https://devpost.com/software/project-y79pb23hj1mz with the current description and live links; its undecided name remains unchanged.",
-        "The video URL is empty and the WebMCP Challenge submitted_at value is null, so no final hackathon submission is claimed."
+        "The update operation for project 1405191 (project-y79pb23hj1mz) returned version 6; the subsequent readback confirmed state published, name 未定, and video_url https://youtu.be/tdSvJw4ghX8. The read tool does not return a version field.",
+        "The linked video is public, titled WebMCP vs Duplicate Bookings: A Live Demo, reports 2:30, and has a published Japanese subtitle track.",
+        "YouTube hosts review evidence only and is not a WebMCP execution service; WebMCP Challenge submitted_at is null, so final submission was not performed."
       ],
       "sources": [
         "https://webmcp.devpost.com/resources"

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
+  "$comment": "information_uuid_v5=befe51ac-d842-523a-83ba-91290fa1301d event_uuid_v7=01a04c63-6328-7ecf-9db0-2d826f35eece state_transition=PUBLICATION_FAIL_CLOSED -> PUBLICATION_READBACK_VERIFIED occurred_at=2026-08-29T07:19:37.000Z machine-contract=public video evidence binds owner approval anonymous playback exact duration subtitles thumbnail fallback and an unsubmitted Devpost challenge",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
@@ -53,17 +54,117 @@
       }
     },
     "publication": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["youtubeUrl", "status", "requiresSeparateApproval"],
-      "properties": {
-        "youtubeUrl": { "const": null },
-        "status": { "const": "NOT_STARTED" },
-        "requiresSeparateApproval": { "const": true }
-      }
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["youtubeUrl", "status", "requiresSeparateApproval"],
+          "properties": {
+            "youtubeUrl": { "const": null },
+            "status": { "const": "NOT_STARTED" },
+            "requiresSeparateApproval": { "const": true }
+          }
+        },
+        { "$ref": "#/$defs/publishedPublication" }
+      ]
     }
   },
   "$defs": {
+    "publishedPublication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publicationId",
+        "observationUuidV7",
+        "youtubeUrl",
+        "videoId",
+        "channelId",
+        "status",
+        "visibility",
+        "publishedAt",
+        "observedAt",
+        "requiresSeparateApproval",
+        "approvalState",
+        "anonymousReadback",
+        "subtitles",
+        "thumbnail",
+        "devpostReadback"
+      ],
+      "properties": {
+        "publicationId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "youtubeUrl": { "type": "string", "pattern": "^https://youtu\\.be/[A-Za-z0-9_-]{11}$" },
+        "videoId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{11}$" },
+        "channelId": { "type": "string", "pattern": "^UC[A-Za-z0-9_-]{22}$" },
+        "status": { "const": "PUBLIC_VERIFIED" },
+        "visibility": { "const": "PUBLIC" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "requiresSeparateApproval": { "const": true },
+        "approvalState": { "const": "GRANTED" },
+        "anonymousReadback": { "$ref": "#/$defs/youtubeAnonymousReadback" },
+        "subtitles": { "$ref": "#/$defs/youtubeSubtitleReadback" },
+        "thumbnail": { "$ref": "#/$defs/youtubeThumbnailReadback" },
+        "devpostReadback": { "$ref": "#/$defs/devpostVideoReadback" }
+      }
+    },
+    "youtubeAnonymousReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["httpStatus", "oEmbedTitle", "playabilityStatus", "playableInEmbed", "isPrivate", "isUnlisted", "durationSeconds"],
+      "properties": {
+        "httpStatus": { "const": 200 },
+        "oEmbedTitle": { "const": "WebMCP vs Duplicate Bookings: A Live Demo" },
+        "playabilityStatus": { "const": "OK" },
+        "playableInEmbed": { "const": true },
+        "isPrivate": { "const": false },
+        "isUnlisted": { "const": false },
+        "durationSeconds": { "const": 150 }
+      }
+    },
+    "youtubeSubtitleReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["englishAutomatic", "japaneseAuthored"],
+      "properties": {
+        "englishAutomatic": { "const": "PUBLISHED" },
+        "japaneseAuthored": { "const": "PUBLISHED" }
+      }
+    },
+    "youtubeThumbnailReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canvaAssetSha256", "customApplicationState", "failureReason", "publicState", "publicUrl", "publicSha256", "publicWidth", "publicHeight"],
+      "properties": {
+        "canvaAssetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "customApplicationState": { "const": "NOT_APPLIED_TOOL_TIMEOUT" },
+        "failureReason": { "const": "YOUTUBE_FILE_CHOOSER_TIMEOUT" },
+        "publicState": { "const": "AUTO_GENERATED_PUBLIC_VERIFIED" },
+        "publicUrl": { "type": "string", "pattern": "^https://i\\.ytimg\\.com/vi/[A-Za-z0-9_-]{11}/maxresdefault\\.jpg$" },
+        "publicSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "publicWidth": { "const": 1280 },
+        "publicHeight": { "const": 720 }
+      }
+    },
+    "devpostVideoReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "observedAt", "projectId", "projectSlug", "projectState", "projectName", "videoUrl", "updateResponseVersion", "challengeSlug", "submittedAt", "finalSubmissionState"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "projectId": { "const": 1405191 },
+        "projectSlug": { "const": "project-y79pb23hj1mz" },
+        "projectState": { "const": "published" },
+        "projectName": { "const": "未定" },
+        "videoUrl": { "type": "string", "pattern": "^https://youtu\\.be/[A-Za-z0-9_-]{11}$" },
+        "updateResponseVersion": { "type": "integer", "minimum": 1 },
+        "challengeSlug": { "const": "webmcp" },
+        "submittedAt": { "const": null },
+        "finalSubmissionState": { "const": "NOT_SUBMITTED" }
+      }
+    },
     "identity": {
       "type": "object",
       "additionalProperties": false,

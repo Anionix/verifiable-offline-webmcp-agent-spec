@@ -18,9 +18,9 @@ final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
 source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
-publication_state_event_uuid_v7: "01a04c50-33a1-7536-aa11-e25a6e5ca58d"
+publication_state_event_uuid_v7: "01a04c63-a6db-752d-8b87-cd0c38748887"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T06:58:39.649Z"
+updated_at: "2026-08-29T07:19:54.331Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -38,7 +38,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 
 このリポジトリは、モバイル優先・オフライン対応・検証可能なエージェント設計を、英日併記、JSON-LD、PROV-O、DCAT風catalog、JSON Schema、UUIDv5/v7、形式仕様、実行可能な参照コードでまとめたものです。「Open Knowledge Format」という単一の公式標準への適合を主張するものではありません。
 
-> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、所有者限定の[ChatGPT Sites本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)で四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。一般公開、Vercelの更新、実ホテル予約、決済、取消はまだ行っていません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
+> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、[ChatGPT Sites](https://kyoto-booking-retry-proof.anionix.chatgpt.site)と[Vercel](https://kyoto-booking-retry-proof.vercel.app)で一般公開し、四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。審査向け[YouTube動画](https://youtu.be/tdSvJw4ghX8)も一般公開済みです。Devpostの一般プロジェクトページへ動画URLまで反映しましたが、WebMCP Challengeの最終提出は行っていません。実ホテル予約、決済、取消は一切行いません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
 
 ## Architectural stance / 設計の立場
 
@@ -153,7 +153,7 @@ Public ChatGPT Sites version 8 uses exact source commit `370c2d9fb0b1a1a4938bbb0
 
 One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
 
-A locally verified 150-second 1920×1080 review video version 10 combines 20 disclosed seconds of fictional generated dramatization with 113.2 seconds (75.5%) of actual public Site screen recording, then shows current public Sites version 7 service-state and retry-result captures. It preserves audible English narration, burned-in English captions, and a separate Japanese subtitle file. The [public Devpost project page](https://devpost.com/software/project-y79pb23hj1mz) contains the current explanation and live links and returns HTTP 200 without sign-in; its name remains `未定`, its video URL is empty, and `submitted_at` is `null`, so final hackathon submission has not occurred. Keyboard traversal, screen-reader behavior, Chrome-native WebMCP execution, video publication, and final Devpost submission remain `INCONCLUSIVE` or not started until their separate checks and approvals are recorded. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
+A locally verified 150-second 1920×1080 review video version 10 combines 20 disclosed seconds of fictional generated dramatization with 113.2 seconds (75.5%) of actual public Site screen recording, then shows public Sites version 7 service-state and retry-result captures. YouTube now publishes it as [WebMCP vs Duplicate Bookings: A Live Demo](https://youtu.be/tdSvJw4ghX8); the public player reports 2:30. Upload and high-definition processing completed, the copyright check reported no issues, audible English narration and burned-in English captions remain present, and the separate Japanese subtitle track is published. The owner-selected Canva thumbnail is ready locally, but the browser file chooser failed, so the public video currently uses a YouTube-generated thumbnail. The Devpost update operation returned version 6, and a subsequent readback of the [public project page](https://devpost.com/software/project-y79pb23hj1mz) confirmed this YouTube URL, the unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`. Final challenge submission has therefore not occurred. Keyboard traversal, screen-reader behavior, and Chrome-native WebMCP execution remain `INCONCLUSIVE`; the custom thumbnail remains prepared but not applied. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

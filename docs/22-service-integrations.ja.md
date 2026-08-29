@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c50-33a1-7536-aa11-e25b39656438"
-observed_at: "2026-08-29T06:58:39.649Z"
-state_transition: "DEVPOST_PROJECT_PAGE_PUBLISHED -> SITES_VERSION_8_AND_VERCEL_RELEASE_VERIFIED -> NOTIFICATION_ALIAS_RESTORED -> SITES_VERSION_8_RETRY_VERIFIED"
+event_uuid_v7: "01a04c63-a6eb-787f-bebc-81c56d1c5045"
+observed_at: "2026-08-29T07:19:54.347Z"
+state_transition: "SITES_VERSION_8_RETRY_VERIFIED -> YOUTUBE_PUBLIC_WITH_JAPANESE_SUBTITLES -> DEVPOST_VERSION_6_VIDEO_ATTACHED -> FINAL_SUBMISSION_PENDING"
 ---
 
 # サービス連携状態の読み方
@@ -39,7 +39,7 @@ state_transition: "DEVPOST_PROJECT_PAGE_PUBLISHED -> SITES_VERSION_8_AND_VERCEL_
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日6時58分39秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日7時19分54秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
@@ -50,9 +50,11 @@ state_transition: "DEVPOST_PROJECT_PAGE_PUBLISHED -> SITES_VERSION_8_AND_VERCEL_
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
-| Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 現行説明と公開URLを載せたプロジェクトページ。最終提出は別 |
+| Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 現行説明、公開URL、YouTube動画を載せた版6。最終提出は別 |
 
-Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリを反映しました。提供元の読み戻しは版5・状態`published`で、未ログインのHTTP 200応答も確認しました。名称は利用者が決めるため`未定`のままです。動画URLは空、WebMCP Challengeの`submitted_at`は`null`なので、一般プロジェクトページの公開を最終提出とは扱いません。
+Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリ、一般公開した[YouTube動画](https://youtu.be/tdSvJw4ghX8)を反映しました。更新操作は版6を返し、その後の読み戻しでプロジェクト識別子`1405191`、状態`published`、YouTubeの動画URL、名称`未定`を確認しました。読み取り機能は版番号を返さないため、版6は更新応答の記録です。WebMCP Challengeの`submitted_at`は`null`なので、一般プロジェクトページの更新を最終提出とは扱いません。
+
+YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しました。公開プレーヤーの表示時間は2分30秒です。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声と画面へ焼き込んだ英語字幕に加え、日本語字幕トラックも公開済みです。Canvaで選んだ専用サムネイルは端末内に準備済みですが、ブラウザーのファイル選択が失敗したため未反映で、現在はYouTubeが自動生成したサムネイルを使っています。この失敗から専用サムネイルの外部公開成功は推測しません。
 
 ChatGPT Sitesでは、正確な配置元コミット`370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6`を版8として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは配置識別子`appgdep_6a928039357c8191947ea3a0115e91a7`です。新しいブラウザー保存領域から、準備、人間の画面操作による確定、安全な再送、再読込復元を実行し、2試行、架空予約1件、処理開始1回を保持しました。完成動画版10の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
 
@@ -95,10 +97,10 @@ Google Chromeでは一般公開の版6を未ログインで表示し、初期状
 | Render | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は構成確認だけで、一般公開しない |
 | Shopify | `COMMERCE_WRITE` | `OUT_OF_SCOPE` | 商品、買い物かご、購入、注文を書き換えない |
 | Google Chrome | `PUBLIC_DEPLOYMENT` | `NOT_APPLICABLE` | 検査用ブラウザーであり、公開先ではない |
-| Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_PLAN` | 下書き更新は計画で許可済み |
-| Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 最終提出の直前に別の確認が必要 |
+| Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_USER` | 最終提出直前までの更新を利用者が明示的に許可し、版6へ動画URLまで反映済み |
+| Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 最終提出せず停止し、利用者の明示的な再指示を待つ |
 
-`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開に使っています。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
+`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開、Devpostの最終提出直前までの更新に使っています。YouTubeの一般公開も利用者の明示許可に基づきます。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
 
 ## 認証を成功扱いする条件
 

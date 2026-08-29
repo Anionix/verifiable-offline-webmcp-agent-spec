@@ -491,8 +491,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "a5dcf9cbd0fb5819a0723f7459003501d7e475bf0cc5b40f0ed4c205723e04ed",
-      "bytes": 26432,
+      "sha256": "b5440dfe3bd115d60f9f0bafc9275a57405c257744cdd22096a46fb8f23846be",
+      "bytes": 27033,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1783,8 +1783,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "5dea97fb24e65181797fee33a61ea62b3fd5901577b9cb89380189f7b7cad8a3",
-      "bytes": 14509,
+      "sha256": "fd6d17500e9b6d430bd739d1e3479cfc9cc8375bff765bc7186982c29f0cd3d0",
+      "bytes": 15511,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1802,8 +1802,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "9f6c5fd8bbbe9d69f03114771ee2c90048c541440deb9e24cf1954745b1bc6b2",
-      "bytes": 9676,
+      "sha256": "8e5a4af74f1af92b642af9de70c00c57f9809d79a0c2c61817c6ea0cf2e96058",
+      "bytes": 10475,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3550,8 +3550,8 @@
     },
     {
       "path": "media/demo-video/publication-copy.md",
-      "sha256": "6939d21cd001cd7ae17968f924ec1259401ad765e5b4bbcc0ac7a3fe5ba5a496",
-      "bytes": 9400,
+      "sha256": "3aa3cb16c97afe94268666f7fae14589852e3a8b73441187ae71969fb9b8ac77",
+      "bytes": 11203,
       "mediaType": "text/markdown",
       "category": "media",
       "identity": {
@@ -3664,8 +3664,8 @@
     },
     {
       "path": "metadata/demo-video-production.json",
-      "sha256": "987a2fdc122f1478ed8461e8b5955aaa0d9559a927366bd66f6782935f004b37",
-      "bytes": 18079,
+      "sha256": "0c1b7d30498d79390235e187ea209ed2e6adc20be6775813e78e07f056885547",
+      "bytes": 20378,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -3722,8 +3722,8 @@
     },
     {
       "path": "metadata/hotel-booking-verification.json",
-      "sha256": "5c613b1909e735d2d1c7fe89046390a971a0020e205c4dfa01fad79995dbd5de",
-      "bytes": 11363,
+      "sha256": "77a0d9046ccdc0581c4d9668c838d0264e5bb96fce94fde48e938b36ee00daef",
+      "bytes": 11937,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -3874,8 +3874,8 @@
     },
     {
       "path": "metadata/service-integration-registry.json",
-      "sha256": "561f4aba7c50b152bdb0428878f9c3e73413ebde54d3b44c25a3b70b74b9108c",
-      "bytes": 16151,
+      "sha256": "6b1aa9711398d0f8a027346e18a0c1e2f512a0e7f597b4e426f3055e637c23e4",
+      "bytes": 16438,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4235,8 +4235,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "053714050dc78b5057e6be81c6eb26f059f6ba69794c709abbca134937f16a12",
-      "bytes": 12578,
+      "sha256": "a11a2a168d3e236427b3347ca5883060286e55d7645d8eb57fb55c10d68918a8",
+      "bytes": 17735,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4311,8 +4311,8 @@
     },
     {
       "path": "schemas/hotel-booking-verification.schema.json",
-      "sha256": "cd06cbe115b4f6839ed26cfb3f857bd28832dc91c0badb8ef8b0132e69681653",
-      "bytes": 5508,
+      "sha256": "404c43d1c3d5aa73deaad70e08631132db637c6e81562965291a3431801d5bc6",
+      "bytes": 5504,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4501,8 +4501,8 @@
     },
     {
       "path": "schemas/service-integration-registry.schema.json",
-      "sha256": "10eda2adbd081d77c6cd48cb6f791654b54f33165455004bb821af5d5975e104",
-      "bytes": 12951,
+      "sha256": "2d93ab0485a10d9812c5a1e88b577bffe9d433e4d7ca2f1d68f1b2cde04ba581",
+      "bytes": 12974,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4881,8 +4881,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "55f18259ff634c375786c03332a49b224f41668d31e366b0e6a7a95849055c0b",
-      "bytes": 70988,
+      "sha256": "2bf37cf667b9df37dfc7347dcbfa699ecc12175aa9de2270b734d692fbe14bc5",
+      "bytes": 76475,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

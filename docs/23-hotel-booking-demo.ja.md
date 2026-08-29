@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04b5a-5d98-77bc-8c2f-db0cb564eb68"
-observed_at: "2026-08-29T02:30:08.536Z"
-status: "owner-only-live-verified"
+event_uuid_v7: "01a04b95-2084-76ed-bebb-25d5c01be34b"
+observed_at: "2026-08-29T03:34:19.524Z"
+status: "worktree-candidate-quality-verified-prior-artifact-owner-only-live-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -50,6 +50,10 @@ status: "owner-only-live-verified"
 - 最後に扱った予約識別子を端末内へ残し、再読込時はその識別子から日付、人数、部屋数、表示言語を復元します。
 - 期限到達は画面の時計、再読込、再準備のいずれでも`PREPARED → EXPIRED`として一度だけ記録され、予約処理は始まりません。
 
+## 画面に出る検証証拠
+
+作業中の候補画面には、現在の端末内履歴から読む検証パネルがあります。同じ予約条件を表すUUIDv5、履歴件数、最新イベントのUUIDv7、SHA-256連鎖の先頭12文字と連鎖検査結果を表示します。ローカル実画面では履歴件数が`0 → 1 → 3 → 4`と進み、各段階で連鎖が有効であることを確認しました。この表示は端末内履歴の可視化であり、外部予約や公開配備の証明ではありません。
+
 ## 保存範囲
 
 保存先はブラウザーのIndexedDBです。ChatGPT SitesとVercelは別の公開元なので、保存領域を共有しません。画面に「この端末・この公開先だけの架空予約」と表示します。サーバーデータベース、ファイル保管、OpenAI API鍵は使いません。
@@ -61,25 +65,35 @@ status: "owner-only-live-verified"
 | 言語変更でも同じUUIDv5 | 成功 | Node試験 |
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
-| WebMCP四機能の発見と実行 | 成功 | 所有者限定のChatGPT Sites本番URL。準備後に人間確認ボタンが有効になることも確認 |
+| WebMCP四機能の発見と実行 | 成功（前の公開成果物） | 所有者限定のChatGPT Sites版2。準備後に人間確認ボタンが有効になることも確認。作業中候補は含まない |
 | 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites所有者限定実行 | 成功 | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)で四機能、2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認 |
+| ChatGPT Sites所有者限定実行 | 成功（前の公開成果物） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版2で四機能、2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認。作業中候補は未配備 |
+| 可視証拠パネル | 成功（作業中候補） | UUIDv5、最新UUIDv7、履歴件数、SHA-256連鎖をローカル実画面で確認 |
 | ChatGPT Sites一般公開、Vercel更新 | 未計測 | 別承認が必要 |
 
 機械可読の正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)です。
+
+## 公開、動画、Devpostの現在状態
+
+- 可視証拠パネルを含む成果物は`WORKTREE_CANDIDATE`で、まだ公開版ではありません。所有者限定のChatGPT Sitesは一つ前の成果物を配信しており、この候補を保存、配備、再読込確認するまでは現行公開版とは呼びません。
+- HeyGenの既成音声は148.192625秒と実測済みです。英語と日本語の字幕はこの音声へ時間合わせ済みですが、完成映像への重なり、読みやすさ、総尺はまだ確認していません。
+- Devpost下書きは今回更新していません。この作業場所に`.devpost-hackathon-state.json`がないため、下書き更新の前提を満たしておらず、最終提出も行っていません。
 
 ## 構築と検査
 
 ```bash
 npm ci
+npm run quality:check
 npm run build:web
 node scripts/validate_hotel_site.mjs
 cd src/typescript && npm test && npm run typecheck
 ```
+
+コード品質の役割は重ねていません。Oxlintはホテル用JavaScriptの誤り、Biomeは画面のHTMLとCSS、Oxfmtは今回から管理する少数ファイルの書式だけを検査します。`npm run lsp:oxlint`、`npm run lsp:oxfmt`、`npm run lsp:biome`で各コード解析サーバーを起動できます。既存ファイル全体の自動整形は行いません。
 
 構築物は次へ分離されます。
 

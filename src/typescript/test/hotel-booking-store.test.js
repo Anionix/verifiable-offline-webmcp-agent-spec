@@ -79,6 +79,28 @@ test("two tabs, language changes, reload, and repeated preparation keep one inte
   await resetHotelBookingDatabase(options);
 });
 
+test("audit history reads the intent head and events from one database snapshot", async () => {
+  const options = databaseOptions("audit-snapshot");
+  await resetHotelBookingDatabase(options);
+  await prepareHotelBooking(BASE, options);
+  const database = await openHotelBookingDatabase(options);
+  const observedScopes = [];
+  const instrumentedDatabase = {
+    transaction(storeNames, mode) {
+      observedScopes.push({ storeNames: Array.isArray(storeNames) ? [...storeNames] : [storeNames], mode });
+      return database.transaction(storeNames, mode);
+    },
+  };
+  try {
+    const history = await listHotelBookingEvents(BASE, { ...options, database: instrumentedDatabase });
+    assert.equal(history.chainValid, true);
+    assert.deepEqual(observedScopes, [{ storeNames: ["intents", "events"], mode: "readonly" }]);
+  } finally {
+    database.close();
+  }
+  await resetHotelBookingDatabase(options);
+});
+
 test("double approval and retry converge to one booking, one confirmation, and one effect", async () => {
   const options = databaseOptions("approval-race");
   await resetHotelBookingDatabase(options);
@@ -177,7 +199,7 @@ test("human approval rejects a stale visible binding after booking details chang
   const changed = { ...BASE, checkOutDate: "2026-10-14" };
   await resetHotelBookingDatabase(options);
   const first = await prepareHotelBooking(BASE, options);
-  const second = await prepareHotelBooking(changed, options);
+  await prepareHotelBooking(changed, options);
 
   await assert.rejects(
     humanApproveAndCommit(changed, {

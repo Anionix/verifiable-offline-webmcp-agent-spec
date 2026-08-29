@@ -12,6 +12,7 @@ import {
   expireHotelBookingPreparation,
   getHotelBookingStatus,
   humanApproveAndCommit,
+  listHotelBookingEvents,
   prepareHotelBooking,
   recognizeHotelBookingRetry,
 } from "../../src/typescript/hotel/browser-store.js";
@@ -43,6 +44,12 @@ const elements = Object.freeze({
   lostResponse: document.querySelector("#lost-response"),
   resultSummary: document.querySelector("#result-summary"),
   confirmationNumber: document.querySelector("#confirmation-number"),
+  auditProof: document.querySelector(".audit-proof-grid"),
+  proofFingerprint: document.querySelector("#proof-fingerprint"),
+  proofEventCount: document.querySelector("#proof-event-count"),
+  proofLatestEvent: document.querySelector("#proof-latest-event"),
+  proofChainHead: document.querySelector("#proof-chain-head"),
+  proofChainValid: document.querySelector("#proof-chain-valid"),
   toolStatus: document.querySelector("#tool-status"),
   serviceGrid: document.querySelector("#service-grid"),
 });
@@ -50,6 +57,7 @@ const elements = Object.freeze({
 let activeBinding = null;
 let inputGeneration = 0;
 let expiryTimer = null;
+let auditRenderGeneration = 0;
 
 function currentInput() {
   return {
@@ -129,8 +137,19 @@ function setBusy(isBusy) {
   }
 }
 
+function markAuditProofRechecking() {
+  auditRenderGeneration += 1;
+  elements.auditProof.setAttribute("aria-busy", "true");
+  elements.proofFingerprint.textContent = "Rechecking…";
+  elements.proofEventCount.textContent = "—";
+  elements.proofLatestEvent.textContent = "Rechecking…";
+  elements.proofChainHead.textContent = "Rechecking…";
+  setChainState("Rechecking…", "pending");
+}
+
 function invalidateVisibleApproval() {
   inputGeneration += 1;
+  markAuditProofRechecking();
   if (expiryTimer !== null) clearTimeout(expiryTimer);
   expiryTimer = null;
   activeBinding = null;
@@ -163,6 +182,52 @@ const explanations = Object.freeze({
   EXPIRED: "The 120-second preparation expired without confirmation. Change the details to prepare a new intent.",
 });
 
+function setChainState(label, state) {
+  elements.proofChainValid.textContent = label;
+  elements.proofChainValid.dataset.state = state;
+}
+
+async function renderAuditProof(status) {
+  const generation = ++auditRenderGeneration;
+  const fingerprint = typeof status?.fingerprint === "string" ? status.fingerprint : null;
+  const eventCount = Number.isSafeInteger(status?.eventCount) ? status.eventCount : 0;
+  const chainHead = typeof status?.eventChainHead === "string" ? status.eventChainHead : null;
+
+  elements.auditProof.setAttribute("aria-busy", "true");
+  elements.proofFingerprint.textContent = fingerprint ?? "Unavailable";
+  elements.proofEventCount.textContent = String(eventCount);
+  elements.proofLatestEvent.textContent = eventCount === 0 ? "None yet" : "Checking…";
+  elements.proofChainHead.textContent = chainHead ? `${chainHead.slice(0, 12)}…` : "Unavailable";
+  setChainState("Checking…", "pending");
+
+  if (!fingerprint) {
+    setChainState("Unavailable", "unknown");
+    elements.auditProof.setAttribute("aria-busy", "false");
+    return;
+  }
+
+  try {
+    const audit = await listHotelBookingEvents(status.intentId ?? currentInput());
+    if (generation !== auditRenderGeneration) return;
+    const latestEvent = audit.events.at(-1) ?? null;
+    const eventHead = latestEvent?.eventHash ?? "0".repeat(64);
+    elements.proofEventCount.textContent = String(audit.events.length);
+    elements.proofLatestEvent.textContent = latestEvent?.eventId ?? "None yet";
+    elements.proofChainHead.textContent = `${eventHead.slice(0, 12)}…`;
+    // machine-contract: the proof fields come from one audit read. A second tab
+    // may advance the intent after the status card was rendered; that snapshot
+    // drift is not chain corruption and must never produce a false failure.
+    const chainIsValid = audit.chainValid && audit.fingerprint === fingerprint;
+    setChainState(chainIsValid ? "Valid" : "Check failed", chainIsValid ? "valid" : "invalid");
+  } catch {
+    if (generation !== auditRenderGeneration) return;
+    elements.proofLatestEvent.textContent = eventCount === 0 ? "None yet" : "Unavailable";
+    setChainState("Unavailable", "unknown");
+  } finally {
+    if (generation === auditRenderGeneration) elements.auditProof.setAttribute("aria-busy", "false");
+  }
+}
+
 function renderStatus(status) {
   if (expiryTimer !== null) clearTimeout(expiryTimer);
   expiryTimer = null;
@@ -180,6 +245,7 @@ function renderStatus(status) {
   elements.attemptCount.textContent = String(status?.attemptCount ?? 0);
   elements.bookingCount.textContent = status?.bookingExists ? "1" : "0";
   elements.effectCount.textContent = String(status?.effectStartCount ?? 0);
+  void renderAuditProof(status);
 
   const canApprove = state === "PREPARED" && !status.approvalExpired;
   elements.approve.disabled = !canApprove;

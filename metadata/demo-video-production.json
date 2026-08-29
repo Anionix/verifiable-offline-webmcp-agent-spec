@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04b61-601d-71a8-bd97-51879b5e2bfd"
+    "observationUuidV7": "01a04b8d-00b5-7583-86fc-d4e7a75d3edf"
   },
-  "updatedAt": "2026-08-29T02:37:47.933Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED",
+  "updatedAt": "2026-08-29T03:25:27.093Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -23,9 +23,9 @@
       "taskCallable": true,
       "callableToolCount": 46,
       "authenticationState": "CONFIRMED",
-      "verifiedOperations": ["READ:balance", "WRITE:generate_video"],
+      "verifiedOperations": ["READ:balance", "WRITE:generate_video", "WRITE:subtitle_timing"],
       "productionUseState": "USED",
-      "reasonCode": "TWO_SOURCE_SCENES_PRESERVED"
+      "reasonCode": "VIDEO_AND_AUDIO_TIMING_ASSETS_PRESERVED"
     },
     {
       "capabilityId": "0d325ce9-7a64-5be5-b436-c4c889c88f33",
@@ -71,9 +71,9 @@
       "taskCallable": true,
       "callableToolCount": 38,
       "authenticationState": "CONFIRMED",
-      "verifiedOperations": ["READ:list_voices"],
-      "productionUseState": "NOT_USED",
-      "reasonCode": "VOICE_GENERATION_DEFERRED_UNTIL_SITE_RECORDING"
+      "verifiedOperations": ["READ:get_account", "READ:get_voice", "READ:list_voices", "WRITE:create_speech"],
+      "productionUseState": "USED",
+      "reasonCode": "STOCK_VOICE_AUDIO_PRESERVED"
     },
     {
       "capabilityId": "e8c065e6-5f6d-50cc-95a9-46e44f85f7a3",
@@ -124,6 +124,80 @@
       "localPath": ".local/video-production/higgsfield-scene-02-duplicate-alert.mp4",
       "sha256": "6ca61f5392c4f1a3a022de216b64793cd02ae1f999ecd6311bbc8c1e8617bcca",
       "disclosure": "AI-generated dramatization / Fictional booking"
+    },
+    {
+      "assetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+      "service": "HeyGen",
+      "kind": "VOICE",
+      "status": "COMPLETED",
+      "prompt": "English narration from media/demo-video/narration.en.txt, using a stock public English voice at 0.95 speed; no voice clone and no avatar.",
+      "createdAt": "2026-08-29T02:44:35Z",
+      "remoteId": "76c97614-ce81-46e7-8c5c-8014acf25a18",
+      "localPath": ".local/video-production/heygen-narration-en.mp3",
+      "sha256": "1acecfe48d3d673e2312fd8aee0b68485f003e32944c058997bc08b7f41e0fa6",
+      "disclosure": "The creation time is the provider object's HTTP Last-Modified value. The remote ID is the audio URL object ID, not the lost generation request ID. The downloaded file is audio/mpeg despite the provider URL ending in .wav.",
+      "voiceEvidence": {
+        "voiceId": "330290724a1b470fb63153f34d4c0183",
+        "voiceName": "Annie - Lifelike",
+        "voiceType": "STOCK_PUBLIC",
+        "voiceCloneUsed": false,
+        "avatarUsed": false,
+        "durationSeconds": 148.192625,
+        "byteLength": 4742164,
+        "codec": "mp3",
+        "sampleRateHertz": 44100,
+        "channels": 1,
+        "audioUrlObjectId": "76c97614-ce81-46e7-8c5c-8014acf25a18",
+        "providerObjectLastModifiedAt": "2026-08-29T02:44:35Z",
+        "generationRequestId": null,
+        "generationRequestIdState": "NOT_RETAINED"
+      }
+    },
+    {
+      "assetId": "7594f33f-5af6-5485-9731-fa8d97ad4a85",
+      "service": "Higgsfield",
+      "kind": "SUBTITLE",
+      "status": "COMPLETED",
+      "prompt": "Use local faster-whisper only as the word clock for the preserved HeyGen narration, then align every caption token back to the authored English narration. Keep each burned-in caption to at most three words and fifteen characters.",
+      "createdAt": null,
+      "remoteId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
+      "localPath": "media/demo-video/subtitles.en.srt",
+      "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+      "disclosure": "The exact remote creation time was not returned. observedAt records this evidence update. Timing came from the preserved audio; final-video timing remains unverified until the completed cut is analyzed.",
+      "subtitleEvidence": {
+        "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+        "timingMethod": "FASTER_WHISPER_LOCAL",
+        "authoredTextAligned": true,
+        "similarity": 0.9631901840490797,
+        "timedWords": 325,
+        "captionCount": 184,
+        "remoteMediaId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
+        "observedAt": "2026-08-29T03:01:26.992Z",
+        "finalVideoVerified": false
+      }
+    },
+    {
+      "assetId": "2c7342a8-27a7-5132-bb4b-268c05735a7d",
+      "service": "LOCAL",
+      "kind": "SUBTITLE",
+      "status": "COMPLETED",
+      "prompt": "Translate the authored English narration into concise Japanese, then reuse the audio-derived English cue boundaries without generating or changing the voice.",
+      "createdAt": null,
+      "remoteId": null,
+      "localPath": "media/demo-video/subtitles.ja.srt",
+      "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
+      "disclosure": "Locally authored Japanese subtitle draft aligned to the preserved narration clock. No remote generation ID exists; final-video timing and readability remain unverified.",
+      "subtitleEvidence": {
+        "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+        "timingMethod": "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES",
+        "authoredTextAligned": true,
+        "similarity": null,
+        "timedWords": null,
+        "captionCount": 28,
+        "remoteMediaId": null,
+        "observedAt": "2026-08-29T03:21:17.650Z",
+        "finalVideoVerified": false
+      }
     }
   ],
   "productionFiles": [
@@ -131,7 +205,7 @@
       "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
       "kind": "STORYBOARD",
       "path": "media/demo-video/storyboard.md",
-      "sha256": "dd0dc1a5ce73342296baf32b93ca619715832c14bdaba800cfabc183484814ab",
+      "sha256": "af34d4ab58bcf90ee9c5021eb0681a2b11306fb9c44e8838e36b8f6daae2b259",
       "status": "DRAFT",
       "requiresAudioRetiming": false
     },
@@ -139,7 +213,7 @@
       "fileId": "f3efcb83-4fa6-5f89-a55e-4cb921cd2ea8",
       "kind": "NARRATION_EN",
       "path": "media/demo-video/narration.en.txt",
-      "sha256": "24f3543e116c78339087b21eefe6151cdf601f4442812ffe0b647ad64b5a3df7",
+      "sha256": "cb8b88c6dead055790b2477f8ef135694a4ed42d48be7d52066c44a9f519119b",
       "status": "DRAFT",
       "requiresAudioRetiming": false
     },
@@ -147,25 +221,25 @@
       "fileId": "4a96147c-83db-5c87-b46d-b1fc4afd2d4a",
       "kind": "SUBTITLES_EN",
       "path": "media/demo-video/subtitles.en.srt",
-      "sha256": "8f737c25d1ee86c6c2ea4c79437c461a36c09655c6cdcdd099e10ffbc0f773c7",
-      "status": "DRAFT",
-      "requiresAudioRetiming": true
+      "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+      "status": "TIMED_DRAFT",
+      "requiresAudioRetiming": false
     },
     {
       "fileId": "8e3b3333-ca44-59e3-902a-276d8fb3bf8f",
       "kind": "SUBTITLES_JA",
       "path": "media/demo-video/subtitles.ja.srt",
-      "sha256": "8024f751854f4340c95d23c896020a5eb5df5433fc8a55ff02e92fe8d300acb5",
-      "status": "DRAFT",
-      "requiresAudioRetiming": true
+      "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
+      "status": "TIMED_DRAFT",
+      "requiresAudioRetiming": false
     }
   ],
   "productionPlan": {
-    "plannedDurationSeconds": 165,
-    "plannedActualSiteRecordingSeconds": 145,
-    "plannedActualSiteRecordingPermille": 879,
-    "voiceState": "NOT_GENERATED",
-    "captionTimingState": "PROVISIONAL"
+    "plannedDurationSeconds": 150,
+    "plannedActualSiteRecordingSeconds": 130,
+    "plannedActualSiteRecordingPermille": 867,
+    "voiceState": "MEASURED",
+    "captionTimingState": "AUDIO_TIMED_PENDING_FINAL_VIDEO"
   },
   "publication": {
     "youtubeUrl": null,

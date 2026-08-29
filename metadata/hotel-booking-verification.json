@@ -2,11 +2,12 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04b5a-5d98-77bc-8c2f-db0cb564eb68"
+    "observationUuidV7": "01a04b95-2084-7560-a549-347b4b691820"
   },
-  "observedAt": "2026-08-29T02:30:08.536Z",
-  "sourceCommit": "64306a20916d9456794eb310e8f518eb6ecdb7ee",
-  "artifactDigest": "435dc83c2a5d880a31b990970eef4d7b71112b66876bb7919795e16b167f28a6",
+  "observedAt": "2026-08-29T03:34:19.524Z",
+  "sourceCommit": "WORKTREE",
+  "sourceState": "WORKTREE_CANDIDATE",
+  "artifactDigest": "e1de0f34988839e0e94143e4eb8e389b9f552b44257da41fc509872da09ed4f7",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
@@ -16,22 +17,37 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "9f6ceb7cfeebfcd5e6b681eb0249eab9155d4991ad22a3af3363d08e8a8e7865",
+  "fullClientArtifactDigest": "9f7b5455cc2c6b887cac9b04f4611093918e0cd75b4783b7d9d8c84a09dd95b4",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "dbd20208e063240b123d676a3417740dff237e071429f5e0e8dd041b9555f13f",
+  "fullSitesPackageDigest": "84bfec436c1074f610818bb124e202fbb103720791674226d9e4dcdfbc0bb3ab",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_DEPLOYED -> LIVE_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_DEPLOYED -> LIVE_VERIFIED -> WORKTREE_CANDIDATE_QUALITY_VERIFIED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
+  "liveDeployment": {
+    "functionalSourceCommit": "64306a20916d9456794eb310e8f518eb6ecdb7ee",
+    "deployedVersionSourceCommit": "90106d47bba820798ed0af77499141a3e5057cc7",
+    "functionalArtifactDigest": "435dc83c2a5d880a31b990970eef4d7b71112b66876bb7919795e16b167f28a6",
+    "fullSitesPackageDigest": "dbd20208e063240b123d676a3417740dff237e071429f5e0e8dd041b9555f13f",
+    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_6127bf1e83d48191b47526db122c310e",
+    "versionNumber": 2,
+    "deploymentId": "appgdep_6a92466f3b908191b5618565dcf6b65c",
+    "providerArchiveContentHash": "sha256:97851b0c9ac3e4c650d3be5d09317918e5beb2b22db3465f05f856112453bcc7",
+    "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
+    "accessMode": "OWNER_ONLY",
+    "status": "PREVIOUS_ARTIFACT_VERIFIED",
+    "observedAt": "2026-08-29T03:16:55.013Z",
+    "evidence": "Sites version 2 and deployment readback identify 90106d47bba820798ed0af77499141a3e5057cc7 as the exact deployed version source. Commit 64306a20916d9456794eb310e8f518eb6ecdb7ee is separately recorded as the functional source. The owner-only deployment still serves that prior functional artifact while this worktree candidate adds the visible proof panel."
+  },
   "checks": [
     {
       "checkId": "60f8e686-7399-5a51-9d99-3b4dc14aa437",
@@ -94,10 +110,22 @@
       "evidence": "Chrome reached the owner-only production URL but displayed Sign in required, so live page execution was not measured. Earlier local Chrome testing restored a non-default Japanese stay with attempts=2, bookings=1, effects=1, but the native WebMCP runtime was not exposed; Chrome discovery and execution remain inconclusive."
     },
     {
+      "checkId": "cc47b03a-10b9-5806-b327-67b2139a0b93",
+      "name": "Visible local proof panel",
+      "status": "PASS",
+      "evidence": "The worktree candidate's browser flow displayed the stable UUIDv5, latest UUIDv7, event counts 0 -> 1 -> 3 -> 4, the first 12 SHA-256 chain-head characters, and Valid at each step. At 320 CSS pixels the proof panel wrapped without horizontal overflow. This check is local and is not deployment evidence."
+    },
+    {
+      "checkId": "f7e5400d-3f70-57ef-aa97-17cab03c8915",
+      "name": "Bounded source-quality toolchain",
+      "status": "PASS",
+      "evidence": "Pinned Oxlint 1.80.0 checks hotel JavaScript, Biome 2.5.11 checks the hotel HTML and CSS, and Oxfmt 0.65.0 checks the newly governed formatting surface. npm run quality:check completed without diagnostics; historical files outside the declared surface were not reformatted."
+    },
+    {
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "Commit 64306a20916d9456794eb310e8f518eb6ecdb7ee was saved and deployed to the owner-only production URL. The in-app browser loaded the page with no console warnings or errors, discovered exactly four safe tools, completed one human-only fictional commit, recognized one retry, preserved 2 attempts -> 1 booking -> 1 effect start -> 1 confirmation, and kept cancellation preview read-only."
+      "evidence": "The owner-only production URL still verifies prior functional commit 64306a20916d9456794eb310e8f518eb6ecdb7ee, not the current worktree candidate. That deployed artifact loaded with no console warnings or errors, exposed exactly four safe tools, preserved 2 attempts -> 1 booking -> 1 effect start -> 1 confirmation, and kept cancellation preview read-only."
     }
   ],
   "designFidelity": [

@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 # information_uuid_v5=2529999d-3fab-525f-ae00-9cf933e597a5
 # event_uuid_v7=01a04b41-fd38-75c5-99ac-b6e473f1ea38 state_transition=ONE_HOST_RECEIPT -> PORTABLE_AND_SITES_RECEIPTS occurred_at=2026-08-29T02:03:31.000Z
+# information_uuid_v5=bf5f3cfb-4add-5274-bd53-4fe165bfe985
+# event_uuid_v7=01a04b93-947d-7143-8e2a-4ef233e51598 state_transition=SOURCE_QUALITY_UNMEASURED -> BOUNDED_SOURCE_QUALITY_GATE occurred_at=2026-08-29T03:32:38.141Z
 # machine-contract: the portable client and Sites package must pass independently before repository validation can succeed.
+# machine-contract: Oxlint checks hotel JavaScript, Biome checks hotel markup and styles, and Oxfmt checks only the newly governed formatting surface before repository validation proceeds.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$ROOT/.local"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$ROOT/.local/uv-cache}"
+npm --prefix "$ROOT" run quality:check
 uv run --frozen python "$ROOT/scripts/validate_repo.py" --report "$ROOT/.local/build-report.json"
 node "$ROOT/scripts/build_web_site.mjs"
 node "$ROOT/scripts/validate_hotel_portable_validator.mjs"

@@ -47,6 +47,11 @@ ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
 JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
 IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".wrangler", "dist", "node_modules", "__pycache__"}
+SRT_TIMING = re.compile(
+    r"(?P<start_h>\d{2}):(?P<start_m>\d{2}):(?P<start_s>\d{2}),(?P<start_ms>\d{3})"
+    r" --> "
+    r"(?P<end_h>\d{2}):(?P<end_m>\d{2}):(?P<end_s>\d{2}),(?P<end_ms>\d{3})"
+)
 
 
 def is_ignored(path: Path):
@@ -55,6 +60,49 @@ def is_ignored(path: Path):
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def parse_subrip(path: Path):
+    """Return a strict, ordered SubRip summary for machine-checkable caption evidence."""
+    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    blocks = [block for block in re.split(r"\n{2,}", text.strip()) if block]
+    cues = []
+    previous_end = 0
+    for expected_index, block in enumerate(blocks, start=1):
+        lines = block.splitlines()
+        if len(lines) < 3 or lines[0] != str(expected_index):
+            raise ValueError(f"{path.relative_to(ROOT)} has a missing or non-sequential cue at {expected_index}")
+        timing = SRT_TIMING.fullmatch(lines[1])
+        if timing is None:
+            raise ValueError(f"{path.relative_to(ROOT)} has invalid timing at cue {expected_index}")
+
+        def milliseconds(prefix):
+            minute = int(timing[f"{prefix}_m"])
+            second = int(timing[f"{prefix}_s"])
+            if minute >= 60 or second >= 60:
+                raise ValueError(f"{path.relative_to(ROOT)} has out-of-range timing at cue {expected_index}")
+            return (
+                int(timing[f"{prefix}_h"]) * 3_600_000
+                + minute * 60_000
+                + second * 1_000
+                + int(timing[f"{prefix}_ms"])
+            )
+
+        start = milliseconds("start")
+        end = milliseconds("end")
+        caption = "\n".join(lines[2:]).strip()
+        if not caption or start >= end:
+            raise ValueError(f"{path.relative_to(ROOT)} has an empty or non-positive cue at {expected_index}")
+        if start < previous_end:
+            raise ValueError(f"{path.relative_to(ROOT)} overlaps at cue {expected_index}")
+        cues.append({"start": start, "end": end, "caption": caption})
+        previous_end = end
+    return {
+        "captionCount": len(cues),
+        "timedWords": sum(len(cue["caption"].split()) for cue in cues),
+        "lastEndMs": cues[-1]["end"] if cues else 0,
+        "cues": cues,
+    }
 
 
 def canonical_bytes(value):
@@ -460,6 +508,19 @@ def main():
     )
     for e in hotel_evidence_validator.iter_errors(hotel_evidence):
         errors.append(f"schema metadata/hotel-booking-verification.json: {e.message}")
+    if hotel_evidence["sourceCommit"] == "WORKTREE" and hotel_evidence["sourceState"] != "WORKTREE_CANDIDATE":
+        errors.append("hotel WORKTREE source must remain a worktree candidate")
+    live_hotel = hotel_evidence["liveDeployment"]
+    if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":
+        if (
+            live_hotel["status"] != "CURRENT_ARTIFACT_VERIFIED"
+            or live_hotel["deployedVersionSourceCommit"] != hotel_evidence["sourceCommit"]
+            or live_hotel["functionalArtifactDigest"] != hotel_evidence["artifactDigest"]
+            or live_hotel["fullSitesPackageDigest"] != hotel_evidence["fullSitesPackageDigest"]
+        ):
+            errors.append("deployed-current hotel evidence must match the live version source and both artifact digests")
+    elif live_hotel["status"] == "CURRENT_ARTIFACT_VERIFIED":
+        errors.append("a non-deployed candidate cannot claim the current artifact is live-verified")
     video_production = load_json(ROOT / "metadata/demo-video-production.json")
     video_production_validator = Draft202012Validator(
         schemas["demo-video-production"], registry=schema_registry, format_checker=format_checker
@@ -478,7 +539,13 @@ def main():
             if record["authenticationState"] != "CONFIRMED" and record["verifiedOperations"]:
                 errors.append(f"unverified media authentication lists a successful operation: {record['service']}")
         used_services = {record["service"] for record in media_capabilities if record["productionUseState"] == "USED"}
-        asset_services = {record["service"] for record in video_production["assets"] if record["status"] == "COMPLETED"}
+        if any(record["service"] == "LOCAL" and record["remoteId"] is not None for record in video_production["assets"]):
+            errors.append("local video-production assets cannot claim a remote provider identifier")
+        asset_services = {
+            record["service"]
+            for record in video_production["assets"]
+            if record["status"] == "COMPLETED" and record["service"] in expected_media_services
+        }
         if used_services != asset_services:
             errors.append("used media capability services differ from completed production asset services")
         production_files = video_production["productionFiles"]
@@ -493,6 +560,12 @@ def main():
             if sha256(path.read_bytes()) != record["sha256"]:
                 errors.append(f"video production file digest mismatch: {record['path']}")
         plan = video_production["productionPlan"]
+        if video_production["publication"] != {
+            "youtubeUrl": None,
+            "status": "NOT_STARTED",
+            "requiresSeparateApproval": True,
+        }:
+            errors.append("video publication must remain not started until final media and approval evidence exist")
         planned_permille = round(
             1000 * plan["plannedActualSiteRecordingSeconds"] / plan["plannedDurationSeconds"]
         )
@@ -501,10 +574,70 @@ def main():
         if plan["plannedActualSiteRecordingPermille"] < 700:
             errors.append("video production plan does not reserve at least 70 percent for actual site recording")
         subtitle_records = [record for record in production_files if record["kind"].startswith("SUBTITLES_")]
+        subtitle_assets = [record for record in video_production["assets"] if record["kind"] == "SUBTITLE"]
+        subtitle_assets_by_path = {record["localPath"]: record for record in subtitle_assets}
+        subtitle_paths = {record["path"] for record in subtitle_records}
+        if len(subtitle_assets) != 2 or set(subtitle_assets_by_path) != subtitle_paths:
+            errors.append("each timed subtitle file must have one path-bound provenance asset")
+
+        voice_assets = [record for record in video_production["assets"] if record["kind"] == "VOICE"]
+        if len(voice_assets) != 1:
+            errors.append("video production must contain exactly one measured narration asset")
+            voice_asset = None
+            audio_end_ms = 0
+        else:
+            voice_asset = voice_assets[0]
+            audio_end_ms = round(1000 * voice_asset["voiceEvidence"]["durationSeconds"])
+
+        parsed_subtitles = {}
+        for record in subtitle_records:
+            path = ROOT / record["path"]
+            parsed = parse_subrip(path)
+            parsed_subtitles[record["kind"]] = parsed
+            asset = subtitle_assets_by_path.get(record["path"])
+            if asset is None:
+                continue
+            evidence = asset["subtitleEvidence"]
+            if asset["sha256"] != record["sha256"]:
+                errors.append(f"subtitle asset digest differs from production file: {record['path']}")
+            if evidence["captionCount"] != parsed["captionCount"]:
+                errors.append(f"subtitle caption count differs from file: {record['path']}")
+            if voice_asset is not None and evidence["sourceAudioAssetId"] != voice_asset["assetId"]:
+                errors.append(f"subtitle is not bound to the measured narration asset: {record['path']}")
+            if parsed["lastEndMs"] > audio_end_ms:
+                errors.append(f"subtitle ends after measured narration: {record['path']}")
+
+            if record["kind"] == "SUBTITLES_EN":
+                if evidence["timingMethod"] != "FASTER_WHISPER_LOCAL":
+                    errors.append("English subtitles must use the preserved audio-derived clock")
+                if evidence["timedWords"] != parsed["timedWords"]:
+                    errors.append("English timed-word count differs from the subtitle file")
+                if any("\n" in cue["caption"] for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must remain one line")
+                if any(len(cue["caption"].split()) > 3 for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must contain at most three words")
+                if any(len(cue["caption"]) > 15 for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must contain at most fifteen characters")
+            elif record["kind"] == "SUBTITLES_JA":
+                if evidence["timingMethod"] != "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES":
+                    errors.append("Japanese subtitles must identify the locally authored translation timing method")
+
         if plan["captionTimingState"] == "PROVISIONAL" and not all(
             record["requiresAudioRetiming"] is True for record in subtitle_records
         ):
             errors.append("provisional subtitles must require retiming from final audio")
+        if plan["captionTimingState"] == "AUDIO_TIMED_PENDING_FINAL_VIDEO":
+            if not all(
+                record["status"] == "TIMED_DRAFT" and record["requiresAudioRetiming"] is False
+                for record in subtitle_records
+            ):
+                errors.append("audio-timed captions must be timed drafts that do not require another audio retiming")
+            if any("NOTE" in (ROOT / record["path"]).read_text(encoding="utf-8") for record in subtitle_records):
+                errors.append("audio-timed public subtitle drafts must not contain non-SubRip NOTE blocks")
+            if not subtitle_assets or any(
+                record["subtitleEvidence"]["finalVideoVerified"] is not False for record in subtitle_assets
+            ):
+                errors.append("pending final-video captions must remain marked final-video unverified")
     except Exception as exc:
         errors.append(f"video production evidence structure: {exc}")
     checks["video_production_files"] = len(errors) == video_start

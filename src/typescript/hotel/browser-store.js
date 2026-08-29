@@ -684,10 +684,18 @@ export async function listHotelBookingEvents(reference, options = {}) {
   const { identity } = await resolveIdentity(reference);
   const lease = await acquireDatabase(options);
   try {
-    const intent = await readIntent(lease.database, identity);
-    if (!intent) return { intentId: null, fingerprint: identity.value, chainValid: true, events: [] };
-    const transaction = lease.database.transaction(EVENTS, "readonly");
+    // machine-contract: intent head/count and its events share one IndexedDB
+    // snapshot. A second tab may write before or after this transaction, but it
+    // cannot make a healthy chain look corrupt by advancing between two reads.
+    const transaction = lease.database.transaction([INTENTS, EVENTS], "readonly");
     const completion = transactionCompletion(transaction);
+    const intent = /** @type {Record<string, any> | undefined} */ (
+      await readIntentFromStore(transaction.objectStore(INTENTS), identity)
+    );
+    if (!intent) {
+      await completion;
+      return { intentId: null, fingerprint: identity.value, chainValid: true, events: [] };
+    }
     const raw = /** @type {Array<Record<string, any>>} */ (
       await requestResult(transaction.objectStore(EVENTS).index("byIntentId").getAll(intent.intentId))
     );

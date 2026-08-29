@@ -26,10 +26,10 @@
             予約は端末に届いたのに、成功画面だけ消えた——そんな再送を、二重予約にしないデモです。
           </p>
         </div>
-        <div class="status-card" aria-labelledby="current-status-title">
+        <section class="status-card" aria-labelledby="current-status-title">
           <div class="status-heading">
             <p id="current-status-title">Current status</p>
-            <span id="connection-state" aria-label="Browser connection state">Online</span>
+            <span id="connection-state" role="status" aria-label="Browser connection state">Online</span>
           </div>
           <p class="state-name" id="state-name">EMPTY</p>
           <p id="state-explanation">No simulated booking has been prepared on this device.</p>
@@ -38,7 +38,7 @@
             <div><dt>Bookings</dt><dd id="booking-count">0</dd></div>
             <div><dt>Effect starts</dt><dd id="effect-count">0</dd></div>
           </dl>
-        </div>
+        </section>
       </section>
 
       <section class="workspace" aria-label="Booking demo">
@@ -144,6 +144,32 @@
               <li>The browser database rejects a second record with the same identity.</li>
               <li>Every state change has a UUIDv7 event and a SHA-256 link to the prior event.</li>
             </ol>
+            <section class="audit-proof" aria-labelledby="audit-proof-title">
+              <h3 id="audit-proof-title">Current local proof</h3>
+              <p>These values update from this booking's device-local history.</p>
+              <dl class="audit-proof-grid" aria-live="polite" aria-busy="true">
+                <div class="audit-proof-wide">
+                  <dt>Stable UUIDv5 fingerprint</dt>
+                  <dd><code id="proof-fingerprint">Checking…</code></dd>
+                </div>
+                <div>
+                  <dt>Audit events</dt>
+                  <dd id="proof-event-count">0</dd>
+                </div>
+                <div>
+                  <dt>Chain check</dt>
+                  <dd><span id="proof-chain-valid" class="chain-state" data-state="pending">Checking…</span></dd>
+                </div>
+                <div class="audit-proof-wide">
+                  <dt>Latest UUIDv7 event</dt>
+                  <dd><code id="proof-latest-event">None yet</code></dd>
+                </div>
+                <div class="audit-proof-wide">
+                  <dt>SHA-256 chain head · first 12</dt>
+                  <dd><code id="proof-chain-head">000000000000…</code></dd>
+                </div>
+              </dl>
+            </section>
           </details>
 
           <div class="scope-note">

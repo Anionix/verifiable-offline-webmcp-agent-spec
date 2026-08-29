@@ -203,6 +203,18 @@ input, select {
 details { margin-top: 1.1rem; border-top: 1px solid var(--line); padding-top: 1rem; }
 summary { cursor: pointer; font-weight: 800; }
 .proof-list { margin-bottom: 0; padding-left: 1.25rem; color: var(--muted); line-height: 1.6; }
+.audit-proof { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); background: white; }
+.audit-proof h3 { margin: 0; color: var(--indigo-deep); font-size: 0.95rem; }
+.audit-proof > p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+.audit-proof-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem 1rem; margin: 1rem 0 0; }
+.audit-proof-grid div { min-width: 0; padding-top: 0.7rem; border-top: 1px solid var(--line); }
+.audit-proof-grid .audit-proof-wide { grid-column: 1 / -1; }
+.audit-proof-grid dt { color: var(--muted); font-size: 0.72rem; font-weight: 700; }
+.audit-proof-grid dd { min-width: 0; margin: 0.3rem 0 0; color: var(--indigo-deep); font-size: 0.8rem; font-weight: 800; }
+.audit-proof-grid code { display: block; max-width: 100%; overflow-wrap: anywhere; color: inherit; font-size: 0.76rem; }
+.chain-state[data-state="valid"] { color: var(--success); }
+.chain-state[data-state="invalid"] { color: var(--warning); }
+.chain-state[data-state="pending"], .chain-state[data-state="unknown"] { color: var(--muted); }
 
 .contract-section, .service-section { margin-bottom: 1.2rem; }
 .contract-heading { align-items: end; }
@@ -242,6 +254,8 @@ footer a { color: var(--indigo); }
   .price-total { text-align: left; }
   .status-metrics { gap: 0.5rem; }
   .status-metrics dt { min-height: 2.2em; }
+  .audit-proof-grid { grid-template-columns: 1fr; }
+  .audit-proof-grid .audit-proof-wide { grid-column: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

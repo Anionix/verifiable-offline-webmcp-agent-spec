@@ -17,8 +17,9 @@ slo_gate_review_fix_event_uuid_v7: "01a049ba-c4e3-753e-8c7d-c353034a2a3b"
 final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
 service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
+source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T01:25:00Z"
+updated_at: "2026-08-29T03:34:19.524Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -101,6 +102,17 @@ The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-re
 
 `make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, the root `package-lock.json`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
 
+The bounded source-quality gate uses Oxlint for the hotel JavaScript, Biome for the hotel page markup and styles, and Oxfmt for the newly governed formatting surface. It avoids rewriting historical files while making the current demo mechanically reviewable.
+
+```bash
+npm run quality:check
+npm run lsp:oxlint
+npm run lsp:oxfmt
+npm run lsp:biome
+```
+
+Each `lsp:*` command starts one code-analysis server for editor integration and keeps running until the editor stops it. The fixed versions and integrity values are recorded in `package-lock.json`.
+
 <!-- information_uuid_v5=81366b7a-5c59-5af5-be85-e988d824320c -->
 <!-- event_uuid_v7=01a04aa0-782f-7b3e-8cec-6cb8a87937df state_transition=SERVICE_BOUNDARIES_DOCUMENTED -> EVERYDAY_DUPLICATE_VALUE_VISIBLE occurred_at=2026-08-28T23:07:05.647Z -->
 <!-- machine-contract=Every service example is illustrative and unobserved; current deployment state comes from metadata/service-integration-registry.json. -->
@@ -134,7 +146,7 @@ The shared build produces `dist/client/**` for Vercel, Netlify, and Render confi
 
 Confirmation, payment, and cancellation mutation are deliberately absent. IndexedDB unique constraints, UUIDv7 events, and a SHA-256 forward chain protect the local result across repeated clicks, two tabs, reload, and retry. ChatGPT Sites and Vercel do not share browser storage, so the page explicitly says the fictional result belongs only to this device and deployment.
 
-Local evidence currently passes 131 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one. The owner-only ChatGPT Sites production URL independently passed four-tool discovery, the human-only commit boundary, safe retry, and reload restoration. Keyboard traversal, screen-reader behavior, Chrome execution behind the owner-only sign-in, general Sites access, and the current Vercel deployment remain `INCONCLUSIVE` or `UNMEASURED` until their separate checks are recorded. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json) and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
+Local evidence currently passes 134 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one. The previous owner-only ChatGPT Sites artifact independently passed four-tool discovery, the human-only commit boundary, safe retry, and reload restoration; the current worktree candidate is not included in that claim. Keyboard traversal, screen-reader behavior, Chrome execution behind the owner-only sign-in, general Sites access, and the current Vercel deployment remain `INCONCLUSIVE` or `UNMEASURED` until their separate checks are recorded. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json) and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

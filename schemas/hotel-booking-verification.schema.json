@@ -5,12 +5,13 @@
   "title": "Hotel booking demo verification record",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "identity", "observedAt", "sourceCommit", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "checks", "designFidelity"],
+  "required": ["$schema", "identity", "observedAt", "sourceCommit", "sourceState", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "liveDeployment", "checks", "designFidelity"],
   "properties": {
     "$schema": { "const": "../schemas/hotel-booking-verification.schema.json" },
     "identity": { "$ref": "#/$defs/identity" },
     "observedAt": { "type": "string", "format": "date-time" },
     "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
+    "sourceState": { "enum": ["WORKTREE_CANDIDATE", "COMMITTED_CANDIDATE", "DEPLOYED_CURRENT"] },
     "artifactDigest": { "$ref": "#/$defs/sha256" },
     "artifactDigestScope": {
       "const": {
@@ -40,6 +41,26 @@
     },
     "stateTransition": { "type": "string", "minLength": 3 },
     "scope": { "type": "string", "minLength": 3 },
+    "liveDeployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionalSourceCommit", "deployedVersionSourceCommit", "functionalArtifactDigest", "fullSitesPackageDigest", "versionId", "versionNumber", "deploymentId", "providerArchiveContentHash", "url", "accessMode", "status", "observedAt", "evidence"],
+      "properties": {
+        "functionalSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "deployedVersionSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "functionalArtifactDigest": { "$ref": "#/$defs/sha256" },
+        "fullSitesPackageDigest": { "$ref": "#/$defs/sha256" },
+        "versionId": { "type": "string", "minLength": 3 },
+        "versionNumber": { "type": "integer", "minimum": 1 },
+        "deploymentId": { "type": "string", "minLength": 3 },
+        "providerArchiveContentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "url": { "type": "string", "format": "uri" },
+        "accessMode": { "const": "OWNER_ONLY" },
+        "status": { "enum": ["PREVIOUS_ARTIFACT_VERIFIED", "CURRENT_ARTIFACT_VERIFIED"] },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "evidence": { "type": "string", "minLength": 3 }
+      }
+    },
     "checks": {
       "type": "array",
       "minItems": 1,

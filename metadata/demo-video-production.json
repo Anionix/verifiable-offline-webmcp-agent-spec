@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04c09-60b2-790c-8cd3-1809a644bc24"
+    "observationUuidV7": "01a04c2d-3882-7f7c-ba6a-441b69f2d53b"
   },
-  "updatedAt": "2026-08-29T05:41:18.130Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED",
+  "updatedAt": "2026-08-29T06:20:27.000Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -85,7 +85,7 @@
       "authenticationState": "CONFIRMED",
       "verifiedOperations": ["READ:search"],
       "productionUseState": "NOT_USED",
-      "reasonCode": "THUMBNAIL_DEFERRED_UNTIL_FINAL_VIDEO"
+      "reasonCode": "THUMBNAIL_DEFERRED_UNTIL_PUBLICATION_REVIEW"
     }
   ],
   "assets": [
@@ -172,7 +172,7 @@
         "timedWords": 325,
         "captionCount": 184,
         "remoteMediaId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
-        "observedAt": "2026-08-29T05:41:18.130Z",
+        "observedAt": "2026-08-29T06:20:27.000Z",
         "finalVideoVerified": true
       }
     },
@@ -195,7 +195,7 @@
         "timedWords": null,
         "captionCount": 28,
         "remoteMediaId": null,
-        "observedAt": "2026-08-29T05:41:18.130Z",
+        "observedAt": "2026-08-29T06:20:27.000Z",
         "finalVideoVerified": true
       }
     },
@@ -258,16 +258,28 @@
       "disclosure": "Actual public ChatGPT Sites capture. It records Sites and Vercel as current-artifact verified while preserving unknown and not-published states for the other services."
     },
     {
+      "assetId": "ae8d8512-f2c9-5c66-b161-e727bb079c8c",
+      "service": "LOCAL",
+      "kind": "SCREEN_CAPTURE",
+      "status": "COMPLETED",
+      "prompt": "Capture the public ChatGPT Sites version 7 retry result after the second identical attempt was recognized without starting another simulated booking.",
+      "createdAt": "2026-08-29T05:46:07Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-public-v7-retry-result.png",
+      "sha256": "435fd077c9f3cd2123785230dc663c248b01d8502188940f31d35d56e15e1e43",
+      "disclosure": "Actual public ChatGPT Sites version 7 capture of a fictional booking. It shows RETRY_RECOGNIZED, two attempts, one simulated booking, and one effect start; no personal information, payment, real hotel, or external reservation is present."
+    },
+    {
       "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
       "service": "LOCAL",
       "kind": "FINAL_VIDEO",
       "status": "COMPLETED",
-      "prompt": "Assemble two disclosed fictional Higgsfield scenes, at least 113 seconds of public Site screen recording, the current version 7 public Site service-table capture, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
-      "createdAt": "2026-08-29T05:40:31Z",
+      "prompt": "Assemble two disclosed fictional Higgsfield scenes, 113.2 seconds of public Site screen recording, current version 7 public Site service-table and retry-result captures, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
+      "createdAt": "2026-08-29T06:19:46Z",
       "remoteId": null,
-      "localPath": ".local/video-production/webmcp-hotel-demo-final-v4.mp4",
-      "sha256": "ebb3f75f7aa8a54cd1fcef4dd085ce7f118fdd2946d3e1ebb43455824b50043c",
-      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds. At least 113.2 seconds remain public Site screen recording; the visible stale Vercel status was replaced with an actual public version 7 Site capture. The narration audio packets and subtitle clock are unchanged.",
+      "localPath": ".local/video-production/webmcp-hotel-demo-final-v10.mp4",
+      "sha256": "3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7",
+      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds. It retains 113.2 seconds of public Site screen recording and ends with actual public Sites version 7 service-table and retry-result captures. The narration audio packet digest and subtitle clock are unchanged.",
       "videoEvidence": {
         "durationSeconds": 150,
         "width": 1920,
@@ -277,7 +289,7 @@
         "englishCaptionsBurned": true,
         "siteRecordingSeconds": 113.2,
         "actualSiteRecordingPermille": 755,
-        "verifiedAt": "2026-08-29T05:41:18.130Z"
+        "verifiedAt": "2026-08-29T06:20:27.000Z"
       }
     }
   ],
@@ -286,7 +298,7 @@
       "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
       "kind": "STORYBOARD",
       "path": "media/demo-video/storyboard.md",
-      "sha256": "c64174f4a5c85e14b93f227b4909e4591f10176199d31edeb12de02eb47cd88a",
+      "sha256": "cdd9c0c8c90d0fc01c3c5fe43dedf6e7e6de2e574ad85c074849042d41a4eadc",
       "status": "FINAL",
       "requiresAudioRetiming": false
     },
@@ -317,8 +329,8 @@
   ],
   "productionPlan": {
     "plannedDurationSeconds": 150,
-    "plannedActualSiteRecordingSeconds": 130,
-    "plannedActualSiteRecordingPermille": 867,
+    "plannedActualSiteRecordingSeconds": 113,
+    "plannedActualSiteRecordingPermille": 753,
     "voiceState": "MEASURED",
     "captionTimingState": "FINAL_VIDEO_VERIFIED"
   },

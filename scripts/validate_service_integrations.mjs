@@ -14,7 +14,7 @@
 // machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
 // event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
 // state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
-// machine-contract: the current Vercel receipt binds a clean provider Git commit, five anonymous remote hashes, carried fresh-storage proof only by identical functional digest, and recovery from an accidental notification-project deployment.
+// machine-contract: the current Vercel receipt binds a provider-reported clean Git commit as an explicit off-history observation, five anonymous remote hashes, carried fresh-storage proof only by identical functional digest, and recovery from an accidental notification-project deployment.
 // event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
 // state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
 // machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
@@ -113,8 +113,9 @@ const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
   deploymentId: "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
-  sourceState: "CLEAN_COMMIT",
-  providerGitCommit: "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+  sourceState: "PROVIDER_COMMIT_OFF_HISTORY",
+  providerGitCommit: "OFF_HISTORY",
+  providerGitCommitObservation: "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
   providerGitDirty: false,
   uniqueUrl: "https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
@@ -248,6 +249,7 @@ const SCHEMA_PATTERN_MATCHERS = new Map([
   ["^FKR-[0-9A-F]{10}$", /^FKR-[0-9A-F]{10}$/u],
   ["^[0-9a-f]{12}$", /^[0-9a-f]{12}$/u],
   ["^[0-9a-f]{40}$", /^[0-9a-f]{40}$/u],
+  ["^(?:[0-9a-f]{40}|CHECKOUT_TREE|OFF_HISTORY)$", /^(?:[0-9a-f]{40}|CHECKOUT_TREE|OFF_HISTORY)$/u],
   ["^[a-z0-9][a-z0-9-]*$", /^[a-z0-9][a-z0-9-]*$/u],
   ["^dist/client/[A-Za-z0-9._/-]+$", /^dist\/client\/[A-Za-z0-9._/-]+$/u],
   ["^dpl_[A-Za-z0-9]+$", /^dpl_[A-Za-z0-9]+$/u],
@@ -571,6 +573,12 @@ if (vercelDeployment && vercelDeploymentSchema) {
     isDeepStrictEqual(vercelDeployment.deployment, EXPECTED_VERCEL_DEPLOYMENT),
     "Vercel receipt project, deployment, URLs, state, source, or timestamps differ from provider readback",
   );
+  record(
+    vercelDeployment.deployment?.sourceState === "PROVIDER_COMMIT_OFF_HISTORY" &&
+      vercelDeployment.deployment?.providerGitCommit === "OFF_HISTORY" &&
+      /^[0-9a-f]{40}$/u.test(vercelDeployment.deployment?.providerGitCommitObservation ?? ""),
+    "Vercel provider commit must be retained as an off-history observation, not presented as a reachable source commit",
+  );
   const remoteArtifacts = vercelDeployment.remoteArtifacts ?? {};
   record(remoteArtifacts.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel remote artifacts differ from the deployment ID");
   record(remoteArtifacts.baseUrl === vercelDeployment.deployment?.publicAlias, "Vercel remote artifacts must use the anonymously accessible public alias");
@@ -875,6 +883,12 @@ if (registry && schema) {
   record(vercel?.reasonCode === "PUBLIC_HOTEL_ARTIFACT_VERIFIED", "vercel: reasonCode differs from the verified hotel deployment state");
   record(vercel?.artifactCommit === vercelDeployment?.artifact?.sourceCommit, "vercel: artifactCommit differs from the Vercel hotel deployment receipt");
   record(vercel?.artifactSha256 === vercelDeployment?.artifact?.functionalDigest, "vercel: artifactSha256 differs from the Vercel hotel deployment receipt");
+  record(
+    hotelVerification?.sourceCommit === "CHECKOUT_TREE" &&
+      hotelVerification?.sourceProvenance?.providerCommitReachability === "OFF_HISTORY" &&
+      hotelVerification?.sourceProvenance?.reproducibilityBoundary === "FULL_SITES_PACKAGE_DIGEST",
+    "hotel Sites receipt must state the off-history provider source and artifact reproducibility boundary",
+  );
   record(
     vercelDeployment?.artifact?.functionalDigest === hotelVerification?.artifactDigest,
     "Vercel and Sites receipts differ on the shared functional client digest",

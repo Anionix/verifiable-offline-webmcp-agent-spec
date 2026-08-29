@@ -562,6 +562,14 @@ def main():
         errors.append(f"schema metadata/hotel-booking-verification.json: {e.message}")
     if hotel_evidence["sourceCommit"] == "WORKTREE" and hotel_evidence["sourceState"] != "WORKTREE_CANDIDATE":
         errors.append("hotel WORKTREE source must remain a worktree candidate")
+    if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":
+        source_provenance = hotel_evidence.get("sourceProvenance", {})
+        if hotel_evidence["sourceCommit"] == "CHECKOUT_TREE":
+            if (
+                source_provenance.get("providerCommitReachability") != "OFF_HISTORY"
+                or source_provenance.get("reproducibilityBoundary") != "FULL_SITES_PACKAGE_DIGEST"
+            ):
+                errors.append("hotel CHECKOUT_TREE deployment must record an off-history provider source and full package digest boundary")
     live_hotel = hotel_evidence["liveDeployment"]
     if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":
         if (

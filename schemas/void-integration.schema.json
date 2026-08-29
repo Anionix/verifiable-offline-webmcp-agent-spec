@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/void-integration.schema.json",
+  "$comment": "information_uuid_v5=48462b55-a3ce-517e-9c43-8409b5619f84 event_uuid_v7=01a04c82-7268-7973-8c57-33ab9892a05c state_transition=NOT_INSTALLED -> PACKAGE_PINNED -> CODEX_MCP_REGISTERED -> STATIC_ADAPTER_VALIDATED -> READY_FOR_SEPARATE_AUTHORIZATION occurred_at=2026-08-29T07:53:32.520Z machine-contract=local installation and MCP registration do not imply provider authentication project linking publication or runtime execution",
+  "title": "Void integration evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "stateTransition", "component", "installation", "codexMcp", "staticAdapter", "providerState", "dependencyCompatibility", "dependencyAudit", "sources", "secretsIncluded"],
+  "properties": {
+    "$schema": { "const": "../schemas/void-integration.schema.json" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "namespace", "observedAt"],
+      "properties": {
+        "informationUuidV5": { "const": "22fa5437-e104-5ea2-acfe-fe57cc2553f2" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "namespace": { "const": "47f3e535-0e27-559a-9556-aa79a84f95eb" },
+        "observedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "through", "to", "eventId", "occurredAt", "machineContract"],
+      "properties": {
+        "from": { "const": "NOT_INSTALLED" },
+        "through": { "const": ["PACKAGE_PINNED", "CODEX_MCP_REGISTERED", "STATIC_ADAPTER_VALIDATED"] },
+        "to": { "const": "READY_FOR_SEPARATE_AUTHORIZATION" },
+        "eventId": { "$ref": "#/$defs/uuidV7" },
+        "occurredAt": { "$ref": "#/$defs/observedAt" },
+        "machineContract": { "type": "string", "minLength": 80 }
+      }
+    },
+    "component": {
+      "const": {
+        "name": "Void",
+        "packageName": "void",
+        "version": "0.10.12",
+        "packageIntegrity": "sha512-oYOKjnnV5AwMNRy2uB+WJGpIWapUTXWie+czt7BFTf8hpZSaws6X3wH+YCB/PGQmd+YSDlKqDOBbCFnDW7JKLQ==",
+        "repository": "https://github.com/voidzero-dev/void"
+      }
+    },
+    "installation": {
+      "const": {
+        "state": "CONFIRMED",
+        "scope": "PROJECT_DEV_DEPENDENCY",
+        "cliVersionCommand": "void --version",
+        "cliVersionObserved": "0.10.12"
+      }
+    },
+    "codexMcp": {
+      "const": {
+        "state": "REGISTERED_ENABLED_RESTART_REQUIRED",
+        "command": "npx",
+        "args": ["-y", "void@0.10.12", "mcp"],
+        "authenticationState": "NOT_REQUIRED_FOR_DOCUMENTATION_SERVER",
+        "secretsConfigured": false
+      }
+    },
+    "staticAdapter": {
+      "const": {
+        "state": "VALIDATED_NOT_DEPLOYED",
+        "configuration": "void.json",
+        "applicationType": "static",
+        "buildCommand": "npm run build:web",
+        "artifactDirectory": "dist/client",
+        "deploymentCommand": "npm run deploy:void:static",
+        "voidPluginInExistingViteGraph": false,
+        "bindings": {
+          "database": false,
+          "keyValue": false,
+          "storage": false,
+          "artificialIntelligence": false
+        }
+      }
+    },
+    "providerState": {
+      "const": {
+        "authentication": "NOT_ATTEMPTED",
+        "projectLink": "NOT_CONFIGURED",
+        "publication": "NOT_PUBLISHED",
+        "runtime": "NOT_RUN",
+        "nextExternalAction": "REQUIRES_SEPARATE_APPROVAL",
+        "deploymentExecutionCount": 0
+      }
+    },
+    "dependencyCompatibility": {
+      "const": {
+        "state": "COMPATIBLE_SET_PINNED",
+        "cloudflareVitePlugin": "1.43.0",
+        "wrangler": "4.107.0",
+        "workersTypes": "4.20260702.1",
+        "forceInstallUsed": false,
+        "legacyPeerDependenciesUsed": false
+      }
+    },
+    "dependencyAudit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capturedAt", "scope", "status", "moderate", "high", "critical", "total", "automaticFixApplied", "evidence"],
+      "properties": {
+        "capturedAt": { "$ref": "#/$defs/observedAt" },
+        "scope": { "const": "ENTIRE_ROOT_DEVELOPMENT_DEPENDENCY_GRAPH" },
+        "status": { "const": "KNOWN_RISKS_REMAIN" },
+        "moderate": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "critical": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "automaticFixApplied": { "const": false },
+        "evidence": { "type": "string", "minLength": 40 }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sourceId", "title", "url", "supports"],
+        "properties": {
+          "sourceId": { "$ref": "#/$defs/uuidV5" },
+          "title": { "type": "string", "minLength": 3 },
+          "url": { "type": "string", "format": "uri" },
+          "supports": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 3 } }
+        }
+      }
+    },
+    "secretsIncluded": { "const": false }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" }
+  }
+}

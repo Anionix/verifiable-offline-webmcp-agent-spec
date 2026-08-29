@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c71-bf6f-7c14-b932-4f4496137bfb"
-observed_at: "2026-08-29T07:35:18.127Z"
-state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04c82-7268-7c70-b652-6c42e98c965b"
+observed_at: "2026-08-29T07:53:32.520Z"
+state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_RELEASE_UPDATED -> DELIVERY_MATCH_VERIFIED -> VOID_LOCAL_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN -> FINAL_SUBMISSION_PENDING"
 ---
 
 # サービス連携状態の読み方
@@ -39,7 +39,7 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日7時35分18秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日7時53分32秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
@@ -51,6 +51,25 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
 | Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 現行説明、公開URL、YouTube動画を載せた版6。最終提出は別 |
+
+## Voidの端末内開発連携
+
+<!-- information_uuid_v5=4a96e407-d7a0-5750-8fed-87c40066dea2 -->
+<!-- event_uuid_v7=01a04c82-7268-7c70-b652-6c42e98c965b state_transition=VOID_NOT_CONFIGURED -> VOID_LOCAL_AND_GLOBAL_MCP_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN occurred_at=2026-08-29T07:53:32.520Z -->
+<!-- machine-contract=Void is a local development adapter outside the eight-service release registry until authentication, project linking, deployment, and public readback are separately observed. -->
+
+Voidは、上の八サービスとは別の端末内開発補助として導入しました。端末内の開発依存は`0.10.12`へ完全一致で固定しています。Codex全体では`npx -y void@0.10.12 mcp`を有効化済みで、現在の処理へ途中から読み込ませず、Codex再起動後に利用します。
+
+`void.json`は`dist/client`を対象にした静的アダプターです。データベース、キーと値、保管、人工知能の各結合をすべて無効にしています。既存のVite構成`cloudflare()`と`sites()`へ`voidPlugin`を追加しません。Void配下で併用するCloudflare Vite plug-inは`1.43.0`、Wranglerは`4.107.0`に固定しています。
+
+```sh
+npm run validate:void
+npm run build:void:static
+```
+
+Voidの認証、プロジェクト接続、配置は未実施です。`npm run deploy:void:static`は、利用者が今後明示的に選ぶ配置操作として分離してあり、現在の公開成功は主張しません。この区別は[Quickstart](https://void.cloud/guide/quickstart)、[Agents integration](https://void.cloud/integrations/agents)、[CLI reference](https://void.cloud/reference/cli)の公式情報を根拠にしています。Devpostの最終提出も引き続き未実施です。
+
+機械可読の状態は[`metadata/void-integration.json`](../metadata/void-integration.json)で確認できます。導入済みと公開済みを同じ状態にはしません。
 
 Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリ、一般公開した[YouTube動画](https://youtu.be/tdSvJw4ghX8)を反映しました。更新操作は版6を返し、その後の読み戻しでプロジェクト識別子`1405191`、状態`published`、YouTubeの動画URL、名称`未定`を確認しました。読み取り機能は版番号を返さないため、版6は更新応答の記録です。WebMCP Challengeの`submitted_at`は`null`なので、一般プロジェクトページの更新を最終提出とは扱いません。
 

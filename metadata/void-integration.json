@@ -1,0 +1,128 @@
+{
+  "$schema": "../schemas/void-integration.schema.json",
+  "identity": {
+    "informationUuidV5": "22fa5437-e104-5ea2-acfe-fe57cc2553f2",
+    "observationUuidV7": "01a04c84-1a18-746f-8cc5-e7e077f8d41b",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "observedAt": "2026-08-29T07:55:20.984Z"
+  },
+  "stateTransition": {
+    "from": "NOT_INSTALLED",
+    "through": [
+      "PACKAGE_PINNED",
+      "CODEX_MCP_REGISTERED",
+      "STATIC_ADAPTER_VALIDATED"
+    ],
+    "to": "READY_FOR_SEPARATE_AUTHORIZATION",
+    "eventId": "01a04c84-1a18-746f-8cc5-e7e077f8d41b",
+    "occurredAt": "2026-08-29T07:55:20.984Z",
+    "machineContract": "Installation, Codex registration, authentication, project linking, publication, and runtime execution are separate states. This record proves only the pinned local package, enabled MCP registration, and validated pre-built static adapter."
+  },
+  "component": {
+    "name": "Void",
+    "packageName": "void",
+    "version": "0.10.12",
+    "packageIntegrity": "sha512-oYOKjnnV5AwMNRy2uB+WJGpIWapUTXWie+czt7BFTf8hpZSaws6X3wH+YCB/PGQmd+YSDlKqDOBbCFnDW7JKLQ==",
+    "repository": "https://github.com/voidzero-dev/void"
+  },
+  "installation": {
+    "state": "CONFIRMED",
+    "scope": "PROJECT_DEV_DEPENDENCY",
+    "cliVersionCommand": "void --version",
+    "cliVersionObserved": "0.10.12"
+  },
+  "codexMcp": {
+    "state": "REGISTERED_ENABLED_RESTART_REQUIRED",
+    "command": "npx",
+    "args": [
+      "-y",
+      "void@0.10.12",
+      "mcp"
+    ],
+    "authenticationState": "NOT_REQUIRED_FOR_DOCUMENTATION_SERVER",
+    "secretsConfigured": false
+  },
+  "staticAdapter": {
+    "state": "VALIDATED_NOT_DEPLOYED",
+    "configuration": "void.json",
+    "applicationType": "static",
+    "buildCommand": "npm run build:web",
+    "artifactDirectory": "dist/client",
+    "deploymentCommand": "npm run deploy:void:static",
+    "voidPluginInExistingViteGraph": false,
+    "bindings": {
+      "database": false,
+      "keyValue": false,
+      "storage": false,
+      "artificialIntelligence": false
+    }
+  },
+  "providerState": {
+    "authentication": "NOT_ATTEMPTED",
+    "projectLink": "NOT_CONFIGURED",
+    "publication": "NOT_PUBLISHED",
+    "runtime": "NOT_RUN",
+    "nextExternalAction": "REQUIRES_SEPARATE_APPROVAL",
+    "deploymentExecutionCount": 0
+  },
+  "dependencyCompatibility": {
+    "state": "COMPATIBLE_SET_PINNED",
+    "cloudflareVitePlugin": "1.43.0",
+    "wrangler": "4.107.0",
+    "workersTypes": "4.20260702.1",
+    "forceInstallUsed": false,
+    "legacyPeerDependenciesUsed": false
+  },
+  "dependencyAudit": {
+    "capturedAt": "2026-08-29T07:55:20.984Z",
+    "scope": "ENTIRE_ROOT_DEVELOPMENT_DEPENDENCY_GRAPH",
+    "status": "KNOWN_RISKS_REMAIN",
+    "moderate": 4,
+    "high": 8,
+    "critical": 0,
+    "total": 12,
+    "automaticFixApplied": false,
+    "evidence": "npm audit reported existing direct Vite and Cloudflare tool findings plus Void transitive findings. No forced downgrade or automatic breaking fix was applied."
+  },
+  "sources": [
+    {
+      "sourceId": "bcee0651-5def-5648-b442-327b64871698",
+      "title": "Void Quickstart",
+      "url": "https://void.cloud/guide/quickstart",
+      "supports": [
+        "local package installation",
+        "existing Vite application setup",
+        "local rather than global package"
+      ]
+    },
+    {
+      "sourceId": "a6c82bdb-7aca-5824-9798-dc93dbb8e110",
+      "title": "Using Void with Coding Agents",
+      "url": "https://void.cloud/integrations/agents",
+      "supports": [
+        "Codex MCP registration",
+        "agent documentation access"
+      ]
+    },
+    {
+      "sourceId": "226fbb52-cc16-508e-83c8-0196b864253a",
+      "title": "Void CLI",
+      "url": "https://void.cloud/reference/cli",
+      "supports": [
+        "pre-built static directory deployment",
+        "authentication and project link boundaries"
+      ]
+    },
+    {
+      "sourceId": "fabf9cdc-8722-5bbc-ac7b-9c3641285a4a",
+      "title": "Void package registry record",
+      "url": "https://registry.npmjs.org/void/0.10.12",
+      "supports": [
+        "package version",
+        "package integrity",
+        "source repository"
+      ]
+    }
+  ],
+  "secretsIncluded": false
+}

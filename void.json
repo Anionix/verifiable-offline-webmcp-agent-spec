@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/void/schema.json",
+  "target": "cloudflare",
+  "output": "static",
+  "inference": {
+    "bindings": {
+      "db": false,
+      "kv": false,
+      "storage": false,
+      "ai": false
+    },
+    "build": "npm run build:web",
+    "outputDir": "dist/client",
+    "appType": "static"
+  },
+  "worker": {
+    "compatibility_date": "2026-05-22"
+  }
+}

@@ -19,8 +19,9 @@ service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
 source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
 publication_state_event_uuid_v7: "01a04c71-bf66-788b-8a8e-74e9459ac233"
+void_integration_event_uuid_v7: "01a04c82-7268-7a01-b288-6d617c70cf55"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T07:35:18.118Z"
+updated_at: "2026-08-29T07:53:32.520Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -113,6 +114,25 @@ npm run lsp:biome
 ```
 
 Each `lsp:*` command starts one code-analysis server for editor integration and keeps running until the editor stops it. The fixed versions and integrity values are recorded in `package-lock.json`.
+
+## Void local integration / Void端末内連携
+
+<!-- information_uuid_v5=294f20c3-0104-56ef-96c4-3a262bd9d7a4 -->
+<!-- event_uuid_v7=01a04c82-7268-7a01-b288-6d617c70cf55 state_transition=VOID_NOT_CONFIGURED -> VOID_LOCAL_AND_GLOBAL_MCP_CONFIGURED -> VOID_STATIC_VALIDATE_READY -> VOID_AUTH_AND_DEPLOY_NOT_RUN occurred_at=2026-08-29T07:53:32.520Z -->
+<!-- machine-contract=Void installation and local validation readiness do not imply authentication, project linking, deployment, or public readback; those later states remain incomplete. -->
+
+Void `0.10.12` is fixed as an exact local development dependency. The Codex-wide Model Context Protocol command `npx -y void@0.10.12 mcp` is enabled and becomes available after Codex restarts. The separate static adapter in `void.json` builds `dist/client` with database, key-value, storage, and artificial-intelligence bindings all disabled. It does not add `voidPlugin` to the existing `cloudflare()` and `sites()` Vite plug-ins. Void's nested compatibility set is fixed to Cloudflare Vite plug-in `1.43.0` and Wrangler `4.107.0`.
+
+Void `0.10.12`を端末内の開発依存として完全一致で固定しました。Codex全体のModel Context Protocolコマンド`npx -y void@0.10.12 mcp`も有効化済みで、Codex再起動後に利用できます。`void.json`は`dist/client`だけを対象とする別の静的アダプターです。データベース、キーと値、保管、人工知能の各結合はすべて無効で、既存の`cloudflare()`と`sites()`へ`voidPlugin`を重ねません。Void配下の依存互換集合はCloudflare Vite plug-in `1.43.0`、Wrangler `4.107.0`へ固定しています。
+
+```bash
+npm run validate:void
+npm run build:void:static
+```
+
+Voidの認証、プロジェクト接続、配置はまだ行っていません。`npm run deploy:void:static`は将来の明示的な配置操作であり、現時点の公開成功を表しません。公式の[Quickstart](https://void.cloud/guide/quickstart)、[Agents integration](https://void.cloud/integrations/agents)、[CLI reference](https://void.cloud/reference/cli)を一次情報としています。
+
+導入、Codex登録、認証、接続、公開、依存関係監査の状態は[`metadata/void-integration.json`](metadata/void-integration.json)へ分けて記録しています。
 
 <!-- information_uuid_v5=81366b7a-5c59-5af5-be85-e988d824320c -->
 <!-- event_uuid_v7=01a04aa0-782f-7b3e-8cec-6cb8a87937df state_transition=SERVICE_BOUNDARIES_DOCUMENTED -> EVERYDAY_DUPLICATE_VALUE_VISIBLE occurred_at=2026-08-28T23:07:05.647Z -->

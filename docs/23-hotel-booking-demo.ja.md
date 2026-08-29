@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04dab-38f0-7c3c-9226-e891c7e82046"
-observed_at: "2026-08-29T13:17:42.000Z"
-status: "dependency-patched-sites-version-11-vercel-deployment-8kb6-ready-five-files-matched-carried-forward-browser-proof-youtube-public-artifact-identity-unmeasured-devpost-version-11-sixty-second-test-final-submission-provider-verified-title-image-current"
+event_uuid_v7: "01a04dcb-8678-79cc-97a7-5daac61059f8"
+observed_at: "2026-08-29T13:52:59.000Z"
+status: "sites-version-12-current-vercel-clean-current-carried-forward-browser-proof-youtube-public-artifact-identity-unmeasured-devpost-final-submission-provider-verified-title-image-current"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -71,7 +71,7 @@ status: "dependency-patched-sites-version-11-vercel-deployment-8kb6-ready-five-f
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
-| ChatGPT Sites一般公開 | 成功（動作版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版11はコミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`、配置`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`。匿名HTTP 200と当時の`service-integrations.json`の一致を確認。再送収束は同じ機能要約値の版10で実測し、版11で再読込復元を確認。Devpost版11を含む新しい状態表は未公開候補として分離 |
+| ChatGPT Sites一般公開 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版12はコミット`f832cc611ed43613035a8735ca97d4bc1a0a8efc`、配置`appgdep_6a92e425bbdc8191ac9ca35d524f61a0`。匿名HTTP 200と四つの静的ファイル一致を確認。再送収束は同じ機能要約値の版10から引き継ぎ、版12で再実行したとは扱わない |
 | 可視証拠パネル | 成功（現行機能） | 版10でUUIDv5`64ccc2dc-0404-5566-b296-92d0eb7ed00f`、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版11で同じ結果を復元 |
 | Vercel一般公開 | 成功（現行版） | クリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`の配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`を[ホテル専用URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app)で匿名確認。5ファイル一致、警告・エラー0件。再送収束は同じ機能要約値の直前配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`から引き継ぎ、現行配置で再実行したとは扱わない |
 
@@ -79,7 +79,7 @@ Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../met
 
 ## 公開、動画、Devpostの現在状態
 
-- 安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`は、ChatGPT Sites版10でWebMCP四機能、人間確認境界、2試行から1予約・処理開始1回への収束を実測しました。状態表だけを更新した最終コミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`は、版11として版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d`、配置`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`から従来のURLへ一般公開済みです。二版の機能要約値は同一で、版11の再読込後も同じ結果を復元しました。
+- 安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`は、ChatGPT Sites版10でWebMCP四機能、人間確認境界、2試行から1予約・処理開始1回への収束を実測しました。最終状態を含むコミット`f832cc611ed43613035a8735ca97d4bc1a0a8efc`は、版12として版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_feeff1aa402c8191a02e0945d9cdd04e`、配置`appgdep_6a92e425bbdc8191ac9ca35d524f61a0`から同じURLへ一般公開済みです。匿名HTTP 200と四つの静的ファイル一致を確認しました。版12の機能要約値は版10と同一なので実操作証拠を引き継ぎますが、版12で再実行したとは主張しません。
 - Vercelでは直前配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`で同じ再送収束を実測しました。現行配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`はクリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`を使い、`2026-08-29T13:35:38.108Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app)から取得した五つのファイルは端末内成果物と一致し、提供元の警告・エラー読み戻しはともに0件でした。機能要約値`06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132`は直前配置と同じなので実操作証拠を引き継ぎますが、現行配置で新たに実操作したとは主張しません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧済みで、現在も別プロジェクトです。
 - 端末内で検査した最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、公開Site画面録画は113.2秒（75.5%）です。端末内ファイルのSHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。これとは別に、[YouTube](https://youtu.be/tdSvJw4ghX8)で`WebMCP vs Duplicate Bookings: A Live Demo`の一般公開、150秒の再生時間、匿名再生、英語字幕と日本語字幕トラック、処理完了、著作権検査の問題なしを読み戻しました。リポジトリ内にはアップロード操作由来の独立した受領記録がないため、端末内ファイルと公開動画が同一成果物であることは`UNMEASURED`であり、同一だとは断定しません。時間の一致と編集可能な自己記録は成果物同一性の根拠にしません。
 - Canvaで選んだ専用サムネイルは端末内に準備済みです。ただしYouTube画面のブラウザー用ファイル選択が失敗し、専用画像は反映できなかったため、現在はYouTubeが自動生成したサムネイルを使っています。これはYouTubeだけの状態です。

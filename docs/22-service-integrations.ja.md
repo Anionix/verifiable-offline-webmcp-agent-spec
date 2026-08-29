@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04dab-38f0-7145-8324-579d5c07b2e6"
-observed_at: "2026-08-29T13:17:42.000Z"
-state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED"
+event_uuid_v7: "01a04dcb-8678-7e22-973d-dc0d0617b0ce"
+observed_at: "2026-08-29T13:52:59.000Z"
+state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED -> SITES_VERSION_12_CURRENT_ARTIFACT_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -43,14 +43,14 @@ state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は動作版11。安全版依存を使う版10で実操作し、同一機能の版11で再読込復元を確認。Devpost版11を含む新しい状態表は未公開候補として分離 |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先は版12。確定コミットから公開し、匿名HTTP 200と四つの静的ファイル一致を確認。実操作は同一機能要約値の版10から引き継ぐ |
 | Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | クリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`の現行配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`で匿名5ファイル一致と警告・エラー0件を確認。実操作証拠は同じ機能要約値の直前配置から引き継ぎ |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
-| Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 京都ホテル向け説明、公開URL、動画、60秒手順を揃えた版11。Open Graph画像の関連付けは`INCONCLUSIVE`で、最終送信は未実行 |
+| Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 京都ホテル向け説明、公開URL、動画、60秒手順を揃えた版11。Open Graph画像を読み戻し、提出番号`1158722`は`Submitted` |
 
 ## Voidの端末内開発連携
 
@@ -67,7 +67,7 @@ npm run validate:void
 npm run build:void:static
 ```
 
-Voidの認証、プロジェクト接続、配置は未実施です。`npm run deploy:void:static`は、利用者が今後明示的に選ぶ配置操作として分離してあり、現在の公開成功は主張しません。この区別は[Quickstart](https://void.cloud/guide/quickstart)、[Agents integration](https://void.cloud/integrations/agents)、[CLI reference](https://void.cloud/reference/cli)の公式情報を根拠にしています。Devpostは提出内容まで準備済みですが、最終送信は引き続き未実施です。
+Voidの認証、プロジェクト接続、配置は未実施です。`npm run deploy:void:static`は、利用者が今後明示的に選ぶ配置操作として分離してあり、現在の公開成功は主張しません。この区別は[Quickstart](https://void.cloud/guide/quickstart)、[Agents integration](https://void.cloud/integrations/agents)、[CLI reference](https://void.cloud/reference/cli)の公式情報を根拠にしています。Devpostはホテル向けの提出内容を更新し、提出番号`1158722`で送信済みです。
 
 機械可読の状態は[`metadata/void-integration.json`](../metadata/void-integration.json)で確認できます。導入済みと公開済みを同じ状態にはしません。
 
@@ -75,7 +75,7 @@ Devpostでは、[プロジェクトページ](https://devpost.com/software/proje
 
 YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しました。公開プレーヤーの表示時間は2分30秒です。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声と画面へ焼き込んだ英語字幕に加え、日本語字幕トラックも公開済みです。Canvaで選んだ専用サムネイルは端末内に準備済みですが、ブラウザーのファイル選択が失敗したため未反映で、現在はYouTubeが自動生成したサムネイルを使っています。この失敗から専用サムネイルの外部公開成功は推測しません。
 
-ChatGPT Sitesでは、安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`を版10へ配置し、新しい予約条件で準備、人間の画面操作による確定、安全な再送を実行しました。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、WebMCP四機能、確認番号`FKR-7EF2A00FA2`を直接確認しています。サービス状態表だけを更新した最終コミット`51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf`は、版11として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは版識別子`appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d`、配置識別子`appgdep_6a92a1cf0bb08191bbd00064ac2cdd12`です。版10と版11の機能要約値は同一で、版11の再読込後も同じ結果を復元しました。現行URLの匿名HTTP 200応答と、配信された`service-integrations.json`の端末内成果物との一致も確認しました。
+ChatGPT Sitesでは、安全版依存を使う機能コミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`を版10へ配置し、新しい予約条件で準備、人間の画面操作による確定、安全な再送を実行しました。`PREPARED → COMMITTED → RETRY_RECOGNIZED`、2試行、架空予約1件、処理開始1回、WebMCP四機能、確認番号`FKR-7EF2A00FA2`を直接確認しています。最終状態を含むコミット`f832cc611ed43613035a8735ca97d4bc1a0a8efc`は、版12として[一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の版識別子は`appgprj_6a923239002081918896546134a7dc8f~appgver_feeff1aa402c8191a02e0945d9cdd04e`、配置識別子は`appgdep_6a92e425bbdc8191ac9ca35d524f61a0`です。匿名HTTP 200に加え、JavaScript、スタイルシート、サービスワーカー、サービス状態表が端末内成果物と一致しました。CloudflareがルートHTMLへ検査用スクリプトを追加するため、ルートHTMLのバイト一致は主張しません。版12の機能要約値は実操作済み版10と同一なので、実操作証拠を引き継ぎますが、版12で再実行したとは扱いません。
 
 Vercelでは、機能コミットをホテル専用配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`へ配置し、新しい保存領域から同じ再送収束を実測しました。現行配置`dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2`はクリーンコミット`e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb`から公開され、`2026-08-29T13:35:38.108Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app)から取得した五つのファイルは端末内成果物と一致し、`2026-08-29T13:37:06.000Z`の提供元読み戻しで警告・エラーはともに0件でした。機能ソースコミット`5ac1fe51a29800eb052f9a63e7311559b7c01e45`の要約値`06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132`は実操作済みの直前配置と同一なので、その実操作証拠を引き継ぎます。現行配置で新しい実操作を行ったとは主張しません。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
@@ -117,9 +117,9 @@ Google Chromeでは一般公開の版6を未ログインで表示し、初期状
 | Shopify | `COMMERCE_WRITE` | `OUT_OF_SCOPE` | 商品、買い物かご、購入、注文を書き換えない |
 | Google Chrome | `PUBLIC_DEPLOYMENT` | `NOT_APPLICABLE` | 検査用ブラウザーであり、公開先ではない |
 | Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_PLAN` | ホテル向け題名、説明、公開先、動画、60秒手順、提出回答を版11まで準備済み。画像関連付けは`INCONCLUSIVE` |
-| Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 提出内容は揃っており、最終送信だけ利用者の明示的な`yes, submit`を待つ |
+| Devpost | `FINAL_SUBMISSION` | `AUTHORIZED_BY_USER` | 利用者の「devpostも投稿まで行う」に基づき、提出番号`1158722`で送信済み |
 
-`AUTHORIZED_BY_USER`は、利用者が対象操作を個別に明示許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開に使っています。YouTubeの一般公開も利用者の明示許可に基づきます。Devpostの下書き更新と提出パケット準備は、利用者が実装を指示した計画を根拠とする`AUTHORIZED_BY_PLAN`へ文書、台帳、スキーマ、検査を統一しました。個人回答も確認済みですが、最終送信は別操作なので、明示的な`yes, submit`を受けるまで`REQUIRES_SEPARATE_APPROVAL`のままです。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
+`AUTHORIZED_BY_USER`は、利用者が対象操作を個別に明示許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開、YouTubeの一般公開、Devpostの最終送信に使っています。Devpostの下書き更新と提出パケット準備は、利用者が実装を指示した計画を根拠とする`AUTHORIZED_BY_PLAN`へ文書、台帳、スキーマ、検査を統一しました。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
 
 ## 認証を成功扱いする条件
 

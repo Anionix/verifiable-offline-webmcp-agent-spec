@@ -2,11 +2,11 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04dc2-1868-72b5-9621-f3275923df90"
+    "observationUuidV7": "01a04dcb-8678-76bf-b181-d86c21eaa1ea"
   },
-  "observedAt": "2026-08-29T13:42:41.000Z",
-  "sourceCommit": "WORKTREE",
-  "sourceState": "WORKTREE_CANDIDATE",
+  "observedAt": "2026-08-29T13:52:59.000Z",
+  "sourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
+  "sourceState": "DEPLOYED_CURRENT",
   "artifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
@@ -31,22 +31,22 @@
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED -> DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING -> DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED -> DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED -> DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING -> DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED -> DEVPOST_SUBMITTED_CLEAN_VERCEL_WORKTREE_CANDIDATE -> SITES_VERSION_12_DEPLOYED_CURRENT",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
-    "deployedVersionSourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
+    "deployedVersionSourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
     "functionalArtifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
-    "fullSitesPackageDigest": "d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa",
-    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_40087b159eb8819197ae93e67e78a50d",
-    "versionNumber": 11,
-    "deploymentId": "appgdep_6a92a1cf0bb08191bbd00064ac2cdd12",
-    "providerArchiveContentHash": "sha256:2c971dfc7e860e75a1e9d23bdfc185c1fc0c450cda6575757276b029cf254e40",
+    "fullSitesPackageDigest": "221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15",
+    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_feeff1aa402c8191a02e0945d9cdd04e",
+    "versionNumber": 12,
+    "deploymentId": "appgdep_6a92e425bbdc8191ac9ca35d524f61a0",
+    "providerArchiveContentHash": "sha256:2d9b71404892b9a7a5a66ab0e0d1d9eea1f7585cb9d918a917dd7ca05c6af563",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
     "accessMode": "PUBLIC",
-    "status": "PREVIOUS_ARTIFACT_VERIFIED",
-    "observedAt": "2026-08-29T09:09:43.704Z",
-      "evidence": "Sites version 11 and deployment readback identify commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf as the exact source of the previously verified live package d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. Anonymous requests to the public root and service-integrations.json returned HTTP 200. A fresh version 10 browser run proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. The current worktree records Devpost final submission and clean Vercel deployment dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2 while retaining functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132. Its new full Sites package digest is a local candidate and has not yet been published to ChatGPT Sites."
+    "status": "CURRENT_ARTIFACT_VERIFIED",
+    "observedAt": "2026-08-29T13:52:59.000Z",
+    "evidence": "Sites version 12 and deployment readback identify commit f832cc611ed43613035a8735ca97d4bc1a0a8efc as the exact source of the current full package 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15. The deployment succeeded at the public URL. Anonymous requests returned HTTP 200; app.js, index.css, service-worker.js, and service-integrations.json matched the local bytes, including registry SHA-256 9dea4961b965174e088a3b7004f9e85a9938e8c134f8a96f605025ee957931fe. Cloudflare appended a challenge script to the root HTML, so root-byte identity is not claimed. A fresh version 10 browser run directly proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 12 retains the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132; that earlier runtime proof is carried forward and is not described as a new browser run."
   },
   "checks": [
     {
@@ -59,7 +59,7 @@
       "checkId": "311a96f7-7859-5b7f-baf2-17e39b83502d",
       "name": "Two attempts remain one booking",
       "status": "PASS",
-      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; Sites version 11 and current Vercel deployment dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2 retain the same functional digest, and the Vercel alias matched five local files."
+      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; Sites version 12 and current Vercel deployment dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2 retain the same functional digest, and their anonymously fetched static files matched the local artifacts."
     },
     {
       "checkId": "8982f898-c1da-55cd-834b-211099bc82ca",
@@ -113,7 +113,7 @@
       "checkId": "cc47b03a-10b9-5806-b327-67b2139a0b93",
       "name": "Visible local proof panel",
       "status": "PASS",
-      "evidence": "The public Sites version 10 run displayed reservation UUIDv5 64ccc2dc-0404-5566-b296-92d0eb7ed00f, latest event UUIDv7 01a04cc5-e895-7137-aa26-1b35ad955fc4, four events, chain head 8a47e7f03278..., and Valid after retry. Version 11 restored the same result after reload. The same panel also passed local 320 CSS-pixel wrapping without horizontal overflow."
+      "evidence": "The public Sites version 10 run displayed reservation UUIDv5 64ccc2dc-0404-5566-b296-92d0eb7ed00f, latest event UUIDv7 01a04cc5-e895-7137-aa26-1b35ad955fc4, four events, chain head 8a47e7f03278..., and Valid after retry. Version 11 restored the same result after reload, and version 12 retains the identical functional digest. The same panel also passed local 320 CSS-pixel wrapping without horizontal overflow."
     },
     {
       "checkId": "f7e5400d-3f70-57ef-aa97-17cab03c8915",
@@ -125,13 +125,13 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The public production URL loaded Sites version 11 anonymously from exact deployed source commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf. Its public root and service-integrations.json returned HTTP 200, the service record matched the then-deployed registry SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c, and the full Sites package matched digest d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 11 has the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132 and restored the same result after reload. Devpost version 11 now includes a public four-step 60-second test. The new registry containing that Devpost state is a separately validated worktree candidate and is not claimed as the currently deployed full Sites package; final submission and stale Open Graph metadata remain explicit gaps."
+      "evidence": "The public production URL loaded Sites version 12 anonymously from exact source commit f832cc611ed43613035a8735ca97d4bc1a0a8efc. The full Sites package matched digest 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15. Its root, app.js, index.css, service-worker.js, and service-integrations.json returned HTTP 200; the four static files matched local bytes, while Cloudflare's root-HTML script injection is recorded separately. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 12 has the identical functional digest, so the runtime proof is carried forward without claiming a new browser run. Devpost submission 1158722 is final, and its anonymous Open Graph title and hotel image are current."
     },
     {
       "checkId": "d81f9523-0616-59e8-8bf5-46339ed98b57",
       "name": "Public review video and Devpost link",
       "status": "PASS",
-      "evidence": "https://youtu.be/tdSvJw4ghX8 is public as WebMCP vs Duplicate Bookings: A Live Demo; its public player reports 2:30 and its Japanese subtitle track is published. YouTube hosts review evidence only and is not a WebMCP execution service. Devpost project 1405191 (project-y79pb23hj1mz) visibly presents Kyoto Booking Retry Proof, 153 Node tests, and version 11's four-step 60-second test. The uploaded hotel-image URL is public, but anonymous project HTML still reports og:title=未定 and Devpost's default og:image, so project-image association is INCONCLUSIVE. Individual, Japan, Existing, Significant, and Yes are prepared. WebMCP Challenge submitted_at remains null, so final submission was not performed."
+      "evidence": "https://youtu.be/tdSvJw4ghX8 is public as WebMCP vs Duplicate Bookings: A Live Demo; its public player reports 2:30 and its Japanese subtitle track is published. YouTube hosts review evidence only and is not a WebMCP execution service. Devpost project 1405191 visibly presents Kyoto Booking Retry Proof, 153 Node tests, and the four-step 60-second test. Submission 1158722 has status Submitted and authenticated submittedAt 2026-08-29T13:14:00.129Z. Anonymous project HTML reports og:title=Kyoto Booking Retry Proof and the uploaded hotel image as og:image."
     }
   ],
   "designFidelity": [

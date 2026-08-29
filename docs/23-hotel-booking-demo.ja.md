@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04bd6-e952-73ae-9204-26b090c7d975"
-observed_at: "2026-08-29T04:46:10Z"
-status: "public-version-6-live-verified-and-final-video-verified"
+event_uuid_v7: "01a04be5-0163-7992-8044-fdb1b989cf8e"
+observed_at: "2026-08-29T05:01:34.435Z"
+status: "sites-version-6-and-vercel-live-verified-final-video-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -73,13 +73,14 @@ status: "public-version-6-live-verified-and-final-video-verified"
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
 | ChatGPT Sites一般公開実行 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)の版6を未ログインで表示。2試行、1予約、処理開始1、同じ確認番号、再読込復元を確認 |
 | 可視証拠パネル | 成功（現行版） | 版6でUUIDv5、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版5の同じ機能を実画面録画 |
-| Vercel更新 | 未計測 | 別承認が必要 |
+| Vercel一般公開実行 | 成功（現行版） | [ホテル専用URL](https://kyoto-booking-retry-proof.vercel.app)を匿名表示。人間だけの確定、2試行から予約1件・処理開始1回への収束、同じ確認番号、再読込復元、連鎖`Valid`、誤り・警告0件を確認 |
 
-機械可読の正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)です。
+Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)、Vercelの正本は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)です。二つの提供元の配置証拠を混ぜません。
 
 ## 公開、動画、Devpostの現在状態
 
 - WebMCP比較画面を含む機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`と動画証拠契約を含むコミット`ef35bdec624e660db0cd1849fb3be3e33a6e0cd6`は、ChatGPT Sites版6として一般公開済みです。未ログイン表示、人間確認境界、再送収束、再読込復元を実URLで確認しました。
+- 同じ機能要約値を持つ確定コミット`5ce64bc9a814200467d384bba9d9de364df6fcf6`は、ホテル専用Vercelプロジェクトへ一般公開済みです。旧通知実演は別プロジェクトの元の配置へ戻し、上書きしていません。
 - 最終動画は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、残り130秒（86.7%）は実際の公開Site録画です。日本語字幕は別のSubRipファイルとして保持しています。動画公開はまだ行っていません。
 - Devpost下書きは今回更新していません。この作業場所に`.devpost-hackathon-state.json`がないため、下書き更新の前提を満たしておらず、最終提出も行っていません。
 

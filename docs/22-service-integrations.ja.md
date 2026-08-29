@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04bd6-e952-73ae-9204-26af0331d1c7"
-observed_at: "2026-08-29T04:46:10Z"
-state_transition: "PUBLIC_SITE_CURRENT_VERIFIED -> PUBLIC_SITE_VERSION_6_LIVE_VERIFIED"
+event_uuid_v7: "01a04be5-0163-7712-b7f0-d6bd1bf74767"
+observed_at: "2026-08-29T05:01:34.435Z"
+state_transition: "PUBLIC_SITE_VERSION_6_LIVE_VERIFIED -> SITES_AND_VERCEL_CURRENT_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -39,12 +39,12 @@ state_transition: "PUBLIC_SITE_CURRENT_VERIFIED -> PUBLIC_SITE_VERSION_6_LIVE_VE
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日4時46分10秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日5時1分34秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
 | ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の版6を実行済み、同じ機能の版5を画面録画済み |
-| Vercel | `ACTIVE` | `CONFIRMED` | `BASELINE_ONLY` | `BASELINE_ONLY` | 予備公開先。確認済みなのは古い通知実演だけ |
+| Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 予備公開先。ホテル専用プロジェクトを匿名実行済み |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -56,9 +56,9 @@ DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未�
 
 ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`ef35bdec624e660db0cd1849fb3be3e33a6e0cd6`を版6として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版6で未ログイン表示、通常再送との比較、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の実画面部分は、同じ機能要約値を持つ直前の公開版5を収録しています。
 
-Vercelの`BASELINE_ONLY`は、過去の通知実演を見たという意味です。現在のホテル成果物が公開済み、匿名で閲覧可能、または正常動作するという意味ではありません。
+Vercelでは、確定コミット`5ce64bc9a814200467d384bba9d9de364df6fcf6`をホテル専用プロジェクトへ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名200応答を確認しました。実ブラウザーで`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回、同じ確認番号、再読込復元、履歴4件、SHA-256連鎖`Valid`、ブラウザーの誤り・警告0件を確認しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
-2026年8月29日のVercelプロジェクト読み取りでは、Git接続を表す`link`が`null`でした。したがって、現在の枝をGitへ送るだけで自動公開されるという証拠はありません。この観測は将来の接続状態を保証しないため、公開直前にもう一度読み取ります。
+ホテル版は新しいVercelプロジェクトへ分離しました。既存の通知実演プロジェクトは元の配置`8e0191c3a9ea7b1e64a954cc20fd8e5e357f34d2`へ戻し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)を維持しています。両プロジェクトともGit自動配置ではなく、確定コミットだけを含む隔離作業場所から手動配置しました。
 
 NetlifyとRenderは、リポジトリ内の公開先パスと限定した設定構文だけを端末内で検査しています。提供元による設定検証、外部配置、外部URLでの実行確認は行っていないため、実行状態は`NOT_RUN`です。
 
@@ -89,7 +89,7 @@ Google Chromeでは一般公開の版6を未ログインで表示し、初期状
 |---|---|---|---|
 | ChatGPT Sites | `OWNER_ONLY_DEPLOYMENT` | `AUTHORIZED_BY_PLAN` | 所有者だけが見られる初回公開は計画で許可済み |
 | ChatGPT Sites | `PUBLIC_DEPLOYMENT` | `AUTHORIZED_BY_USER` | 利用者の「公開しながら作っていいです」を根拠に一般公開済み |
-| Vercel | `PRODUCTION_DEPLOYMENT` | `REQUIRES_SEPARATE_APPROVAL` | 本番公開の直前に別の確認が必要 |
+| Vercel | `PRODUCTION_DEPLOYMENT` | `AUTHORIZED_BY_USER` | 利用者の「公開しながら作っていいです」を根拠にホテル専用プロジェクトへ一般公開済み |
 | Cloudflare | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は一般公開しない |
 | Netlify | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は構成確認だけで、一般公開しない |
 | Render | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は構成確認だけで、一般公開しない |
@@ -98,7 +98,7 @@ Google Chromeでは一般公開の版6を未ログインで表示し、初期状
 | Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_PLAN` | 下書き更新は計画で許可済み |
 | Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 最終提出の直前に別の確認が必要 |
 
-`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT Sitesの一般公開だけに使っています。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
+`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT SitesとVercelの一般公開に使っています。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
 
 ## 認証を成功扱いする条件
 
@@ -133,11 +133,12 @@ node scripts/validate_service_integrations.mjs
 4. 観測のUUIDv7が観測時刻と一秒以内で一致し、重複しないこと。
 5. 参照先がサービスごとの公式HTTPS情報源だけであること。
 6. 秘密値らしい文字列を含まないこと。
-7. 必須の四ファイルが存在すること。
+7. SitesとVercelを分けた必須の六ファイルが存在すること。
 8. 集計値が八行から再計算した値と一致すること。
 9. `dist/client/service-integrations.json`が生成済みなら、正本と完全一致すること。
 10. 八サービスの承認門が、上表の操作と承認状態に完全一致すること。
 11. 今回成果物の実行成功は今回成果物の公開に、過去成果物の実行証拠は過去成果物の公開に対応すること。
+12. Vercelの成功表示が、専用プロジェクト、READY配置、匿名200応答、実ブラウザーの再送収束、旧通知配置の復元証拠と一致すること。
 
 生成前は配布用写しがなくても成功します。生成後は写しが存在するため、不一致を失敗にします。
 

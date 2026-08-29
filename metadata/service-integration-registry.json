@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04bce-e62c-70e3-8983-07f9e6dcebea",
+    "evidenceEventId": "01a04be5-0163-7a97-8904-c882da28add6",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T04:37:25.000Z"
+    "observedAt": "2026-08-29T05:01:34.435Z"
   },
   "stateTransition": {
-    "from": "PUBLIC_SITE_VERSION_4_VERIFIED",
-    "to": "PUBLIC_SITE_CURRENT_VERIFIED",
-    "eventId": "01a04bce-e62c-70e3-8983-07f9e6dcebea",
-    "occurredAt": "2026-08-29T04:37:25.000Z",
-    "machineContract": "The user authorized public Sites access and local video assembly. Vercel production, video publication, and final Devpost submission remain separate actions."
+    "from": "PUBLIC_SITE_CURRENT_VERIFIED",
+    "to": "SITES_AND_VERCEL_CURRENT_VERIFIED",
+    "eventId": "01a04be5-0163-7a97-8904-c882da28add6",
+    "occurredAt": "2026-08-29T05:01:34.435Z",
+    "machineContract": "The user authorized public builds. Sites and Vercel current hotel artifacts are anonymously verified; video publication and final Devpost submission remain separate actions."
   },
   "services": [
     {
@@ -75,41 +75,47 @@
       "serviceId": "vercel",
       "displayName": "Vercel",
       "integrationSurfaceId": "55a56d54-713f-524f-98de-ac3da90e3310",
-      "evidenceEventId": "01a04b2c-f2e7-7999-a2a0-d4ebf8831950",
-      "observedAt": "2026-08-29T01:40:32.103Z",
+      "evidenceEventId": "01a04be5-0163-714b-a6ff-62c559d227b8",
+      "observedAt": "2026-08-29T05:01:34.435Z",
       "pluginRef": "vercel@openai-curated-remote",
       "pluginState": "ACTIVE",
       "installationEvidence": {
         "localPluginState": "INSTALLED_ENABLED",
-        "localPluginRef": "vercel@openai-curated",
-        "localPluginVersion": "bd2122cb",
+        "localPluginRef": "vercel@openai-curated-remote",
+        "localPluginVersion": "0.21.4",
         "taskAttachmentState": "ATTACHED",
         "taskCallable": true,
         "callableToolCount": 24,
         "restartState": "NOT_REQUIRED"
       },
       "authenticationState": "CONFIRMED",
-      "publicationState": "BASELINE_ONLY",
-      "runtimeState": "BASELINE_ONLY",
+      "publicationState": "CURRENT_ARTIFACT",
+      "runtimeState": "CURRENT_ARTIFACT_VERIFIED",
       "approvalGates": [
         {
           "action": "PRODUCTION_DEPLOYMENT",
-          "state": "REQUIRES_SEPARATE_APPROVAL"
+          "state": "AUTHORIZED_BY_USER"
         }
       ],
       "verifiedAuthOperations": [
-        "READ:list_teams"
+        "READ:list_teams",
+        "READ:list_projects",
+        "READ:list_deployments",
+        "READ:get_deployment",
+        "WRITE:create_project",
+        "WRITE:deploy_production",
+        "WRITE:promote_deployment"
       ],
-      "artifactCommit": null,
-      "artifactSha256": null,
-      "reasonCode": "HISTORICAL_DEPLOYMENT_ONLY",
+      "artifactCommit": "5ce64bc9a814200467d384bba9d9de364df6fcf6",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PUBLIC_HOTEL_ARTIFACT_VERIFIED",
       "roles": [
         "Backup public host for the same static client artifact.",
         "Provide an anonymous-access fallback for judges."
       ],
       "limitations": [
-        "Only an older notification-demo deployment was observed; it does not identify the current hotel artifact.",
-        "An anonymous 200 response for the current artifact has not been verified."
+        "The current hotel artifact is live at https://kyoto-booking-retry-proof.vercel.app with anonymous 200 access, the human-only confirmation boundary, safe retry, and reload restoration verified.",
+        "The older notification demo remains separately live at https://verifiable-offline-webmcp-agent-spe.vercel.app; browser storage is not shared with ChatGPT Sites."
       ],
       "sources": [
         "https://vercel.com/docs/deployments"
@@ -395,15 +401,15 @@
       "NOT_APPLICABLE": 1
     },
     "publicationState": {
-      "CURRENT_ARTIFACT": 1,
-      "BASELINE_ONLY": 1,
+      "CURRENT_ARTIFACT": 2,
+      "BASELINE_ONLY": 0,
       "NOT_PUBLISHED": 4,
       "UNVERIFIED": 0,
       "NOT_APPLICABLE": 2
     },
     "runtimeState": {
-      "CURRENT_ARTIFACT_VERIFIED": 1,
-      "BASELINE_ONLY": 1,
+      "CURRENT_ARTIFACT_VERIFIED": 2,
+      "BASELINE_ONLY": 0,
       "INCONCLUSIVE": 1,
       "NOT_RUN": 3,
       "NOT_APPLICABLE": 2
@@ -413,6 +419,8 @@
     "required": [
       "metadata/service-integration-registry.json",
       "schemas/service-integration-registry.schema.json",
+      "metadata/vercel-hotel-deployment.json",
+      "schemas/vercel-hotel-deployment.schema.json",
       "scripts/validate_service_integrations.mjs",
       "docs/22-service-integrations.ja.md"
     ],

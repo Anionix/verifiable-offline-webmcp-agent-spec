@@ -8,7 +8,10 @@
 // machine-contract: external writes are allowed only when the exact service/action gate records plan or user authority.
 // event_uuid_v7=01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1
 // state_transition=OWNER_ONLY_SITE_LIVE_VERIFIED -> PUBLIC_SITE_VERSION_4_VERIFIED occurred_at=2026-08-29T04:06:39.087Z
-// machine-contract: the current Sites row must identify the same functional commit and digest as the live hotel deployment receipt.
+// machine-contract: the current Sites row must identify the same functional commit and digest as the Sites-specific hotel receipt.
+// event_uuid_v7=01a04be5-0163-7a97-8904-c882da28add6
+// state_transition=SITES_RECEIPT_BOUND_ONLY -> SITES_AND_VERCEL_RECEIPTS_BOUND occurred_at=2026-08-29T05:01:34.435Z
+// machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -20,6 +23,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const REGISTRY_PATH = resolve(ROOT, "metadata/service-integration-registry.json");
 const SCHEMA_PATH = resolve(ROOT, "schemas/service-integration-registry.schema.json");
 const HOTEL_VERIFICATION_PATH = resolve(ROOT, "metadata/hotel-booking-verification.json");
+const VERCEL_DEPLOYMENT_PATH = resolve(ROOT, "metadata/vercel-hotel-deployment.json");
+const VERCEL_DEPLOYMENT_SCHEMA_PATH = resolve(ROOT, "schemas/vercel-hotel-deployment.schema.json");
 const UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 
 const EXPECTED_SERVICE_IDS = [
@@ -73,7 +78,7 @@ const EXPECTED_APPROVAL_GATES = {
     { action: "OWNER_ONLY_DEPLOYMENT", state: "AUTHORIZED_BY_PLAN" },
     { action: "PUBLIC_DEPLOYMENT", state: "AUTHORIZED_BY_USER" },
   ],
-  vercel: [{ action: "PRODUCTION_DEPLOYMENT", state: "REQUIRES_SEPARATE_APPROVAL" }],
+  vercel: [{ action: "PRODUCTION_DEPLOYMENT", state: "AUTHORIZED_BY_USER" }],
   cloudflare: [{ action: "PUBLIC_DEPLOYMENT", state: "OUT_OF_SCOPE" }],
   netlify: [{ action: "PUBLIC_DEPLOYMENT", state: "OUT_OF_SCOPE" }],
   render: [{ action: "PUBLIC_DEPLOYMENT", state: "OUT_OF_SCOPE" }],
@@ -88,9 +93,125 @@ const EXPECTED_APPROVAL_GATES = {
 const REQUIRED_ARTIFACTS = [
   "metadata/service-integration-registry.json",
   "schemas/service-integration-registry.schema.json",
+  "metadata/vercel-hotel-deployment.json",
+  "schemas/vercel-hotel-deployment.schema.json",
   "scripts/validate_service_integrations.mjs",
   "docs/22-service-integrations.ja.md",
 ];
+
+const EXPECTED_VERCEL_PROVIDER = {
+  name: "Vercel",
+  teamId: "team_npJWoj9cpy54Q7B3fpGdBCCX",
+};
+
+const EXPECTED_VERCEL_ARTIFACT = {
+  sourceCommit: "5ce64bc9a814200467d384bba9d9de364df6fcf6",
+  functionalDigest: "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+  functionalDigestScope: {
+    algorithm: "SHA-256",
+    root: "dist/client",
+    canonicalization: "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+    excludedPaths: [".assetsignore", "service-integrations.json"],
+  },
+};
+
+const EXPECTED_VERCEL_DEPLOYMENT = {
+  projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+  projectName: "kyoto-booking-retry-proof",
+  deploymentId: "dpl_CyYYwVhbugwfLWTKwYhizsNmQ41h",
+  deployedSourceCommit: "5ce64bc9a814200467d384bba9d9de364df6fcf6",
+  uniqueUrl: "https://kyoto-booking-retry-proof-pascji816-aniotajp-1978s-projects.vercel.app",
+  publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
+  state: "READY",
+  target: "production",
+  source: "cli",
+  createdAtUnixMs: 1787979546470,
+  createdAt: "2026-08-29T04:59:06.470Z",
+  readyAtUnixMs: 1787979557329,
+  readyAt: "2026-08-29T04:59:17.329Z",
+};
+
+const EXPECTED_REMOTE_ARTIFACTS = [
+  { name: "document", requestPath: "/", localPath: "dist/client/index.html" },
+  { name: "application-script", requestPath: "/assets/app.js", localPath: "dist/client/assets/app.js" },
+  { name: "application-style", requestPath: "/assets/index.css", localPath: "dist/client/assets/index.css" },
+  { name: "service-worker", requestPath: "/service-worker.js", localPath: "dist/client/service-worker.js" },
+  {
+    name: "service-integration-registry",
+    requestPath: "/service-integrations.json",
+    localPath: "dist/client/service-integrations.json",
+  },
+];
+
+const EXPECTED_VERCEL_HTTP = {
+  entrypoint: {
+    method: "GET",
+    url: "https://kyoto-booking-retry-proof.vercel.app",
+    statusCode: 200,
+    authentication: "ANONYMOUS",
+  },
+  browserRequests: [
+    { path: "/", statusCode: 200 },
+    { path: "/assets/app.js", statusCode: 200 },
+    { path: "/assets/index.css", statusCode: 200 },
+    { path: "/service-integrations.json", statusCode: 200 },
+  ],
+  serviceWorker: {
+    path: "/service-worker.js",
+    statusCode: 200,
+    serviceWorkerAllowed: "/",
+  },
+};
+
+const EXPECTED_VERCEL_BROWSER_FLOW = {
+  testedUrl: "https://kyoto-booking-retry-proof-pascji816-aniotajp-1978s-projects.vercel.app",
+  deploymentId: "dpl_CyYYwVhbugwfLWTKwYhizsNmQ41h",
+  stateSequence: ["PREPARED", "COMMITTED", "RETRY_RECOGNIZED"],
+  humanConfirmationRequired: true,
+  attempts: 2,
+  bookings: 1,
+  effectStarts: 1,
+  confirmationNumber: "FKR-1852E0269A",
+  reservationUuidV5: "4181074b-ce92-5b97-9eef-964a6f8f064b",
+  latestEventUuidV7: "01a04be3-c7cf-70bf-b76a-d870ee1ba2a3",
+  auditEvents: 4,
+  chainValid: true,
+  chainHeadPrefix: "58fcb989f045",
+  reloadRestored: true,
+  errors: 0,
+  warnings: 0,
+};
+
+const EXPECTED_VERCEL_OBSERVABILITY = {
+  projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+  environment: "production",
+  queryMode: "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY",
+  queryExecutedAt: "2026-08-29T05:06:19.195Z",
+  windowStart: "2026-08-29T04:06:19.195Z",
+  windowEnd: "2026-08-29T05:06:19.195Z",
+  queriedLevels: ["error", "warning"],
+  runtimeErrorClusters: 0,
+  matchingLogEntries: 0,
+  conclusion: "ONE_HOUR_LOOKBACK_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS",
+};
+
+const EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT = {
+  projectId: "prj_4gaEpKhQ7MPkgovfw3wr1xdokMO6",
+  projectName: "verifiable-offline-webmcp-agent-spec",
+  deploymentId: "dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE",
+  state: "READY",
+  sourceCommit: "8e0191c3a9ea7b1e64a954cc20fd8e5e357f34d2",
+  publicAlias: "https://verifiable-offline-webmcp-agent-spe.vercel.app",
+  aliasState: "RESTORED_TO_DEPLOYMENT",
+};
+
+const VERCEL_EVIDENCE_SOURCE_NAMES = {
+  VERCEL_PROVIDER_READBACK: "vercel-provider-readback",
+  ANONYMOUS_HTTP_READBACK: "anonymous-http",
+  BROWSER_RUNTIME_READBACK: "browser-runtime",
+  VERCEL_OBSERVABILITY_READBACK: "vercel-observability-readback",
+  RESTORED_NOTIFICATION_READBACK: "restored-notification-deployment",
+};
 
 const SOURCE_ALLOWLIST = {
   "chatgpt-sites": [/^https:\/\/learn\.chatgpt\.com\/docs\/sites\/?$/],
@@ -315,6 +436,118 @@ function checkSecretFields(value, path = "$") {
 const registry = readJson(REGISTRY_PATH);
 const schema = readJson(SCHEMA_PATH);
 const hotelVerification = readJson(HOTEL_VERIFICATION_PATH);
+const vercelDeployment = readJson(VERCEL_DEPLOYMENT_PATH);
+const vercelDeploymentSchema = readJson(VERCEL_DEPLOYMENT_SCHEMA_PATH);
+
+if (vercelDeployment && vercelDeploymentSchema) {
+  validateWithSchema(vercelDeployment, vercelDeploymentSchema, "$vercelDeployment", vercelDeploymentSchema);
+
+  const identity = vercelDeployment.identity ?? {};
+  const stateTransition = vercelDeployment.stateTransition ?? {};
+  record(
+    identity.informationUuidV5 === stableUuidV5("deployment-receipt", "vercel-hotel-deployment"),
+    "Vercel receipt informationUuidV5 is not the stable deployment-receipt identity",
+  );
+  record(identity.namespace === UUID_NAMESPACE, "Vercel receipt UUID namespace differs from the repository namespace");
+  checkUuidV7Time(identity.observationUuidV7 ?? "", identity.observedAt ?? "", "Vercel receipt identity");
+  record(stateTransition.eventId === identity.observationUuidV7, "Vercel receipt transition event differs from its observation event");
+  record(stateTransition.occurredAt === identity.observedAt, "Vercel receipt transition time differs from its observation time");
+
+  record(isDeepStrictEqual(vercelDeployment.provider, EXPECTED_VERCEL_PROVIDER), "Vercel receipt provider or team differs from deployment readback");
+  record(isDeepStrictEqual(vercelDeployment.artifact, EXPECTED_VERCEL_ARTIFACT), "Vercel receipt source commit, digest, or digest scope differs from the deployed artifact");
+  record(isDeepStrictEqual(vercelDeployment.deployment, EXPECTED_VERCEL_DEPLOYMENT), "Vercel receipt project, deployment, URLs, state, source, or timestamps differ from provider readback");
+  const remoteArtifacts = vercelDeployment.remoteArtifacts ?? {};
+  record(remoteArtifacts.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel remote artifacts differ from the deployment ID");
+  record(remoteArtifacts.baseUrl === vercelDeployment.deployment?.uniqueUrl, "Vercel remote artifacts must use the unique deployment URL");
+  const remoteArtifactRows = Array.isArray(remoteArtifacts.artifacts) ? remoteArtifacts.artifacts : [];
+  record(
+    isDeepStrictEqual(
+      remoteArtifactRows.map(({ name, requestPath, localPath }) => ({ name, requestPath, localPath })),
+      EXPECTED_REMOTE_ARTIFACTS,
+    ),
+    "Vercel remote artifact names, request paths, local paths, or order differ from the fixed contract",
+  );
+  for (const remoteArtifact of remoteArtifactRows) {
+    record(remoteArtifact.statusCode === 200, `Vercel remote artifact ${remoteArtifact.requestPath} is not HTTP 200`);
+    const localPath = safeArtifactPath(remoteArtifact.localPath);
+    record(existsSync(localPath), `Vercel remote artifact local file does not exist: ${remoteArtifact.localPath}`);
+    if (existsSync(localPath)) {
+      const localSha256 = createHash("sha256").update(readFileSync(localPath)).digest("hex");
+      record(remoteArtifact.sha256 === localSha256, `Vercel remote artifact hash differs from ${remoteArtifact.localPath}`);
+    }
+  }
+  if (remoteArtifacts.hashEvidenceState === "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY") {
+    record(remoteArtifacts.remoteHashReadbackAt === null, "Staged Vercel hashes cannot claim a remote readback time");
+  } else if (remoteArtifacts.hashEvidenceState === "REMOTE_HASHES_READ_BACK_AND_MATCHED") {
+    record(
+      Date.parse(remoteArtifacts.remoteHashReadbackAt) >= Date.parse(vercelDeployment.deployment?.readyAt),
+      "Vercel remote hash readback predates deployment READY",
+    );
+  }
+  record(isDeepStrictEqual(vercelDeployment.anonymousHttp, EXPECTED_VERCEL_HTTP), "Vercel receipt anonymous HTTP, browser request, or service-worker evidence differs from readback");
+  record(isDeepStrictEqual(vercelDeployment.browserFlow, EXPECTED_VERCEL_BROWSER_FLOW), "Vercel receipt browser flow differs from the verified retry sequence and counters");
+  record(vercelDeployment.browserFlow?.testedUrl === vercelDeployment.deployment?.uniqueUrl, "Vercel browser flow was not tested on the unique deployment URL");
+  record(vercelDeployment.browserFlow?.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel browser flow deployment ID differs from provider readback");
+  record(isDeepStrictEqual(vercelDeployment.postDeployObservability, EXPECTED_VERCEL_OBSERVABILITY), "Vercel receipt bounded post-deploy error scan differs from provider readback");
+  record(
+    isDeepStrictEqual(vercelDeployment.restoredNotificationDeployment, EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT),
+    "Vercel receipt restored notification deployment differs from provider readback",
+  );
+
+  const deployment = vercelDeployment.deployment ?? {};
+  record(
+    Number.isInteger(deployment.createdAtUnixMs) && new Date(deployment.createdAtUnixMs).toISOString() === deployment.createdAt,
+    "Vercel receipt createdAt does not match the provider millisecond timestamp",
+  );
+  record(
+    Number.isInteger(deployment.readyAtUnixMs) && new Date(deployment.readyAtUnixMs).toISOString() === deployment.readyAt,
+    "Vercel receipt readyAt does not match the provider millisecond timestamp",
+  );
+  record(deployment.readyAtUnixMs >= deployment.createdAtUnixMs, "Vercel receipt READY time precedes creation time");
+
+  const observability = vercelDeployment.postDeployObservability ?? {};
+  record(
+    Date.parse(observability.windowEnd) - Date.parse(observability.windowStart) === 60 * 60 * 1000,
+    "Vercel receipt post-deploy observation window is not exactly one hour",
+  );
+  record(
+    observability.windowEnd === observability.queryExecutedAt,
+    "Vercel one-hour lookback must end when the query was executed",
+  );
+  record(
+    Date.parse(observability.queryExecutedAt) >= Date.parse(deployment.readyAt),
+    "Vercel one-hour lookback query was executed before deployment READY",
+  );
+
+  const evidenceSources = Array.isArray(vercelDeployment.evidenceSources) ? vercelDeployment.evidenceSources : [];
+  record(
+    isDeepStrictEqual(
+      evidenceSources.map((source) => source?.kind),
+      Object.keys(VERCEL_EVIDENCE_SOURCE_NAMES),
+    ),
+    "Vercel receipt evidence source order or kinds differ from the machine contract",
+  );
+  const evidenceSourceIds = new Set();
+  for (const source of evidenceSources) {
+    const canonicalName = VERCEL_EVIDENCE_SOURCE_NAMES[source?.kind];
+    record(typeof canonicalName === "string", `Vercel receipt has an unknown evidence source kind: ${source?.kind}`);
+    if (typeof canonicalName === "string") {
+      record(
+        source.sourceId === stableUuidV5("evidence-source", canonicalName),
+        `Vercel receipt ${source.kind} sourceId is not the stable UUIDv5`,
+      );
+    }
+    record(!evidenceSourceIds.has(source?.sourceId), `Vercel receipt duplicates evidence source ${source?.sourceId}`);
+    evidenceSourceIds.add(source?.sourceId);
+  }
+
+  record(vercelDeployment.secretsIncluded === false, "Vercel receipt must state that no secrets are included");
+  const serializedVercelDeployment = JSON.stringify(vercelDeployment);
+  for (const pattern of SECRET_PATTERNS) {
+    record(!pattern.test(serializedVercelDeployment), `Vercel receipt contains secret-shaped data matching ${pattern}`);
+  }
+  checkSecretFields(vercelDeployment, "$vercelDeployment");
+}
 
 if (registry && schema) {
   validateWithSchema(registry, schema, "$", schema);
@@ -448,6 +681,23 @@ if (registry && schema) {
     "chatgpt-sites: artifactSha256 differs from the live hotel deployment receipt",
   );
 
+  const vercel = services.find((service) => service?.serviceId === "vercel");
+  record(vercel?.publicationState === "CURRENT_ARTIFACT", "vercel: receipt requires CURRENT_ARTIFACT publication state");
+  record(vercel?.runtimeState === "CURRENT_ARTIFACT_VERIFIED", "vercel: receipt requires CURRENT_ARTIFACT_VERIFIED runtime state");
+  record(vercel?.reasonCode === "PUBLIC_HOTEL_ARTIFACT_VERIFIED", "vercel: reasonCode differs from the verified hotel deployment state");
+  record(
+    vercel?.artifactCommit === vercelDeployment?.artifact?.sourceCommit,
+    "vercel: artifactCommit differs from the Vercel hotel deployment receipt",
+  );
+  record(
+    vercel?.artifactSha256 === vercelDeployment?.artifact?.functionalDigest,
+    "vercel: artifactSha256 differs from the Vercel hotel deployment receipt",
+  );
+  record(
+    vercelDeployment?.artifact?.functionalDigest === hotelVerification?.artifactDigest,
+    "Vercel and Sites receipts differ on the shared functional client digest",
+  );
+
   const computedSummary = {
     totalServices: services.length,
     ...Object.fromEntries(Object.entries(AXES).map(([axis, allowed]) => [axis, countAxis(services, axis, allowed)])),
@@ -493,5 +743,7 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   const copyState = existsSync(resolve(ROOT, "dist/client/service-integrations.json")) ? "client copy matched" : "client copy not built";
-  console.log(`service integration registry: PASS (8 services; schema, identities, states, approval gates, sources, artifacts, summary; ${copyState})`);
+  console.log(
+    `service integration registry: PASS (8 services; registry and Vercel receipt schemas, identities, states, approval gates, deployment and browser evidence, sources, artifacts, summary; ${copyState})`,
+  );
 }

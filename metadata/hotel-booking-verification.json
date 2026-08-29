@@ -2,11 +2,11 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04ccd-b75f-70e6-a355-3e8cba3ab3b7"
+    "observationUuidV7": "01a04d81-12de-78aa-8949-ca8aa113566e"
   },
-  "observedAt": "2026-08-29T09:15:45.375Z",
-  "sourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
-  "sourceState": "DEPLOYED_CURRENT",
+  "observedAt": "2026-08-29T12:31:39.742Z",
+  "sourceCommit": "WORKTREE",
+  "sourceState": "WORKTREE_CANDIDATE",
   "artifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
@@ -17,21 +17,21 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "738ae7e306c823f4df66bd611147b0f3830cc53fb736fe561deccb6bb02378a7",
+  "fullClientArtifactDigest": "116fe8f079014fae5d1571aed7bd429929d2063e9db36f595b7b1115da76a1ea",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa",
+  "fullSitesPackageDigest": "1d888c7d37f1f16874b61bc4102b988772be595727ba5820f9b4c951bb9cfa9c",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED -> YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> WORKTREE_PUBLICATION_RECORD_CANDIDATE -> SITES_VERSION_9_PUBLICATION_RECORD_DEPLOYED -> VERCEL_PUBLICATION_RECORD_REDEPLOYED -> AGGREGATE_PUBLICATION_TIMELINE_RECONCILED -> DEPENDENCY_PATCH_VERSION_10_BROWSER_RUN_VERIFIED -> DEPENDENCY_PATCH_VERSION_11_CURRENT_VERIFIED -> DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING -> DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> VERCEL_DEVPOST_VERSION_11_REGISTRY_REDEPLOY_VERIFIED -> DEVPOST_ALIGNED_WORKTREE_CANDIDATE_SITES_PREVIOUS_ARTIFACT_PRESERVED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
@@ -44,9 +44,9 @@
     "providerArchiveContentHash": "sha256:2c971dfc7e860e75a1e9d23bdfc185c1fc0c450cda6575757276b029cf254e40",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
     "accessMode": "PUBLIC",
-    "status": "CURRENT_ARTIFACT_VERIFIED",
+    "status": "PREVIOUS_ARTIFACT_VERIFIED",
     "observedAt": "2026-08-29T09:09:43.704Z",
-    "evidence": "Sites version 11 and deployment readback identify commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf as the exact current source and match full Sites package digest d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. Anonymous requests to the public root and service-integrations.json returned HTTP 200, and the published service record matched local SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c. The dependency-patched functional digest is 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132. A fresh version 10 browser run proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 11 keeps the same functional digest, updates only the public service record, and restored that result after reload."
+    "evidence": "Sites version 11 and deployment readback identify commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf as the exact source of the previously verified live package d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. Anonymous requests to the public root and service-integrations.json returned HTTP 200, and the published service record matched SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c. A fresh version 10 browser run proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 11 kept functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132 and restored that result after reload. The current worktree changes only the public service record and Devpost evidence; its functional digest remains identical, but its new full Sites package digest is a local candidate and has not been published to ChatGPT Sites."
   },
   "checks": [
     {
@@ -59,7 +59,7 @@
       "checkId": "311a96f7-7859-5b7f-baf2-17e39b83502d",
       "name": "Two attempts remain one booking",
       "status": "PASS",
-      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; the final version 11 and deployment dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe restored the same local result after reload."
+      "evidence": "Concurrency tests directly count one physical row in the IndexedDB bookings store. Fresh public runs on Sites version 10 and Vercel deployment dpl_4uthDyjgSi1KxbssW9t5u18xJbLs each reported attempts=2, bookings=1, effectStartCount=1, and confirmation FKR-7EF2A00FA2; Sites version 11 and current Vercel deployment dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL retain the same functional digest, and the Vercel alias matched five local files."
     },
     {
       "checkId": "8982f898-c1da-55cd-834b-211099bc82ca",
@@ -125,13 +125,13 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The public production URL loaded Sites version 11 anonymously from exact deployed source commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf. Its public root and service-integrations.json returned HTTP 200, the service record matched local SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c, and the full Sites package matched digest d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 11 has the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132 and restored the same result after reload. Final Devpost submission remains pending."
+      "evidence": "The public production URL loaded Sites version 11 anonymously from exact deployed source commit 51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf. Its public root and service-integrations.json returned HTTP 200, the service record matched the then-deployed registry SHA-256 47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c, and the full Sites package matched digest d7b4b43fa3c5b3530bd02aba7cf2dc0f7e1c8c8b5ee07709466fc297c213d8fa. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 11 has the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132 and restored the same result after reload. Devpost version 11 now includes a public four-step 60-second test. The new registry containing that Devpost state is a separately validated worktree candidate and is not claimed as the currently deployed full Sites package; final submission and stale Open Graph metadata remain explicit gaps."
     },
     {
       "checkId": "d81f9523-0616-59e8-8bf5-46339ed98b57",
       "name": "Public review video and Devpost link",
       "status": "PASS",
-      "evidence": "https://youtu.be/tdSvJw4ghX8 is public as WebMCP vs Duplicate Bookings: A Live Demo; its public player reports 2:30 and its Japanese subtitle track is published. YouTube hosts review evidence only and is not a WebMCP execution service. The Devpost update for project 1405191 (project-y79pb23hj1mz) returned version 6; the subsequent readback confirmed state published, name 未定, and that URL as video_url. The read tool does not return a version field. WebMCP Challenge submitted_at remains null, so final submission was not performed."
+      "evidence": "https://youtu.be/tdSvJw4ghX8 is public as WebMCP vs Duplicate Bookings: A Live Demo; its public player reports 2:30 and its Japanese subtitle track is published. YouTube hosts review evidence only and is not a WebMCP execution service. Devpost project 1405191 (project-y79pb23hj1mz) visibly presents Kyoto Booking Retry Proof, 153 Node tests, and version 11's four-step 60-second test. The uploaded hotel-image URL is public, but anonymous project HTML still reports og:title=未定 and Devpost's default og:image, so project-image association is INCONCLUSIVE. Individual, Japan, Existing, Significant, and Yes are prepared. WebMCP Challenge submitted_at remains null, so final submission was not performed."
     }
   ],
   "designFidelity": [

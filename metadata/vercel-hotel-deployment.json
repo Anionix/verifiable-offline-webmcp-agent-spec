@@ -3,16 +3,16 @@
   "receiptVersion": "1.2.0",
   "identity": {
     "informationUuidV5": "b5e254dc-08a3-59e9-a4dd-f2215b184964",
-    "observationUuidV7": "01a04cc9-7198-7cbb-8b04-9cb8ec2900e8",
+    "observationUuidV7": "01a04d81-12de-7e8e-8957-a1eaead5c991",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T09:11:05.368Z"
+    "observedAt": "2026-08-29T12:31:39.742Z"
   },
   "stateTransition": {
-    "from": "DEPENDENCY_PATCH_BROWSER_RUN_VERIFIED",
-    "to": "DEPENDENCY_PATCH_CURRENT_ARTIFACT_REDEPLOY_VERIFIED",
-    "eventId": "01a04cc9-7198-7cbb-8b04-9cb8ec2900e8",
-    "occurredAt": "2026-08-29T09:11:05.368Z",
-    "machineContract": "The dependency-patched artifact is current only after the first deployment passes a fresh browser retry run, the second deployment retains the same functional digest, provider READY is read back, and five anonymous remote hashes match local files."
+    "from": "DEPENDENCY_PATCH_CURRENT_ARTIFACT_REDEPLOY_VERIFIED",
+    "to": "DEVPOST_VERSION_11_REGISTRY_CURRENT_ARTIFACT_VERIFIED",
+    "eventId": "01a04d81-12de-7e8e-8957-a1eaead5c991",
+    "occurredAt": "2026-08-29T12:31:39.742Z",
+    "machineContract": "The hotel fallback is current only after provider READY, five anonymous file hashes including the Devpost version 11 registry, and a bounded error readback agree with the local artifact."
   },
   "provider": {
     "name": "Vercel",
@@ -31,32 +31,32 @@
   "deployment": {
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
-    "deployedSourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app",
+    "deploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
+    "deployedSourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+    "uniqueUrl": "https://kyoto-booking-retry-proof-4p3pru70s-aniotajp-1978s-projects.vercel.app",
     "publicAlias": "https://kyoto-booking-retry-proof.vercel.app",
     "state": "READY",
     "target": "production",
     "source": "cli",
-    "createdAtUnixMs": 1787994594530,
-    "createdAt": "2026-08-29T09:09:54.530Z",
-    "buildingAtUnixMs": 1787994595509,
-    "buildingAt": "2026-08-29T09:09:55.509Z",
-    "readyAtUnixMs": 1787994601421,
-    "readyAt": "2026-08-29T09:10:01.421Z",
+    "createdAtUnixMs": 1788006628238,
+    "createdAt": "2026-08-29T12:30:28.238Z",
+    "buildingAtUnixMs": 1788006629310,
+    "buildingAt": "2026-08-29T12:30:29.310Z",
+    "readyAtUnixMs": 1788006635535,
+    "readyAt": "2026-08-29T12:30:35.535Z",
     "aliasError": null
   },
   "remoteArtifacts": {
-    "deploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
+    "deploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
     "baseUrl": "https://kyoto-booking-retry-proof.vercel.app",
     "hashEvidenceState": "REMOTE_HASHES_READ_BACK_AND_MATCHED",
-    "remoteHashReadbackAt": "2026-08-29T09:10:26.248Z",
+    "remoteHashReadbackAt": "2026-08-29T12:31:31.000Z",
     "artifacts": [
       { "name": "document", "requestPath": "/", "localPath": "dist/client/index.html", "statusCode": 200, "sha256": "6091acbce2127ded26bc1e03d98dcdd22296f8c4be91271711d68f739a2e2d01" },
       { "name": "application-script", "requestPath": "/assets/app.js", "localPath": "dist/client/assets/app.js", "statusCode": 200, "sha256": "a72d09c3cd0f34c15f674ef1bc809a513b6fe8f299c2998a3552ae3042115755" },
       { "name": "application-style", "requestPath": "/assets/index.css", "localPath": "dist/client/assets/index.css", "statusCode": 200, "sha256": "18d4ffe7171923260be7503842a8e0faf1a2b66e7e1e1606a506c58e8d4bd9ec" },
       { "name": "service-worker", "requestPath": "/service-worker.js", "localPath": "dist/client/service-worker.js", "statusCode": 200, "sha256": "9fdc8252d772e71cc462c00fe29d9ee9294460c67d46105335a1b98f4de6e610" },
-      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "47ac2da3d4c09872a24caf6aef54246e7921b3a3e0984b3778b2c477d4dfee4c" }
+      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "73107a770910b4e36f7a1c2e3b64282715266313a323df0d78d885acd57dc068" }
     ]
   },
   "anonymousHttp": {
@@ -83,8 +83,8 @@
     "deploymentId": "dpl_4uthDyjgSi1KxbssW9t5u18xJbLs",
     "evidenceState": "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
     "testedFunctionalDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
-    "appliesToDeploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
-    "appliesToDeployedSourceCommit": "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
+    "appliesToDeploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
+    "appliesToDeployedSourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
     "storageState": "FRESH",
     "input": {
       "checkIn": "2026-12-10",
@@ -111,12 +111,12 @@
   },
   "postDeployObservability": {
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
-    "readyBoundaryDeploymentId": "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
+    "readyBoundaryDeploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
     "environment": "production",
     "queryMode": "READY_TO_QUERY_BOUNDED_MAX_ONE_HOUR",
-    "queryExecutedAt": "2026-08-29T09:10:40.000Z",
-    "windowStart": "2026-08-29T09:10:01.421Z",
-    "windowEnd": "2026-08-29T09:10:40.000Z",
+    "queryExecutedAt": "2026-08-29T12:31:39.742Z",
+    "windowStart": "2026-08-29T12:30:35.535Z",
+    "windowEnd": "2026-08-29T12:31:39.742Z",
     "queriedLevels": ["error", "warning"],
     "runtimeErrorClusters": 0,
     "matchingLogEntries": 0,

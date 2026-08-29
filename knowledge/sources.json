@@ -3,21 +3,21 @@
     "id": "DS-SOURCES",
     "identity": {
       "uuid_v5": "fa577775-5c7f-5972-82eb-ec59444e94b9",
-      "uuid_v7": "01a049a3-edbc-7d99-96f5-6bc46cd41163",
+      "uuid_v7": "01a04d7d-44d2-7109-b00a-5db3bea981b5",
       "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
       "canonical_name": "ds-sources",
       "category": "dataset"
     },
     "temporal": {
       "created_at": "2026-08-27T09:34:00Z",
-      "updated_at": "2026-08-28T18:31:15.132Z",
-      "observed_at": "2026-08-28T18:31:15.132Z",
+      "updated_at": "2026-08-29T12:27:30.386Z",
+      "observed_at": "2026-08-29T12:27:30.386Z",
       "valid_from": "2026-08-27T09:34:00Z",
       "valid_to": null,
-      "epoch_ms": 1787941875132,
+      "epoch_ms": 1788006450386,
       "time_zone": "UTC",
       "local_time_zone": "Asia/Tokyo",
-      "local_rendering": "2026-08-29T03:31:15.132+09:00",
+      "local_rendering": "2026-08-29T21:27:30.386+09:00",
       "precision": "millisecond",
       "standard": "RFC 3339 profile"
     },
@@ -27,11 +27,91 @@
     },
     "type": "Dataset",
     "version": "0.1.0",
-    "record_count": 29,
+    "record_count": 31,
     "format": "application/json",
     "license": "Apache-2.0"
   },
   "records": [
+    {
+      "id": "SRC-DEVPOST-WEBMCP-RESOURCES-2026",
+      "identity": {
+        "uuid_v5": "1c1cbd23-de2a-5c7f-8ea4-eb7589262718",
+        "uuid_v7": "01a04d7d-41ae-7def-8233-939e3a4dbaeb",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "devpost-webmcp-challenge-resources-2026",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-29T12:27:29.582Z",
+        "updated_at": "2026-08-29T12:27:29.582Z",
+        "observed_at": "2026-08-29T12:27:29.582Z",
+        "valid_from": "2026-08-29T12:27:29.582Z",
+        "valid_to": null,
+        "epoch_ms": 1788006449582,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-29T21:27:29.582+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "WebMCP Challenge 公式リソース",
+        "en": "The WebMCP Challenge official resources"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI and Devpost",
+      "authors": ["OpenAI", "Devpost"],
+      "published_at": "2026",
+      "accessed_at": "2026-08-29T12:27:29.582Z",
+      "locator": {
+        "url": "https://webmcp.devpost.com/resources"
+      },
+      "status": "Official challenge resources and submission guidance observed while submissions were open",
+      "primary_source": true,
+      "topics": ["WebMCP Challenge", "submission requirements", "testing clients", "supporter resources", "deadline"],
+      "supports": ["REQ-WEBMCP-001", "REQ-TOOL-001", "REQ-VERIFY-001"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
+    {
+      "id": "SRC-DEVPOST-WEBMCP-RULES-2026",
+      "identity": {
+        "uuid_v5": "599b0dda-2a71-5ed4-8aec-3e1cc12371a9",
+        "uuid_v7": "01a04d7d-435b-7fe6-a03a-4887e8c3c9df",
+        "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+        "canonical_name": "devpost-webmcp-challenge-official-rules-2026",
+        "category": "source"
+      },
+      "temporal": {
+        "created_at": "2026-08-29T12:27:30.011Z",
+        "updated_at": "2026-08-29T12:27:30.011Z",
+        "observed_at": "2026-08-29T12:27:30.011Z",
+        "valid_from": "2026-08-29T12:27:30.011Z",
+        "valid_to": null,
+        "epoch_ms": 1788006450011,
+        "time_zone": "UTC",
+        "local_time_zone": "Asia/Tokyo",
+        "local_rendering": "2026-08-29T21:27:30.011+09:00",
+        "precision": "millisecond",
+        "standard": "RFC 3339 profile"
+      },
+      "title": {
+        "ja": "OpenAI WebMCP Challenge 公式規則",
+        "en": "OpenAI WebMCP Challenge Official Rules"
+      },
+      "type": "PrimarySource",
+      "publisher": "OpenAI and Devpost",
+      "authors": ["OpenAI", "Devpost"],
+      "published_at": "2026",
+      "accessed_at": "2026-08-29T12:27:30.011Z",
+      "locator": {
+        "url": "https://webmcp.devpost.com/rules"
+      },
+      "status": "Official challenge rules observed while submissions were open",
+      "primary_source": true,
+      "topics": ["WebMCP Challenge", "eligibility", "submission period", "live demo", "public repository", "demo video", "judging"],
+      "supports": ["REQ-WEBMCP-001", "REQ-VERIFY-001"],
+      "rights_note": "The repository stores metadata, links, and paraphrases only; the source remains under its own terms."
+    },
     {
       "id": "SRC-WEBMCP-2026",
       "identity": {

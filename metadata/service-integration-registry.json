@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04c63-e410-75a5-a2bc-3df473bb0757",
+    "evidenceEventId": "01a04d7a-8fe8-732c-9336-a930b25edb00",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T07:20:10.000Z"
+    "observedAt": "2026-08-29T12:24:33.000Z"
   },
   "stateTransition": {
-    "from": "DEVPOST_PROJECT_PAGE_PUBLISHED",
-    "to": "YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED",
-    "eventId": "01a04c63-e410-75a5-a2bc-3df473bb0757",
-    "occurredAt": "2026-08-29T07:20:10.000Z",
-    "machineContract": "The public 2:30 YouTube video and Japanese subtitle track are linked from Devpost version 6. YouTube is evidence hosting, not WebMCP execution, and final challenge submission remains unperformed."
+    "from": "DEVPOST_VERSION_10_HOTEL_PROJECT_THUMBNAIL_PACKET_READY_FINAL_SUBMISSION_PENDING",
+    "to": "DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING",
+    "eventId": "01a04d7a-8fe8-732c-9336-a930b25edb00",
+    "occurredAt": "2026-08-29T12:24:33.000Z",
+    "machineContract": "Devpost version 11 presents the hotel demo and four-step public test. The visible title is current, Open Graph metadata is stale, image association is inconclusive, and submitted_at remains null."
   },
   "services": [
     {
@@ -340,18 +340,18 @@
       "serviceId": "devpost",
       "displayName": "Devpost",
       "integrationSurfaceId": "3e8ffb12-0a3e-5c18-9dc4-81d59d91ef48",
-      "evidenceEventId": "01a04c63-e410-7a0c-8363-e72639f9f15d",
-      "observedAt": "2026-08-29T07:20:10.000Z",
+      "evidenceEventId": "01a04d7a-8fe8-7a66-90d7-5f46ea9c3be8",
+      "observedAt": "2026-08-29T12:24:33.000Z",
       "pluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
       "pluginState": "ACTIVE",
       "installationEvidence": {
-        "localPluginState": "NOT_INSTALLED",
-        "localPluginRef": null,
-        "localPluginVersion": null,
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
+        "localPluginVersion": "4.0.1",
         "taskAttachmentState": "ATTACHED",
         "taskCallable": true,
         "callableToolCount": 21,
-        "restartState": "NOT_APPLICABLE"
+        "restartState": "NOT_REQUIRED"
       },
       "authenticationState": "CONFIRMED",
       "publicationState": "CURRENT_ARTIFACT",
@@ -367,23 +367,29 @@
         }
       ],
       "verifiedAuthOperations": [
+        "READ:whoami",
         "READ:list_my_projects",
         "READ:get_project",
         "READ:get_submission_requirements",
         "READ:get_judging_criteria",
+        "READ:get_hackathon_rules",
+        "READ:get_key_dates",
+        "WRITE:prepare_thumbnail_upload",
         "WRITE:update_project"
       ],
-      "artifactCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
-      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-      "reasonCode": "PROJECT_PAGE_VIDEO_LINKED_FINAL_SUBMISSION_PENDING",
+      "artifactCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
+      "artifactSha256": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
+      "reasonCode": "HOTEL_PROJECT_VERSION_11_TEST_STEPS_PUBLIC_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING",
       "roles": [
         "Provide the challenge resources and hold the submission draft.",
-        "Link the public demonstration video without performing final challenge submission."
+        "Present the hotel-focused title, description, public demonstrations, video, image candidate, and prepared submission answers without performing final submission."
       ],
       "limitations": [
-        "The update operation for project 1405191 (project-y79pb23hj1mz) returned version 6; the subsequent readback confirmed state published, name 未定, and video_url https://youtu.be/tdSvJw4ghX8. The read tool does not return a version field.",
+        "Project 1405191 is Kyoto Booking Retry Proof. Version 8 aligned the 153-test description, version 9 unified technologies, links, and video, version 10 formatted the judge-facing explanation, and version 11 published a four-step 60-second test.",
+        "The uploaded hotel image has a public content-delivery URL, but anonymous project HTML still exposes Devpost's default Open Graph image; project-card association is INCONCLUSIVE.",
+        "The visible page title and heading use Kyoto Booking Retry Proof, while anonymous Open Graph title remains the old 未定 value.",
         "The linked video is public, titled WebMCP vs Duplicate Bookings: A Live Demo, reports 2:30, and has a published Japanese subtitle track.",
-        "YouTube hosts review evidence only and is not a WebMCP execution service; WebMCP Challenge submitted_at is null, so final submission was not performed."
+        "Individual, Japan, Existing, Significant, and Yes are ready; WebMCP Challenge submitted_at is null, so only the explicit final-submit action remains pending."
       ],
       "sources": [
         "https://webmcp.devpost.com/resources"

@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/devpost-public-readback.schema.json",
+  "$comment": "information_uuid_v5=5239a2c0-d589-56b8-b380-358a07f5f58a schema_event_uuid_v7=01a04d7a-8fe8-7fbb-9581-3cfc5c2b3eb6 record_information_uuid_v5=0c07e0df-d0fe-5ea5-8967-b7263738ab69 record_observation_uuid_v7=01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc state_transition=PUBLIC_DESCRIPTION_VERSION_11_SAVED -> PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE occurred_at=2026-08-29T12:24:33.000Z machine-contract=authenticated saved content anonymous public HTML Open Graph metadata and uploaded asset availability remain separate evidence domains and no raw authentication information or secrets are retained",
+  "title": "Devpost public readback evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "format",
+    "identity",
+    "preparedFromCommit",
+    "machineContract",
+    "updateReceipt",
+    "authenticatedReadback",
+    "anonymousPublicHtml",
+    "uploadedAssetReadback",
+    "security"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/devpost-public-readback.schema.json"
+    },
+    "format": {
+      "$ref": "#/$defs/format"
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "preparedFromCommit": {
+      "const": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6"
+    },
+    "machineContract": {
+      "$ref": "#/$defs/machineContract"
+    },
+    "updateReceipt": {
+      "$ref": "#/$defs/updateReceipt"
+    },
+    "authenticatedReadback": {
+      "$ref": "#/$defs/authenticatedReadback"
+    },
+    "anonymousPublicHtml": {
+      "$ref": "#/$defs/anonymousPublicHtml"
+    },
+    "uploadedAssetReadback": {
+      "$ref": "#/$defs/uploadedAssetReadback"
+    },
+    "security": {
+      "$ref": "#/$defs/security"
+    }
+  },
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "millisecondDateTime": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "nonEmptyText": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 1000
+    },
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "profile"],
+      "properties": {
+        "name": {
+          "const": "OpenKnowledgeFormat-inspired evidence record"
+        },
+        "version": {
+          "const": "0.2"
+        },
+        "profile": {
+          "const": "devpost-public-readback"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaceUuidV5", "uuidV5Name", "informationUuidV5", "observationUuidV7", "observedAt"],
+      "properties": {
+        "namespaceUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+        },
+        "uuidV5Name": {
+          "const": "evidence/devpost-public-readback-project-1405191-version-11"
+        },
+        "informationUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "0c07e0df-d0fe-5ea5-8967-b7263738ab69"
+        },
+        "observationUuidV7": {
+          "$ref": "#/$defs/uuidV7",
+          "const": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/millisecondDateTime",
+          "const": "2026-08-29T12:24:33.000Z"
+        }
+      }
+    },
+    "machineContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stateTransition", "invariants"],
+      "properties": {
+        "stateTransition": {
+          "$ref": "#/$defs/stateTransition"
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyText"
+          }
+        }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventUuidV7", "occurredAt", "from", "to", "evidence"],
+      "properties": {
+        "eventUuidV7": {
+          "$ref": "#/$defs/uuidV7",
+          "const": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc"
+        },
+        "occurredAt": {
+          "$ref": "#/$defs/millisecondDateTime",
+          "const": "2026-08-29T12:24:33.000Z"
+        },
+        "from": {
+          "const": "PUBLIC_DESCRIPTION_VERSION_11_SAVED"
+        },
+        "to": {
+          "const": "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE"
+        },
+        "evidence": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "updateReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIdUuidV5", "uuidV5Name", "projectId", "version", "state", "evidenceBoundary"],
+      "properties": {
+        "evidenceIdUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "2ea3bd29-ff3f-54d3-a466-6d236fbe0605"
+        },
+        "uuidV5Name": {
+          "const": "source/devpost-update-receipt-project-1405191-version-11"
+        },
+        "projectId": {
+          "const": "1405191"
+        },
+        "version": {
+          "const": 11
+        },
+        "state": {
+          "const": "PUBLIC_DESCRIPTION_VERSION_11_SAVED"
+        },
+        "evidenceBoundary": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "authenticatedReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIdUuidV5", "uuidV5Name", "accessMode", "updatedAt", "project", "evidenceBoundary"],
+      "properties": {
+        "evidenceIdUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "6af32503-a2b6-5a42-b7d1-7c88caa6c08c"
+        },
+        "uuidV5Name": {
+          "const": "source/devpost-authenticated-project-readback-1405191-version-11"
+        },
+        "accessMode": {
+          "const": "AUTHENTICATED_READBACK"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/millisecondDateTime",
+          "const": "2026-08-29T12:23:58.494Z"
+        },
+        "project": {
+          "$ref": "#/$defs/project"
+        },
+        "evidenceBoundary": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "slug", "name", "tagline", "descriptionMarkers", "videoUrl", "challenge"],
+      "properties": {
+        "projectId": {
+          "const": "1405191"
+        },
+        "slug": {
+          "const": "project-y79pb23hj1mz"
+        },
+        "name": {
+          "const": "Kyoto Booking Retry Proof"
+        },
+        "tagline": {
+          "const": "WebMCP stops a lost hotel-booking response from becoming a duplicate reservation."
+        },
+        "descriptionMarkers": {
+          "$ref": "#/$defs/descriptionMarkers"
+        },
+        "videoUrl": {
+          "const": "https://youtu.be/tdSvJw4ghX8"
+        },
+        "challenge": {
+          "$ref": "#/$defs/challenge"
+        }
+      }
+    },
+    "descriptionMarkers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeTests", "quickStart", "preparedState", "retryState", "resultCounts"],
+      "properties": {
+        "nodeTests": {
+          "const": "153 Node tests"
+        },
+        "quickStart": {
+          "const": "Try it in about 60 seconds"
+        },
+        "preparedState": {
+          "const": "PREPARED"
+        },
+        "retryState": {
+          "const": "RETRY_RECOGNIZED"
+        },
+        "resultCounts": {
+          "const": "attempts2 bookings1 effectStarts1"
+        }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "submittedAt", "submissionState"],
+      "properties": {
+        "slug": {
+          "const": "webmcp"
+        },
+        "submittedAt": {
+          "type": "null"
+        },
+        "submissionState": {
+          "const": "FINAL_SUBMISSION_NOT_PROVEN"
+        }
+      }
+    },
+    "anonymousPublicHtml": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceIdUuidV5",
+        "uuidV5Name",
+        "url",
+        "accessMode",
+        "observedAt",
+        "statusCode",
+        "documentTitle",
+        "h1",
+        "openGraph",
+        "uploadedAssetReference",
+        "visibleEvidence",
+        "evidenceBoundary"
+      ],
+      "properties": {
+        "evidenceIdUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "fb461104-72be-5f26-a478-7c13a89cd356"
+        },
+        "uuidV5Name": {
+          "const": "source/devpost-anonymous-public-html-project-y79pb23hj1mz"
+        },
+        "url": {
+          "const": "https://devpost.com/software/project-y79pb23hj1mz"
+        },
+        "accessMode": {
+          "const": "ANONYMOUS_HTTP"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/millisecondDateTime",
+          "const": "2026-08-29T12:24:33.000Z"
+        },
+        "statusCode": {
+          "const": 200
+        },
+        "documentTitle": {
+          "const": "Kyoto Booking Retry Proof | Devpost"
+        },
+        "h1": {
+          "const": "Kyoto Booking Retry Proof"
+        },
+        "openGraph": {
+          "$ref": "#/$defs/openGraph"
+        },
+        "uploadedAssetReference": {
+          "$ref": "#/$defs/uploadedAssetReference"
+        },
+        "visibleEvidence": {
+          "$ref": "#/$defs/visibleEvidence"
+        },
+        "evidenceBoundary": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "openGraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "image"],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/observedOpenGraphTitle"
+        },
+        "image": {
+          "$ref": "#/$defs/openGraphImage"
+        }
+      }
+    },
+    "observedOpenGraphTitle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "classification", "evidenceBoundary"],
+      "properties": {
+        "state": {
+          "const": "OBSERVED"
+        },
+        "value": {
+          "const": "未定"
+        },
+        "classification": {
+          "const": "STALE_INITIAL_PROJECT_TITLE"
+        },
+        "evidenceBoundary": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "openGraphImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "url", "classification"],
+      "properties": {
+        "state": {
+          "const": "OBSERVED"
+        },
+        "url": {
+          "const": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg"
+        },
+        "classification": {
+          "const": "SHARED_DEVPOST_SOCIAL_ICON"
+        }
+      }
+    },
+    "uploadedAssetReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["searchedUrl", "presentInHtml", "state"],
+      "properties": {
+        "searchedUrl": {
+          "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png"
+        },
+        "presentInHtml": {
+          "const": false
+        },
+        "state": {
+          "const": "NOT_REFERENCED"
+        }
+      }
+    },
+    "visibleEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quickStartHeading", "quickStartVisible", "stepCount", "webMcpTools", "nodeTestMarker", "nodeTestCount"],
+      "properties": {
+        "quickStartHeading": {
+          "const": "Try it in about 60 seconds"
+        },
+        "quickStartVisible": {
+          "const": true
+        },
+        "stepCount": {
+          "const": 4
+        },
+        "webMcpTools": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "prefixItems": [
+            { "const": "check_existing_hotel_booking" },
+            { "const": "prepare_hotel_booking" },
+            { "const": "get_hotel_booking_status" },
+            { "const": "preview_hotel_cancellation" }
+          ],
+          "items": false
+        },
+        "nodeTestMarker": {
+          "const": "153 Node tests"
+        },
+        "nodeTestCount": {
+          "const": 153
+        }
+      }
+    },
+    "uploadedAssetReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceIdUuidV5", "uuidV5Name", "url", "observedAt", "statusCode", "projectAssociation"],
+      "properties": {
+        "evidenceIdUuidV5": {
+          "$ref": "#/$defs/uuidV5",
+          "const": "ec8bc0f3-3a11-5edd-bb9f-49f5628c003d"
+        },
+        "uuidV5Name": {
+          "const": "source/devpost-uploaded-thumbnail-005-194-459"
+        },
+        "url": {
+          "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/millisecondDateTime",
+          "const": "2026-08-29T12:24:33.000Z"
+        },
+        "statusCode": {
+          "const": 200
+        },
+        "projectAssociation": {
+          "$ref": "#/$defs/projectAssociation"
+        }
+      }
+    },
+    "projectAssociation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reason"],
+      "properties": {
+        "state": {
+          "const": "INCONCLUSIVE"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawAuthenticationInformationIncluded", "secretsIncluded"],
+      "properties": {
+        "rawAuthenticationInformationIncluded": {
+          "const": false
+        },
+        "secretsIncluded": {
+          "const": false
+        }
+      }
+    }
+  }
+}

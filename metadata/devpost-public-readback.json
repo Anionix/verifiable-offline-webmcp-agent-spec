@@ -1,0 +1,124 @@
+{
+  "$schema": "../schemas/devpost-public-readback.schema.json",
+  "format": {
+    "name": "OpenKnowledgeFormat-inspired evidence record",
+    "version": "0.2",
+    "profile": "devpost-public-readback"
+  },
+  "identity": {
+    "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "uuidV5Name": "evidence/devpost-public-readback-project-1405191-version-11",
+    "informationUuidV5": "0c07e0df-d0fe-5ea5-8967-b7263738ab69",
+    "observationUuidV7": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc",
+    "observedAt": "2026-08-29T12:24:33.000Z"
+  },
+  "preparedFromCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  "machineContract": {
+    "stateTransition": {
+      "eventUuidV7": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc",
+      "occurredAt": "2026-08-29T12:24:33.000Z",
+      "from": "PUBLIC_DESCRIPTION_VERSION_11_SAVED",
+      "to": "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE",
+      "evidence": "Version 11 was saved and its authenticated project readback was aligned. The later anonymous page returned HTTP 200 and the expected visible project text, but its Open Graph image remained the shared Devpost icon and its HTML did not reference the uploaded image URL. The image URL itself returned HTTP 200, which does not prove project association."
+    },
+    "invariants": [
+      "A version 11 update receipt and authenticated content readback prove a saved public description, not final challenge submission.",
+      "Only a non-null Devpost submittedAt value proves final WebMCP Challenge submission; null keeps that claim unproven.",
+      "Anonymous HTTP 200 proves page availability but does not prove that the uploaded image is associated with the project.",
+      "HTTP 200 for the uploaded image URL proves asset availability but not its association with the public project page.",
+      "The anonymous Open Graph title is recorded separately from the visible document title and heading.",
+      "The retry counts describe a fictional device-local demonstration, not a real hotel reservation."
+    ]
+  },
+  "updateReceipt": {
+    "evidenceIdUuidV5": "2ea3bd29-ff3f-54d3-a466-6d236fbe0605",
+    "uuidV5Name": "source/devpost-update-receipt-project-1405191-version-11",
+    "projectId": "1405191",
+    "version": 11,
+    "state": "PUBLIC_DESCRIPTION_VERSION_11_SAVED",
+    "evidenceBoundary": "The receipt proves the accepted update version. The authenticated readback separately proves the resulting project fields."
+  },
+  "authenticatedReadback": {
+    "evidenceIdUuidV5": "6af32503-a2b6-5a42-b7d1-7c88caa6c08c",
+    "uuidV5Name": "source/devpost-authenticated-project-readback-1405191-version-11",
+    "accessMode": "AUTHENTICATED_READBACK",
+    "updatedAt": "2026-08-29T12:23:58.494Z",
+    "project": {
+      "projectId": "1405191",
+      "slug": "project-y79pb23hj1mz",
+      "name": "Kyoto Booking Retry Proof",
+      "tagline": "WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.",
+      "descriptionMarkers": {
+        "nodeTests": "153 Node tests",
+        "quickStart": "Try it in about 60 seconds",
+        "preparedState": "PREPARED",
+        "retryState": "RETRY_RECOGNIZED",
+        "resultCounts": "attempts2 bookings1 effectStarts1"
+      },
+      "videoUrl": "https://youtu.be/tdSvJw4ghX8",
+      "challenge": {
+        "slug": "webmcp",
+        "submittedAt": null,
+        "submissionState": "FINAL_SUBMISSION_NOT_PROVEN"
+      }
+    },
+    "evidenceBoundary": "The authenticated readback reports project content and submittedAt without retaining credentials, cookies, tokens, headers, or account details."
+  },
+  "anonymousPublicHtml": {
+    "evidenceIdUuidV5": "fb461104-72be-5f26-a478-7c13a89cd356",
+    "uuidV5Name": "source/devpost-anonymous-public-html-project-y79pb23hj1mz",
+    "url": "https://devpost.com/software/project-y79pb23hj1mz",
+    "accessMode": "ANONYMOUS_HTTP",
+    "observedAt": "2026-08-29T12:24:33.000Z",
+    "statusCode": 200,
+    "documentTitle": "Kyoto Booking Retry Proof | Devpost",
+    "h1": "Kyoto Booking Retry Proof",
+    "openGraph": {
+      "title": {
+        "state": "OBSERVED",
+        "value": "未定",
+        "classification": "STALE_INITIAL_PROJECT_TITLE",
+        "evidenceBoundary": "The cache-bypassed anonymous HTML contained this exact og:title value even though the document title and visible heading used the hotel name."
+      },
+      "image": {
+        "state": "OBSERVED",
+        "url": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg",
+        "classification": "SHARED_DEVPOST_SOCIAL_ICON"
+      }
+    },
+    "uploadedAssetReference": {
+      "searchedUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+      "presentInHtml": false,
+      "state": "NOT_REFERENCED"
+    },
+    "visibleEvidence": {
+      "quickStartHeading": "Try it in about 60 seconds",
+      "quickStartVisible": true,
+      "stepCount": 4,
+      "webMcpTools": [
+        "check_existing_hotel_booking",
+        "prepare_hotel_booking",
+        "get_hotel_booking_status",
+        "preview_hotel_cancellation"
+      ],
+      "nodeTestMarker": "153 Node tests",
+      "nodeTestCount": 153
+    },
+    "evidenceBoundary": "This anonymous readback proves only the returned public HTML and visible markers at the stated observation time."
+  },
+  "uploadedAssetReadback": {
+    "evidenceIdUuidV5": "ec8bc0f3-3a11-5edd-bb9f-49f5628c003d",
+    "uuidV5Name": "source/devpost-uploaded-thumbnail-005-194-459",
+    "url": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+    "observedAt": "2026-08-29T12:24:33.000Z",
+    "statusCode": 200,
+    "projectAssociation": {
+      "state": "INCONCLUSIVE",
+      "reason": "The asset URL returned HTTP 200, but the anonymous project HTML did not reference that URL."
+    }
+  },
+  "security": {
+    "rawAuthenticationInformationIncluded": false,
+    "secretsIncluded": false
+  }
+}

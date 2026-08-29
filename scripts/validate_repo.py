@@ -48,6 +48,14 @@
 # information_uuid_v5=17436d1b-fda6-5147-b5b0-ba04f2465e30
 # event_uuid_v7=01a04c9e-a9f3-75f0-ac02-6d9514cfc4b5 state_transition=PYTHON_TYPE_TOOLS_STANDALONE -> PYTHON_TYPE_TOOLS_IN_FULL_GATE occurred_at=2026-08-29T08:24:21.747Z
 # machine-contract: schema evidence must preserve exact tool versions, release status, project scope, and language-server handshake results.
+# information_uuid_v5=3187a82a-436d-568c-8a6a-92ab2fb5dbde
+# event_uuid_v7=01a04d6e-75d4-749c-b4df-e530ab59c8e7
+# state_transition=DEVPOST_PACKET_UNCHECKED -> DEVPOST_PACKET_FAIL_CLOSED occurred_at=2026-08-29T12:11:46.452Z
+# machine-contract: every Devpost hotel record must bind its UUID clocks, ordered state chain, source references, thumbnail bytes, exact owner answers, and one coherent pending or verified-submission state.
+# information_uuid_v5=e3b5d6d7-ce34-5b89-97de-26d670db8f7d
+# event_uuid_v7=01a04d89-72ed-735c-a675-2a8ebac80f49
+# state_transition=DEVPOST_CLAIMS_PATH_ONLY -> DEVPOST_CLAIMS_DIGEST_BOUND occurred_at=2026-08-29T12:40:48.621Z
+# machine-contract: each observed Devpost claim resolves through one UUIDv5 context to a repository path, source commit, and recomputed SHA-256 while pending and submitted terminal states remain mutually exclusive.
 from __future__ import annotations
 
 import argparse
@@ -160,6 +168,13 @@ def uuid7_ms(value: str):
     u = uuid.UUID(value)
     if u.version != 7: raise ValueError("not v7")
     return u.int >> 80
+
+
+def rfc3339_ms(value: str):
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("timestamp lacks an offset")
+    return int(parsed.timestamp() * 1000)
 
 
 def merkle_leaf(d: str): return hashlib.sha256(b"\x00" + bytes.fromhex(d)).digest()
@@ -554,6 +569,326 @@ def main():
             errors.append("deployed-current hotel evidence must match the live version source and both artifact digests")
     elif live_hotel["status"] == "CURRENT_ARTIFACT_VERIFIED":
         errors.append("a non-deployed candidate cannot claim the current artifact is live-verified")
+
+    # Devpost hotel submission packet. JSON Schema keeps the record closed at
+    # every nesting level; these checks bind identities, clocks, references,
+    # and the local thumbnail bytes that JSON Schema cannot inspect.
+    devpost_start = len(errors)
+    devpost_path = ROOT / "metadata/devpost-hotel-submission.json"
+    devpost_evidence = load_json(devpost_path)
+    devpost_validator = Draft202012Validator(
+        schemas["devpost-hotel-submission"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in devpost_validator.iter_errors(devpost_evidence):
+        location = "/".join(str(part) for part in e.absolute_path) or "<root>"
+        errors.append(f"schema metadata/devpost-hotel-submission.json/{location}: {e.message}")
+
+    devpost_public_readback = load_json(ROOT / "metadata/devpost-public-readback.json")
+    devpost_public_validator = Draft202012Validator(
+        schemas["devpost-public-readback"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in devpost_public_validator.iter_errors(devpost_public_readback):
+        location = "/".join(str(part) for part in e.absolute_path) or "<root>"
+        errors.append(f"schema metadata/devpost-public-readback.json/{location}: {e.message}")
+
+    try:
+        def require_uuid_version(value: str, version: int, label: str):
+            parsed = uuid.UUID(value)
+            if parsed.version != version:
+                raise ValueError(f"{label} is not UUIDv{version}")
+
+        def require_uuid7_time(value: str, occurred_at: str, label: str):
+            require_uuid_version(value, 7, label)
+            if uuid7_ms(value) != rfc3339_ms(occurred_at):
+                raise ValueError(f"{label} UUIDv7 timestamp differs from {occurred_at}")
+
+        identity = devpost_evidence["identity"]
+        require_uuid_version(identity["namespaceUuidV5"], 5, "Devpost namespace")
+        require_uuid_version(identity["informationUuidV5"], 5, "Devpost record information")
+        require_uuid7_time(identity["recordEventUuidV7"], devpost_evidence["recordedAt"], "Devpost record event")
+
+        state_sequence = devpost_evidence["machineContract"]["stateSequence"]
+        previous_state = None
+        previous_time = None
+        state_event_ids = set()
+        for index, event in enumerate(state_sequence, 1):
+            label = f"Devpost state event {index}"
+            require_uuid7_time(event["eventUuidV7"], event["occurredAt"], label)
+            occurred_ms = rfc3339_ms(event["occurredAt"])
+            if event["eventUuidV7"] in state_event_ids:
+                errors.append(f"{label} repeats an earlier event UUID")
+            if previous_time is not None and occurred_ms <= previous_time:
+                errors.append(f"{label} is not strictly later than the previous state event")
+            if previous_state is not None and event["from"] != previous_state:
+                errors.append(f"{label} starts at {event['from']} instead of previous state {previous_state}")
+            state_event_ids.add(event["eventUuidV7"])
+            previous_state = event["to"]
+            previous_time = occurred_ms
+        if (
+            state_sequence[-1]["eventUuidV7"] != identity["recordEventUuidV7"]
+            or state_sequence[-1]["occurredAt"] != devpost_evidence["recordedAt"]
+        ):
+            errors.append("Devpost record identity must equal the last state-sequence event and timestamp")
+        expected_devpost_state_pairs = [
+            ("MISMATCH_DETECTED", "PUBLIC_PROJECT_ALIGNED"),
+            ("PUBLIC_PROJECT_ALIGNED", "SUBMISSION_PREPARED"),
+            ("SUBMISSION_PREPARED", "FINAL_SUBMISSION_PENDING"),
+        ]
+        current_state_pairs = [(event["from"], event["to"]) for event in state_sequence]
+        if devpost_evidence["submission"]["devpostOwnedStatus"] == "FINAL_SUBMISSION_PENDING":
+            if current_state_pairs != expected_devpost_state_pairs:
+                errors.append("pending Devpost evidence does not preserve the required mismatch-to-pending state sequence")
+        elif current_state_pairs != [
+            *expected_devpost_state_pairs,
+            ("FINAL_SUBMISSION_PENDING", "FINAL_SUBMISSION_VERIFIED"),
+        ]:
+            errors.append("verified Devpost evidence does not append the required final-submission transition")
+
+        source_ids = []
+        for source in devpost_evidence["sources"]:
+            require_uuid_version(source["sourceIdUuidV5"], 5, "Devpost source")
+            source_ids.append(source["sourceIdUuidV5"])
+            if "path" in source:
+                local_source = (ROOT / source["path"]).resolve()
+                if ROOT not in local_source.parents or not local_source.is_file():
+                    errors.append(f"Devpost local source is missing or outside the repository: {source['path']}")
+        if len(source_ids) != len(set(source_ids)):
+            errors.append("Devpost source identifiers must be unique")
+        known_source_ids = set(source_ids)
+
+        observation_contexts = devpost_evidence["observationContexts"]
+        context_by_id = {}
+        for context in observation_contexts:
+            context_id = context["contextIdUuidV5"]
+            require_uuid_version(context_id, 5, "Devpost observation context")
+            if context_id in context_by_id:
+                errors.append(f"Devpost observation context repeats identifier {context_id}")
+            context_by_id[context_id] = context
+            if context["sourceCommit"] != devpost_evidence["preparedFromCommit"]:
+                errors.append(f"Devpost observation context {context_id} uses a different source commit")
+            context_path = (ROOT / context["path"]).resolve()
+            if ROOT not in context_path.parents or not context_path.is_file():
+                errors.append(f"Devpost observation context is missing or outside the repository: {context['path']}")
+            elif sha256(context_path.read_bytes()) != context["artifactSha256"]:
+                errors.append(f"Devpost observation context SHA-256 differs for {context['path']}")
+
+        claim_ids = []
+        used_context_ids = []
+        for collection_name in ("observed", "unmeasured", "notApplicable"):
+            for index, claim in enumerate(devpost_evidence[collection_name], 1):
+                label = f"Devpost {collection_name} claim {index}"
+                require_uuid_version(claim["claimIdUuidV5"], 5, label)
+                claim_ids.append(claim["claimIdUuidV5"])
+                unknown_sources = set(claim["sourceIds"]) - known_source_ids
+                if unknown_sources:
+                    errors.append(f"{label} has unknown source IDs: {sorted(unknown_sources)}")
+                if collection_name == "observed":
+                    require_uuid7_time(claim["observationEventUuidV7"], claim["observedAt"], label)
+                    context_id = claim["contextIdUuidV5"]
+                    used_context_ids.append(context_id)
+                    if context_id not in context_by_id:
+                        errors.append(f"{label} references unknown observation context {context_id}")
+        if len(claim_ids) != len(set(claim_ids)):
+            errors.append("Devpost claim identifiers must be unique across evidence classes")
+        unused_context_ids = set(context_by_id) - set(used_context_ids)
+        if unused_context_ids:
+            errors.append(f"Devpost observation contexts are not used by observed claims: {sorted(unused_context_ids)}")
+
+        public_project = devpost_public_readback["authenticatedReadback"]["project"]
+        public_html = devpost_public_readback["anonymousPublicHtml"]
+        visible = public_html["visibleEvidence"]
+        expected_hotel_tools = [
+            "check_existing_hotel_booking",
+            "prepare_hotel_booking",
+            "get_hotel_booking_status",
+            "preview_hotel_cancellation",
+        ]
+        expected_default_open_graph_image = (
+            "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/"
+            "devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg"
+        )
+        if (
+            devpost_public_readback["updateReceipt"]["version"] != 11
+            or public_project["projectId"] != "1405191"
+            or public_project["name"] != "Kyoto Booking Retry Proof"
+            or public_project["challenge"]["submittedAt"] is not None
+            or public_project["challenge"]["submissionState"] != "FINAL_SUBMISSION_NOT_PROVEN"
+            or public_html["url"] != "https://devpost.com/software/project-y79pb23hj1mz"
+            or public_html["statusCode"] != 200
+            or public_html["documentTitle"] != "Kyoto Booking Retry Proof | Devpost"
+            or public_html["h1"] != "Kyoto Booking Retry Proof"
+            or visible["nodeTestMarker"] != "153 Node tests"
+            or visible["nodeTestCount"] != 153
+            or visible["quickStartHeading"] != "Try it in about 60 seconds"
+            or not visible["quickStartVisible"]
+            or visible["stepCount"] != 4
+            or visible["webMcpTools"] != expected_hotel_tools
+        ):
+            errors.append("Devpost public readback does not match the version 11 hotel test surface")
+        open_graph = public_html["openGraph"]
+        if (
+            open_graph["title"] != {
+                "state": "OBSERVED",
+                "value": "未定",
+                "classification": "STALE_INITIAL_PROJECT_TITLE",
+                "evidenceBoundary": open_graph["title"].get("evidenceBoundary"),
+            }
+            or not open_graph["title"].get("evidenceBoundary")
+            or open_graph["image"] != {
+                "state": "OBSERVED",
+                "url": expected_default_open_graph_image,
+                "classification": "SHARED_DEVPOST_SOCIAL_ICON",
+            }
+            or public_html["uploadedAssetReference"]["presentInHtml"] is not False
+            or public_html["uploadedAssetReference"]["state"] != "NOT_REFERENCED"
+            or devpost_public_readback["uploadedAssetReadback"]["statusCode"] != 200
+            or devpost_public_readback["uploadedAssetReadback"]["projectAssociation"]["state"] != "INCONCLUSIVE"
+        ):
+            errors.append("Devpost public readback crosses the stale Open Graph or image-association boundary")
+
+        workflow_state = load_json(ROOT / devpost_evidence["submission"]["workflowStateFile"])
+        draft_text = (ROOT / devpost_evidence["submission"]["draftFile"]).read_text(encoding="utf-8")
+        workflow_submission = workflow_state["submission"]
+        if (
+            workflow_state["project"]["name"] != "Kyoto Booking Retry Proof"
+            or workflow_state["current_stage"] != "submit-project"
+            or workflow_state["next_command"] != "submit-project"
+            or workflow_submission["status"] != "ready"
+            or workflow_submission["last_project_version"] != 11
+            or workflow_submission["public_page_state"] != "HOTEL_TITLE_AND_60_SECOND_TEST_PUBLIC"
+            or workflow_submission["public_open_graph_state"] != "STALE_TITLE_AND_DEFAULT_IMAGE"
+            or workflow_submission["thumbnail_project_association"] != "INCONCLUSIVE"
+            or workflow_submission["final_submission_state"] != "FINAL_SUBMISSION_PENDING"
+        ):
+            errors.append("Devpost workflow state does not match the prepared version 11 pending submission")
+        required_draft_markers = [
+            "https://devpost.com/software/project-y79pb23hj1mz",
+            "153 Node tests",
+            *expected_hotel_tools,
+            "`INCONCLUSIVE`",
+            "`UNMEASURED`",
+            "FINAL_SUBMISSION_PENDING",
+        ]
+        missing_draft_markers = [marker for marker in required_draft_markers if marker not in draft_text]
+        if missing_draft_markers:
+            errors.append(f"Devpost draft is missing required hotel or evidence markers: {missing_draft_markers}")
+
+        thumbnail = devpost_evidence["thumbnail"]
+        require_uuid_version(thumbnail["assetIdUuidV5"], 5, "Devpost thumbnail asset")
+        thumbnail_path = (ROOT / thumbnail["localPath"]).resolve()
+        if ROOT not in thumbnail_path.parents or not thumbnail_path.is_file():
+            errors.append("Devpost thumbnail is missing or outside the repository")
+        else:
+            thumbnail_bytes = thumbnail_path.read_bytes()
+            if sha256(thumbnail_bytes) != thumbnail["sha256"]:
+                errors.append("Devpost thumbnail SHA-256 differs from the repository file")
+            png_signature = b"\x89PNG\r\n\x1a\n"
+            if len(thumbnail_bytes) < 24 or not thumbnail_bytes.startswith(png_signature):
+                errors.append("Devpost thumbnail is not a structurally recognizable PNG")
+            else:
+                png_width = int.from_bytes(thumbnail_bytes[16:20], "big")
+                png_height = int.from_bytes(thumbnail_bytes[20:24], "big")
+                if (png_width, png_height) != (thumbnail["width"], thumbnail["height"]):
+                    errors.append("Devpost thumbnail PNG dimensions differ from the evidence record")
+        rfc3339_ms(thumbnail["provenance"]["fileObservedAt"])
+
+        submission = devpost_evidence["submission"]
+        confirmed = submission["confirmedAnswers"]
+        require_uuid_version(confirmed["informationUuidV5"], 5, "Devpost owner answers")
+        require_uuid7_time(
+            confirmed["confirmationEventUuidV7"], confirmed["confirmedAt"], "Devpost owner confirmation"
+        )
+        expected_answers = {
+            "28249": "Individual",
+            "28250": "Japan",
+            "28259": "Significant",
+            "28260": "Yes",
+        }
+        if confirmed["values"] != expected_answers:
+            errors.append("Devpost confirmed owner answers differ from Individual/Japan/Significant/Yes")
+        if submission["requiredOwnerAnswers"] != []:
+            errors.append("Devpost submission still has unanswered required owner fields")
+
+        submitted_fields = {"devpostSubmissionId", "devpostSubmissionUrl", "devpostSubmitToolStatus"}
+        if submission["devpostOwnedStatus"] == "FINAL_SUBMISSION_PENDING":
+            if (
+                submission["localStatus"] != "READY"
+                or submission["devpostSubmittedAt"] is not None
+                or submission["nextCommand"] != "submit-project"
+                or submitted_fields & submission.keys()
+            ):
+                errors.append("pending Devpost evidence must remain READY, unsubmitted, and free of submission receipt fields")
+        elif submission["devpostOwnedStatus"] == "FINAL_SUBMISSION_VERIFIED":
+            if (
+                submission["localStatus"] != "SUBMITTED"
+                or not isinstance(submission["devpostSubmittedAt"], str)
+                or submission["nextCommand"] != "hackathon-map"
+                or not submitted_fields.issubset(submission)
+                or submission.get("devpostSubmitToolStatus") != "SUBMITTED"
+            ):
+                errors.append("verified Devpost evidence lacks a complete submitted-state receipt")
+            elif rfc3339_ms(submission["devpostSubmittedAt"]) > rfc3339_ms(devpost_evidence["recordedAt"]):
+                errors.append("Devpost final submission time occurs after the evidence record time")
+        else:
+            errors.append("Devpost evidence has an unsupported provider-owned submission state")
+
+        # The same schema must continue to represent the next authoritative
+        # provider state without weakening the pending/submitted exclusivity.
+        future_submitted = json.loads(json.dumps(devpost_evidence))
+        future_event = {
+            "eventUuidV7": "01a04d7a-8fe9-78ff-b058-fd491ddcf84b",
+            "occurredAt": "2026-08-29T12:24:33.001Z",
+            "from": "FINAL_SUBMISSION_PENDING",
+            "to": "FINAL_SUBMISSION_VERIFIED",
+            "evidence": "A future Devpost-owned receipt and non-null submittedAt readback verify final challenge submission.",
+        }
+        future_submitted["machineContract"]["stateSequence"].append(future_event)
+        future_submitted["identity"]["recordEventUuidV7"] = future_event["eventUuidV7"]
+        future_submitted["recordedAt"] = future_event["occurredAt"]
+        future_submission = future_submitted["submission"]
+        future_submission.update({
+            "localStatus": "SUBMITTED",
+            "devpostSubmittedAt": future_submitted["recordedAt"],
+            "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
+            "devpostSubmissionId": 1,
+            "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+            "devpostSubmitToolStatus": "SUBMITTED",
+            "nextCommand": "hackathon-map",
+        })
+        if list(devpost_validator.iter_errors(future_submitted)):
+            errors.append("Devpost schema cannot represent a complete future verified-submission state")
+
+        incoherent_pending = json.loads(json.dumps(devpost_evidence))
+        incoherent_pending["submission"].update({
+            "localStatus": "SUBMITTED",
+            "devpostSubmissionId": 1,
+            "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+            "devpostSubmitToolStatus": "SUBMITTED",
+        })
+        if not list(devpost_validator.iter_errors(incoherent_pending)):
+            errors.append("Devpost schema accepted pending evidence mixed with a submission receipt")
+
+        incoherent_pending_terminal = json.loads(json.dumps(devpost_evidence))
+        incoherent_pending_terminal["machineContract"]["stateSequence"][-1]["to"] = "FINAL_SUBMISSION_VERIFIED"
+        if not list(devpost_validator.iter_errors(incoherent_pending_terminal)):
+            errors.append("Devpost schema accepted a pending submission with a verified terminal state")
+
+        missing_verified_transition = json.loads(json.dumps(devpost_evidence))
+        missing_verified_transition["submission"].update({
+            "localStatus": "SUBMITTED",
+            "devpostSubmittedAt": missing_verified_transition["recordedAt"],
+            "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
+            "devpostSubmissionId": 1,
+            "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+            "devpostSubmitToolStatus": "SUBMITTED",
+            "nextCommand": "hackathon-map",
+        })
+        if not list(devpost_validator.iter_errors(missing_verified_transition)):
+            errors.append("Devpost schema accepted verified submission without the terminal transition")
+    except Exception as exc:
+        errors.append(f"Devpost hotel submission evidence structure: {exc}")
+    checks["devpost_hotel_submission"] = len(errors) == devpost_start
+
     void_evidence = load_json(ROOT / "metadata/void-integration.json")
     void_evidence_validator = Draft202012Validator(
         schemas["void-integration"], registry=schema_registry, format_checker=format_checker
@@ -598,6 +933,26 @@ def main():
     )
     for e in video_production_validator.iter_errors(video_production):
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    future_video_submission = json.loads(json.dumps(video_production))
+    future_video_devpost = future_video_submission["publication"]["devpostReadback"]
+    future_video_devpost.update({
+        "submissionPacketState": "SUBMITTED",
+        "submittedAt": future_video_devpost["observedAt"],
+        "finalSubmissionState": "FINAL_SUBMISSION_VERIFIED",
+        "submissionId": 1,
+        "submissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+        "submitToolStatus": "SUBMITTED",
+    })
+    if list(video_production_validator.iter_errors(future_video_submission)):
+        errors.append("video production schema cannot represent a future verified Devpost submission")
+    pending_video_with_receipt = json.loads(json.dumps(video_production))
+    pending_video_with_receipt["publication"]["devpostReadback"].update({
+        "submissionId": 1,
+        "submissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+        "submitToolStatus": "SUBMITTED",
+    })
+    if not list(video_production_validator.iter_errors(pending_video_with_receipt)):
+        errors.append("video production schema accepted a Devpost receipt in the pending state")
     false_video_promotions = {
         "verified identity state": ("state", "VERIFIED"),
         "same-artifact assertion": ("sameArtifactClaim", "SAME_ARTIFACT"),
@@ -790,7 +1145,29 @@ def main():
                 devpost.get("videoUrl") != publication.get("youtubeUrl")
                 or devpost.get("projectState") != "published"
                 or devpost.get("submittedAt") is not None
-                or devpost.get("finalSubmissionState") != "NOT_SUBMITTED"
+                or devpost.get("projectName") != "Kyoto Booking Retry Proof"
+                or devpost.get("descriptionNodeTestCount") != 153
+                or devpost.get("updateResponseVersion") != 11
+                or devpost.get("publicTestInstructionsState") != "FOUR_STEP_60_SECOND_FLOW_VISIBLE"
+                or devpost.get("submissionPacketState") != "READY"
+                or devpost.get("finalSubmissionState") != "FINAL_SUBMISSION_PENDING"
+                or devpost.get("thumbnail") != {
+                    "publicUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+                    "publicationState": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_INCONCLUSIVE",
+                }
+                or devpost.get("publicOpenGraphReadback") != {
+                    "documentTitle": "Kyoto Booking Retry Proof | Devpost",
+                    "pageHeading": "Kyoto Booking Retry Proof",
+                    "openGraphTitle": "未定",
+                    "openGraphImageUrl": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg",
+                    "state": "VISIBLE_HOTEL_TITLE_SOCIAL_METADATA_STALE",
+                }
+                or devpost.get("confirmedAnswers") != {
+                    "submitterType": "Individual",
+                    "countryResidence": "Japan",
+                    "learningLevel": "Significant",
+                    "careerArtificialIntelligenceValue": "Yes",
+                }
             ):
                 errors.append("Devpost video readback crosses or obscures the final-submission boundary")
         else:

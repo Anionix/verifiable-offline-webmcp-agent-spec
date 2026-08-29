@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=8e656bba-df14-5ee2-9348-f6239fb7edf9 event_uuid_v7=01a04cf7-edba-71cd-b1c5-c8271758d1b4 state_transition=SELF_CERTIFIED_ARTIFACT_BINDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED occurred_at=2026-08-29T10:01:51.802Z machine-contract=public playback and subtitle readback remain verified while local-artifact to public-video identity stays UNMEASURED until an independent upload-operation receipt is retained",
+  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
@@ -196,7 +196,7 @@
     "devpostVideoReadback": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["informationUuidV5", "observationUuidV7", "observedAt", "projectId", "projectSlug", "projectState", "projectName", "videoUrl", "updateResponseVersion", "challengeSlug", "submittedAt", "finalSubmissionState"],
+      "required": ["informationUuidV5", "observationUuidV7", "observedAt", "projectId", "projectSlug", "projectState", "projectName", "tagline", "descriptionNodeTestCount", "videoUrl", "updateResponseVersion", "publicTestInstructionsState", "thumbnail", "publicOpenGraphReadback", "submissionPacketState", "confirmedAnswers", "challengeSlug", "submittedAt", "finalSubmissionState"],
       "properties": {
         "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
@@ -204,13 +204,82 @@
         "projectId": { "const": 1405191 },
         "projectSlug": { "const": "project-y79pb23hj1mz" },
         "projectState": { "const": "published" },
-        "projectName": { "const": "未定" },
+        "projectName": { "const": "Kyoto Booking Retry Proof" },
+        "tagline": { "const": "WebMCP stops a lost hotel-booking response from becoming a duplicate reservation." },
+        "descriptionNodeTestCount": { "const": 153 },
         "videoUrl": { "type": "string", "pattern": "^https://youtu\\.be/[A-Za-z0-9_-]{11}$" },
-        "updateResponseVersion": { "type": "integer", "minimum": 1 },
+        "updateResponseVersion": { "const": 11 },
+        "publicTestInstructionsState": { "const": "FOUR_STEP_60_SECOND_FLOW_VISIBLE" },
+        "thumbnail": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publicUrl", "publicationState"],
+          "properties": {
+            "publicUrl": { "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png" },
+            "publicationState": { "const": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_INCONCLUSIVE" }
+          }
+        },
+        "publicOpenGraphReadback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["documentTitle", "pageHeading", "openGraphTitle", "openGraphImageUrl", "state"],
+          "properties": {
+            "documentTitle": { "const": "Kyoto Booking Retry Proof | Devpost" },
+            "pageHeading": { "const": "Kyoto Booking Retry Proof" },
+            "openGraphTitle": { "const": "未定" },
+            "openGraphImageUrl": { "const": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg" },
+            "state": { "const": "VISIBLE_HOTEL_TITLE_SOCIAL_METADATA_STALE" }
+          }
+        },
+        "submissionPacketState": { "enum": ["READY", "SUBMITTED"] },
+        "confirmedAnswers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["submitterType", "countryResidence", "learningLevel", "careerArtificialIntelligenceValue"],
+          "properties": {
+            "submitterType": { "const": "Individual" },
+            "countryResidence": { "const": "Japan" },
+            "learningLevel": { "const": "Significant" },
+            "careerArtificialIntelligenceValue": { "const": "Yes" }
+          }
+        },
         "challengeSlug": { "const": "webmcp" },
-        "submittedAt": { "const": null },
-        "finalSubmissionState": { "const": "NOT_SUBMITTED" }
-      }
+        "submittedAt": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "format": "date-time" }
+          ]
+        },
+        "finalSubmissionState": { "enum": ["FINAL_SUBMISSION_PENDING", "FINAL_SUBMISSION_VERIFIED"] },
+        "submissionId": { "type": "integer", "minimum": 1 },
+        "submissionUrl": { "type": "string", "format": "uri" },
+        "submitToolStatus": { "const": "SUBMITTED" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["finalSubmissionState"],
+            "properties": { "finalSubmissionState": { "const": "FINAL_SUBMISSION_PENDING" } }
+          },
+          "then": {
+            "properties": {
+              "submissionPacketState": { "const": "READY" },
+              "submittedAt": { "type": "null" },
+              "submissionId": false,
+              "submissionUrl": false,
+              "submitToolStatus": false
+            }
+          },
+          "else": {
+            "required": ["submissionId", "submissionUrl", "submitToolStatus"],
+            "properties": {
+              "submissionPacketState": { "const": "SUBMITTED" },
+              "submittedAt": { "type": "string", "format": "date-time" },
+              "finalSubmissionState": { "const": "FINAL_SUBMISSION_VERIFIED" }
+            }
+          }
+        }
+      ]
     },
     "identity": {
       "type": "object",

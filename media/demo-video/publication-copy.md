@@ -1,15 +1,15 @@
 ---
 title: "Publication copy for the fictional Kyoto booking retry demo"
 information_uuid_v5: "22ea7511-834f-5b4f-b08b-9d6e95328540"
-event_uuid_v7: "01a04cf7-edba-71cd-b1c5-c8271758d1b4"
-occurred_at: "2026-08-29T10:01:51.802Z"
-state: "YOUTUBE_PUBLIC_READBACK_VERIFIED_ARTIFACT_IDENTITY_UNMEASURED"
-state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED -> THUMBNAIL_SAVED_AND_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED"
+event_uuid_v7: "01a04d7b-5431-78e2-a367-235829d5edc4"
+occurred_at: "2026-08-29T12:25:26.450Z"
+state: "DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC_IMAGE_ASSOCIATION_INCONCLUSIVE_FINAL_SUBMISSION_PENDING"
+state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED -> THUMBNAIL_SAVED_AND_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED -> DEVPOST_HOTEL_PROJECT_ALIGNED -> DEVPOST_HOTEL_IMAGE_UPLOAD_ACCEPTED -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> FINAL_SUBMISSION_PENDING"
 ---
 
 # Publication copy
 
-<!-- machine-contract: This file records the public YouTube video and the Devpost project-page readback. It is not evidence of final challenge submission. Keep the project name and owner-only submission answers unresolved, and never cross the final-submit boundary without a new owner confirmation. -->
+<!-- machine-contract: This file records the public YouTube video, the hotel-aligned Devpost project, and the owner-confirmed submission answers. It is not evidence of final challenge submission; only a Devpost readback with non-null submitted_at may prove that transition. -->
 <!-- information_uuid_v5=8e656bba-df14-5ee2-9348-f6239fb7edf9 event_uuid_v7=01a04cf7-edba-71cd-b1c5-c8271758d1b4 state_transition=SELF_CERTIFIED_ARTIFACT_BINDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED occurred_at=2026-08-29T10:01:51.802Z -->
 <!-- machine-contract: Public playback, title, duration, and subtitles remain readback facts. The local file digest and public YouTube identifier are not asserted to identify the same artifact without an independent upload-operation receipt. -->
 
@@ -89,13 +89,11 @@ The in-app browser could not open YouTube's custom-thumbnail file chooser after 
 
 ### Project name
 
-NEEDS_OWNER_CONFIRMATION
-
-The live draft remains named `未定`. Do not rename it automatically.
+Kyoto Booking Retry Proof
 
 ### Tagline
 
-Two booking attempts become one safe result—even when the success response disappears.
+WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.
 
 ### Description
 
@@ -142,6 +140,13 @@ This is an existing open-source specification repository. During the submission 
 
 ## Try it
 
+Complete this 60-second check:
+
+1. Open the primary live Site in a fresh browser storage context and select **1. Check and prepare**.
+2. Select **2. Confirm booking — human action only**; the page stores one fictional booking and intentionally hides the success response.
+3. Select **Retry the same booking**.
+4. Verify `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the same confirmation number.
+
 Primary live site: https://kyoto-booking-retry-proof.anionix.chatgpt.site
 
 Backup live site: https://kyoto-booking-retry-proof.vercel.app
@@ -152,7 +157,7 @@ No account, personal information, payment, real hotel, email, or external reserv
 
 ## Verification
 
-The repository passes 135 Node tests, TypeScript checking, source-quality checks, repository schemas, build checks, and two consecutive full validation runs. The public Sites and Vercel builds were exercised from fresh browser storage. Both reached `RETRY_RECOGNIZED` with two attempts, one booking, and one effect start.
+The repository passes 153 Node tests, TypeScript checking, source-quality checks, repository schemas, build checks, and two consecutive full validation runs. The public Sites and Vercel builds were exercised from fresh browser storage. Both reached `RETRY_RECOGNIZED` with two attempts, one booking, and one effect start.
 
 Chrome-native WebMCP execution remains explicitly unmeasured because the required interface was not exposed in the connected Chrome session. This limitation is shown rather than reported as a success.
 
@@ -168,8 +173,8 @@ WebMCP, JavaScript, TypeScript, Vite, IndexedDB, Service Worker, ChatGPT Sites, 
 
 | Field | Prepared answer | State |
 |---|---|---|
-| Submitter Type | Individual | READY |
-| Country of residence | Japan | NEEDS_OWNER_CONFIRMATION |
+| Submitter Type | Individual | OWNER_CONFIRMED |
+| Country of residence | Japan | OWNER_CONFIRMED |
 | App Status | Existing | READY |
 | Existing-project update | Use “What changed during the submission period” above. | READY |
 | Live URL | https://kyoto-booking-retry-proof.anionix.chatgpt.site | READY |
@@ -177,15 +182,16 @@ WebMCP, JavaScript, TypeScript, Vite, IndexedDB, Service Worker, ChatGPT Sites, 
 | Public repository | https://github.com/Anionix/verifiable-offline-webmcp-agent-spec | READY |
 | Tested agents or clients | OpenAI Codex in-app browser for discovery and execution; ordinary Chrome page interaction. Native Chrome WebMCP execution remains inconclusive. | READY |
 | Artificial-intelligence tools | OpenAI Codex and ChatGPT, Higgsfield, OpenArt, HeyGen, Canva, and vidIQ. | READY |
-| Learning | Significant | NEEDS_OWNER_CONFIRMATION |
-| Career value | Yes | NEEDS_OWNER_CONFIRMATION |
+| Learning | Significant | OWNER_CONFIRMED |
+| Career value | Yes | OWNER_CONFIRMED |
 | Public video URL | https://youtu.be/tdSvJw4ghX8 | READY_AND_LINKED |
 
 ## Current publication boundary
 
 - Canva candidate 4 was owner-selected and saved as editable design `DAHTp751k_A`; the 1280×720 derivative is preserved, but YouTube's custom-thumbnail chooser did not open in the connected browser. The public video therefore uses an automatically generated thumbnail.
+- A Devpost image upload used the actual public fictional-hotel result showing `RETRY_RECOGNIZED`, two attempts, one booking, and one effect start. The returned content-delivery URL, `https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png`, is anonymously reachable. This proves that the image file is public, not that the public project currently uses it.
 - The locally measured final video is 150 seconds and has SHA-256 `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`. Separately, https://youtu.be/tdSvJw4ghX8 returned HTTP 200, anonymous playback, the expected title, and a 150-second public duration; upload processing and copyright checks completed without an issue. No independent upload-operation receipt is retained in this repository, so the local artifact-to-public-video identity is `UNMEASURED` and the two records are not asserted to describe the same file.
 - English narration and short English captions remain in the video. The separate Japanese SubRip file was uploaded and YouTube Studio reported the Japanese subtitle track as published.
-- The Devpost update for project `1405191` returned version 6. A subsequent readback confirmed the attached YouTube URL, unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`; the read tool itself does not expose a version field.
-- Final Devpost submission has not occurred. The next allowed action is owner review of unresolved submission answers; the final-submit action remains outside this run.
+- Devpost project `1405191` has visible page title and heading `Kyoto Booking Retry Proof`. Version 8 aligned the hotel description to 153 Node tests, version 9 unified the technologies, links, and video, version 10 formatted the opening formula and retry-result list, and version 11 added the four-step 60-second check. A cache-bypassed anonymous HTML readback still returned Open Graph title `未定` and Devpost's default Open Graph image, so association of the uploaded hotel image with the public project remains `INCONCLUSIVE`. Current project readback retains state `published`, the public video, and WebMCP Challenge `submitted_at: null`.
+- Individual, Japan, Existing, Significant, and Yes are ready as the required submission answers. Final Devpost submission has not occurred; only the explicit final-submit action remains pending.
 - Pull request 53 was merged into `main`, so the public repository root now contains the hotel demo and its verification evidence.

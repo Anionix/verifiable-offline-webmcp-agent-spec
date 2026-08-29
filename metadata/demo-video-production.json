@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04bcc-aa72-7226-9787-1c0a20bef2e8"
+    "observationUuidV7": "01a04c09-60b2-790c-8cd3-1809a644bc24"
   },
-  "updatedAt": "2026-08-29T04:34:59Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED",
+  "updatedAt": "2026-08-29T05:41:18.130Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -172,7 +172,7 @@
         "timedWords": 325,
         "captionCount": 184,
         "remoteMediaId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
-        "observedAt": "2026-08-29T04:34:59Z",
+        "observedAt": "2026-08-29T05:41:18.130Z",
         "finalVideoVerified": true
       }
     },
@@ -195,7 +195,7 @@
         "timedWords": null,
         "captionCount": 28,
         "remoteMediaId": null,
-        "observedAt": "2026-08-29T04:34:59Z",
+        "observedAt": "2026-08-29T05:41:18.130Z",
         "finalVideoVerified": true
       }
     },
@@ -246,16 +246,28 @@
       }
     },
     {
+      "assetId": "960d59ae-160c-50f8-ab2a-8990518569de",
+      "service": "LOCAL",
+      "kind": "SCREEN_CAPTURE",
+      "status": "COMPLETED",
+      "prompt": "Capture the public ChatGPT Sites version 7 service table after the Vercel deployment and independent live run were verified.",
+      "createdAt": "2026-08-29T05:27:06Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-public-v7-service-table.png",
+      "sha256": "4e4b9f541a5527e65e70e0b426ecdd96c7e22dfe44fed078244e02d69ef3e955",
+      "disclosure": "Actual public ChatGPT Sites capture. It records Sites and Vercel as current-artifact verified while preserving unknown and not-published states for the other services."
+    },
+    {
       "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
       "service": "LOCAL",
       "kind": "FINAL_VIDEO",
       "status": "COMPLETED",
-      "prompt": "Assemble two disclosed fictional Higgsfield scenes, 130 seconds of unmodified public Site recording, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
-      "createdAt": "2026-08-29T04:34:09Z",
+      "prompt": "Assemble two disclosed fictional Higgsfield scenes, at least 113 seconds of public Site screen recording, the current version 7 public Site service-table capture, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
+      "createdAt": "2026-08-29T05:40:31Z",
       "remoteId": null,
-      "localPath": ".local/video-production/webmcp-hotel-demo-final.mp4",
-      "sha256": "2ceed7bf417dd29a56902276ed9384a5ed9e87734ca66336022f78a1bd0ee12a",
-      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds; the remaining 130 seconds are actual public Site recording of a fictional booking.",
+      "localPath": ".local/video-production/webmcp-hotel-demo-final-v4.mp4",
+      "sha256": "ebb3f75f7aa8a54cd1fcef4dd085ce7f118fdd2946d3e1ebb43455824b50043c",
+      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds. At least 113.2 seconds remain public Site screen recording; the visible stale Vercel status was replaced with an actual public version 7 Site capture. The narration audio packets and subtitle clock are unchanged.",
       "videoEvidence": {
         "durationSeconds": 150,
         "width": 1920,
@@ -263,9 +275,9 @@
         "frameRate": 30,
         "hasAudio": true,
         "englishCaptionsBurned": true,
-        "siteRecordingSeconds": 130,
-        "actualSiteRecordingPermille": 867,
-        "verifiedAt": "2026-08-29T04:34:59Z"
+        "siteRecordingSeconds": 113.2,
+        "actualSiteRecordingPermille": 755,
+        "verifiedAt": "2026-08-29T05:41:18.130Z"
       }
     }
   ],

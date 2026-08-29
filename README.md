@@ -115,6 +115,25 @@ npm run lsp:biome
 
 Each `lsp:*` command starts one code-analysis server for editor integration and keeps running until the editor stops it. The fixed versions and integrity values are recorded in `package-lock.json`.
 
+## Python type analysis / Python型解析
+
+<!-- information_uuid_v5=0295e1e4-5327-5304-8f27-a63d49de4ba3 -->
+<!-- event_uuid_v7=01a04c99-d1c3-776e-9e68-78f0ce19ce97 state_transition=PYTHON_TYPE_ANALYSIS_UNCONFIGURED -> VERSION_PINNED -> PROJECT_SCOPE_CONFIGURED -> TYPE_CHECKS_PASSED -> LANGUAGE_SERVER_HANDSHAKES_VERIFIED occurred_at=2026-08-29T08:19:04.259Z -->
+<!-- machine-contract=Both exact development dependency versions, both configured project checks, and both initialize and shutdown language-server handshakes must pass without a global installation or generated configuration migration. -->
+
+`ty 0.0.75` and Pyrefly `1.2.0` are exact project development dependencies in `pyproject.toml` and `uv.lock`. The two tools check the same seven Python files under `scripts` and `formal/model-checker`, targeting the repository minimum Python version, 3.12. `ty` remains beta software; Pyrefly is recorded separately as stable. No global installation was performed, and `pyrefly init` was not run.
+
+`ty 0.0.75`とPyrefly `1.2.0`を、`pyproject.toml`と`uv.lock`の開発依存へ完全一致で固定しました。両方とも、`scripts`と`formal/model-checker`にある同じ7個のPythonファイルを、リポジトリの最小Python版3.12として検査します。`ty`はベータ版、Pyreflyは安定版として状態を分けています。端末全体への導入と`pyrefly init`は行っていません。
+
+```bash
+make typecheck-python
+make validate-python-tools
+make lsp-ty
+make lsp-pyrefly
+```
+
+`make validate-python-tools` verifies the exact versions, macOS Arm64 wheel SHA-256 values, configured file inventory, both type checks, and full initialize/shutdown handshakes with both language servers. The `lsp-*` commands are the long-running editor entry points. Primary references are the official [ty installation](https://docs.astral.sh/ty/installation/), [ty type-checking](https://docs.astral.sh/ty/type-checking/), [Pyrefly installation](https://pyrefly.org/en/docs/installation/), and [Pyrefly editor integration](https://pyrefly.org/en/docs/IDE/) pages. Machine-readable evidence is in [`metadata/python-type-tools.json`](metadata/python-type-tools.json).
+
 ## Void local integration / Void端末内連携
 
 <!-- information_uuid_v5=294f20c3-0104-56ef-96c4-3a262bd9d7a4 -->

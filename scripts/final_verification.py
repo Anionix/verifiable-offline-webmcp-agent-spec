@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal, getcontext
 from fractions import Fraction
 from pathlib import Path
+from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb")
@@ -57,13 +58,40 @@ def exact_integer(value: object, expected: int) -> bool:
     return type(value) is int and value == expected
 
 
-def require_exact_keys(value: dict[str, object], expected: set[str], label: str) -> None:
+JsonObject = dict[str, Any]
+
+
+def require_json_object(value: object, message: str) -> JsonObject:
+    if not isinstance(value, dict):
+        raise VerificationError(message)
+    return cast(JsonObject, value)
+
+
+def require_json_list(value: object, message: str) -> list[Any]:
+    if not isinstance(value, list):
+        raise VerificationError(message)
+    return cast(list[Any], value)
+
+
+def require_string(value: object, message: str) -> str:
+    if not isinstance(value, str):
+        raise VerificationError(message)
+    return value
+
+
+def require_integer(value: object, message: str) -> int:
+    if type(value) is not int:
+        raise VerificationError(message)
+    return value
+
+
+def require_exact_keys(value: JsonObject, expected: set[str], label: str) -> None:
     actual = set(value)
     require(actual == expected, f"{label} fields differ; missing={sorted(expected - actual)}, extra={sorted(actual - expected)}")
 
 
-def require_tlc_result(value: object, label: str) -> dict[str, object]:
-    require(isinstance(value, dict), f"{label} TLC result must be an object")
+def require_tlc_result(value: object, label: str) -> JsonObject:
+    value = require_json_object(value, f"{label} TLC result must be an object")
     require_exact_keys(
         value,
         {"status", "noError", "statesGenerated", "distinctStates", "statesLeftOnQueue", "completeGraphDepth", "invariants"},
@@ -82,10 +110,9 @@ def require_tlc_result(value: object, label: str) -> dict[str, object]:
     return value
 
 
-def load_json(path: Path) -> dict[str, object]:
+def load_json(path: Path) -> JsonObject:
     value = json.loads(path.read_text(encoding="utf-8"))
-    require(isinstance(value, dict), f"{path.relative_to(ROOT)} must contain a JSON object")
-    return value
+    return require_json_object(value, f"{path.relative_to(ROOT)} must contain a JSON object")
 
 
 def json_bytes(value: object) -> bytes:
@@ -140,7 +167,7 @@ def uuid7_epoch_ms(value: str) -> int:
 
 
 def validate_identity(identity: object, stable_name: str, observed_ms: int, event_seed: str) -> None:
-    require(isinstance(identity, dict), f"identity for {stable_name} must be an object")
+    identity = require_json_object(identity, f"identity for {stable_name} must be an object")
     expected_v5 = stable_id(stable_name)
     expected_v7 = deterministic_uuid7(observed_ms, event_seed)
     require(identity.get("uuidV5") == expected_v5, f"UUIDv5 mismatch for {stable_name}")
@@ -150,34 +177,30 @@ def validate_identity(identity: object, stable_name: str, observed_ms: int, even
     require(uuid7_epoch_ms(expected_v7) == observed_ms, f"UUIDv7 timestamp mismatch for {stable_name}")
 
 
-def validate_observations(observations: dict[str, object]) -> None:
+def validate_observations(observations: JsonObject) -> None:
     require_exact_keys(
         observations,
         {"identity", "temporal", "issue", "webMcpSpecification", "browserObservations", "discoveredTools", "conclusion", "wolframCurrentRun", "scope"},
         "final observation",
     )
-    temporal = observations.get("temporal")
-    require(isinstance(temporal, dict), "observation temporal object missing")
+    temporal = require_json_object(observations.get("temporal"), "observation temporal object missing")
     require_exact_keys(temporal, {"observedAt", "observedAtEpochMs", "timeZone"}, "observation temporal")
-    observed_at = temporal.get("observedAt")
-    observed_ms = temporal.get("observedAtEpochMs")
-    require(isinstance(observed_at, str) and type(observed_ms) is int, "observation time missing")
+    observed_at = require_string(temporal.get("observedAt"), "observation time missing")
+    observed_ms = require_integer(temporal.get("observedAtEpochMs"), "observation time missing")
     require(epoch_ms(observed_at) == observed_ms, "observation RFC 3339 and epoch times differ")
     require(temporal.get("timeZone") == "UTC", "observation time zone drift")
     require(isinstance(observations.get("identity"), dict), "observation identity missing")
     require_exact_keys(observations["identity"], {"uuidV5", "uuidV7", "namespace"}, "observation identity")
     validate_identity(observations.get("identity"), "observation/final-webmcp-browser-1.0.0", observed_ms, "iab")
 
-    issue = observations.get("issue")
-    require(isinstance(issue, dict), "Issue boundary missing")
+    issue = require_json_object(observations.get("issue"), "Issue boundary missing")
     require_exact_keys(issue, {"number", "url", "informationUuidV5"}, "Issue boundary")
     require(exact_integer(issue.get("number"), 45), "unexpected Issue number")
     require(issue.get("url") == "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/45", "unexpected Issue URL")
     issue_information_id = uuid.UUID(str(issue.get("informationUuidV5")))
     require(issue_information_id.version == 5, "Issue information ID must be UUIDv5")
 
-    specification = observations.get("webMcpSpecification")
-    require(isinstance(specification, dict), "WebMCP specification observation missing")
+    specification = require_json_object(observations.get("webMcpSpecification"), "WebMCP specification observation missing")
     require_exact_keys(
         specification,
         {"source", "publication", "publishedOn", "standardsTrack", "documentSurface", "toolRegistrationSurface", "permissionsPolicyFeature"},
@@ -208,26 +231,24 @@ def validate_observations(observations: dict[str, object]) -> None:
             "CONFIRMED_PRESENT",
         ),
     }
-    records = observations.get("browserObservations")
-    require(isinstance(records, list) and len(records) == 3, "exactly three bounded browser observations required")
-    by_context: dict[str, dict[str, object]] = {}
+    records = require_json_list(observations.get("browserObservations"), "browser observations must be a list")
+    require(len(records) == 3, "exactly three bounded browser observations required")
+    by_context: dict[str, JsonObject] = {}
     browser_observation_times: list[int] = []
-    for record in records:
-        require(isinstance(record, dict), "browser observation must be an object")
+    for raw_record in records:
+        record = require_json_object(raw_record, "browser observation must be an object")
         require_exact_keys(
             record,
             {"identity", "temporal", "context", "browserVersion", "documentModelContext", "modelContextVersion", "toolsPermissionsPolicyAllowed", "notificationPermission", "serviceWorkerControllerPresent", "tabWebMcpCapability", "console", "network"},
             "browser observation",
         )
-        context = record.get("context")
-        require(isinstance(context, str) and context in expected_contexts, f"unexpected browser context: {context}")
+        context = require_string(record.get("context"), "browser context missing")
+        require(context in expected_contexts, f"unexpected browser context: {context}")
         require(context not in by_context, f"duplicate browser context: {context}")
-        record_temporal = record.get("temporal")
-        require(isinstance(record_temporal, dict), f"temporal missing for {context}")
+        record_temporal = require_json_object(record.get("temporal"), f"temporal missing for {context}")
         require_exact_keys(record_temporal, {"observedAt", "observedAtEpochMs"}, f"temporal for {context}")
-        record_at = record_temporal.get("observedAt")
-        record_ms = record_temporal.get("observedAtEpochMs")
-        require(isinstance(record_at, str) and type(record_ms) is int, f"observation time missing for {context}")
+        record_at = require_string(record_temporal.get("observedAt"), f"observation time missing for {context}")
+        record_ms = require_integer(record_temporal.get("observedAtEpochMs"), f"observation time missing for {context}")
         require(epoch_ms(record_at) == record_ms, f"observation time mismatch for {context}")
         require(record_ms <= observed_ms, f"browser observation occurs after final observation: {context}")
         browser_observation_times.append(record_ms)
@@ -237,16 +258,14 @@ def validate_observations(observations: dict[str, object]) -> None:
         validate_identity(record.get("identity"), stable_name, record_ms, event_seed)
         require(record.get("documentModelContext") == expected_surface, f"document surface mismatch for {context}")
         require(record.get("tabWebMcpCapability") == expected_capability, f"tab capability mismatch for {context}")
-        network = record.get("network")
-        require(isinstance(network, dict), f"network observation missing for {context}")
+        network = require_json_object(record.get("network"), f"network observation missing for {context}")
         require_exact_keys(network, {"localStaticGetRequests", "mutatingRequests", "externalRequests"}, f"network observation for {context}")
         require(
             exact_integer(network.get("mutatingRequests"), 0)
             and exact_integer(network.get("externalRequests"), 0),
             f"unsafe request observed for {context}",
         )
-        console = record.get("console")
-        require(isinstance(console, dict), f"console observation missing for {context}")
+        console = require_json_object(record.get("console"), f"console observation missing for {context}")
         require_exact_keys(console, {"errorCount", "warningCount", "warning"}, f"console observation for {context}")
         require(type(console.get("errorCount")) is int and console["errorCount"] >= 0, f"console error count invalid for {context}")
         require(type(console.get("warningCount")) is int and console["warningCount"] >= 0, f"console warning count invalid for {context}")
@@ -260,10 +279,10 @@ def validate_observations(observations: dict[str, object]) -> None:
     require(automation.get("notificationPermission") == "default", "automation notification permission drift")
     require(exact_integer(automation["network"].get("localStaticGetRequests"), 6), "automation static request count drift")
 
-    tools = observations.get("discoveredTools")
-    require(isinstance(tools, list) and len(tools) == 1, "exactly one bounded WebMCP tool required")
-    tool = tools[0]
-    require(isinstance(tool, dict) and tool.get("name") == "notify_once", "unexpected WebMCP tool")
+    tools = require_json_list(observations.get("discoveredTools"), "discovered tools must be a list")
+    require(len(tools) == 1, "exactly one bounded WebMCP tool required")
+    tool = require_json_object(tools[0], "WebMCP tool must be an object")
+    require(tool.get("name") == "notify_once", "unexpected WebMCP tool")
     require_exact_keys(
         tool,
         {"name", "title", "description", "origin", "strictObjectInput", "requiredFields", "additionalProperties", "called"},
@@ -273,8 +292,7 @@ def validate_observations(observations: dict[str, object]) -> None:
     require(tool.get("strictObjectInput") is True and tool.get("additionalProperties") is False, "WebMCP input must remain strict")
     require(tool.get("requiredFields") == ["logicalOperationId", "title", "body"], "WebMCP required fields drift")
 
-    conclusion = observations.get("conclusion")
-    require(isinstance(conclusion, dict), "WebMCP conclusion missing")
+    conclusion = require_json_object(observations.get("conclusion"), "WebMCP conclusion missing")
     require_exact_keys(
         conclusion,
         {"boundedToolDiscovery", "standardDocumentSurfaceInObservedChrome", "nativeWebMcpConformance", "nativeWebMcpVersion", "reason"},
@@ -285,8 +303,8 @@ def validate_observations(observations: dict[str, object]) -> None:
     require(conclusion.get("nativeWebMcpConformance") == "INCONCLUSIVE", "native conformance must remain INCONCLUSIVE")
     require(conclusion.get("nativeWebMcpVersion") == "INCONCLUSIVE", "native version must remain INCONCLUSIVE")
 
-    scope = observations.get("scope")
-    require(isinstance(scope, dict) and scope, "observation scope missing")
+    scope = require_json_object(observations.get("scope"), "observation scope missing")
+    require(bool(scope), "observation scope missing")
     require_exact_keys(
         scope,
         {"actualWebMcpToolCalls", "actualNotificationPermissionRequests", "actualNotifications", "actualObservedPageExternalNetworkRequests", "intentRows", "attemptRows", "effectRows", "auditEvents"},
@@ -296,8 +314,7 @@ def validate_observations(observations: dict[str, object]) -> None:
         all(exact_integer(value, 0) for value in scope.values()),
         "final browser observation must have integer zero counts for calls, permissions, notifications, effects, and external requests",
     )
-    wolfram = observations.get("wolframCurrentRun")
-    require(isinstance(wolfram, dict), "current Wolfram observation missing")
+    wolfram = require_json_object(observations.get("wolframCurrentRun"), "current Wolfram observation missing")
     require_exact_keys(
         wolfram,
         {"observedAt", "runtimeAvailability", "currentExecution", "capturedReportStatus", "independentExactArithmetic"},
@@ -309,7 +326,7 @@ def validate_observations(observations: dict[str, object]) -> None:
     require(wolfram.get("capturedReportStatus") == "CONFIRMED", "captured Wolfram report status missing")
 
 
-def run_reachability() -> dict[str, object]:
+def run_reachability() -> JsonObject:
     completed = subprocess.run(
         [sys.executable, str(REACHABILITY_PATH), "--max-retry", "2"],
         cwd=ROOT,
@@ -318,17 +335,15 @@ def run_reachability() -> dict[str, object]:
         text=True,
     )
     require(completed.returncode == 0, f"finite explorer failed: {completed.stderr.strip()}")
-    report = json.loads(completed.stdout)
+    report = require_json_object(json.loads(completed.stdout), "finite explorer report must be an object")
     require(report.get("passed") is True, "finite explorer did not pass")
-    baseline = report.get("baseline")
-    require(isinstance(baseline, dict), "finite explorer baseline missing")
+    baseline = require_json_object(report.get("baseline"), "finite explorer baseline missing")
     require(exact_integer(baseline.get("reachableStateCount"), 38), "finite explorer reachable-state count drift")
     require(exact_integer(baseline.get("transitionCount"), 43), "finite explorer transition count drift")
     require(baseline.get("commitReachable") is True, "finite explorer lost the verified commit path")
     for key in ["unauthorizedExecuteCount", "doubleEffectCount", "commitWithoutVerificationCount", "ambiguousRetryEdgeCount"]:
         require(exact_integer(baseline.get(key), 0), f"finite explorer baseline violation: {key}")
-    mutations = report.get("mutations")
-    require(isinstance(mutations, dict), "finite explorer mutations missing")
+    mutations = require_json_object(report.get("mutations"), "finite explorer mutations missing")
     mutation_expectations = {
         "unauthorized": "unauthorizedExecuteCount",
         "double": "doubleEffectCount",
@@ -336,18 +351,21 @@ def run_reachability() -> dict[str, object]:
         "ambiguous-retry": "ambiguousRetryEdgeCount",
     }
     for mutation, counter in mutation_expectations.items():
-        result = mutations.get(mutation)
-        require(isinstance(result, dict) and type(result.get(counter)) is int and result[counter] > 0, f"mutation was not detected: {mutation}")
+        result = require_json_object(mutations.get(mutation), f"mutation result missing: {mutation}")
+        require(require_integer(result.get(counter), f"mutation counter missing: {mutation}") > 0, f"mutation was not detected: {mutation}")
     return report
 
 
-def parse_tlc_output(output: str) -> tuple[dict[str, str], dict[str, object]]:
+def parse_tlc_output(output: str) -> tuple[dict[str, str], JsonObject]:
     version = re.search(r"TLC2 Version ([0-9.]+).*\(rev: ([0-9a-f]+)\)", output)
     counts = re.search(r"(\d+) states generated, (\d+) distinct states found, (\d+) states left on queue", output)
     depth = re.search(r"depth of the complete state graph search is (\d+)", output)
-    require(version is not None, "TLC version was not found in output")
-    require(counts is not None, "TLC state counts were not found in output")
-    require(depth is not None, "TLC graph depth was not found in output")
+    if version is None:
+        raise VerificationError("TLC version was not found in output")
+    if counts is None:
+        raise VerificationError("TLC state counts were not found in output")
+    if depth is None:
+        raise VerificationError("TLC graph depth was not found in output")
     no_error = "Model checking completed. No error has been found." in output
     engine = {"version": version.group(1), "revision": version.group(2)}
     result = {
@@ -369,7 +387,7 @@ def verify_tla_jar(jar: Path) -> None:
     require(digest_path(jar) == TLA_JAR_SHA256, "TLA+ tools jar SHA-256 mismatch")
 
 
-def run_tlc(jar: Path) -> tuple[dict[str, str], dict[str, object]]:
+def run_tlc(jar: Path) -> tuple[dict[str, str], JsonObject]:
     verify_tla_jar(jar)
     with tempfile.TemporaryDirectory(prefix="webmcp-tlc-") as metadata_directory:
         command = [
@@ -401,7 +419,7 @@ def run_tlc(jar: Path) -> tuple[dict[str, str], dict[str, object]]:
     return engine, result
 
 
-def capture_tla_report(jar: Path, observed_at: str) -> dict[str, object]:
+def capture_tla_report(jar: Path, observed_at: str) -> JsonObject:
     observed_ms = epoch_ms(observed_at)
     engine_observation, result = run_tlc(jar)
     event_id = deterministic_uuid7(observed_ms, "tla")
@@ -460,28 +478,24 @@ def capture_tla_report(jar: Path, observed_at: str) -> dict[str, object]:
     }
 
 
-def validate_tla_report(report: dict[str, object], reachability: dict[str, object], rerun_jar: Path | None) -> None:
+def validate_tla_report(report: JsonObject, reachability: JsonObject, rerun_jar: Path | None) -> None:
     require_exact_keys(report, {"identity", "temporal", "stateTransition", "engine", "inputs", "result", "scope"}, "TLA report")
-    temporal = report.get("temporal")
-    require(isinstance(temporal, dict), "TLA temporal record missing")
+    temporal = require_json_object(report.get("temporal"), "TLA temporal record missing")
     require_exact_keys(temporal, {"verifiedAt", "verifiedAtEpochMs", "timeZone"}, "TLA temporal")
-    verified_at = temporal.get("verifiedAt")
-    verified_ms = temporal.get("verifiedAtEpochMs")
-    require(isinstance(verified_at, str) and type(verified_ms) is int, "TLA verification time missing")
+    verified_at = require_string(temporal.get("verifiedAt"), "TLA verification time missing")
+    verified_ms = require_integer(temporal.get("verifiedAtEpochMs"), "TLA verification time missing")
     require(epoch_ms(verified_at) == verified_ms, "TLA RFC 3339 and epoch times differ")
     require(temporal.get("timeZone") == "UTC", "TLA time zone drift")
     require(isinstance(report.get("identity"), dict), "TLA identity missing")
     require_exact_keys(report["identity"], {"uuidV5", "uuidV7", "namespace"}, "TLA identity")
     validate_identity(report.get("identity"), "evidence/tla-tool-execution-1.0.0", verified_ms, "tla")
-    transition = report.get("stateTransition")
-    require(isinstance(transition, dict), "TLA state transition missing")
+    transition = require_json_object(report.get("stateTransition"), "TLA state transition missing")
     require_exact_keys(transition, {"from", "to", "eventId", "occurredAt"}, "TLA state transition")
     require(transition.get("from") == "DRY_RUN" and transition.get("to") == "VERIFIED", "TLA state transition drift")
     require(transition.get("eventId") == report["identity"]["uuidV7"], "TLA state transition event mismatch")
     require(transition.get("occurredAt") == verified_at, "TLA state transition time mismatch")
 
-    engine = report.get("engine")
-    require(isinstance(engine, dict), "TLA engine record missing")
+    engine = require_json_object(report.get("engine"), "TLA engine record missing")
     require_exact_keys(
         engine,
         {"name", "version", "revision", "toolsRelease", "releaseSource", "jarSource", "jarBytes", "publishedSha1", "observedSha1", "observedSha256", "binaryBundled"},
@@ -493,8 +507,7 @@ def validate_tla_report(report: dict[str, object], reachability: dict[str, objec
     require(engine.get("publishedSha1") == TLA_JAR_SHA1 and engine.get("observedSha1") == TLA_JAR_SHA1, "TLA jar SHA-1 mismatch")
     require(engine.get("observedSha256") == TLA_JAR_SHA256 and engine.get("binaryBundled") is False, "TLA jar SHA-256 or bundling claim mismatch")
 
-    inputs = report.get("inputs")
-    require(isinstance(inputs, dict), "TLA inputs missing")
+    inputs = require_json_object(report.get("inputs"), "TLA inputs missing")
     require_exact_keys(
         inputs,
         {"specification", "specificationSha256", "configuration", "configurationSha256", "maxRetry", "workers", "fingerprintIndex", "checkDeadlock", "command"},
@@ -517,8 +530,7 @@ def validate_tla_report(report: dict[str, object], reachability: dict[str, objec
     result = require_tlc_result(report.get("result"), "captured")
     baseline = reachability["baseline"]
     require(result["distinctStates"] == baseline["reachableStateCount"], "TLC and independent explorer state counts differ")
-    scope = report.get("scope")
-    require(isinstance(scope, dict), "TLA scope missing")
+    scope = require_json_object(report.get("scope"), "TLA scope missing")
     require_exact_keys(scope, {"finiteModelOnly", "actualNotificationEffects", "actualNetworkEffectsDuringModelCheck", "runtimeBrowserConformanceProved"}, "TLA scope")
     require(scope.get("finiteModelOnly") is True, "TLA finite scope was overclaimed")
     require(
@@ -535,13 +547,11 @@ def validate_tla_report(report: dict[str, object], reachability: dict[str, objec
         require(rerun_result == result, "rerun TLC semantics differ from captured report")
 
 
-def exact_wolfram_checks() -> dict[str, object]:
+def exact_wolfram_checks() -> JsonObject:
     report = load_json(WOLFRAM_REPORT_PATH)
-    results = report.get("results")
-    require(isinstance(results, dict), "captured Wolfram results missing")
+    results = require_json_object(report.get("results"), "captured Wolfram results missing")
     require(results.get("probabilityMass") == "1", "captured Wolfram probability mass is not one")
-    sample = results.get("sample")
-    require(isinstance(sample, dict), "captured Wolfram sample missing")
+    sample = require_json_object(results.get("sample"), "captured Wolfram sample missing")
 
     retry_probability = Fraction(3, 50)
     retry_budget = 3
@@ -577,22 +587,20 @@ def exact_wolfram_checks() -> dict[str, object]:
     }
 
 
-def validate_test_catalog() -> dict[str, object]:
+def validate_test_catalog() -> JsonObject:
     catalog = load_json(TEST_CATALOG_PATH)
-    records = catalog.get("records")
-    require(isinstance(records, list), "test catalog records missing")
+    records = require_json_list(catalog.get("records"), "test catalog records missing")
     require(len(records) == 67, f"expected 67 test records, got {len(records)}")
     identifiers: list[str] = []
     automation_artifacts: set[str] = set()
-    for record in records:
-        require(isinstance(record, dict), "test record must be an object")
-        identifier = record.get("id")
-        require(isinstance(identifier, str), "test record ID missing")
+    for raw_record in records:
+        record = require_json_object(raw_record, "test record must be an object")
+        identifier = require_string(record.get("id"), "test record ID missing")
         identifiers.append(identifier)
         require(record.get("implementation_status") == "implemented", f"test is not implemented: {identifier}")
         require(record.get("automated") is True, f"test is not automated: {identifier}")
-        artifacts = record.get("automation_artifacts")
-        require(isinstance(artifacts, list) and artifacts, f"test has no automation artifact: {identifier}")
+        artifacts = require_json_list(record.get("automation_artifacts"), f"test has no automation artifact: {identifier}")
+        require(bool(artifacts), f"test has no automation artifact: {identifier}")
         for artifact in artifacts:
             require(isinstance(artifact, str) and (ROOT / artifact).exists(), f"missing automation artifact for {identifier}: {artifact}")
             automation_artifacts.add(artifact)
@@ -609,7 +617,7 @@ def validate_test_catalog() -> dict[str, object]:
     }
 
 
-def build_final_report(rerun_tla_jar: Path | None = None) -> dict[str, object]:
+def build_final_report(rerun_tla_jar: Path | None = None) -> JsonObject:
     observations = load_json(OBSERVATIONS_PATH)
     validate_observations(observations)
     reachability = run_reachability()

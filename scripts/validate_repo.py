@@ -41,6 +41,9 @@
 # event_uuid_v7=01a04c90-5270-7d67-be8b-a19c33bb52ca
 # state_transition=YOUTUBE_DURATION_ONLY_BINDING -> SELECTED_UPLOAD_DIGEST_BOUND occurred_at=2026-08-29T08:08:41.840Z
 # machine-contract: public YouTube evidence must bind the selected local final-video artifact identifier, path, and SHA-256 to the returned public video identifier; equal duration alone is insufficient.
+# information_uuid_v5=17436d1b-fda6-5147-b5b0-ba04f2465e30
+# event_uuid_v7=01a04c9e-a9f3-75f0-ac02-6d9514cfc4b5 state_transition=PYTHON_TYPE_TOOLS_STANDALONE -> PYTHON_TYPE_TOOLS_IN_FULL_GATE occurred_at=2026-08-29T08:24:21.747Z
+# machine-contract: schema evidence must preserve exact tool versions, release status, project scope, and language-server handshake results.
 from __future__ import annotations
 
 import argparse
@@ -53,9 +56,11 @@ import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import yaml
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 
@@ -74,15 +79,23 @@ def is_ignored(path: Path):
     return any(part in IGNORED_PARTS for part in path.relative_to(ROOT).parts)
 
 
-def load_json(path: Path):
+def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def parse_subrip(path: Path):
+def load_ed25519_public_key(path: Path) -> Ed25519PublicKey:
+    """Load a public key and fail closed if an evidence fixture changes algorithms."""
+    key = serialization.load_pem_public_key(path.read_bytes())
+    if not isinstance(key, Ed25519PublicKey):
+        raise TypeError(f"{path.relative_to(ROOT)} must contain an Ed25519 public key")
+    return key
+
+
+def parse_subrip(path: Path) -> dict[str, Any]:
     """Return a strict, ordered SubRip summary for machine-checkable caption evidence."""
     text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
     blocks = [block for block in re.split(r"\n{2,}", text.strip()) if block]
-    cues = []
+    cues: list[dict[str, Any]] = []
     previous_end = 0
     for expected_index, block in enumerate(blocks, start=1):
         lines = block.splitlines()
@@ -92,7 +105,7 @@ def parse_subrip(path: Path):
         if timing is None:
             raise ValueError(f"{path.relative_to(ROOT)} has invalid timing at cue {expected_index}")
 
-        def milliseconds(prefix):
+        def milliseconds(prefix: str) -> int:
             minute = int(timing[f"{prefix}_m"])
             second = int(timing[f"{prefix}_s"])
             if minute >= 60 or second >= 60:
@@ -554,6 +567,27 @@ def main():
         errors.append("Void dependency audit severity counts do not sum to the recorded total")
     if void_evidence["providerState"]["deploymentExecutionCount"] != 0:
         errors.append("Void integration evidence cannot claim a deployment before provider publication evidence exists")
+    python_type_evidence = load_json(ROOT / "metadata/python-type-tools.json")
+    python_type_validator = Draft202012Validator(
+        schemas["python-type-tools"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in python_type_validator.iter_errors(python_type_evidence):
+        errors.append(f"schema metadata/python-type-tools.json: {e.message}")
+    python_type_identity = python_type_evidence["identity"]
+    python_type_transition = python_type_evidence["stateTransition"]
+    if python_type_identity["observationUuidV7"] != python_type_transition["eventId"]:
+        errors.append("Python type-tool observation and transition event identifiers differ")
+    if python_type_identity["observedAt"] != python_type_transition["occurredAt"]:
+        errors.append("Python type-tool observation and transition times differ")
+    if python_type_evidence["installation"]["globalInstallationPerformed"]:
+        errors.append("Python type-tool evidence cannot claim a global installation")
+    if python_type_evidence["installation"]["automaticPyreflyInitExecuted"]:
+        errors.append("Python type-tool evidence cannot claim an automatic Pyrefly configuration migration")
+    if {tool["name"]: tool["officialStatus"] for tool in python_type_evidence["tools"]} != {
+        "ty": "BETA",
+        "Pyrefly": "STABLE",
+    }:
+        errors.append("Python type-tool release status boundary drifted")
     video_production = load_json(ROOT / "metadata/demo-video-production.json")
     video_production_validator = Draft202012Validator(
         schemas["demo-video-production"], registry=schema_registry, format_checker=format_checker
@@ -765,7 +799,7 @@ def main():
             voice_asset = voice_assets[0]
             audio_end_ms = round(1000 * voice_asset["voiceEvidence"]["durationSeconds"])
 
-        parsed_subtitles = {}
+        parsed_subtitles: dict[str, dict[str, Any]] = {}
         for record in subtitle_records:
             path = ROOT / record["path"]
             parsed = parse_subrip(path)
@@ -933,7 +967,7 @@ def main():
 
     # Audit chain and signatures.
     events = [json.loads(x) for x in (ROOT / "data/audit/events.sample.ndjson").read_text(encoding="utf-8").splitlines() if x]
-    pub = serialization.load_pem_public_key((ROOT / "data/audit/keys/sample-device-public-key.pem").read_bytes())
+    pub = load_ed25519_public_key(ROOT / "data/audit/keys/sample-device-public-key.pem")
     prev = ""
     for i, event in enumerate(events, 1):
         core = {k: v for k, v in event.items() if k != "proof"}
@@ -960,7 +994,7 @@ def main():
     cp_core = {k: v for k, v in checkpoint.items() if k not in {"digest", "signature"}}
     cp_digest = sha256(canonical_bytes(cp_core))
     if cp_digest != checkpoint["digest"]: errors.append("checkpoint digest mismatch")
-    cp_pub = serialization.load_pem_public_key((ROOT / "data/audit/keys/sample-checkpoint-public-key.pem").read_bytes())
+    cp_pub = load_ed25519_public_key(ROOT / "data/audit/keys/sample-checkpoint-public-key.pem")
     try: cp_pub.verify(base64.b64decode(checkpoint["signature"]["signatureBase64"]), b"TOOL-AUDIT-CHECKPOINT-v0.1\x00" + bytes.fromhex(cp_digest))
     except Exception as e: errors.append(f"checkpoint signature: {e}")
     checks["merkle_checkpoint"] = not errors
@@ -987,7 +1021,7 @@ def main():
         if len(device_events) != device["eventCount"]:
             errors.append(f"offline sync event count mismatch for {device['deviceId']}")
             continue
-        public_key = serialization.load_pem_public_key((ROOT / device["publicKeyPath"]).read_bytes())
+        public_key = load_ed25519_public_key(ROOT / device["publicKeyPath"])
         previous = sha256(
             b"OFFLINE-SYNC-GENESIS-v0.4\x00"
             + uuid.UUID(device["logId"]).bytes

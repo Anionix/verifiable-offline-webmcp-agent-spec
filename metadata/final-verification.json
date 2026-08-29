@@ -123,6 +123,6 @@
     "formal/wolfram/verification-report.json": "45bfb93ffa808a2bff8b325248de6491af726b196ada9239ca34548433f6817f",
     "knowledge/tests.json": "03bb3afa2159d4f52c61b79b9953d4d1cacb9ed14dd9f0607cd4bcc6525618df",
     "schemas/final-verification.schema.json": "ce990fa897461b05f3b6f706dac23d0d5c03c92697c39c691dbf4bcdbbdc8a26",
-    "scripts/final_verification.py": "fa1dbdf76757e7545feca2e205ccee5cf56e122c989026e48f9f3619b8e9de29"
+    "scripts/final_verification.py": "d2c0d7d7a732370d7dd2d6f3ddaffee25babf833afc86efee0eced25df814938"
   }
 }

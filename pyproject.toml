@@ -11,3 +11,23 @@ dependencies = [
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+  "pyrefly==1.2.0",
+  "ty==0.0.75",
+]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.src]
+include = ["scripts", "formal/model-checker"]
+
+[tool.pyrefly]
+project-includes = ["scripts", "formal/model-checker"]
+python-version = "3.12"
+search-path = ["scripts"]
+
+[tool.pyrefly.errors]
+untyped-import = false

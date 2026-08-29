@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: validate regenerate test-ts typecheck model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner evidence-slo evidence-final verify-tla
+.PHONY: validate regenerate test-ts typecheck typecheck-python validate-python-tools lsp-ty lsp-pyrefly model-check manifest benchmark-notification demo demo-sync demo-planner evidence-sync evidence-planner evidence-slo evidence-final verify-tla
 
 export UV_CACHE_DIR ?= $(CURDIR)/.local/uv-cache
 
@@ -14,6 +14,19 @@ test-ts:
 
 typecheck:
 	cd src/typescript && npm run typecheck
+
+typecheck-python:
+	uv run --frozen ty check
+	uv run --frozen pyrefly check --min-severity warn
+
+validate-python-tools:
+	uv run --frozen python scripts/validate_python_type_tools.py
+
+lsp-ty:
+	uv run --frozen ty server
+
+lsp-pyrefly:
+	uv run --frozen pyrefly lsp
 
 model-check:
 	uv run --frozen python formal/model-checker/reachability.py

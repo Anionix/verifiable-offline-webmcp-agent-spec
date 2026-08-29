@@ -125,6 +125,7 @@ function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStor
   let namedDescriptor: number | null = null;
   try {
     const flags = constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW;
+    // codeql[js/file-system-race]
     guardDescriptor = openSync(storageRoot, flags);
     const guarded = fstatSync(guardDescriptor);
     if (!guarded.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);

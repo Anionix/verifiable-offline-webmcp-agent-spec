@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/vercel-hotel-deployment.schema.json",
-  "receiptVersion": "1.2.0",
+  "receiptVersion": "1.3.0",
   "identity": {
     "informationUuidV5": "b5e254dc-08a3-59e9-a4dd-f2215b184964",
     "observationUuidV7": "01a04d81-12de-7e8e-8957-a1eaead5c991",
@@ -32,7 +32,9 @@
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
     "deploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
-    "deployedSourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+    "sourceState": "DIRTY_WORKTREE",
+    "providerGitCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+    "providerGitDirty": true,
     "uniqueUrl": "https://kyoto-booking-retry-proof-4p3pru70s-aniotajp-1978s-projects.vercel.app",
     "publicAlias": "https://kyoto-booking-retry-proof.vercel.app",
     "state": "READY",
@@ -84,7 +86,7 @@
     "evidenceState": "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
     "testedFunctionalDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
     "appliesToDeploymentId": "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
-    "appliesToDeployedSourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+    "appliesToFunctionalSourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
     "storageState": "FRESH",
     "input": {
       "checkIn": "2026-12-10",
@@ -140,7 +142,7 @@
     {
       "sourceId": "3440768e-6dff-5619-a615-1e919cde6283",
       "kind": "VERCEL_PROVIDER_READBACK",
-      "supports": ["team", "hotel project", "deployment", "source commit", "READY timestamps"]
+      "supports": ["team", "hotel project", "deployment", "provider Git commit", "dirty worktree state", "READY timestamps"]
     },
     {
       "sourceId": "b30fed6a-3f17-520f-bd0a-2b07cb8b03ee",

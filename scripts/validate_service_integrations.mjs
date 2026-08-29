@@ -14,7 +14,7 @@
 // machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
 // event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
 // state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
-// machine-contract: the current Vercel receipt binds exact committed source, five anonymous remote hashes, a fresh-storage retry flow, and explicit recovery from an accidental notification-project deployment.
+// machine-contract: the current Vercel receipt separates provider Git metadata from a dirty worktree, binds five anonymous remote hashes, carries the fresh-storage proof only by identical functional digest, and records recovery from an accidental notification-project deployment.
 // event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
 // state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
 // machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
@@ -113,7 +113,9 @@ const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
   deploymentId: "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
-  deployedSourceCommit: "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  sourceState: "DIRTY_WORKTREE",
+  providerGitCommit: "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  providerGitDirty: true,
   uniqueUrl: "https://kyoto-booking-retry-proof-4p3pru70s-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
   state: "READY",
@@ -166,7 +168,7 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
   evidenceState: "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
   testedFunctionalDigest: "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
   appliesToDeploymentId: "dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL",
-  appliesToDeployedSourceCommit: "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  appliesToFunctionalSourceCommit: "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
   storageState: "FRESH",
   input: {
     checkIn: "2026-12-10",
@@ -618,8 +620,8 @@ if (vercelDeployment && vercelDeploymentSchema) {
     "Carried Vercel browser evidence does not name the current deployment",
   );
   record(
-    vercelDeployment.browserFlow?.appliesToDeployedSourceCommit === vercelDeployment.deployment?.deployedSourceCommit,
-    "Carried Vercel browser evidence does not name the current deployed source",
+    vercelDeployment.browserFlow?.appliesToFunctionalSourceCommit === vercelDeployment.artifact?.sourceCommit,
+    "Carried Vercel browser evidence does not name the functional source commit",
   );
   record(
     vercelDeployment.browserFlow?.testedFunctionalDigest === vercelDeployment.artifact?.functionalDigest,

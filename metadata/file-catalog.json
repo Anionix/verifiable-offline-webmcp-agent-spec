@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "8fc1bd81a370aef8cf05c43fc709874a183726216a5e54ce9265f11676a244bf",
-      "bytes": 41685,
+      "sha256": "6961d32ace03cfa533b3faaee57ac3864d188c61573a94c699658f469557ca3f",
+      "bytes": 41844,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1821,8 +1821,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "f6ffa6dfd12cc5b262ef2f95b8dd38da9b5ada9a791a942444b925b99b42d9fe",
-      "bytes": 20854,
+      "sha256": "b748d393455d6dc7f5153c38ebe79baecf85532ee596d42179bc3c0143e4dc8c",
+      "bytes": 21112,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -4121,8 +4121,8 @@
     },
     {
       "path": "metadata/vercel-hotel-deployment.json",
-      "sha256": "2c665e658b46fffe8d73d95b0eea392eb8630c9fa04e8cae6ff6d8aac478e145",
-      "bytes": 7805,
+      "sha256": "36157ffaae3957142f9edcfb41275d8d765b786d3d32160018fa2d20d6eb2af3",
+      "bytes": 7901,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4938,8 +4938,8 @@
     },
     {
       "path": "schemas/vercel-hotel-deployment.schema.json",
-      "sha256": "6017e6529de76caef74bc56bffb3a5bd35c312d6ddaf5c96f48c4618ddc97e7f",
-      "bytes": 14940,
+      "sha256": "6bec4ddc04be51f08e3030f963f7e9e6da6371730a955d7ccaf0044eaa998374",
+      "bytes": 15125,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5280,8 +5280,8 @@
     },
     {
       "path": "scripts/validate_service_integrations.mjs",
-      "sha256": "fdcb73641a92f9e218627ff0275e3a4712937608115c3ae13ea92a0fe8775604",
-      "bytes": 46703,
+      "sha256": "115906def7ccf90df7f49567c2bad4e5197f37271bbc282ddbe99da54522555f",
+      "bytes": 46825,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

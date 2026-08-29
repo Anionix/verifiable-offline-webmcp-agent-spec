@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04c90-5270-74d5-b3bd-a281ef1755cb"
+    "observationUuidV7": "01a04cf7-edba-71cd-b1c5-c8271758d1b4"
   },
-  "updatedAt": "2026-08-29T08:08:41.840Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED -> THUMBNAIL_SELECTED_AND_SAVED -> PUBLIC_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO",
+  "updatedAt": "2026-08-29T10:01:51.802Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED -> THUMBNAIL_SELECTED_AND_SAVED -> PUBLIC_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -364,22 +364,30 @@
     "youtubeUrl": "https://youtu.be/tdSvJw4ghX8",
     "videoId": "tdSvJw4ghX8",
     "channelId": "UCe6hnuH57zMobuLUArBz4qg",
-    "status": "PUBLIC_VERIFIED",
+    "status": "PUBLIC_READBACK_VERIFIED",
     "visibility": "PUBLIC",
     "publishedAt": "2026-08-29T07:17:40.000Z",
     "observedAt": "2026-08-29T07:19:37.000Z",
     "requiresSeparateApproval": true,
     "approvalState": "GRANTED",
-    "uploadArtifactBinding": {
-      "bindingId": "f49ce1a1-e36f-5ecf-923f-2746676933cf",
-      "observationUuidV7": "01a04c90-5270-74d5-b3bd-a281ef1755cb",
-      "observedAt": "2026-08-29T08:08:41.840Z",
-      "localArtifactId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
-      "localPath": ".local/video-production/webmcp-hotel-demo-final-v10.mp4",
-      "localSha256": "3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7",
-      "youtubeVideoId": "tdSvJw4ghX8",
-      "state": "SELECTED_UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO",
-      "evidence": "The owner-session YouTube upload selected the locally verified final version 10 file and returned this public video identifier; the binding records that selected file's existing SHA-256 rather than inferring identity from duration."
+    "artifactToVideoIdentity": {
+      "informationUuidV5": "8e656bba-df14-5ee2-9348-f6239fb7edf9",
+      "observationUuidV7": "01a04cf7-edba-71cd-b1c5-c8271758d1b4",
+      "observedAt": "2026-08-29T10:01:51.802Z",
+      "state": "UNMEASURED",
+      "independentUploadReceiptState": "NOT_RETAINED",
+      "independentUploadReceipt": null,
+      "localArtifact": {
+        "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
+        "path": ".local/video-production/webmcp-hotel-demo-final-v10.mp4",
+        "sha256": "3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7"
+      },
+      "publicVideo": {
+        "videoId": "tdSvJw4ghX8",
+        "evidenceSource": "YOUTUBE_PUBLIC_AND_OWNER_READBACK"
+      },
+      "sameArtifactClaim": "NOT_ASSERTED",
+      "reason": "No repository-retained upload-operation receipt independently binds the locally measured artifact digest to the public YouTube video identifier. Equal duration and a self-consistent editable record do not establish file identity."
     },
     "anonymousReadback": {
       "httpStatus": 200,

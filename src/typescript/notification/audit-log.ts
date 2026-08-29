@@ -9,25 +9,16 @@
 // event_uuid_v7=01a04ce0-0e77-76e2-b032-8dc5fd1e2f77
 // state_transition=CHECK_THEN_OPEN -> PRIVATE_PARENT_AND_NOFOLLOW_IO occurred_at=2026-08-29T09:35:47.319Z
 // machine-contract: every audit read and append opens the reviewed path with O_NOFOLLOW inside a private caller-owned directory; constructor-time checks alone never authorize later I/O.
+// information_uuid_v5=4701fbc2-25e6-5a23-b7c0-4fb56abd6673
+// event_uuid_v7=01a04d0d-7648-762e-8124-3ceea8de45f9
+// state_transition=NOFOLLOW_WITH_UNCHECKED_HARDLINK -> SINGLE_LINK_DESCRIPTOR_BOUND_IO occurred_at=2026-08-29T10:25:23.016Z
+// machine-contract: every audit read and append rejects multiple links and proves the opened descriptor still names the reviewed path before bytes are read or appended.
 import { createHash } from "node:crypto";
-import {
-  appendFileSync,
-  chmodSync,
-  closeSync,
-  constants,
-  existsSync,
-  fstatSync,
-  lstatSync,
-  mkdirSync,
-  openSync,
-  readFileSync,
-  realpathSync,
-  statSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { appendFileSync, closeSync, constants, openSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson } from "../canonical.ts";
+import { assertNotificationStorageDescriptor, containedNotificationStoragePath } from "./storage-path.ts";
 import type { TransitionRecord } from "./types.ts";
 
 interface AuditLine extends TransitionRecord {
@@ -41,71 +32,16 @@ function hash(value: string): string {
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const repositoryStorageRoot = join(repositoryRoot, ".local");
-const AUDIT_FILENAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,126}\.ndjson$/;
-
-function requirePrivateDirectory(path: string): void {
-  const stats = statSync(path);
-  if (!stats.isDirectory()) throw new TypeError("audit parent must be a directory");
-  if (typeof process.getuid === "function" && stats.uid !== process.getuid()) {
-    throw new TypeError("audit parent must be owned by the current user");
-  }
-  if ((stats.mode & 0o077) !== 0) throw new TypeError("audit parent must be private to the current user");
-}
 
 function containedAuditPath(candidate: string): string {
-  const filename = basename(candidate);
-  if (!AUDIT_FILENAME.test(filename)) {
-    throw new TypeError("audit path must end in a simple .ndjson filename");
-  }
-
-  // Only this fixed application directory may be created. Caller-selected parents must already exist.
-  mkdirSync(repositoryStorageRoot, { recursive: true, mode: 0o700 });
-  chmodSync(repositoryStorageRoot, 0o700);
-  const requestedPath = resolve(candidate);
-  const localRoot = resolve(repositoryStorageRoot);
-  const temporaryRoot = resolve(tmpdir());
-  const fromLocalRoot = relative(localRoot, requestedPath);
-  const fromTemporaryRoot = relative(temporaryRoot, requestedPath);
-  const isBelowLocalRoot = fromLocalRoot !== ""
-    && fromLocalRoot !== ".."
-    && !fromLocalRoot.startsWith(`..${sep}`)
-    && !isAbsolute(fromLocalRoot);
-  const isBelowTemporaryRoot = fromTemporaryRoot !== ""
-    && fromTemporaryRoot !== ".."
-    && !fromTemporaryRoot.startsWith(`..${sep}`)
-    && !isAbsolute(fromTemporaryRoot);
-  const lexicalRoot = isBelowLocalRoot ? localRoot : isBelowTemporaryRoot ? temporaryRoot : null;
-  if (lexicalRoot === null) throw new TypeError("audit path is outside the allowed storage roots");
-
-  const canonicalRoot = realpathSync(lexicalRoot);
-  const canonicalParent = realpathSync(dirname(requestedPath));
-  const fromCanonicalRoot = relative(canonicalRoot, canonicalParent);
-  if (fromCanonicalRoot === ".." || fromCanonicalRoot.startsWith(`..${sep}`) || isAbsolute(fromCanonicalRoot)) {
-    throw new TypeError("audit path resolves outside its allowed storage root");
-  }
-  if (lexicalRoot === temporaryRoot) {
-    const rootStats = statSync(canonicalRoot);
-    const rootIsPrivate = (rootStats.mode & 0o077) === 0;
-    const rootIsSticky = (rootStats.mode & 0o1000) !== 0;
-    if (!rootIsPrivate && !rootIsSticky) throw new TypeError("temporary storage root must be private or sticky");
-    if (fromCanonicalRoot === "" || fromCanonicalRoot.includes(sep)) {
-      throw new TypeError("audit parent must be one direct private child of the temporary root");
-    }
-  }
-  requirePrivateDirectory(canonicalParent);
-
-  const safePath = join(canonicalParent, filename);
-  if (existsSync(safePath) && lstatSync(safePath).isSymbolicLink()) {
-    throw new TypeError("audit path must not be a symbolic link");
-  }
-  return safePath;
+  return containedNotificationStoragePath(candidate, "audit", { repositoryStorageRoot });
 }
 
 function readAuditText(path: string): string | null {
   let descriptor: number | null = null;
   try {
     descriptor = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
-    if (!fstatSync(descriptor).isFile()) throw new TypeError("audit path must be a regular file");
+    assertNotificationStorageDescriptor(path, descriptor, "audit");
     return readFileSync(descriptor, "utf8");
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
@@ -121,7 +57,7 @@ function appendAuditText(path: string, text: string): void {
   let descriptor: number | null = null;
   try {
     descriptor = openSync(path, constants.O_APPEND | constants.O_CREAT | constants.O_WRONLY | constants.O_NOFOLLOW, 0o600);
-    if (!fstatSync(descriptor).isFile()) throw new TypeError("audit path must be a regular file");
+    assertNotificationStorageDescriptor(path, descriptor, "audit");
     appendFileSync(descriptor, text, { encoding: "utf8" });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ELOOP") {

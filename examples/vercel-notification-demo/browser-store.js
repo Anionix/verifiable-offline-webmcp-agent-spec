@@ -7,6 +7,11 @@
 // event_uuid_v7=01a04c92-0d3b-734f-8e7f-2d48e2020c85
 // state_transition=USER_APPROVED_NOT_STARTED -> EXECUTING_ONCE occurred_at=2026-08-29T08:14:35.195Z
 // machine-contract: a persisted approval carries its intent and payload digest, and only that same binding may claim the single effect start after reload.
+// information_uuid_v5=e3600a62-baf5-5f10-b1d3-ae0ae962ca7f
+// source_issue_observation_uuid_v7=01a04cf7-edbe-72e1-954d-efd343fa8750
+// event_uuid_v7=01a04cf7-edba-7522-a031-3eb2f7dad1c8
+// state_transition=OPTIONAL_APPROVAL_BINDING -> COMPLETE_BINDING_REQUIRED occurred_at=2026-08-29T10:01:51.802Z
+// machine-contract: human approval and the single effect-start claim require all six reviewed binding fields; omitted, partial, or mismatched bindings fail before IndexedDB mutation.
 
 import { assertIntentMatchesApprovalBinding } from "./approval-contract.js";
 
@@ -18,6 +23,7 @@ const ROOT_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const TARGET = "browser-notification";
 const ZERO_HASH = "0".repeat(64);
 const ALLOWED_CHANNELS = new Set(["WEBMCP", "LOCAL_FORM"]);
+const APPROVAL_BOUND_TRANSITIONS = new Set(["human-approved", "effect-start-claimed"]);
 
 let databasePromise;
 let localLock = Promise.resolve();
@@ -27,7 +33,10 @@ function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
   const record = /** @type {Record<string, unknown>} */ (value);
-  return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(",")}}`;
+  return `{${Object.keys(record)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`)
+    .join(",")}}`;
 }
 
 /** @param {ArrayBuffer} value */
@@ -70,12 +79,14 @@ export async function deriveIntentId(logicalOperationId) {
 
 /** @param {{ logicalOperationId: string, title: string, body: string }} input */
 export async function digestPayload(input) {
-  return sha256(canonicalJson({
-    body: input.body,
-    logicalOperationId: input.logicalOperationId,
-    target: TARGET,
-    title: input.title,
-  }));
+  return sha256(
+    canonicalJson({
+      body: input.body,
+      logicalOperationId: input.logicalOperationId,
+      target: TARGET,
+      title: input.title,
+    }),
+  );
 }
 
 /** @param {number} [now] */
@@ -138,7 +149,10 @@ async function withLedgerLock(task) {
     return navigator.locks.request(`${DATABASE_NAME}:ledger`, { mode: "exclusive" }, task);
   }
   const run = localLock.then(task, task);
-  localLock = run.then(() => undefined, () => undefined);
+  localLock = run.then(
+    () => undefined,
+    () => undefined,
+  );
   return run;
 }
 
@@ -192,12 +206,13 @@ async function putAndReadBack(intent, event) {
   await transactionDone(transaction);
   const [storedIntent, storedEvent] = await Promise.all([getIntent(intent.intentId), getEvent(event.eventId)]);
   if (
-    !storedIntent
-    || !storedEvent
-    || storedIntent.auditHead !== event.hash
-    || storedEvent.hash !== event.hash
-    || storedEvent.intentId !== storedIntent.intentId
-  ) throw new TypeError("IndexedDB readback mismatch");
+    !storedIntent ||
+    !storedEvent ||
+    storedIntent.auditHead !== event.hash ||
+    storedEvent.hash !== event.hash ||
+    storedEvent.intentId !== storedIntent.intentId
+  )
+    throw new TypeError("IndexedDB readback mismatch");
   return { intent: storedIntent, event: storedEvent };
 }
 
@@ -303,10 +318,7 @@ function dryRunEnvelope(intent, invocation, persistedEvent) {
  */
 export async function createOrReadDryRun(input, context) {
   context.signal?.throwIfAborted();
-  const [intentId, payloadDigest] = await Promise.all([
-    deriveIntentId(input.logicalOperationId),
-    digestPayload(input),
-  ]);
+  const [intentId, payloadDigest] = await Promise.all([deriveIntentId(input.logicalOperationId), digestPayload(input)]);
   context.signal?.throwIfAborted();
   const invocation = provenance(context.channel);
 
@@ -314,12 +326,13 @@ export async function createOrReadDryRun(input, context) {
     const existing = await getIntent(intentId);
     if (existing) {
       if (
-        existing.logicalOperationId !== input.logicalOperationId
-        || existing.title !== input.title
-        || existing.body !== input.body
-        || existing.target !== TARGET
-        || existing.payloadDigest !== payloadDigest
-      ) throw new TypeError("logical operation already exists with different notification content");
+        existing.logicalOperationId !== input.logicalOperationId ||
+        existing.title !== input.title ||
+        existing.body !== input.body ||
+        existing.target !== TARGET ||
+        existing.payloadDigest !== payloadDigest
+      )
+        throw new TypeError("logical operation already exists with different notification content");
       const persistedEvent = await getEvent(existing.provenanceEventId);
       if (!persistedEvent || persistedEvent.hash !== existing.provenanceEventHash) {
         throw new TypeError("persisted provenance event is unavailable");
@@ -379,10 +392,7 @@ export async function createOrReadDryRun(input, context) {
       details: { provenance: invocation, payloadDigest, target: TARGET },
     };
     const hash = await hashEvent(eventWithoutHash);
-    const { intent, event } = await putAndReadBack(
-      { ...baseIntent, auditHead: hash, provenanceEventHash: hash },
-      { ...eventWithoutHash, hash },
-    );
+    const { intent, event } = await putAndReadBack({ ...baseIntent, auditHead: hash, provenanceEventHash: hash }, { ...eventWithoutHash, hash });
     context.signal?.throwIfAborted();
     return dryRunEnvelope(intent, invocation, event);
   });
@@ -398,7 +408,9 @@ async function transition(intentId, change, approvalBinding, bindingOptions) {
   return withLedgerLock(async () => {
     const current = await getIntent(intentId);
     if (!current) throw new TypeError("notification intent does not exist");
-    if (approvalBinding) assertIntentMatchesApprovalBinding(current, approvalBinding, bindingOptions);
+    if (APPROVAL_BOUND_TRANSITIONS.has(change.kind) || approvalBinding !== undefined) {
+      assertIntentMatchesApprovalBinding(current, approvalBinding, bindingOptions);
+    }
     const mutation = await nextMutation(current, change);
     return putAndReadBack(mutation.intent, mutation.event);
   });
@@ -406,21 +418,25 @@ async function transition(intentId, change, approvalBinding, bindingOptions) {
 
 /** @param {string} intentId @param {Record<string, any>} approvalBinding */
 export function approveIntent(intentId, approvalBinding) {
-  return transition(intentId, {
-    kind: "human-approved",
-    toControl: "USER_APPROVED",
-    toEffect: "NOT_STARTED",
-    effectStartCount: 0,
-    intentPatch: {
-      approvalIntentId: approvalBinding?.intentId,
-      approvalPayloadDigest: approvalBinding?.payloadDigest,
+  return transition(
+    intentId,
+    {
+      kind: "human-approved",
+      toControl: "USER_APPROVED",
+      toEffect: "NOT_STARTED",
+      effectStartCount: 0,
+      intentPatch: {
+        approvalIntentId: approvalBinding?.intentId,
+        approvalPayloadDigest: approvalBinding?.payloadDigest,
+      },
+      details: {
+        approvalSurface: "VISIBLE_BUTTON",
+        approvalIntentId: approvalBinding?.intentId,
+        approvalPayloadDigest: approvalBinding?.payloadDigest,
+      },
     },
-    details: {
-      approvalSurface: "VISIBLE_BUTTON",
-      approvalIntentId: approvalBinding?.intentId,
-      approvalPayloadDigest: approvalBinding?.payloadDigest,
-    },
-  }, approvalBinding);
+    approvalBinding,
+  );
 }
 
 /** @param {string} intentId @param {string} reason */
@@ -436,17 +452,22 @@ export function abortBeforeEffect(intentId, reason) {
 
 /** @param {string} intentId @param {Record<string, any>} approvalBinding */
 export function claimEffectStart(intentId, approvalBinding) {
-  return transition(intentId, {
-    kind: "effect-start-claimed",
-    toControl: "EXECUTING",
-    toEffect: "AMBIGUOUS",
-    effectStartCount: 1,
-    details: {
-      startStatus: "UNKNOWN",
-      approvalIntentId: approvalBinding?.intentId,
-      approvalPayloadDigest: approvalBinding?.payloadDigest,
+  return transition(
+    intentId,
+    {
+      kind: "effect-start-claimed",
+      toControl: "EXECUTING",
+      toEffect: "AMBIGUOUS",
+      effectStartCount: 1,
+      details: {
+        startStatus: "UNKNOWN",
+        approvalIntentId: approvalBinding?.intentId,
+        approvalPayloadDigest: approvalBinding?.payloadDigest,
+      },
     },
-  }, approvalBinding, { requirePersistedApproval: true });
+    approvalBinding,
+    { requirePersistedApproval: true },
+  );
 }
 
 /** @param {string} intentId */

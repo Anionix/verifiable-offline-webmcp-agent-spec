@@ -41,6 +41,10 @@
 # event_uuid_v7=01a04c90-5270-7d67-be8b-a19c33bb52ca
 # state_transition=YOUTUBE_DURATION_ONLY_BINDING -> SELECTED_UPLOAD_DIGEST_BOUND occurred_at=2026-08-29T08:08:41.840Z
 # machine-contract: public YouTube evidence must bind the selected local final-video artifact identifier, path, and SHA-256 to the returned public video identifier; equal duration alone is insufficient.
+# information_uuid_v5=8e656bba-df14-5ee2-9348-f6239fb7edf9
+# event_uuid_v7=01a04cf7-edba-71cd-b1c5-c8271758d1b4
+# state_transition=SELF_CERTIFIED_ARTIFACT_BINDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED occurred_at=2026-08-29T10:01:51.802Z
+# machine-contract: anonymous playback, timestamps, and subtitles are verified separately; no editable repository record may promote local-artifact to public-video identity without an independent upload receipt.
 # information_uuid_v5=17436d1b-fda6-5147-b5b0-ba04f2465e30
 # event_uuid_v7=01a04c9e-a9f3-75f0-ac02-6d9514cfc4b5 state_transition=PYTHON_TYPE_TOOLS_STANDALONE -> PYTHON_TYPE_TOOLS_IN_FULL_GATE occurred_at=2026-08-29T08:24:21.747Z
 # machine-contract: schema evidence must preserve exact tool versions, release status, project scope, and language-server handshake results.
@@ -594,6 +598,16 @@ def main():
     )
     for e in video_production_validator.iter_errors(video_production):
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    false_video_promotions = {
+        "verified identity state": ("state", "VERIFIED"),
+        "same-artifact assertion": ("sameArtifactClaim", "SAME_ARTIFACT"),
+        "self-certified receipt": ("independentUploadReceipt", {"source": "SELF_CERTIFIED_EDITABLE_RECORD"}),
+    }
+    for promotion_name, (field, value) in false_video_promotions.items():
+        falsely_promoted_video = json.loads(json.dumps(video_production))
+        falsely_promoted_video["publication"]["artifactToVideoIdentity"][field] = value
+        if not list(video_production_validator.iter_errors(falsely_promoted_video)):
+            errors.append(f"video production schema accepted false promotion: {promotion_name}")
     video_start = len(errors)
     try:
         media_capabilities = video_production["mediaCapabilities"]
@@ -671,7 +685,7 @@ def main():
                 "requiresSeparateApproval": True,
             }:
                 errors.append("unstarted video publication has unexpected evidence fields")
-        elif publication.get("status") == "PUBLIC_VERIFIED":
+        elif publication.get("status") == "PUBLIC_READBACK_VERIFIED":
             try:
                 publication_id = uuid.UUID(publication["publicationId"])
                 publication_event = uuid.UUID(publication["observationUuidV7"])
@@ -710,36 +724,42 @@ def main():
                 record for record in video_production["assets"]
                 if record["service"] == "Canva" and record["kind"] == "THUMBNAIL"
             ]
-            local_duration = (
-                final_video_assets[0]["videoEvidence"]["durationSeconds"]
-                if len(final_video_assets) == 1 else None
-            )
-            upload_binding = publication.get("uploadArtifactBinding", {})
+            artifact_identity = publication.get("artifactToVideoIdentity", {})
             if len(final_video_assets) == 1:
                 final_video = final_video_assets[0]
-                expected_binding_id = str(uuid.uuid5(
-                    uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb"),
-                    f"youtube-upload-artifact-binding:{video_id}:{final_video['assetId']}",
-                ))
                 try:
-                    binding_event = uuid.UUID(upload_binding["observationUuidV7"])
-                    binding_observed_ms = int(datetime.fromisoformat(
-                        upload_binding["observedAt"].replace("Z", "+00:00")
+                    artifact_identity_id = uuid.UUID(artifact_identity["informationUuidV5"])
+                    artifact_identity_event = uuid.UUID(artifact_identity["observationUuidV7"])
+                    artifact_identity_observed_ms = int(datetime.fromisoformat(
+                        artifact_identity["observedAt"].replace("Z", "+00:00")
                     ).timestamp() * 1000)
                 except Exception as exc:
-                    errors.append(f"YouTube upload artifact binding identity or time is invalid: {exc}")
+                    errors.append(f"artifact-to-video identity boundary or time is invalid: {exc}")
                 else:
-                    if binding_event.version != 7 or uuid7_ms(str(binding_event)) != binding_observed_ms:
-                        errors.append("YouTube upload artifact binding UUIDv7 does not match observedAt")
+                    if artifact_identity_id.version != 5:
+                        errors.append("artifact-to-video boundary information identifier is not UUIDv5")
+                    if (
+                        artifact_identity_event.version != 7
+                        or uuid7_ms(str(artifact_identity_event)) != artifact_identity_observed_ms
+                    ):
+                        errors.append("artifact-to-video boundary UUIDv7 does not match observedAt")
                 if (
-                    upload_binding.get("bindingId") != expected_binding_id
-                    or upload_binding.get("localArtifactId") != final_video["assetId"]
-                    or upload_binding.get("localPath") != final_video["localPath"]
-                    or upload_binding.get("localSha256") != final_video["sha256"]
-                    or upload_binding.get("youtubeVideoId") != video_id
-                    or upload_binding.get("state") != "SELECTED_UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO"
+                    artifact_identity.get("informationUuidV5") != "8e656bba-df14-5ee2-9348-f6239fb7edf9"
+                    or artifact_identity.get("state") != "UNMEASURED"
+                    or artifact_identity.get("independentUploadReceiptState") != "NOT_RETAINED"
+                    or artifact_identity.get("independentUploadReceipt") is not None
+                    or artifact_identity.get("sameArtifactClaim") != "NOT_ASSERTED"
+                    or artifact_identity.get("localArtifact") != {
+                        "assetId": final_video["assetId"],
+                        "path": final_video["localPath"],
+                        "sha256": final_video["sha256"],
+                    }
+                    or artifact_identity.get("publicVideo") != {
+                        "videoId": video_id,
+                        "evidenceSource": "YOUTUBE_PUBLIC_AND_OWNER_READBACK",
+                    }
                 ):
-                    errors.append("public YouTube video is not bound to the selected validated final artifact digest")
+                    errors.append("artifact-to-video identity must remain unmeasured without an independent upload receipt")
             if (
                 publication.get("youtubeUrl") != f"https://youtu.be/{video_id}"
                 or publication.get("visibility") != "PUBLIC"
@@ -750,9 +770,8 @@ def main():
                 or anonymous_readback.get("playableInEmbed") is not True
                 or anonymous_readback.get("isPrivate") is not False
                 or anonymous_readback.get("isUnlisted") is not False
-                or anonymous_readback.get("durationSeconds") != local_duration
             ):
-                errors.append("public YouTube evidence does not prove approved anonymous playback of the exact final cut")
+                errors.append("public YouTube evidence does not prove approved anonymous playback and public metadata readback")
             if (
                 subtitles_readback.get("japaneseAuthored") != "PUBLISHED"
                 or subtitles_readback.get("englishAutomatic") != "PUBLISHED"

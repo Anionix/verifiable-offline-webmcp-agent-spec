@@ -19,10 +19,12 @@ service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
 hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
 source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
 publication_state_event_uuid_v7: "01a04c90-5270-7592-8a9a-66a94266b2d7"
-void_integration_event_uuid_v7: "01a04c82-7268-7a01-b288-6d617c70cf55"
+video_identity_boundary_event_uuid_v7: "01a04cf7-edba-71cd-b1c5-c8271758d1b4"
+void_integration_event_uuid_v7: "01a04cfc-c4d5-73b4-8ef0-f22de3c54e65"
+devpost_approval_contract_event_uuid_v7: "01a04cfc-c4d6-71b3-8624-f9e37f1008f2"
 security_remediation_event_uuid_v7: "01a04cdc-3b33-7720-9567-66e1e046e0ea"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-29T09:31:36.627Z"
+updated_at: "2026-08-29T10:07:09.014Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -104,6 +106,8 @@ make validate
 
 The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-references, verifies UUID versions and UUIDv7 timestamps, runs TypeScript golden vectors, verifies Ed25519 signatures/hash chains/Merkle roots, runs the independent reachability model, and rebuilds the final evidence in memory for a byte-for-byte comparison.
 
+Review comments are bound one-to-one to their tracking Issues in [`metadata/review-comment-issue-ledger.json`](metadata/review-comment-issue-ledger.json), with the mapping checked by [`scripts/validate_review_comment_issues.mjs`](scripts/validate_review_comment_issues.mjs). レビューコメントと追跡課題の一対一対応は、同じ台帳と検査で機械的に確認します。
+
 `make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, the root `package-lock.json`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
 
 The bounded source-quality gate uses Oxlint for the hotel JavaScript, Biome for the hotel page markup and styles, and Oxfmt for the newly governed formatting surface. It avoids rewriting historical files while making the current demo mechanically reviewable.
@@ -143,10 +147,20 @@ make lsp-pyrefly
 <!-- machine-contract=Void installation and local validation readiness do not imply authentication, project linking, deployment, or public readback; those later states remain incomplete. -->
 <!-- event_uuid_v7=01a04cb2-3f0b-7892-bd37-f806bd1512f5 state_transition=DEPENDENCY_ALERTS_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> GITHUB_MAIN_READBACK_PENDING occurred_at=2026-08-29T08:45:45.099Z -->
 <!-- machine-contract=Each open Dependabot alert maps to one issue before remediation; local zero findings do not become fixed-on-main until GitHub reads the merged dependency graph. -->
+<!-- information_uuid_v5=59aace12-7f9d-59bb-9b87-55c42e4f5c53 -->
+<!-- event_uuid_v7=01a04cfc-c4d4-7d80-af61-0a7e1146082b state_transition=DIST_ASSUMED_PRESENT -> STANDALONE_VALIDATION_BUILDS_FIRST occurred_at=2026-08-29T10:07:09.012Z -->
+<!-- machine-contract=npm run validate:void builds the deterministic web artifact before validating it, while the clean-checkout regression copies tracked source but never copies ignored dist. -->
+<!-- information_uuid_v5=5b035010-7491-5f10-a312-2fcf372317f3 -->
+<!-- event_uuid_v7=01a04cfc-c4d5-73b4-8ef0-f22de3c54e65 state_transition=GLOBAL_REGISTRATION_ASSERTED -> HOST_OBSERVATION_UNVERIFIED occurred_at=2026-08-29T10:07:09.013Z -->
+<!-- machine-contract=The repository proves a pinned project package and local invocation, not Codex-wide host registration; the historical host observation never becomes a fresh-checkout claim. -->
 
-Void `0.10.12` is fixed as an exact local development dependency. The Codex-wide Model Context Protocol command `npx -y void@0.10.12 mcp` is enabled and becomes available after Codex restarts. The separate static adapter in `void.json` builds `dist/client` with database, key-value, storage, and artificial-intelligence bindings all disabled. It does not add `voidPlugin` to the existing `cloudflare()` and `sites()` Vite plug-ins. Void shares the reviewed root dependency set: Cloudflare Vite plug-in `1.54.2`, Wrangler `4.127.1`, Vite `8.2.2`, Undici `7.29.0`, Sharp `0.35.2`, and ws `8.21.0`. All 17 open Dependabot alerts were mapped individually to issues #73–#89 before the patch; local `npm audit` then reported zero known vulnerabilities.
+Void `0.10.12` is fixed as an exact project development dependency. `npm run validate:void` first builds the deterministic web artifact and then validates the separate static adapter in `void.json`; `npm run test:void:clean` proves that flow from tracked source without copying the ignored `dist` directory. Database, key-value, storage, and artificial-intelligence bindings remain disabled, and `voidPlugin` is not added to the existing `cloudflare()` and `sites()` Vite plug-ins. Void shares the reviewed root dependency set: Cloudflare Vite plug-in `1.54.2`, Wrangler `4.127.1`, Vite `8.2.2`, Undici `7.29.0`, Sharp `0.35.2`, and ws `8.21.0`. All 17 open Dependabot alerts were mapped individually to issues #73–#89 before the patch; local `npm audit` then reported zero known vulnerabilities.
 
-Void `0.10.12`を端末内の開発依存として完全一致で固定しました。Codex全体のModel Context Protocolコマンド`npx -y void@0.10.12 mcp`も有効化済みで、Codex再起動後に利用できます。`void.json`は`dist/client`だけを対象とする別の静的アダプターです。データベース、キーと値、保管、人工知能の各結合はすべて無効で、既存の`cloudflare()`と`sites()`へ`voidPlugin`を重ねません。Voidは、検査済みのルート依存集合（Cloudflare Vite plug-in `1.54.2`、Wrangler `4.127.1`、Vite `8.2.2`、Undici `7.29.0`、Sharp `0.35.2`、ws `8.21.0`）を共有します。公開中だったDependabot警告17件は修正前に課題#73〜#89へ一件ずつ対応付け、端末内の`npm audit`は既知の脆弱性0件になりました。
+Void `0.10.12`をプロジェクトの開発依存として完全一致で固定しました。`npm run validate:void`は決定論的なWeb成果物を先に構築してから`void.json`の静的アダプターを検査し、`npm run test:void:clean`は無視対象の`dist`をコピーしない新規取得相当の条件で同じ流れを確認します。データベース、キーと値、保管、人工知能の各結合はすべて無効で、既存の`cloudflare()`と`sites()`へ`voidPlugin`を重ねません。Voidは、検査済みのルート依存集合（Cloudflare Vite plug-in `1.54.2`、Wrangler `4.127.1`、Vite `8.2.2`、Undici `7.29.0`、Sharp `0.35.2`、ws `8.21.0`）を共有します。公開中だったDependabot警告17件は修正前に課題#73〜#89へ一件ずつ対応付け、端末内の`npm audit`は既知の脆弱性0件になりました。
+
+The tracked `npm run mcp:void` command starts the pinned project documentation server; it does not register Void in Codex globally. The ledger value `REGISTERED_ENABLED_RESTART_REQUIRED` is retained only as a historical observation reported by the setup host. A fresh checkout therefore records Codex-wide availability as `HOST_OBSERVATION_UNVERIFIED` until that host configuration is independently read back. Project dependency installation, host registration, provider authentication, project linking, publication, and runtime execution remain separate states.
+
+追跡済みの`npm run mcp:void`は固定したプロジェクト内の文書サーバーを起動するだけで、Codex全体へVoidを登録する操作ではありません。台帳値`REGISTERED_ENABLED_RESTART_REQUIRED`は、設定に使った端末から報告された過去の観測としてだけ保持します。したがって、新しい取得環境でのCodex全体の利用可否は、端末構成を独立して読み戻すまで`HOST_OBSERVATION_UNVERIFIED`です。プロジェクト依存の導入、端末登録、提供元認証、プロジェクト接続、公開、実行は別状態です。
 
 <!-- information_uuid_v5=63aa7af6-ddbb-5422-b2f0-2fda9e60fc39 -->
 <!-- event_uuid_v7=01a04cdc-3b33-7720-9567-66e1e046e0ea state_transition=CODE_SCANNING_UNMEASURED -> CODEQL_CONFIGURED -> 13_ALERTS_ISSUEIZED -> LOCAL_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING occurred_at=2026-08-29T09:31:36.627Z -->
@@ -156,6 +170,7 @@ GitHub CodeQLの既定設定は、Actions、JavaScript・TypeScript、Pythonを�
 
 ```bash
 npm run validate:void
+npm run test:void:clean
 npm run build:void:static
 ```
 
@@ -202,7 +217,14 @@ Public ChatGPT Sites version 11 uses exact source commit `51fdc38fa4c4cf9d66473b
 
 One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
 
-A locally verified 150-second 1920×1080 review video version 10 combines 20 disclosed seconds of fictional generated dramatization with 113.2 seconds (75.5%) of actual public Site screen recording, then shows public Sites version 7 service-state and retry-result captures. YouTube now publishes it as [WebMCP vs Duplicate Bookings: A Live Demo](https://youtu.be/tdSvJw4ghX8); the public player reports 2:30. The upload record binds the selected local version 10 artifact identifier, path, and SHA-256 `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7` to the returned YouTube video identifier `tdSvJw4ghX8`; matching duration alone is not accepted as artifact identity. Upload and high-definition processing completed, the copyright check reported no issues, audible English narration and burned-in English captions remain present, and the separate Japanese subtitle track is published. The owner-selected Canva thumbnail is ready locally, but the browser file chooser failed, so the public video currently uses a YouTube-generated thumbnail. The Devpost update operation returned version 6, and a subsequent readback of the [public project page](https://devpost.com/software/project-y79pb23hj1mz) confirmed this YouTube URL, the unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`. Final challenge submission has therefore not occurred. Keyboard traversal, screen-reader behavior, and Chrome-native WebMCP execution remain `INCONCLUSIVE`; the custom thumbnail remains prepared but not applied. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
+<!-- information_uuid_v5=8e656bba-df14-5ee2-9348-f6239fb7edf9 event_uuid_v7=01a04cf7-edba-71cd-b1c5-c8271758d1b4 state_transition=SELF_CERTIFIED_ARTIFACT_BINDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED occurred_at=2026-08-29T10:01:51.802Z -->
+<!-- machine-contract=Public playback, duration, and subtitles are readback facts; without an independent upload-operation receipt, the local file digest and public YouTube identifier are not asserted to identify the same artifact. -->
+
+The locally verified 150-second 1920×1080 review video version 10 contains 20 disclosed seconds of fictional generated dramatization and 113.2 seconds (75.5%) of actual public Site screen recording. Its local SHA-256 is `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`. Separately, public readback of [WebMCP vs Duplicate Bookings: A Live Demo](https://youtu.be/tdSvJw4ghX8) confirms anonymous playback, a 150-second duration, completed processing, no copyright issue, English audio and captions, and a published Japanese subtitle track. No independent upload-operation receipt is retained, so the local artifact-to-public-video identity is `UNMEASURED`; equal duration and an editable self-record do not prove file identity.
+
+端末内で検査した150秒・1920×1080の動画版10は、架空の生成映像20秒と実際の公開Site画面録画113.2秒（75.5%）を含み、端末内SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。これとは別に、公開YouTubeの読み戻しでは、匿名再生、150秒の再生時間、処理完了、著作権問題なし、英語音声・字幕、日本語字幕トラックを確認しました。独立したアップロード操作の受領記録は保存されていないため、端末内ファイルと公開動画の同一性は`UNMEASURED`であり、時間の一致や編集可能な自己記録だけでは同一成果物と断定しません。
+
+The owner-selected Canva thumbnail is ready locally, but the browser file chooser failed, so the public video currently uses a YouTube-generated thumbnail. The Devpost update operation returned version 6, and a subsequent readback of the [public project page](https://devpost.com/software/project-y79pb23hj1mz) confirmed this YouTube URL, the unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`. Final challenge submission has therefore not occurred. Keyboard traversal, screen-reader behavior, and Chrome-native WebMCP execution remain `INCONCLUSIVE`; the custom thumbnail remains prepared but not applied. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

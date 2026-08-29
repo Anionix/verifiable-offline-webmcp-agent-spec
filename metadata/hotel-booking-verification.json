@@ -2,11 +2,11 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04c3d-df74-73cb-8f69-e143b5e03816"
+    "observationUuidV7": "01a04c50-33a1-7536-aa11-e25da967ba60"
   },
-  "observedAt": "2026-08-29T06:38:38.000Z",
-  "sourceCommit": "WORKTREE",
-  "sourceState": "WORKTREE_CANDIDATE",
+  "observedAt": "2026-08-29T06:58:39.649Z",
+  "sourceCommit": "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
+  "sourceState": "DEPLOYED_CURRENT",
   "artifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
@@ -31,22 +31,22 @@
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE -> PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
-    "deployedVersionSourceCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
+    "deployedVersionSourceCommit": "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
     "functionalArtifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
-    "fullSitesPackageDigest": "80eadc9a78201629c8b2b29bb405a2ebaeeeac626922c834a1ae6c89b98b746f",
-    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_217f9850d81c819185fe3e68328e4c4e",
-    "versionNumber": 7,
-    "deploymentId": "appgdep_6a926ba4ccc88191bb3dfb39f478c49c",
-    "providerArchiveContentHash": "sha256:5429fab02e8e8a5dbf7a63605601a68deed92a917c69514f5ac32cef8ac2fcb4",
+    "fullSitesPackageDigest": "46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade",
+    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_66f37438eb7881919c755101e638edc9",
+    "versionNumber": 8,
+    "deploymentId": "appgdep_6a928039357c8191947ea3a0115e91a7",
+    "providerArchiveContentHash": "sha256:86faaf6fce3ce2c7c516cb4f41d9398b50cd52e00b701617b5d11954e2161bba",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
     "accessMode": "PUBLIC",
-    "status": "PREVIOUS_ARTIFACT_VERIFIED",
-    "observedAt": "2026-08-29T05:22:22.039Z",
-    "evidence": "Sites version 7 and deployment readback identify commit 34eaed29c397d383cff264a7b86a7ff72a28c083 as the exact deployed source and retain functional source a628eb9a91d310393a3b69b1130ab92871054d16. Anonymous access loaded EMPTY with exactly four safe tool cards and the current Sites and Vercel integration states. A fresh browser-storage run prepared through the visible flow, required the human confirmation button, restored after reload, and converged two attempts to one booking and one effect start with confirmation FKR-1852E0269A, UUIDv5 4181074b-ce92-5b97-9eef-964a6f8f064b, four audit events, SHA-256 chain head e7005aa4d4b2, and a valid chain. Browser errors and warnings were zero."
+    "status": "CURRENT_ARTIFACT_VERIFIED",
+    "observedAt": "2026-08-29T06:58:39.649Z",
+    "evidence": "Sites version 8 and deployment readback identify commit 370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6 as the exact deployed source, retain functional source a628eb9a91d310393a3b69b1130ab92871054d16, and match full Sites package digest 46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade. Anonymous access displayed exactly four safe tool cards and the current state table: ChatGPT Sites, Vercel, and Devpost publish CURRENT ARTIFACT; Sites and Vercel run CURRENT ARTIFACT VERIFIED; Devpost final submission remains a separate approval. A fresh browser-storage run on Sites version 8 reached PREPARED -> COMMITTED -> RETRY_RECOGNIZED, converged two attempts to one booking and one effect start, and restored the same result after reload. The same source commit independently passed the fresh retry flow on Vercel. The public Devpost page is live, but its video URL is empty and submitted_at is null, so neither video publication nor final challenge submission is claimed."
   },
   "checks": [
     {
@@ -125,7 +125,7 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The public production URL verifies Sites version 7 from exact deployed source commit 34eaed29c397d383cff264a7b86a7ff72a28c083 and functional source commit a628eb9a91d310393a3b69b1130ab92871054d16. It loaded anonymously with zero browser errors or warnings, displayed exactly four safe tools and the current Sites and Vercel status rows, enabled the separate human confirmation button only after preparation, preserved 2 attempts -> 1 booking -> 1 effect start -> confirmation FKR-1852E0269A, and restored the same state after reload."
+      "evidence": "The public production URL loaded Sites version 8 anonymously from exact deployed source commit 370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6 and functional source commit a628eb9a91d310393a3b69b1130ab92871054d16. It displayed exactly four safe tools and the current Sites, Vercel, and Devpost publication states, kept final Devpost submission behind separate approval, and matched the current Sites package digest. A fresh version 8 run required the separate human confirmation, reached PREPARED -> COMMITTED -> RETRY_RECOGNIZED, converged 2 attempts to 1 booking and 1 effect start with confirmation FKR-1852E0269A, and restored the same state after reload."
     }
   ],
   "designFidelity": [

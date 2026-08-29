@@ -491,8 +491,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "38fa00a96c5f4158587948bf7e85c9c2564cafe6fbc1ffd57bafff9ac695e703",
-      "bytes": 25902,
+      "sha256": "a5dcf9cbd0fb5819a0723f7459003501d7e475bf0cc5b40f0ed4c205723e04ed",
+      "bytes": 26432,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1783,8 +1783,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "81c01a5d84d56645eb51bea98f382463277da1233bd4ea63419dedcae14efb52",
-      "bytes": 14588,
+      "sha256": "5dea97fb24e65181797fee33a61ea62b3fd5901577b9cb89380189f7b7cad8a3",
+      "bytes": 14509,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1802,8 +1802,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "8cefdb0c1f7e491d01226e12f155c6f72e4a53147dd15038c44941f17add6016",
-      "bytes": 9016,
+      "sha256": "9f6c5fd8bbbe9d69f03114771ee2c90048c541440deb9e24cf1954745b1bc6b2",
+      "bytes": 9676,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3722,8 +3722,8 @@
     },
     {
       "path": "metadata/hotel-booking-verification.json",
-      "sha256": "ad2b98fa2a7b70b573b6194d009c04f9acf696acdded9131c44e13fd4e0a0e36",
-      "bytes": 10824,
+      "sha256": "5c613b1909e735d2d1c7fe89046390a971a0020e205c4dfa01fad79995dbd5de",
+      "bytes": 11363,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -3950,8 +3950,8 @@
     },
     {
       "path": "metadata/vercel-hotel-deployment.json",
-      "sha256": "17f8d10ee97ad4d8da42f377e2aedca99e287cdc197800c9b7d07d3b60dce8b6",
-      "bytes": 6589,
+      "sha256": "06052aa358074a76efacb09a9f7bd86ed1fff9dfb6221dbe63cb96794c4c2a87",
+      "bytes": 7435,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4311,8 +4311,8 @@
     },
     {
       "path": "schemas/hotel-booking-verification.schema.json",
-      "sha256": "7cda8c2f3b265d3c3e6dced39ab29022e340f58daf52c4a5788cd6c9e2870889",
-      "bytes": 5425,
+      "sha256": "cd06cbe115b4f6839ed26cfb3f857bd28832dc91c0badb8ef8b0132e69681653",
+      "bytes": 5508,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4653,8 +4653,8 @@
     },
     {
       "path": "schemas/vercel-hotel-deployment.schema.json",
-      "sha256": "2f2ce073ad8f609a9e29e238677ecf644e17f4c7d8738c9cce5771cd5b3411d0",
-      "bytes": 13015,
+      "sha256": "68bbacba188d9edb1710e97e3948769e3ccb02741a0e035eb8f0ad5b6987853c",
+      "bytes": 14417,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4900,8 +4900,8 @@
     },
     {
       "path": "scripts/validate_service_integrations.mjs",
-      "sha256": "70bb0a95851625ba4d54dadf45a67ba84507e3e3efedc109cbee2eed55de30b3",
-      "bytes": 34118,
+      "sha256": "d9bf3e93408af75bf4ea121f932cd57135948b358798fd5fb3aa56f02acac36c",
+      "bytes": 35606,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04c37-78f2-75ee-bef1-ad3a48c0dc16"
-observed_at: "2026-08-29T06:31:43.000Z"
-state_transition: "VERSION_7_AND_VERCEL_RELEASE_READ_BACK -> DEVPOST_PROJECT_PAGE_PUBLISHED"
+event_uuid_v7: "01a04c50-33a1-7536-aa11-e25b39656438"
+observed_at: "2026-08-29T06:58:39.649Z"
+state_transition: "DEVPOST_PROJECT_PAGE_PUBLISHED -> SITES_VERSION_8_AND_VERCEL_RELEASE_VERIFIED -> NOTIFICATION_ALIAS_RESTORED -> SITES_VERSION_8_RETRY_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -39,11 +39,11 @@ state_transition: "VERSION_7_AND_VERCEL_RELEASE_READ_BACK -> DEVPOST_PROJECT_PAG
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日5時22分22秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日6時58分39秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の版7を実行済み、同じ機能の版5を画面録画済み |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。版8を新しい保存領域から再送・再読込まで実行。動画の操作録画は同じ機能の版5 |
 | Vercel | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 予備公開先。ホテル専用プロジェクトを匿名実行済み |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
@@ -52,13 +52,13 @@ state_transition: "VERSION_7_AND_VERCEL_RELEASE_READ_BACK -> DEVPOST_PROJECT_PAG
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
 | Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 現行説明と公開URLを載せたプロジェクトページ。最終提出は別 |
 
-Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリを反映しました。提供元の読み戻しは版5・状態`published`で、未ログインのHTTP 200応答も確認しました。名称は利用者が決めるため`未定`のままです。動画URLは空、WebMCP Challengeの`submitted_at`も空なので、一般プロジェクトページの公開を最終提出とは扱いません。
+Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリを反映しました。提供元の読み戻しは版5・状態`published`で、未ログインのHTTP 200応答も確認しました。名称は利用者が決めるため`未定`のままです。動画URLは空、WebMCP Challengeの`submitted_at`は`null`なので、一般プロジェクトページの公開を最終提出とは扱いません。
 
-ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`を版7として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版7で未ログイン表示、現在のSites・Vercel状態表、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には現在の一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
+ChatGPT Sitesでは、正確な配置元コミット`370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6`を版8として[従来の一般公開URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。提供元の読み戻しでは配置識別子`appgdep_6a928039357c8191947ea3a0115e91a7`です。新しいブラウザー保存領域から、準備、人間の画面操作による確定、安全な再送、再読込復元を実行し、2試行、架空予約1件、処理開始1回を保持しました。完成動画版10の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
 
-Vercelでは、Sites版7と同じ確定コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`をホテル専用プロジェクトへ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名200応答を確認しました。新しいブラウザー保存領域で`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回、同じ確認番号、再読込復元、履歴4件、SHA-256連鎖`Valid`、ブラウザーの誤り・警告0件を確認しました。さらに公開別名から五ファイルをキャッシュ回避で読み戻し、端末内の確定構築物と一バイトずつ一致する要約値を記録しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
+Vercelでは、同じ配置元コミット`370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6`をホテル専用配置`dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`へ配置し、[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名HTTP 200応答を確認しました。新しいブラウザー保存領域で`PREPARED → COMMITTED → RETRY_RECOGNIZED`を操作し、2試行、架空予約1件、処理開始1回へ収束し、再読込後も同じ結果を保持しました。公開先から読み戻した五つの配信ファイルも端末内構築物と一致しました。正確な提供元識別子は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)へ分離し、Sites専用の配置記録を上書きしません。
 
-ホテル版は新しいVercelプロジェクトへ分離しました。既存の通知実演プロジェクトは元の配置`8e0191c3a9ea7b1e64a954cc20fd8e5e357f34d2`へ戻し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)を維持しています。両プロジェクトともGit自動配置ではなく、確定コミットだけを含む隔離作業場所から手動配置しました。
+配置操作の途中で、旧通知実演プロジェクトを誤って対象にしました。その本番別名は直ちに配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧し、[従来URL](https://verifiable-offline-webmcp-agent-spe.vercel.app)の匿名HTTP 200応答と通知実演表示を確認しました。ホテル版と通知実演版は引き続き別プロジェクトです。
 
 NetlifyとRenderは、リポジトリ内の公開先パスと限定した設定構文だけを端末内で検査しています。提供元による設定検証、外部配置、外部URLでの実行確認は行っていないため、実行状態は`NOT_RUN`です。
 

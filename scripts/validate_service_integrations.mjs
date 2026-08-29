@@ -12,6 +12,9 @@
 // event_uuid_v7=01a04be5-0163-7a97-8904-c882da28add6
 // state_transition=SITES_RECEIPT_BOUND_ONLY -> SITES_AND_VERCEL_RECEIPTS_BOUND occurred_at=2026-08-29T05:01:34.435Z
 // machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
+// event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
+// state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
+// machine-contract: the current Vercel receipt binds exact committed source, five anonymous remote hashes, a fresh-storage retry flow, and explicit recovery from an accidental notification-project deployment.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -118,17 +121,20 @@ const EXPECTED_VERCEL_ARTIFACT = {
 const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
-  deploymentId: "dpl_8mKodVM7QYitgsfcWdcdGtN6QvDu",
-  deployedSourceCommit: "34eaed29c397d383cff264a7b86a7ff72a28c083",
-  uniqueUrl: "https://kyoto-booking-retry-proof-iu3d76hg9-aniotajp-1978s-projects.vercel.app",
+  deploymentId: "dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN",
+  deployedSourceCommit: "370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6",
+  uniqueUrl: "https://kyoto-booking-retry-proof-6a6vc6mk1-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
   state: "READY",
   target: "production",
   source: "cli",
-  createdAtUnixMs: 1787980561871,
-  createdAt: "2026-08-29T05:16:01.871Z",
-  readyAtUnixMs: 1787980570412,
-  readyAt: "2026-08-29T05:16:10.412Z",
+  createdAtUnixMs: 1787986091440,
+  createdAt: "2026-08-29T06:48:11.440Z",
+  buildingAtUnixMs: 1787986092469,
+  buildingAt: "2026-08-29T06:48:12.469Z",
+  readyAtUnixMs: 1787986097630,
+  readyAt: "2026-08-29T06:48:17.630Z",
+  aliasError: null,
 };
 
 const EXPECTED_REMOTE_ARTIFACTS = [
@@ -165,7 +171,15 @@ const EXPECTED_VERCEL_HTTP = {
 
 const EXPECTED_VERCEL_BROWSER_FLOW = {
   testedUrl: "https://kyoto-booking-retry-proof.vercel.app",
-  deploymentId: "dpl_8mKodVM7QYitgsfcWdcdGtN6QvDu",
+  deploymentId: "dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN",
+  storageState: "FRESH",
+  input: {
+    checkIn: "2026-09-28",
+    checkOut: "2026-09-30",
+    adults: 2,
+    rooms: 1,
+    language: "en",
+  },
   stateSequence: ["PREPARED", "COMMITTED", "RETRY_RECOGNIZED"],
   humanConfirmationRequired: true,
   attempts: 2,
@@ -173,10 +187,11 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
   effectStarts: 1,
   confirmationNumber: "FKR-1852E0269A",
   reservationUuidV5: "4181074b-ce92-5b97-9eef-964a6f8f064b",
-  latestEventUuidV7: "01a04bf5-e9da-7e49-917c-d193c319ec01",
+  latestEventUuidV7: "01a04c4a-2e6c-7fb9-bc37-c4fd25e81b3d",
   auditEvents: 4,
   chainValid: true,
-  chainHeadPrefix: "52e25c1b0e27",
+  chainHeadSha256: "98c53884000495b1ec8cddf09d2f252c5ed4dd5cfc5ad65e3afd1f95b53f7b65",
+  chainHeadPrefix: "98c538840004",
   reloadRestored: true,
   errors: 0,
   warnings: 0,
@@ -186,9 +201,9 @@ const EXPECTED_VERCEL_OBSERVABILITY = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   environment: "production",
   queryMode: "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY",
-  queryExecutedAt: "2026-08-29T05:20:36.214Z",
-  windowStart: "2026-08-29T04:20:36.214Z",
-  windowEnd: "2026-08-29T05:20:36.214Z",
+  queryExecutedAt: "2026-08-29T06:53:23.217Z",
+  windowStart: "2026-08-29T05:53:23.217Z",
+  windowEnd: "2026-08-29T06:53:23.217Z",
   queriedLevels: ["error", "warning"],
   runtimeErrorClusters: 0,
   matchingLogEntries: 0,
@@ -203,6 +218,11 @@ const EXPECTED_RESTORED_NOTIFICATION_DEPLOYMENT = {
   sourceCommit: "8e0191c3a9ea7b1e64a954cc20fd8e5e357f34d2",
   publicAlias: "https://verifiable-offline-webmcp-agent-spe.vercel.app",
   aliasState: "RESTORED_TO_DEPLOYMENT",
+  recoveryReason: "ACCIDENTAL_HOTEL_DEPLOYMENT_TO_NOTIFICATION_PROJECT",
+  restorationAction: "PROMOTE_SAVED_ORIGINAL_DEPLOYMENT_IMMEDIATELY",
+  anonymousStatusCode: 200,
+  verifiedContent: "NOTIFICATION_DEMO",
+  recoveryObservedAt: "2026-08-29T06:54:39.527Z",
 };
 
 const VERCEL_EVIDENCE_SOURCE_NAMES = {
@@ -503,7 +523,18 @@ if (vercelDeployment && vercelDeploymentSchema) {
     Number.isInteger(deployment.readyAtUnixMs) && new Date(deployment.readyAtUnixMs).toISOString() === deployment.readyAt,
     "Vercel receipt readyAt does not match the provider millisecond timestamp",
   );
-  record(deployment.readyAtUnixMs >= deployment.createdAtUnixMs, "Vercel receipt READY time precedes creation time");
+  record(
+    Number.isInteger(deployment.buildingAtUnixMs) && new Date(deployment.buildingAtUnixMs).toISOString() === deployment.buildingAt,
+    "Vercel receipt buildingAt does not match the provider millisecond timestamp",
+  );
+  record(
+    deployment.createdAtUnixMs <= deployment.buildingAtUnixMs && deployment.buildingAtUnixMs <= deployment.readyAtUnixMs,
+    "Vercel receipt creation, build, and READY times are out of order",
+  );
+  record(
+    vercelDeployment.browserFlow?.chainHeadPrefix === vercelDeployment.browserFlow?.chainHeadSha256?.slice(0, 12),
+    "Vercel browser-flow chain prefix differs from its full SHA-256 head",
+  );
 
   const observability = vercelDeployment.postDeployObservability ?? {};
   record(

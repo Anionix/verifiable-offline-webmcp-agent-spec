@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c3f-8390-799c-ac51-3166e6f118cf state_transition=CURRENT_HOTEL_ARTIFACT_VERIFIED -> LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY occurred_at=2026-08-29T06:40:26.000Z machine-contract=The verified deployment remains previous while the new local hashes stage the unchanged hotel function and current Devpost project-page state for exact-source redeployment",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d state_transition=LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY -> CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z machine-contract=Exact committed source requires provider READY readback five anonymous remote hashes a fresh-storage retry flow and a post-ready lookback while accidental notification-project deployment and immediate restoration remain explicit",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,
@@ -23,7 +23,7 @@
   ],
   "properties": {
     "$schema": { "const": "../schemas/vercel-hotel-deployment.schema.json" },
-    "receiptVersion": { "const": "1.0.0" },
+    "receiptVersion": { "const": "1.1.0" },
     "identity": { "$ref": "#/$defs/identity" },
     "stateTransition": { "$ref": "#/$defs/stateTransition" },
     "provider": { "$ref": "#/$defs/provider" },
@@ -89,8 +89,8 @@
       "additionalProperties": false,
       "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
-        "from": { "const": "CURRENT_HOTEL_ARTIFACT_VERIFIED" },
-        "to": { "const": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY" },
+        "from": { "const": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY" },
+        "to": { "const": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
         "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }
@@ -137,8 +137,11 @@
         "source",
         "createdAtUnixMs",
         "createdAt",
+        "buildingAtUnixMs",
+        "buildingAt",
         "readyAtUnixMs",
-        "readyAt"
+        "readyAt",
+        "aliasError"
       ],
       "properties": {
         "projectId": { "$ref": "#/$defs/projectId" },
@@ -152,8 +155,11 @@
         "source": { "const": "cli" },
         "createdAtUnixMs": { "type": "integer", "minimum": 0 },
         "createdAt": { "$ref": "#/$defs/observedAt" },
+        "buildingAtUnixMs": { "type": "integer", "minimum": 0 },
+        "buildingAt": { "$ref": "#/$defs/observedAt" },
         "readyAtUnixMs": { "type": "integer", "minimum": 0 },
-        "readyAt": { "$ref": "#/$defs/observedAt" }
+        "readyAt": { "$ref": "#/$defs/observedAt" },
+        "aliasError": { "type": "null" }
       }
     },
     "remoteArtifact": {
@@ -236,6 +242,8 @@
       "required": [
         "testedUrl",
         "deploymentId",
+        "storageState",
+        "input",
         "stateSequence",
         "humanConfirmationRequired",
         "attempts",
@@ -246,6 +254,7 @@
         "latestEventUuidV7",
         "auditEvents",
         "chainValid",
+        "chainHeadSha256",
         "chainHeadPrefix",
         "reloadRestored",
         "errors",
@@ -254,6 +263,19 @@
       "properties": {
         "testedUrl": { "type": "string", "format": "uri" },
         "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "storageState": { "const": "FRESH" },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["checkIn", "checkOut", "adults", "rooms", "language"],
+          "properties": {
+            "checkIn": { "type": "string", "format": "date" },
+            "checkOut": { "type": "string", "format": "date" },
+            "adults": { "const": 2 },
+            "rooms": { "const": 1 },
+            "language": { "const": "en" }
+          }
+        },
         "stateSequence": {
           "type": "array",
           "minItems": 3,
@@ -270,6 +292,7 @@
         "latestEventUuidV7": { "$ref": "#/$defs/uuidV7" },
         "auditEvents": { "type": "integer", "minimum": 0 },
         "chainValid": { "type": "boolean" },
+        "chainHeadSha256": { "$ref": "#/$defs/sha256" },
         "chainHeadPrefix": { "type": "string", "pattern": "^[0-9a-f]{12}$" },
         "reloadRestored": { "type": "boolean" },
         "errors": { "type": "integer", "minimum": 0 },
@@ -313,7 +336,7 @@
     "restoredNotificationDeployment": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["projectId", "projectName", "deploymentId", "state", "sourceCommit", "publicAlias", "aliasState"],
+      "required": ["projectId", "projectName", "deploymentId", "state", "sourceCommit", "publicAlias", "aliasState", "recoveryReason", "restorationAction", "anonymousStatusCode", "verifiedContent", "recoveryObservedAt"],
       "properties": {
         "projectId": { "$ref": "#/$defs/projectId" },
         "projectName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
@@ -321,7 +344,12 @@
         "state": { "const": "READY" },
         "sourceCommit": { "$ref": "#/$defs/sourceCommit" },
         "publicAlias": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
-        "aliasState": { "const": "RESTORED_TO_DEPLOYMENT" }
+        "aliasState": { "const": "RESTORED_TO_DEPLOYMENT" },
+        "recoveryReason": { "const": "ACCIDENTAL_HOTEL_DEPLOYMENT_TO_NOTIFICATION_PROJECT" },
+        "restorationAction": { "const": "PROMOTE_SAVED_ORIGINAL_DEPLOYMENT_IMMEDIATELY" },
+        "anonymousStatusCode": { "const": 200 },
+        "verifiedContent": { "const": "NOTIFICATION_DEMO" },
+        "recoveryObservedAt": { "$ref": "#/$defs/observedAt" }
       }
     },
     "evidenceSource": {

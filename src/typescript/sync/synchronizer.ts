@@ -30,6 +30,18 @@
 // event_uuid_v7=01a04a5f-6d38-7fc8-89b3-1e7daabc661d
 // state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:56:03.000Z
 // machine-contract: a database key is trusted only when its identity and normalized public-key digest match the separately persisted trust anchor.
+// information_uuid_v5=5873e905-b4fe-5cbf-b23e-e92d10068f7b
+// event_uuid_v7=01a04c90-aedf-7a0d-bb62-fe99a19ae1c3
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-29T08:09:05.503Z
+// machine-contract: the first retained checkpoint may omit one signed parent only when its own digest is fixed in the external trust anchor; every later parent link remains mandatory.
+// information_uuid_v5=542c5141-881b-506e-af3b-fa3f25439622
+// event_uuid_v7=01a04c90-aee0-7b99-9581-fa55957b08f4
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-29T08:09:05.504Z
+// machine-contract: external trust-anchor changes serialize lock -> reread -> validate -> merge -> atomic replace, so stale ledger instances cannot remove accepted keys.
+// information_uuid_v5=adafdf1a-7adc-5cc3-948f-b87cc011e114
+// event_uuid_v7=01a04c90-aee1-7e37-a797-81c25dc4b222
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-29T08:09:05.505Z
+// machine-contract: LEGACY_WITHOUT_ANCHOR -> EXPLICIT_TRUST_INPUT -> ANCHOR_MIGRATED; database key rows alone never establish trust.
 import { createPublicKey } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -64,11 +76,16 @@ interface TrustedDeviceKeyAnchor {
   logId: string;
   keyId: string;
   publicKeySha256: string;
+  bootstrapCheckpointDigest: string | null;
 }
 
 const SHA_256 = /^[0-9a-f]{64}$/;
 const TRUST_ANCHOR_FILE_FIELDS = ["schemaVersion", "digestAlgorithm", "anchors"] as const;
-const TRUST_ANCHOR_FIELDS = ["deviceId", "logId", "keyId", "publicKeySha256"] as const;
+const LEGACY_TRUST_ANCHOR_FIELDS = ["deviceId", "logId", "keyId", "publicKeySha256"] as const;
+const TRUST_ANCHOR_FIELDS = [...LEGACY_TRUST_ANCHOR_FIELDS, "bootstrapCheckpointDigest"] as const;
+const TRUST_ANCHOR_LOCK_TIMEOUT_MS = 5_000;
+const TRUST_ANCHOR_LOCK_RETRY_MS = 10;
+const TRUST_ANCHOR_LOCK_WAIT = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
 
 function hasExactFields(value: unknown, fields: readonly string[]): value is Record<string, unknown> {
   return value !== null
@@ -80,6 +97,33 @@ function hasExactFields(value: unknown, fields: readonly string[]): value is Rec
 
 export function trustAnchorPathForDatabase(databasePath: string): string | null {
   return databasePath === ":memory:" ? null : `${databasePath}.trusted-keys.json`;
+}
+
+function filesystemErrorCode(error: unknown): string | null {
+  if (error === null || typeof error !== "object" || !("code" in error)) return null;
+  return typeof error.code === "string" ? error.code : null;
+}
+
+function withTrustedKeyAnchorLock<T>(path: string, operation: () => T): T {
+  const lockPath = `${path}.lock`;
+  const deadline = Date.now() + TRUST_ANCHOR_LOCK_TIMEOUT_MS;
+  while (true) {
+    try {
+      mkdirSync(lockPath, { mode: 0o700 });
+      break;
+    } catch (error) {
+      if (filesystemErrorCode(error) !== "EEXIST") throw error;
+      if (Date.now() >= deadline) {
+        throw new Error("timed out waiting for the trusted device key anchor lock", { cause: error });
+      }
+      Atomics.wait(TRUST_ANCHOR_LOCK_WAIT, 0, 0, TRUST_ANCHOR_LOCK_RETRY_MS);
+    }
+  }
+  try {
+    return operation();
+  } finally {
+    rmSync(lockPath, { recursive: true, force: true });
+  }
 }
 
 function readTrustedKeyAnchors(path: string | null): Map<string, TrustedDeviceKeyAnchor> {
@@ -101,11 +145,14 @@ function readTrustedKeyAnchors(path: string | null): Map<string, TrustedDeviceKe
   const keyIds = new Set<string>();
   for (const item of value.anchors) {
     if (
-      !hasExactFields(item, TRUST_ANCHOR_FIELDS)
+      !(hasExactFields(item, TRUST_ANCHOR_FIELDS) || hasExactFields(item, LEGACY_TRUST_ANCHOR_FIELDS))
       || typeof item.deviceId !== "string"
       || typeof item.logId !== "string"
       || typeof item.keyId !== "string"
       || typeof item.publicKeySha256 !== "string"
+      || ("bootstrapCheckpointDigest" in item
+        && item.bootstrapCheckpointDigest !== null
+        && (typeof item.bootstrapCheckpointDigest !== "string" || !SHA_256.test(item.bootstrapCheckpointDigest)))
       || ![item.deviceId, item.logId, item.keyId].every(identifier => isUuidVersion(identifier, 5))
       || !SHA_256.test(item.publicKeySha256)
       || anchors.has(item.deviceId)
@@ -117,12 +164,68 @@ function readTrustedKeyAnchors(path: string | null): Map<string, TrustedDeviceKe
       logId: item.logId,
       keyId: item.keyId,
       publicKeySha256: item.publicKeySha256,
+      bootstrapCheckpointDigest: "bootstrapCheckpointDigest" in item
+        ? item.bootstrapCheckpointDigest as string | null
+        : null,
     };
     anchors.set(anchor.deviceId, anchor);
     logIds.add(anchor.logId);
     keyIds.add(anchor.keyId);
   }
   return anchors;
+}
+
+function normalizedTrustedDeviceAnchor(identity: DeviceIdentity, publicKeyPem: string): {
+  anchor: TrustedDeviceKeyAnchor;
+  normalizedPublicKeyPem: string;
+} {
+  if (![identity.deviceId, identity.logId, identity.keyId].every(value => isUuidVersion(value, 5))) {
+    throw new TypeError("registered device identity must use UUIDv5");
+  }
+  const publicKey = createPublicKey(publicKeyPem);
+  if (publicKey.asymmetricKeyType !== "ed25519") throw new TypeError("registered key must be Ed25519");
+  const normalizedPublicKeyPem = publicKey.export({ type: "spki", format: "pem" }).toString();
+  return {
+    anchor: {
+      deviceId: identity.deviceId,
+      logId: identity.logId,
+      keyId: identity.keyId,
+      publicKeySha256: sha256Hex(normalizedPublicKeyPem),
+      bootstrapCheckpointDigest: null,
+    },
+    normalizedPublicKeyPem,
+  };
+}
+
+function baseTrustMaterialMatches(left: TrustedDeviceKeyAnchor, right: TrustedDeviceKeyAnchor): boolean {
+  return left.deviceId === right.deviceId
+    && left.logId === right.logId
+    && left.keyId === right.keyId
+    && left.publicKeySha256 === right.publicKeySha256;
+}
+
+function assertAnchorCanBeAdded(
+  anchors: ReadonlyMap<string, TrustedDeviceKeyAnchor>,
+  requestedAnchor: TrustedDeviceKeyAnchor,
+): void {
+  const anchored = anchors.get(requestedAnchor.deviceId);
+  if (anchored && !baseTrustMaterialMatches(anchored, requestedAnchor)) {
+    throw new Error("device identity is already bound to different external trust material");
+  }
+  if (!anchored && [...anchors.values()].some(anchor => {
+    return anchor.logId === requestedAnchor.logId || anchor.keyId === requestedAnchor.keyId;
+  })) throw new Error("device log or key identity is already externally anchored");
+}
+
+export interface LegacyTrustedDeviceInput {
+  identity: DeviceIdentity;
+  publicKeyPem: string;
+}
+
+export interface LocalSyncLedgerOptions {
+  now?: () => number;
+  trustAnchorPath?: string;
+  legacyTrustMigration?: readonly LegacyTrustedDeviceInput[];
 }
 
 interface EventRow {
@@ -174,7 +277,7 @@ export class LocalSyncLedger {
   readonly #trustedKeyAnchors: Map<string, TrustedDeviceKeyAnchor>;
   #anchorWriteSequence = 0;
 
-  constructor(path: string, options: { now?: () => number; trustAnchorPath?: string } = {}) {
+  constructor(path: string, options: LocalSyncLedgerOptions = {}) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     this.#now = options.now ?? Date.now;
     this.#trustAnchorPath = options.trustAnchorPath ?? trustAnchorPathForDatabase(path);
@@ -256,18 +359,38 @@ export class LocalSyncLedger {
     if (!ingestionColumns.some(column => column.name === "source_event_json")) {
       this.database.exec("ALTER TABLE ingestion_events ADD COLUMN source_event_json TEXT");
     }
+    const knownDeviceCount = Number((this.database.prepare("SELECT count(*) AS value FROM known_device_keys")
+      .get() as { value: number }).value);
+    try {
+      if (options.legacyTrustMigration !== undefined) {
+        this.#migrateLegacyTrustAnchors(options.legacyTrustMigration);
+      } else if (
+        knownDeviceCount > 0
+        && (this.#trustAnchorPath === null || !existsSync(this.#trustAnchorPath))
+      ) {
+        throw new Error("legacy trusted device keys require explicit trust migration input");
+      }
+    } catch (error) {
+      this.database.close();
+      throw error;
+    }
   }
 
   close(): void {
     this.database.close();
   }
 
-  #persistTrustedKeyAnchors(): void {
+  #replaceTrustedKeyAnchors(anchors: ReadonlyMap<string, TrustedDeviceKeyAnchor>): void {
+    this.#trustedKeyAnchors.clear();
+    for (const [deviceId, anchor] of anchors) this.#trustedKeyAnchors.set(deviceId, { ...anchor });
+  }
+
+  #writeTrustedKeyAnchors(anchors: ReadonlyMap<string, TrustedDeviceKeyAnchor>): void {
     if (this.#trustAnchorPath === null) return;
     const contents = JSON.stringify({
       schemaVersion: SYNC_VERSION,
       digestAlgorithm: "SHA-256",
-      anchors: [...this.#trustedKeyAnchors.values()].sort((left, right) => left.deviceId.localeCompare(right.deviceId)),
+      anchors: [...anchors.values()].sort((left, right) => left.deviceId.localeCompare(right.deviceId)),
     }, null, 2) + "\n";
     const temporaryPath = `${this.#trustAnchorPath}.${process.pid}.${this.#anchorWriteSequence++}.tmp`;
     writeFileSync(temporaryPath, contents, { encoding: "utf8", mode: 0o600, flag: "wx" });
@@ -277,6 +400,80 @@ export class LocalSyncLedger {
       rmSync(temporaryPath, { force: true });
       throw error;
     }
+  }
+
+  #updateTrustedKeyAnchors<T>(
+    operation: (anchors: Map<string, TrustedDeviceKeyAnchor>) => { changed: boolean; value: T },
+  ): T {
+    const update = (): T => {
+      const anchors = this.#trustAnchorPath === null
+        ? new Map([...this.#trustedKeyAnchors].map(([deviceId, anchor]) => [deviceId, { ...anchor }]))
+        : readTrustedKeyAnchors(this.#trustAnchorPath);
+      const result = operation(anchors);
+      if (result.changed) this.#writeTrustedKeyAnchors(anchors);
+      this.#replaceTrustedKeyAnchors(anchors);
+      return result.value;
+    };
+    return this.#trustAnchorPath === null
+      ? update()
+      : withTrustedKeyAnchorLock(this.#trustAnchorPath, update);
+  }
+
+  #refreshTrustedKeyAnchors(): void {
+    if (this.#trustAnchorPath !== null) this.#replaceTrustedKeyAnchors(readTrustedKeyAnchors(this.#trustAnchorPath));
+  }
+
+  #migrateLegacyTrustAnchors(inputs: readonly LegacyTrustedDeviceInput[]): void {
+    if (this.#trustAnchorPath === null) throw new Error("legacy trust migration requires a separate trust anchor file");
+    const knownRows = this.database.prepare(`
+      SELECT device_id, log_id, key_id, public_key_pem FROM known_device_keys ORDER BY device_id
+    `).all() as unknown as KnownKeyRow[];
+    if (knownRows.length === 0) throw new Error("legacy trust migration requires existing trusted device rows");
+
+    const requestedAnchors = new Map<string, TrustedDeviceKeyAnchor>();
+    for (const input of inputs) {
+      const { anchor, normalizedPublicKeyPem } = normalizedTrustedDeviceAnchor(input.identity, input.publicKeyPem);
+      assertAnchorCanBeAdded(requestedAnchors, anchor);
+      if (requestedAnchors.has(anchor.deviceId)) throw new Error("legacy trust migration contains a duplicate device");
+      const known = knownRows.find(row => row.device_id === anchor.deviceId);
+      if (
+        !known
+        || known.log_id !== anchor.logId
+        || known.key_id !== anchor.keyId
+        || known.public_key_pem !== normalizedPublicKeyPem
+      ) throw new Error("legacy trust migration input does not match the stored device identity and key");
+      requestedAnchors.set(anchor.deviceId, anchor);
+    }
+    if (requestedAnchors.size !== knownRows.length) {
+      throw new Error("legacy trust migration must explicitly cover every stored device key");
+    }
+
+    this.#updateTrustedKeyAnchors(anchors => {
+      if (anchors.size > 0) {
+        if (
+          anchors.size !== requestedAnchors.size
+          || [...requestedAnchors].some(([deviceId, requested]) => {
+            const current = anchors.get(deviceId);
+            return !current || !baseTrustMaterialMatches(current, requested);
+          })
+        ) throw new Error("legacy trust migration conflicts with the existing external trust anchor");
+        return { changed: false, value: undefined };
+      }
+      for (const [deviceId, requested] of requestedAnchors) anchors.set(deviceId, requested);
+      return { changed: true, value: undefined };
+    });
+  }
+
+  #bindBootstrapCheckpoint(deviceId: string, checkpointDigest: string): boolean {
+    return this.#updateTrustedKeyAnchors(anchors => {
+      const anchor = anchors.get(deviceId);
+      if (!anchor) return { changed: false, value: false };
+      if (anchor.bootstrapCheckpointDigest !== null) {
+        return { changed: false, value: anchor.bootstrapCheckpointDigest === checkpointDigest };
+      }
+      anchors.set(deviceId, { ...anchor, bootstrapCheckpointDigest: checkpointDigest });
+      return { changed: true, value: true };
+    });
   }
 
   #knownKeyMatchesAnchor(known: KnownKeyRow): boolean {
@@ -290,54 +487,43 @@ export class LocalSyncLedger {
   }
 
   registerDevice(identity: DeviceIdentity, publicKeyPem: string): void {
-    if (![identity.deviceId, identity.logId, identity.keyId].every(value => isUuidVersion(value, 5))) {
-      throw new TypeError("registered device identity must use UUIDv5");
-    }
-    const publicKey = createPublicKey(publicKeyPem);
-    if (publicKey.asymmetricKeyType !== "ed25519") throw new TypeError("registered key must be Ed25519");
-    const normalizedPem = publicKey.export({ type: "spki", format: "pem" }).toString();
-    const requestedAnchor: TrustedDeviceKeyAnchor = {
-      deviceId: identity.deviceId,
-      logId: identity.logId,
-      keyId: identity.keyId,
-      publicKeySha256: sha256Hex(normalizedPem),
-    };
-    const anchored = this.#trustedKeyAnchors.get(identity.deviceId);
-    if (anchored && (
-      anchored.logId !== requestedAnchor.logId
-      || anchored.keyId !== requestedAnchor.keyId
-      || anchored.publicKeySha256 !== requestedAnchor.publicKeySha256
-    )) throw new Error("device identity is already bound to different external trust material");
-    if (!anchored && [...this.#trustedKeyAnchors.values()].some(anchor => {
-      return anchor.logId === identity.logId || anchor.keyId === identity.keyId;
-    })) throw new Error("device log or key identity is already externally anchored");
+    const { anchor: requestedAnchor, normalizedPublicKeyPem } = normalizedTrustedDeviceAnchor(identity, publicKeyPem);
     const existing = this.database.prepare("SELECT * FROM known_device_keys WHERE device_id = ?")
       .get(identity.deviceId) as KnownKeyRow | undefined;
     if (existing) {
       if (
         existing.log_id !== identity.logId
         || existing.key_id !== identity.keyId
-        || existing.public_key_pem !== normalizedPem
+        || existing.public_key_pem !== normalizedPublicKeyPem
       ) throw new Error("device identity is already bound to different key material");
     }
-    if (!anchored) {
-      this.#trustedKeyAnchors.set(identity.deviceId, requestedAnchor);
-      try {
-        this.#persistTrustedKeyAnchors();
-      } catch (error) {
-        this.#trustedKeyAnchors.delete(identity.deviceId);
-        throw error;
-      }
-    }
+    this.#updateTrustedKeyAnchors(anchors => {
+      assertAnchorCanBeAdded(anchors, requestedAnchor);
+      if (anchors.has(requestedAnchor.deviceId)) return { changed: false, value: undefined };
+      anchors.set(requestedAnchor.deviceId, requestedAnchor);
+      return { changed: true, value: undefined };
+    });
     if (existing) return;
-    this.database.prepare(`
-      INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
-    `).run(identity.deviceId, identity.logId, identity.keyId, normalizedPem);
+    try {
+      this.database.prepare(`
+        INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
+      `).run(identity.deviceId, identity.logId, identity.keyId, normalizedPublicKeyPem);
+    } catch (error) {
+      const concurrentlyInserted = this.database.prepare("SELECT * FROM known_device_keys WHERE device_id = ?")
+        .get(identity.deviceId) as KnownKeyRow | undefined;
+      if (
+        concurrentlyInserted?.log_id === identity.logId
+        && concurrentlyInserted.key_id === identity.keyId
+        && concurrentlyInserted.public_key_pem === normalizedPublicKeyPem
+      ) return;
+      throw error;
+    }
   }
 
   ingest(events: readonly SignedDeviceEvent[], checkpoint: SignedCheckpoint): IngestResult {
     if (events.length === 0) return this.quarantine("EMPTY_CHAIN", null, null, checkpoint.digest);
     const first = events[0]!;
+    this.#refreshTrustedKeyAnchors();
     const known = this.database.prepare("SELECT * FROM known_device_keys WHERE device_id = ?")
       .get(first.deviceId) as KnownKeyRow | undefined;
     if (!known) return this.quarantine("UNKNOWN_KEY", first.deviceId, first.sequence, first.proof.eventDigest);
@@ -392,9 +578,22 @@ export class LocalSyncLedger {
     if (
       !checkpointExists
       && previousCheckpoint
-      && checkpoint.treeSize >= previousCheckpoint.tree_size
-      && checkpoint.previousCheckpointHash !== previousCheckpoint.checkpoint_digest
+      && (
+        checkpoint.treeSize < previousCheckpoint.tree_size
+        || checkpoint.previousCheckpointHash !== previousCheckpoint.checkpoint_digest
+      )
     ) return this.quarantine("CHECKPOINT_MISMATCH", first.deviceId, checkpoint.treeSize, checkpoint.digest);
+    if (!checkpointExists && !previousCheckpoint && Number(maxRow.value) > 0) {
+      return this.quarantine("CHECKPOINT_MISMATCH", first.deviceId, checkpoint.treeSize, checkpoint.digest);
+    }
+    if (!previousCheckpoint && Number(maxRow.value) === 0) {
+      const anchoredBootstrapDigest = this.#trustedKeyAnchors.get(first.deviceId)?.bootstrapCheckpointDigest ?? null;
+      if (
+        checkpoint.previousCheckpointHash === null
+        ? anchoredBootstrapDigest !== null
+        : !this.#bindBootstrapCheckpoint(first.deviceId, checkpoint.digest)
+      ) return this.quarantine("CHECKPOINT_MISMATCH", first.deviceId, checkpoint.treeSize, checkpoint.digest);
+    }
 
     return this.transaction(() => {
       const inserted: GlobalIngestionRecord[] = [];
@@ -533,6 +732,7 @@ export class LocalSyncLedger {
     lastHash: string;
     reason: "VERIFIED" | "GLOBAL_CHAIN_MISMATCH" | "LEGACY_SOURCE_REBIND_REQUIRED" | "SIGNED_SOURCE_MISMATCH" | "SIGNED_DEVICE_CHAIN_MISMATCH" | "TRUST_ANCHOR_MISMATCH";
   } {
+    this.#refreshTrustedKeyAnchors();
     let previousHash = globalGenesisHash();
     let expectedSequence = 1;
     const deviceSources = new Map<string, SignedDeviceEvent[]>();
@@ -647,9 +847,20 @@ export class LocalSyncLedger {
         return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
       }
       const byDigest = new Map(checkpoints.map(checkpoint => [checkpoint.digest, checkpoint]));
+      const bootstrapCheckpointDigest = this.#trustedKeyAnchors.get(deviceId)?.bootstrapCheckpointDigest ?? null;
+      if (bootstrapCheckpointDigest !== null && !byDigest.has(bootstrapCheckpointDigest)) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+      }
       const childByParent = new Map<string, SignedCheckpoint>();
       const roots: SignedCheckpoint[] = [];
       for (const checkpoint of checkpoints) {
+        if (checkpoint.digest === bootstrapCheckpointDigest) {
+          if (checkpoint.previousCheckpointHash === null) {
+            return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+          }
+          roots.push(checkpoint);
+          continue;
+        }
         if (checkpoint.previousCheckpointHash === null) {
           roots.push(checkpoint);
           continue;

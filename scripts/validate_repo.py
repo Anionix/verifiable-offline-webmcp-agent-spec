@@ -38,6 +38,9 @@
 # event_uuid_v7=01a04c84-1a18-7719-84d1-c65cfd9a1db5
 # state_transition=VOID_NOT_INSTALLED -> VOID_LOCAL_ADAPTER_EVIDENCE_VALIDATED occurred_at=2026-08-29T07:55:20.984Z
 # machine-contract: Void package and MCP registration evidence stays separate from provider authentication, project linking, publication, and runtime execution.
+# event_uuid_v7=01a04c90-5270-7d67-be8b-a19c33bb52ca
+# state_transition=YOUTUBE_DURATION_ONLY_BINDING -> SELECTED_UPLOAD_DIGEST_BOUND occurred_at=2026-08-29T08:08:41.840Z
+# machine-contract: public YouTube evidence must bind the selected local final-video artifact identifier, path, and SHA-256 to the returned public video identifier; equal duration alone is insufficient.
 from __future__ import annotations
 
 import argparse
@@ -677,6 +680,32 @@ def main():
                 final_video_assets[0]["videoEvidence"]["durationSeconds"]
                 if len(final_video_assets) == 1 else None
             )
+            upload_binding = publication.get("uploadArtifactBinding", {})
+            if len(final_video_assets) == 1:
+                final_video = final_video_assets[0]
+                expected_binding_id = str(uuid.uuid5(
+                    uuid.UUID("47f3e535-0e27-559a-9556-aa79a84f95eb"),
+                    f"youtube-upload-artifact-binding:{video_id}:{final_video['assetId']}",
+                ))
+                try:
+                    binding_event = uuid.UUID(upload_binding["observationUuidV7"])
+                    binding_observed_ms = int(datetime.fromisoformat(
+                        upload_binding["observedAt"].replace("Z", "+00:00")
+                    ).timestamp() * 1000)
+                except Exception as exc:
+                    errors.append(f"YouTube upload artifact binding identity or time is invalid: {exc}")
+                else:
+                    if binding_event.version != 7 or uuid7_ms(str(binding_event)) != binding_observed_ms:
+                        errors.append("YouTube upload artifact binding UUIDv7 does not match observedAt")
+                if (
+                    upload_binding.get("bindingId") != expected_binding_id
+                    or upload_binding.get("localArtifactId") != final_video["assetId"]
+                    or upload_binding.get("localPath") != final_video["localPath"]
+                    or upload_binding.get("localSha256") != final_video["sha256"]
+                    or upload_binding.get("youtubeVideoId") != video_id
+                    or upload_binding.get("state") != "SELECTED_UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO"
+                ):
+                    errors.append("public YouTube video is not bound to the selected validated final artifact digest")
             if (
                 publication.get("youtubeUrl") != f"https://youtu.be/{video_id}"
                 or publication.get("visibility") != "PUBLIC"

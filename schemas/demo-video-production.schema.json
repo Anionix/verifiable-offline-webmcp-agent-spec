@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=befe51ac-d842-523a-83ba-91290fa1301d event_uuid_v7=01a04c63-6328-7ecf-9db0-2d826f35eece state_transition=PUBLICATION_FAIL_CLOSED -> PUBLICATION_READBACK_VERIFIED occurred_at=2026-08-29T07:19:37.000Z machine-contract=public video evidence binds owner approval anonymous playback exact duration subtitles thumbnail fallback and an unsubmitted Devpost challenge",
+  "$comment": "information_uuid_v5=befe51ac-d842-523a-83ba-91290fa1301d event_uuid_v7=01a04c90-5270-7d87-ad50-d7f95b7ba56d state_transition=PUBLICATION_READBACK_VERIFIED -> UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO occurred_at=2026-08-29T08:08:41.840Z machine-contract=public video evidence must bind the selected upload artifact identifier path and SHA-256 to the public YouTube video identifier instead of relying on duration alone",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
@@ -85,6 +85,7 @@
         "observedAt",
         "requiresSeparateApproval",
         "approvalState",
+        "uploadArtifactBinding",
         "anonymousReadback",
         "subtitles",
         "thumbnail",
@@ -102,10 +103,27 @@
         "observedAt": { "type": "string", "format": "date-time" },
         "requiresSeparateApproval": { "const": true },
         "approvalState": { "const": "GRANTED" },
+        "uploadArtifactBinding": { "$ref": "#/$defs/youtubeUploadArtifactBinding" },
         "anonymousReadback": { "$ref": "#/$defs/youtubeAnonymousReadback" },
         "subtitles": { "$ref": "#/$defs/youtubeSubtitleReadback" },
         "thumbnail": { "$ref": "#/$defs/youtubeThumbnailReadback" },
         "devpostReadback": { "$ref": "#/$defs/devpostVideoReadback" }
+      }
+    },
+    "youtubeUploadArtifactBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bindingId", "observationUuidV7", "observedAt", "localArtifactId", "localPath", "localSha256", "youtubeVideoId", "state", "evidence"],
+      "properties": {
+        "bindingId": { "const": "f49ce1a1-e36f-5ecf-923f-2746676933cf" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "localArtifactId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "localPath": { "const": ".local/video-production/webmcp-hotel-demo-final-v10.mp4" },
+        "localSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "youtubeVideoId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{11}$" },
+        "state": { "const": "SELECTED_UPLOAD_ARTIFACT_BOUND_TO_PUBLIC_VIDEO" },
+        "evidence": { "type": "string", "minLength": 80 }
       }
     },
     "youtubeAnonymousReadback": {

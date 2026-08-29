@@ -8,6 +8,7 @@ import {
   assertPersistedIntentMatchesPreview,
   createInputBoundaryState,
   createVisualState,
+  notificationControlAvailability,
   reduceInputBoundaryState,
   reduceVisualState,
   visualEventFromPersistedStatus,
@@ -120,6 +121,64 @@ test("a pre-effect state with a measured effect is a violation", () => {
   assert.equal(state.phase, "violation");
   assert.equal(state.effectStartCount, 1);
   assert.match(state.announcement, /安全条件違反/);
+});
+
+test("restored safety violations disable every effect-bearing control until evidence recovers", () => {
+  const invalidPreview = notificationControlAvailability(
+    { controlState: "DRY_RUN", effectState: "NOT_STARTED" },
+    1,
+  );
+  assert.deepEqual(invalidPreview, {
+    approve: false,
+    reconcile: false,
+    retry: false,
+    safetyPassed: false,
+  });
+  const invalidVerified = notificationControlAvailability(
+    { controlState: "VERIFIED", effectState: "CONFIRMED_PRESENT" },
+    2,
+  );
+  assert.equal(invalidVerified.retry, false);
+  assert.equal(invalidVerified.safetyPassed, false);
+
+  const recoveredPreview = notificationControlAvailability(
+    { controlState: "DRY_RUN", effectState: "NOT_STARTED" },
+    0,
+  );
+  assert.equal(recoveredPreview.approve, true);
+  assert.equal(recoveredPreview.safetyPassed, true);
+  const recoveredVerified = notificationControlAvailability(
+    { controlState: "VERIFIED", effectState: "CONFIRMED_PRESENT" },
+    1,
+  );
+  assert.equal(recoveredVerified.retry, true);
+  assert.equal(recoveredVerified.safetyPassed, true);
+});
+
+test("an expired restored approval is visible but cannot authorize an effect", () => {
+  const intent = {
+    controlState: "USER_APPROVED",
+    effectState: "NOT_STARTED",
+    approvalExpiresAt: 2_000,
+  };
+  const event = visualEventFromPersistedStatus(intent, 0, 2_001);
+  const state = reduceVisualState(createVisualState(), event);
+  assert.equal(event.type, "APPROVAL_EXPIRED");
+  assert.equal(state.phase, "approval-expired");
+  assert.match(state.announcement, /古い承認では通知せず/);
+  assert.equal(notificationControlAvailability(intent, 0, 2_001).approve, false);
+});
+
+test("local and WebMCP restoration pass measured counts through the same control gate", async () => {
+  const application = await readFile(
+    new URL("../../../examples/notification-demo/app.js", import.meta.url),
+    "utf8",
+  );
+  assert.match(application, /notificationControlAvailability\(intent, effectStartCount\)/);
+  assert.match(application, /render\([\s\S]*status\.effectStartCount,[\s\S]*\);/);
+  const webMcpRestoration = application.slice(application.indexOf("async function registerWebMcp"));
+  assert.match(webMcpRestoration, /render\([\s\S]*status\.effectStartCount,[\s\S]*\);/);
+  assert.match(application, /if \(state\.phase === "violation"\) disableEffectControls\(\)/);
 });
 
 test("the visible flow converges two requests to one notification", () => {

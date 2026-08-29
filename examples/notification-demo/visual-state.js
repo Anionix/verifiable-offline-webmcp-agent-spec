@@ -22,6 +22,10 @@
 // event_uuid_v7=01a04a4c-1be8-7a58-a3c1-5c4e0474d59f
 // state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:34:57.000Z
 // machine-contract: NOT_STARTED and CONFIRMED_ABSENT require zero measured starts, while AMBIGUOUS and CONFIRMED_PRESENT require exactly one.
+// information_uuid_v5=46bf9ce6-0dd1-5600-8a28-f576dcb565fe
+// event_uuid_v7=01a04c92-0d3a-7148-ac98-bfcdcc353975
+// state_transition=PERSISTED_STATUS_READ -> EFFECT_CONTROLS_GATED occurred_at=2026-08-29T08:14:35.194Z
+// machine-contract: approval, retry, and reconciliation require both an allowed lifecycle pair and a passing measured-effect invariant.
 
 export const REPLAY_GATE_KEYS = Object.freeze([
   "authorization",
@@ -188,7 +192,7 @@ export function assertPersistedIntentMatchesPreview(persisted, preview) {
 // event_uuid_v7=01a049fe-ffc3-73a1-9446-8e38a434dfca
 // state_transition=DRY_RUN -> VERIFIED occurred_at=2026-08-28T20:10:43.523Z
 // machine-contract: persisted control/effect state plus the measured ledger count determines the restored visualization; preview never overwrites observed truth.
-export function visualEventFromPersistedStatus(intent, effectStartCount) {
+export function visualEventFromPersistedStatus(intent, effectStartCount, nowEpochMs = Date.now()) {
   const count = measuredCount(effectStartCount);
   if (intent?.controlState === "VERIFIED" && intent.effectState === "CONFIRMED_PRESENT") {
     return { type: "PRESENT_CONFIRMED", effectStartCount: count };
@@ -199,6 +203,14 @@ export function visualEventFromPersistedStatus(intent, effectStartCount) {
   if (intent?.controlState === "ABORTED" && intent.effectState === "CONFIRMED_ABSENT") {
     return { type: "ABSENT_CONFIRMED", effectStartCount: count };
   }
+  if (
+    intent?.controlState === "USER_APPROVED"
+    && intent.effectState === "NOT_STARTED"
+    && Number.isSafeInteger(intent.approvalExpiresAt)
+    && intent.approvalExpiresAt <= nowEpochMs
+  ) {
+    return { type: "APPROVAL_EXPIRED", effectStartCount: count };
+  }
   if (["DRY_RUN", "USER_APPROVED"].includes(intent?.controlState) && intent.effectState === "NOT_STARTED") {
     return { type: "PREVIEWED", effectStartCount: count };
   }
@@ -206,6 +218,22 @@ export function visualEventFromPersistedStatus(intent, effectStartCount) {
     return { type: "FAILED", message: "既存の操作は実行前に停止済みです", effectStartCount: count };
   }
   throw new TypeError(`unsupported persisted notification state: ${intent?.controlState}/${intent?.effectState}`);
+}
+
+export function notificationControlAvailability(intent, effectStartCount, nowEpochMs = Date.now()) {
+  const event = visualEventFromPersistedStatus(intent, effectStartCount, nowEpochMs);
+  const visual = reduceVisualState(createVisualState(), event);
+  const safe = visual.phase !== "violation";
+  const approvalExpired = event.type === "APPROVAL_EXPIRED";
+  return Object.freeze({
+    approve: safe
+      && !approvalExpired
+      && intent.effectState === "NOT_STARTED"
+      && ["DRY_RUN", "USER_APPROVED"].includes(intent.controlState),
+    reconcile: safe && intent.controlState === "EXECUTING" && intent.effectState === "AMBIGUOUS",
+    retry: safe && intent.controlState === "VERIFIED" && intent.effectState === "CONFIRMED_PRESENT",
+    safetyPassed: safe,
+  });
 }
 
 function violationState(state, count, message) {
@@ -271,6 +299,18 @@ export function reduceVisualState(previous, event) {
         ledgerInitialState: "ready",
         ledgerInitialText: "新しい操作として待機",
         announcement: "乾式実行が完了しました。通知はまだ0件です。",
+      }, event.effectStartCount ?? 0);
+    case "APPROVAL_EXPIRED":
+      return withNoEffectInvariant({
+        ...createVisualState(),
+        phase: "approval-expired",
+        initialState: "warning",
+        initialText: "承認期限切れ",
+        ledgerInitialState: "ready",
+        ledgerInitialText: "外部効果は未開始",
+        countLabel: "再準備が必要",
+        countText: "乾式実行をやり直してから再承認してください",
+        announcement: "保存された承認は期限切れです。古い承認では通知せず、乾式実行から再準備してください。",
       }, event.effectStartCount ?? 0);
     case "EXECUTION_CLAIMED":
       return {

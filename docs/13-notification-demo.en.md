@@ -8,6 +8,7 @@ replay_verification_event_uuid_v7: "01a0497e-f947-7442-b95c-2eed7476e477"
 replay_browser_event_uuid_v7: "01a04987-5d7c-7ebe-9208-c468f5c24ebf"
 effect_accounting_event_uuid_v7: "01a0498b-5662-7094-9bef-88e9b2f13a10"
 effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
+approval_recovery_event_uuid_v7: "01a04c92-0d3a-7302-a9ae-07a565dd08db"
 generated_at: "2026-08-28T12:23:50Z"
 updated_at: "2026-08-28T18:13:00.135Z"
 version: "0.2.0"
@@ -37,6 +38,10 @@ NOT_STARTED -> AMBIGUOUS -> RECONCILING -> CONFIRMED_PRESENT
 
 Machine contract: `AMBIGUOUS` permits reconciliation only. Current absence does not prove that a notification was never shown earlier, so an unknown historical start remains blocked. After explicit pre-effect non-start and independent current absence establish `CONFIRMED_ABSENT`, replay still requires six fresh checks: authorization, host permission, implementation version, bound user consent, lifetime, and the independently observed precondition. One failure stops before a second effect claim.
 
+Restoration never enables an effect-bearing control from lifecycle state alone. Approval, retry, and reconciliation also require the measured SQLite effect-start count to satisfy the state invariant. An expired `USER_APPROVED / NOT_STARTED` record is cleared back to `DRY_RUN / NOT_STARTED`; no effect can begin until a new UUIDv7 approval record is stored.
+
+The static browser version binds the normalized dry-run input, UUIDv5 intent ID, and payload digest into one immutable approval target. Editing any field invalidates approval immediately. A notification-permission result can apply only to the target captured before the wait. After reload, `USER_APPROVED / NOT_STARTED` resumes the same persisted binding at most once.
+
 A tool result is stored only as a recorded claim. Verification requires a distinct adapter or Service Worker readback. The recorded claim and the independently estimated truth remain separate in the SQLite effect receipt.
 
 Execution claims and conservative effect starts are separate as well. `STARTED` and `UNKNOWN` each consume one count. Only an explicit pre-effect `NOT_STARTED` assessment plus independent absence contributes zero while remaining auditable. If one later replay succeeds, the conservative count is one rather than two.
@@ -53,7 +58,7 @@ make demo
 
 Open `http://127.0.0.1:4173`. Preview is side-effect free. The browser asks for notification permission only from the explicit approval click. The notification tag equals the UUIDv5 intent ID, and `getNotifications()` provides independent readback before the intent becomes `VERIFIED`.
 
-Automated coverage includes success, failure before effect, timeout after effect, ambiguous-state retry rejection, reconciliation, restart persistence, approval expiry, distinct logical operations with identical content, all six replay checks, tool-claim rejection without readback, fabricated browser counts and tags, and 100 healthy simulated runs.
+Automated coverage includes success, failure before effect, timeout after effect, ambiguous-state retry rejection, reconciliation, restart persistence, approval expiry and reapproval, contradictory restored counts, visible-input changes, permission-wait races, approved-state resume, distinct logical operations with identical content, all six replay checks, tool-claim rejection without readback, fabricated browser counts and tags, and 100 healthy simulated runs.
 
 On 2026-08-28 this Mac measured a `8.99 ms` p95 across 100 simulated samples, below the `2,000 ms` bound. The environment and every sample are stored in [`metadata/notification-demo-latency.json`](../metadata/notification-demo-latency.json) and [`data/timeseries/notification-demo-latency.ndjson`](../data/timeseries/notification-demo-latency.ndjson). This is not a browser-notification latency measurement.
 

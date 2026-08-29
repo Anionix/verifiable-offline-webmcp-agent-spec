@@ -10,6 +10,10 @@
 // event_uuid_v7=01a04993-3867-7e11-b120-01b3bab8ec62
 // state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T18:13:00.135Z
 // machine-contract: STARTED and UNKNOWN each consume one external-effect-start budget slot.
+// information_uuid_v5=aaac8ecc-02ba-512e-ae0b-3584d2482e61
+// event_uuid_v7=01a04c92-0d3a-7302-a9ae-07a565dd08db
+// state_transition=USER_APPROVED_EXPIRED -> DRY_RUN_REPREPARED occurred_at=2026-08-29T08:14:35.194Z
+// machine-contract: preview clears an expired approval before a new approval can be recorded; an old receipt can never authorize a later effect.
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -210,6 +214,32 @@ export class NotificationStore {
   markDryRun(intentId: string, eventId: string, now: number): { intent: NotificationIntent; transition: TransitionRecord | null } {
     return this.transaction(() => {
       const before = this.requireIntent(intentId);
+      if (
+        before.controlState === "USER_APPROVED"
+        && before.effectState === "NOT_STARTED"
+        && (before.approvalExpiresAt === null || before.approvalExpiresAt <= now)
+      ) {
+        if (this.countEffectStarts(intentId) !== 0) {
+          throw new StateConflictError("expired approval cannot be reprepared after an effect start");
+        }
+        this.database.prepare(`
+          UPDATE intents SET control_state = 'DRY_RUN',
+            approval_event_id = NULL, approval_target = NULL, approval_payload_digest = NULL,
+            approval_expires_at = NULL, updated_at = ?, revision = revision + 1
+          WHERE intent_id = ?
+        `).run(now, intentId);
+        const transition = this.makeTransition(
+          before,
+          eventId,
+          now,
+          "expired-approval-reprepared",
+          "DRY_RUN",
+          "NOT_STARTED",
+          { expiredApprovalEventId: before.approvalEventId },
+        );
+        this.insertAttempt(transition);
+        return { intent: this.requireIntent(intentId), transition };
+      }
       if (before.controlState !== "PROPOSED") return { intent: before, transition: null };
       return this.transition(before, eventId, now, "dry-run-reviewed", "DRY_RUN", before.effectState, {});
     });
@@ -223,6 +253,9 @@ export class NotificationStore {
         return { intent: before, transition: null };
       }
       if (before.controlState !== "DRY_RUN") throw new StateConflictError(`approval requires DRY_RUN, got ${before.controlState}`);
+      if (before.effectState !== "NOT_STARTED" || this.countEffectStarts(intentId) !== 0) {
+        throw new StateConflictError("approval safety invariant requires zero prior effect starts");
+      }
       this.database.prepare(`
         UPDATE intents SET
           control_state = 'USER_APPROVED', approval_event_id = ?, approval_target = target,
@@ -256,6 +289,9 @@ export class NotificationStore {
       }
       if (before.controlState !== "USER_APPROVED") {
         throw new StateConflictError(`execution requires USER_APPROVED, got ${before.controlState}`);
+      }
+      if (before.effectState !== "NOT_STARTED" || this.countEffectStarts(intentId) !== 0) {
+        throw new StateConflictError("execution safety invariant requires zero prior effect starts");
       }
       if (
         before.approvalExpiresAt === null

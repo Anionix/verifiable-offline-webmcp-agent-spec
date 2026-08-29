@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/verifiable-offline-webmcp-agent/schemas/review-comment-issue-ledger.schema.json",
+  "$comment": "information_uuid_v5=b73de7b4-0acd-510f-a0a5-a1d270aced91 event_uuid_v7=01a04d0b-9cbd-7199-aa22-33405aca5d6d state_transition=SCHEMA_DECLARED_ONLY -> DRAFT_2020_12_EXECUTED occurred_at=2026-08-29T10:23:21.789Z machine-contract=the pinned Draft 2020-12 validator and format checker must accept the ledger and reject invalid date-time, minimum, and additional-property mutations",
+  "title": "Review comment to issue ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "observedAt", "observedAtEpochMs", "stateTransition", "sourceMainCommit", "repository", "summary", "entries"],
+  "properties": {
+    "$schema": { "const": "../schemas/review-comment-issue-ledger.schema.json" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" }
+      }
+    },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "observedAtEpochMs": { "type": "integer", "minimum": 0 },
+    "stateTransition": { "const": "REVIEW_THREADS_UNRESOLVED -> ISSUES_TRACKED -> FIX_IN_PROGRESS" },
+    "sourceMainCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "repository": { "const": "Anionix/verifiable-offline-webmcp-agent-spec" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unresolvedReviewThreadsObserved",
+        "currentThreadsObserved",
+        "outdatedThreadsObserved",
+        "issuesAlreadyTracked",
+        "issuesCreatedInBatch",
+        "fixesVerifiedBeforeBatch",
+        "fixesInBatch",
+        "actualNotifications",
+        "externalBookingEffects",
+        "devpostFinalSubmissions"
+      ],
+      "properties": {
+        "unresolvedReviewThreadsObserved": { "const": 53 },
+        "currentThreadsObserved": { "const": 44 },
+        "outdatedThreadsObserved": { "const": 9 },
+        "issuesAlreadyTracked": { "const": 12 },
+        "issuesCreatedInBatch": { "const": 41 },
+        "fixesVerifiedBeforeBatch": { "const": 44 },
+        "fixesInBatch": { "const": 9 },
+        "actualNotifications": { "const": 0 },
+        "externalBookingEffects": { "const": 0 },
+        "devpostFinalSubmissions": { "const": 0 }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 53,
+      "maxItems": 53,
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "issueObservationUuidV7",
+        "sourcePullRequest",
+        "sourcePullRequestState",
+        "sourceMergedAt",
+        "sourceThreadId",
+        "sourceCommentId",
+        "sourceReviewUrl",
+        "path",
+        "line",
+        "severity",
+        "title",
+        "outdatedAtObservation",
+        "threadStateAtObservation",
+        "issueNumber",
+        "issueUrl",
+        "issueStateAtObservation",
+        "issueStateReasonAtObservation",
+        "trackingDisposition",
+        "fixDisposition"
+      ],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "issueObservationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "sourcePullRequest": { "type": "integer", "minimum": 1 },
+        "sourcePullRequestState": { "enum": ["OPEN", "MERGED"] },
+        "sourceMergedAt": { "type": ["string", "null"], "format": "date-time" },
+        "sourceThreadId": { "type": "string", "pattern": "^PRRT_" },
+        "sourceCommentId": { "type": "integer", "minimum": 1 },
+        "sourceReviewUrl": {
+          "type": "string",
+          "pattern": "^https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/pull/[0-9]+#discussion_r[0-9]+$"
+        },
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": ["integer", "null"], "minimum": 1 },
+        "severity": { "enum": ["P1", "P2"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 180 },
+        "outdatedAtObservation": { "type": "boolean" },
+        "threadStateAtObservation": { "const": "UNRESOLVED" },
+        "issueNumber": { "type": "integer", "minimum": 1 },
+        "issueUrl": {
+          "type": "string",
+          "pattern": "^https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/[0-9]+$"
+        },
+        "issueStateAtObservation": { "enum": ["OPEN", "CLOSED"] },
+        "issueStateReasonAtObservation": { "type": ["string", "null"], "enum": ["COMPLETED", null] },
+        "trackingDisposition": { "enum": ["ISSUE_ALREADY_TRACKED", "ISSUE_CREATED_IN_BATCH"] },
+        "fixDisposition": { "enum": ["FIXED_BEFORE_BATCH", "FIX_IN_BATCH"] }
+      }
+    }
+  }
+}

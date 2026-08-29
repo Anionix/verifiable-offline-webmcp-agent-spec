@@ -10,6 +10,9 @@
 # information_uuid_v5=17436d1b-fda6-5147-b5b0-ba04f2465e30
 # event_uuid_v7=01a04c9e-a9f3-75f0-ac02-6d9514cfc4b5 state_transition=PYTHON_TYPE_TOOLS_STANDALONE -> PYTHON_TYPE_TOOLS_IN_FULL_GATE occurred_at=2026-08-29T08:24:21.747Z
 # machine-contract: both pinned Python type checks and both language-server protocol handshakes must pass before repository validation proceeds.
+# information_uuid_v5=9adde648-42dc-5cc8-af8f-7aa910cab9ca
+# event_uuid_v7=01a04cfc-2b4f-718a-83a2-c74468300f07 state_transition=UNRESOLVED_REVIEW_COMMENTS -> ONE_COMMENT_ONE_ISSUE_GATE occurred_at=2026-08-29T10:06:29.711Z
+# machine-contract: every observed unresolved review comment must retain one unique issue mapping before repository validation succeeds.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$ROOT/.local"
@@ -23,4 +26,5 @@ node "$ROOT/scripts/validate_hotel_portable_validator.mjs"
 node "$ROOT/scripts/validate_hotel_sites_validator.mjs"
 node "$ROOT/scripts/validate_service_integrations.mjs"
 node "$ROOT/scripts/validate_security_remediation.mjs"
+node "$ROOT/scripts/validate_review_comment_issues.mjs"
 uv run --frozen python "$ROOT/scripts/build_manifest.py" --check

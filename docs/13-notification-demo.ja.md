@@ -54,6 +54,13 @@ NOT_STARTED -> AMBIGUOUS -> RECONCILING -> CONFIRMED_PRESENT
 
 実行権を取得した回数と、外部効果を開始した、または開始した可能性がある回数も分けます。台帳の`STARTED`と`UNKNOWN`は安全側で各1回と数えます。明示的な実行前失敗と独立した表示なしの両方がそろった`NOT_STARTED`だけは0回です。その記録は監査用に残るため、後の安全な再試行が1回成功しても、保守的な外部効果開始件数は2ではなく1です。
 
+<!-- information_uuid_v5=f38bf817-15be-5398-bd7e-78bc788498ec -->
+<!-- information_uuid_v5=8df16df0-2a3c-5e18-9e82-4e36870b5a43 -->
+<!-- event_uuid_v7=01a04cf4-5c1a-740e-bf0b-21652882816d state_transition=PLATFORM_AMBIGUOUS_STORAGE -> PLATFORM_BOUND_STORAGE occurred_at=2026-08-29T09:57:57.921Z -->
+<!-- machine-contract=Every platform enforces fixed roots, canonical containment, simple filenames, and link rejection; POSIX ownership and mode checks run only where those bits represent access control. -->
+
+監査ログとSQLiteのファイルは、リポジトリ内の固定`.local`か、試験用一時領域の直下一階層だけへ置けます。`.local`自体がシンボリックリンクなら、リンク先をたどる前、書き込む前、権限を変える前に拒否します。macOSとLinuxでは所有者と`0700`相当の権限も確認します。Windowsでは意味の異なるUnix形式の権限ビットを判定材料にせず、固定領域、実体パス包含、単純なファイル名、リンク拒否を維持します。Windows分岐は自動試験済みですが、Windows実機でのアクセス制御読み戻しは`UNMEASURED`です。
+
 ## 実行方法
 
 ```bash

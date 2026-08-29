@@ -2,22 +2,26 @@
 // event_uuid_v7=01a0491b-3e66-7d00-a3eb-8e48125bd44f
 // machine-contract: offline divergence may merge safe tags, but duplicate, ambiguous, forked, or dangerous effect records never execute an external effect.
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
-import { globalRecordHash, sha256Hex } from "../sync/crypto.ts";
-import {
-  createDeviceIdentity,
-  createDeviceKeyMaterial,
-  SignedDeviceLog,
-  verifyDeviceChain,
-} from "../sync/device-log.ts";
+import type { CanonicalValue } from "../canonical.ts";
+import { canonicalDigest, checkpointSignatureMessage, globalRecordHash, sha256Hex, signBase64 } from "../sync/crypto.ts";
+import { createDeviceIdentity, createDeviceKeyMaterial, SignedDeviceLog, verifyDeviceChain } from "../sync/device-log.ts";
 import { runOfflineSyncSimulation } from "../sync/simulation.ts";
 import { LocalSyncLedger, trustAnchorPathForDatabase } from "../sync/synchronizer.ts";
-import { SYNC_UUID_NAMESPACE, type OfflineSyncVerificationEvidence, type SignedDeviceEvent } from "../sync/types.ts";
-import { uuidV5 } from "../uuid.ts";
+import {
+  SYNC_UUID_NAMESPACE,
+  type OfflineSyncVerificationEvidence,
+  type SignedCheckpoint,
+  type SignedCheckpointCore,
+  type SignedDeviceEvent,
+} from "../sync/types.ts";
+import { uuidV5, uuidV7 } from "../uuid.ts";
 
 // information_uuid_v5=3a0187cc-7497-5325-a2ad-3df91330e778
 // event_uuid_v7=01a049ff-0159-7193-b343-dc803d80f4e0
@@ -60,6 +64,18 @@ import { uuidV5 } from "../uuid.ts";
 // event_uuid_v7=01a04c90-aee1-7e37-a797-81c25dc4b222
 // state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-29T08:09:05.505Z
 // machine-contract: a genuine legacy database without an anchor rejects implicit startup and migrates only from a complete matching external key set.
+// information_uuid_v5=7dd6096b-95e3-51c1-ae79-caaaa138acf6
+// event_uuid_v7=01a04cfe-b737-754d-ac88-851801eeb679
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-29T10:10:51.895Z
+// machine-contract: two simultaneous FIRST_CHECKPOINT candidates serialize to exactly one retained root, while dead and expired-uninitialized locks recover without ever stealing a live owner's lock.
+// information_uuid_v5=48eb0153-4016-5492-89f2-f52d840b65c5
+// event_uuid_v7=01a04d10-b64b-79db-8311-644ee54d3524
+// state_transition=ROLLBACK_SPLIT -> REGRESSION_PROOF occurred_at=2026-08-29T10:30:33.868Z
+// machine-contract: caught SQLite failure restores the prior anchor before unlock, and failed lock initialization may clean only its original directory identity and never a replacement owner's live lock.
+// information_uuid_v5=bc645fff-7535-58d2-80c0-9a6bd3a721ee
+// event_uuid_v7=01a04d19-f9ee-7e63-a9fe-8b74c23514c6
+// state_transition=PATH_SWAP_RISK -> DESCRIPTOR_BOUND_REGRESSION_PROOF occurred_at=2026-08-29T10:40:43.886Z
+// machine-contract: missing owner remains recoverable, while symbolic-link and nonregular owner entries never become lock authority; live and dead regular-file owners keep their existing behavior.
 
 function clock(start = Date.UTC(2026, 7, 28, 17, 0, 0, 0)): () => number {
   let value = start;
@@ -75,11 +91,78 @@ function fixture(name: string): { directory: string; database: string; close(): 
   };
 }
 
-function createLegacyKnownKeyDatabase(
+function spawnConcurrentIngest(
   databasePath: string,
-  identity: ReturnType<typeof createDeviceIdentity>,
-  publicKeyPem: string,
-): void {
+  payloadPath: string,
+  checkpointIndex: number,
+  startPath: string,
+): { ready: Promise<void>; completion: Promise<{ status: string; code?: string }> } {
+  const moduleUrl = new URL("../sync/synchronizer.ts", import.meta.url).href;
+  const script = `
+    import { existsSync, readFileSync } from "node:fs";
+    const [databasePath, payloadPath, checkpointIndexText, startPath, moduleUrl] = process.argv.slice(1);
+    const { LocalSyncLedger } = await import(moduleUrl);
+    const payload = JSON.parse(readFileSync(payloadPath, "utf8"));
+    const wait = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
+    const ledger = new LocalSyncLedger(databasePath);
+    try {
+      process.stdout.write("READY\\n");
+      while (!existsSync(startPath)) Atomics.wait(wait, 0, 0, 2);
+      const result = ledger.ingest(payload.events, payload.checkpoints[Number(checkpointIndexText)]);
+      process.stdout.write(\`RESULT:\${JSON.stringify(result)}\\n\`);
+    } finally {
+      ledger.close();
+    }
+  `;
+  const child = spawn(
+    process.execPath,
+    ["--experimental-strip-types", "--input-type=module", "--eval", script, databasePath, payloadPath, String(checkpointIndex), startPath, moduleUrl],
+    { stdio: ["ignore", "pipe", "pipe"] },
+  );
+  let output = "";
+  let errorOutput = "";
+  let readyResolve!: () => void;
+  let readyReject!: (error: Error) => void;
+  let readyObserved = false;
+  const ready = new Promise<void>((resolveReady, rejectReady) => {
+    readyResolve = resolveReady;
+    readyReject = rejectReady;
+  });
+  child.stdout.setEncoding("utf8");
+  child.stderr.setEncoding("utf8");
+  child.stdout.on("data", (chunk) => {
+    output += chunk;
+    if (!readyObserved && output.includes("READY\n")) {
+      readyObserved = true;
+      readyResolve();
+    }
+  });
+  child.stderr.on("data", (chunk) => {
+    errorOutput += chunk;
+  });
+  const completion = new Promise<{ status: string; code?: string }>((resolveCompletion, rejectCompletion) => {
+    child.on("error", (error) => {
+      if (!readyObserved) readyReject(error);
+      rejectCompletion(error);
+    });
+    child.on("exit", (code) => {
+      if (!readyObserved) readyReject(new Error(`concurrent ingest exited before ready: ${errorOutput}`));
+      if (code !== 0) {
+        rejectCompletion(new Error(`concurrent ingest exited ${code}: ${errorOutput}`));
+        return;
+      }
+      const resultLine = output.split("\n").find((line) => line.startsWith("RESULT:"));
+      if (!resultLine) {
+        rejectCompletion(new Error(`concurrent ingest returned no result: ${output}`));
+        return;
+      }
+      resolveCompletion(JSON.parse(resultLine.slice("RESULT:".length)) as { status: string; code?: string });
+    });
+  });
+  return { ready, completion };
+}
+
+function createLegacyKnownKeyDatabase(databasePath: string, identity: ReturnType<typeof createDeviceIdentity>, publicKeyPem: string): void {
   const database = new DatabaseSync(databasePath);
   try {
     database.exec(`
@@ -90,9 +173,11 @@ function createLegacyKnownKeyDatabase(
         public_key_pem TEXT NOT NULL
       );
     `);
-    database.prepare(`
+    database
+      .prepare(`
       INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
-    `).run(identity.deviceId, identity.logId, identity.keyId, publicKeyPem);
+    `)
+      .run(identity.deviceId, identity.logId, identity.keyId, publicKeyPem);
   } finally {
     database.close();
   }
@@ -172,10 +257,7 @@ test("latest-only initial synchronization binds one omitted checkpoint parent ex
     const anchorFile = JSON.parse(readFileSync(anchorPath, "utf8")) as {
       anchors: Array<{ deviceId: string; bootstrapCheckpointDigest: string | null }>;
     };
-    assert.equal(
-      anchorFile.anchors.find(anchor => anchor.deviceId === identity.deviceId)?.bootstrapCheckpointDigest,
-      latestCheckpoint.digest,
-    );
+    assert.equal(anchorFile.anchors.find((anchor) => anchor.deviceId === identity.deviceId)?.bootstrapCheckpointDigest, latestCheckpoint.digest);
 
     log.append({ type: "SAFE_TAG_ADD", setId: "bootstrap", tag: "four" });
     const nextCheckpoint = log.checkpoint();
@@ -185,6 +267,158 @@ test("latest-only initial synchronization binds one omitted checkpoint parent ex
     ledger.close();
 
     const reopened = new LocalSyncLedger(item.database, { now });
+    assert.equal(reopened.verifyGlobalChain().valid, true);
+    reopened.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("SQLite rollback restores the prior bootstrap anchor before restart and retry", () => {
+  const item = fixture("bootstrap-anchor-rollback");
+  const now = clock();
+  const identity = createDeviceIdentity("bootstrap-anchor-rollback");
+  const log = new SignedDeviceLog(identity, { now });
+  log.append({ type: "SAFE_TAG_ADD", setId: "anchor-rollback", tag: "one" });
+  log.checkpoint();
+  const latestCheckpoint = log.checkpoint();
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  try {
+    const ledger = new LocalSyncLedger(item.database, { now });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    const priorAnchorText = readFileSync(anchorPath, "utf8");
+    ledger.database.exec(`
+      CREATE TRIGGER abort_safe_tag_insert
+      BEFORE INSERT ON safe_tags
+      BEGIN
+        SELECT RAISE(ABORT, 'forced safe_tags failure');
+      END;
+    `);
+
+    assert.throws(() => ledger.ingest(log.events(), latestCheckpoint), /forced safe_tags failure/);
+    assert.equal(readFileSync(anchorPath, "utf8"), priorAnchorText);
+    assert.equal(ledger.globalCount(), 0);
+    assert.equal(Number((ledger.database.prepare("SELECT count(*) AS value FROM device_checkpoints").get() as { value: number }).value), 0);
+    ledger.close();
+
+    const restarted = new LocalSyncLedger(item.database, { now });
+    restarted.database.exec("DROP TRIGGER abort_safe_tag_insert");
+    assert.equal(restarted.ingest(log.events(), latestCheckpoint).status, "INGESTED");
+    const anchorFile = JSON.parse(readFileSync(anchorPath, "utf8")) as {
+      anchors: Array<{ deviceId: string; bootstrapCheckpointDigest: string | null }>;
+    };
+    assert.equal(anchorFile.anchors.find((anchor) => anchor.deviceId === identity.deviceId)?.bootstrapCheckpointDigest, latestCheckpoint.digest);
+    assert.equal(restarted.globalCount(), 1);
+    assert.equal(restarted.verifyGlobalChain().valid, true);
+    restarted.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("anchor-only crash residue fails closed and recovers through the same signed checkpoint", () => {
+  const item = fixture("bootstrap-anchor-crash-residue");
+  const now = clock();
+  const identity = createDeviceIdentity("bootstrap-anchor-crash-residue");
+  const log = new SignedDeviceLog(identity, { now });
+  log.append({ type: "SAFE_TAG_ADD", setId: "anchor-crash", tag: "one" });
+  log.checkpoint();
+  const anchoredCheckpoint = log.checkpoint();
+  const alternateCheckpoint = log.checkpoint();
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  try {
+    const setup = new LocalSyncLedger(item.database, { now });
+    setup.registerDevice(identity, log.publicKeyPem());
+    setup.close();
+
+    const crashResidue = JSON.parse(readFileSync(anchorPath, "utf8")) as {
+      anchors: Array<{ deviceId: string; bootstrapCheckpointDigest: string | null }>;
+    };
+    crashResidue.anchors[0]!.bootstrapCheckpointDigest = anchoredCheckpoint.digest;
+    writeFileSync(anchorPath, `${JSON.stringify(crashResidue, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+
+    const restarted = new LocalSyncLedger(item.database, { now });
+    const alternateResult = restarted.ingest(log.events(), alternateCheckpoint);
+    assert.equal(alternateResult.status, "QUARANTINED");
+    if (alternateResult.status === "QUARANTINED") assert.equal(alternateResult.code, "CHECKPOINT_MISMATCH");
+    assert.equal(restarted.globalCount(), 0);
+    assert.equal(Number((restarted.database.prepare("SELECT count(*) AS value FROM device_checkpoints").get() as { value: number }).value), 0);
+
+    assert.equal(restarted.ingest(log.events(), anchoredCheckpoint).status, "INGESTED");
+    assert.equal(restarted.globalCount(), 1);
+    assert.equal(restarted.verifyGlobalChain().valid, true);
+    restarted.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("simultaneous initial synchronization retains exactly one checkpoint root", async () => {
+  const item = fixture("simultaneous-checkpoint-root");
+  const now = clock();
+  const identity = createDeviceIdentity("simultaneous-checkpoint-root");
+  const keys = createDeviceKeyMaterial();
+  const log = new SignedDeviceLog(identity, { keys, now });
+  log.append({ type: "SAFE_TAG_ADD", setId: "serialized-root", tag: "one" });
+  const firstCheckpoint = log.checkpoint();
+  const secondCheckpointEpochMs = now();
+  const secondCheckpointCore: SignedCheckpointCore = {
+    version: firstCheckpoint.version,
+    checkpointId: uuidV7(secondCheckpointEpochMs),
+    createdAt: new Date(secondCheckpointEpochMs).toISOString(),
+    createdAtEpochMs: secondCheckpointEpochMs,
+    logId: firstCheckpoint.logId,
+    deviceId: firstCheckpoint.deviceId,
+    keyId: firstCheckpoint.keyId,
+    treeSize: firstCheckpoint.treeSize,
+    merkleRoot: firstCheckpoint.merkleRoot,
+    chainHead: firstCheckpoint.chainHead,
+    previousCheckpointHash: null,
+  };
+  const secondCheckpointDigest = canonicalDigest(secondCheckpointCore as unknown as CanonicalValue);
+  const secondCheckpoint: SignedCheckpoint = {
+    ...secondCheckpointCore,
+    digest: secondCheckpointDigest,
+    signature: {
+      algorithm: "Ed25519",
+      keyId: identity.keyId,
+      signatureBase64: signBase64(keys.privateKey, checkpointSignatureMessage(secondCheckpointDigest)),
+    },
+  };
+  const payloadPath = join(item.directory, "concurrent-ingest.json");
+  const startPath = join(item.directory, "start");
+  try {
+    const setup = new LocalSyncLedger(item.database, { now });
+    setup.registerDevice(identity, log.publicKeyPem());
+    setup.close();
+    writeFileSync(
+      payloadPath,
+      JSON.stringify({
+        events: log.events(),
+        checkpoints: [firstCheckpoint, secondCheckpoint],
+      }),
+      { encoding: "utf8", mode: 0o600 },
+    );
+
+    const first = spawnConcurrentIngest(item.database, payloadPath, 0, startPath);
+    const second = spawnConcurrentIngest(item.database, payloadPath, 1, startPath);
+    await Promise.all([first.ready, second.ready]);
+    writeFileSync(startPath, "go\n", { encoding: "utf8", mode: 0o600, flag: "wx" });
+    const results = await Promise.all([first.completion, second.completion]);
+    assert.deepEqual(results.map((result) => result.status).sort(), ["INGESTED", "QUARANTINED"]);
+    assert.equal(results.find((result) => result.status === "QUARANTINED")?.code, "CHECKPOINT_MISMATCH");
+
+    const reopened = new LocalSyncLedger(item.database, { now });
+    const checkpointCounts = reopened.database
+      .prepare(`
+      SELECT count(*) AS total,
+             sum(CASE WHEN previous_checkpoint_hash IS NULL THEN 1 ELSE 0 END) AS roots
+      FROM device_checkpoints WHERE device_id = ?
+    `)
+      .get(identity.deviceId) as { total: number; roots: number };
+    assert.equal(Number(checkpointCounts.total), 1);
+    assert.equal(Number(checkpointCounts.roots), 1);
+    assert.equal(reopened.globalCount(), 1);
     assert.equal(reopened.verifyGlobalChain().valid, true);
     reopened.close();
   } finally {
@@ -211,9 +445,11 @@ test("global verification rejects a missing interior checkpoint after a normal r
     assert.equal(ledger.ingest(rootEvents, rootCheckpoint).status, "INGESTED");
     assert.equal(ledger.ingest(interiorEvents, interiorCheckpoint).status, "INGESTED");
     assert.equal(ledger.ingest(log.events(), headCheckpoint).status, "INGESTED");
-    const removed = ledger.database.prepare(`
+    const removed = ledger.database
+      .prepare(`
       DELETE FROM device_checkpoints WHERE checkpoint_digest = ?
-    `).run(interiorCheckpoint.digest);
+    `)
+      .run(interiorCheckpoint.digest);
     assert.equal(removed.changes, 1);
     const verification = ledger.verifyGlobalChain();
     assert.equal(verification.valid, false);
@@ -245,20 +481,28 @@ test("global ingestion is persistent, idempotent, and preserves each device sequ
     ledger.registerDevice(identityB, logB.publicKeyPem());
     assert.equal(ledger.ingest(logB.events(), checkpointB).status, "INGESTED");
     assert.equal(ledger.ingest(logA.events(), checkpointA).status, "INGESTED");
-    assert.deepEqual(ledger.ingestionRecords().map(record => record.globalSequence), [1, 2, 3, 4]);
     assert.deepEqual(
-      ledger.ingestionRecords().filter(record => record.deviceId === identityA.deviceId).map(record => record.deviceSequence),
+      ledger.ingestionRecords().map((record) => record.globalSequence),
+      [1, 2, 3, 4],
+    );
+    assert.deepEqual(
+      ledger
+        .ingestionRecords()
+        .filter((record) => record.deviceId === identityA.deviceId)
+        .map((record) => record.deviceSequence),
       [1, 2],
     );
     assert.deepEqual(ledger.safeTags("set"), ["a", "b"]);
-    assert.deepEqual(ledger.dangerousReviews(), [{
-      intentId,
-      effectKind: "NOTIFICATION",
-      payloadDigest,
-      status: "HUMAN_REVIEW_REQUIRED",
-      sourceCount: 2,
-      conflictingPayloads: false,
-    }]);
+    assert.deepEqual(ledger.dangerousReviews(), [
+      {
+        intentId,
+        effectKind: "NOTIFICATION",
+        payloadDigest,
+        status: "HUMAN_REVIEW_REQUIRED",
+        sourceCount: 2,
+        conflictingPayloads: false,
+      },
+    ]);
     assert.equal(ledger.externalEffectStarts(), 0);
     assert.equal(ledger.verifyGlobalChain().valid, true);
     ledger.close();
@@ -298,12 +542,9 @@ test("stale ledger instances serialize trust-anchor updates and retain the durab
       anchors: Array<{ deviceId: string; publicKeySha256: string }>;
     };
     assert.equal(existsSync(`${anchorPath}.lock`), false);
+    assert.deepEqual(anchorFile.anchors.map((anchor) => anchor.deviceId).sort(), [identityA.deviceId, identityB.deviceId].sort());
     assert.deepEqual(
-      anchorFile.anchors.map(anchor => anchor.deviceId).sort(),
-      [identityA.deviceId, identityB.deviceId].sort(),
-    );
-    assert.deepEqual(
-      anchorFile.anchors.map(anchor => anchor.publicKeySha256).sort(),
+      anchorFile.anchors.map((anchor) => anchor.publicKeySha256).sort(),
       [sha256Hex(logA.publicKeyPem()), sha256Hex(logB.publicKeyPem())].sort(),
     );
 
@@ -316,6 +557,160 @@ test("stale ledger instances serialize trust-anchor updates and retain the durab
     assert.equal(reopened.verifyGlobalChain().valid, true);
     assert.deepEqual(reopened.safeTags("anchors"), ["a", "b"]);
     reopened.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("trust-anchor lock recovers abnormal termination but never displaces a live owner", async () => {
+  const item = fixture("recoverable-trust-anchor-lock");
+  const now = clock();
+  const identityAfterDeadOwner = createDeviceIdentity("anchor-after-dead-owner");
+  const identityAfterUninitializedLock = createDeviceIdentity("anchor-after-uninitialized-lock");
+  const identityBlockedByLiveOwner = createDeviceIdentity("anchor-blocked-by-live-owner");
+  const logAfterDeadOwner = new SignedDeviceLog(identityAfterDeadOwner, { now });
+  const logAfterUninitializedLock = new SignedDeviceLog(identityAfterUninitializedLock, { now });
+  const logBlockedByLiveOwner = new SignedDeviceLog(identityBlockedByLiveOwner, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  try {
+    const abandonedOwnerProcess = spawn(process.execPath, ["--eval", "setInterval(() => {}, 1_000)"], {
+      stdio: "ignore",
+    });
+    await once(abandonedOwnerProcess, "spawn");
+    mkdirSync(lockPath, { mode: 0o700 });
+    const deadOwnerEpochMs = Date.now();
+    writeFileSync(
+      join(lockPath, "owner.json"),
+      `${JSON.stringify({
+        schemaVersion: 1,
+        ownerProcessId: abandonedOwnerProcess.pid,
+        acquiredAtEpochMs: deadOwnerEpochMs,
+        ownerEventId: uuidV7(deadOwnerEpochMs),
+      })}\n`,
+      { encoding: "utf8", mode: 0o600, flag: "wx" },
+    );
+    abandonedOwnerProcess.kill("SIGKILL");
+    await once(abandonedOwnerProcess, "exit");
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 40 });
+    ledger.registerDevice(identityAfterDeadOwner, logAfterDeadOwner.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+
+    mkdirSync(lockPath, { mode: 0o700 });
+    const expired = new Date(Date.now() - 60_000);
+    utimesSync(lockPath, expired, expired);
+    ledger.registerDevice(identityAfterUninitializedLock, logAfterUninitializedLock.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+
+    mkdirSync(lockPath, { mode: 0o700 });
+    const liveOwnerEpochMs = Date.now() - 60_000;
+    const liveOwner = {
+      schemaVersion: 1,
+      ownerProcessId: process.pid,
+      acquiredAtEpochMs: liveOwnerEpochMs,
+      ownerEventId: uuidV7(liveOwnerEpochMs),
+    };
+    writeFileSync(join(lockPath, "owner.json"), `${JSON.stringify(liveOwner)}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+      flag: "wx",
+    });
+    assert.throws(
+      () => ledger.registerDevice(identityBlockedByLiveOwner, logBlockedByLiveOwner.publicKeyPem()),
+      /timed out waiting for the trusted device key anchor lock/,
+    );
+    assert.deepEqual(JSON.parse(readFileSync(join(lockPath, "owner.json"), "utf8")), liveOwner);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    ledger.registerDevice(identityBlockedByLiveOwner, logBlockedByLiveOwner.publicKeyPem());
+    const anchorFile = JSON.parse(readFileSync(anchorPath, "utf8")) as { anchors: Array<{ deviceId: string }> };
+    assert.deepEqual(
+      anchorFile.anchors.map((anchor) => anchor.deviceId).sort(),
+      [identityAfterDeadOwner.deviceId, identityAfterUninitializedLock.deviceId, identityBlockedByLiveOwner.deviceId].sort(),
+    );
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("failed lock initialization preserves a replacement live owner's directory", () => {
+  const item = fixture("lock-initialization-replacement");
+  const now = clock();
+  const identity = createDeviceIdentity("lock-initialization-replacement");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const replacementEpochMs = Date.now();
+  const replacementOwner = {
+    schemaVersion: 1,
+    ownerProcessId: process.pid,
+    acquiredAtEpochMs: replacementEpochMs,
+    ownerEventId: uuidV7(replacementEpochMs),
+  };
+  let replacementInstalled = false;
+  try {
+    const ledger = new LocalSyncLedger(item.database, {
+      now,
+      trustAnchorLockTimeoutMs: 40,
+      afterTrustAnchorLockDirectoryCreated: (createdLockPath) => {
+        if (replacementInstalled) return;
+        replacementInstalled = true;
+        assert.equal(createdLockPath, lockPath);
+        rmSync(createdLockPath, { recursive: true, force: false });
+        mkdirSync(createdLockPath, { mode: 0o700 });
+        writeFileSync(join(createdLockPath, "owner.json"), `${JSON.stringify(replacementOwner)}\n`, {
+          encoding: "utf8",
+          mode: 0o600,
+          flag: "wx",
+        });
+      },
+    });
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /timed out waiting for the trusted device key anchor lock/);
+    assert.equal(replacementInstalled, true);
+    assert.equal(existsSync(lockPath), true);
+    assert.deepEqual(JSON.parse(readFileSync(join(lockPath, "owner.json"), "utf8")), replacementOwner);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("lock-owner reads reject symbolic links and nonregular entries before trusting bytes", () => {
+  const item = fixture("lock-owner-descriptor-boundary");
+  const now = clock();
+  const identity = createDeviceIdentity("lock-owner-descriptor-boundary");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const ownerPath = join(lockPath, "owner.json");
+  const outsideOwnerPath = join(item.directory, "outside-owner.json");
+  try {
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 40 });
+    const outsideText = '{"not":"lock authority"}\n';
+    writeFileSync(outsideOwnerPath, outsideText, { encoding: "utf8", mode: 0o600 });
+
+    mkdirSync(lockPath, { mode: 0o700 });
+    symlinkSync(outsideOwnerPath, ownerPath);
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /trusted device key anchor lock owner must be a regular file/);
+    assert.equal(readFileSync(outsideOwnerPath, "utf8"), outsideText);
+    assert.equal(existsSync(anchorPath), false);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    mkdirSync(lockPath, { mode: 0o700 });
+    mkdirSync(ownerPath, { mode: 0o700 });
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /trusted device key anchor lock owner must be a regular file/);
+    assert.equal(existsSync(anchorPath), false);
+
+    rmSync(lockPath, { recursive: true, force: false });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+    assert.equal(existsSync(anchorPath), true);
+    ledger.close();
   } finally {
     item.close();
   }
@@ -374,17 +769,21 @@ test("global verification binds each projected operation to its stored signed so
     const ledger = new LocalSyncLedger(item.database, { now });
     ledger.registerDevice(identity, log.publicKeyPem());
     assert.equal(ledger.ingest(log.events(), log.checkpoint()).status, "INGESTED");
-    const row = ledger.database.prepare(`
+    const row = ledger.database
+      .prepare(`
       SELECT global_sequence, record_json FROM ingestion_events ORDER BY global_sequence DESC LIMIT 1
-    `).get() as { global_sequence: number; record_json: string };
+    `)
+      .get() as { global_sequence: number; record_json: string };
     const record = JSON.parse(row.record_json);
     record.operation = { type: "SAFE_TAG_ADD", setId: "forged", tag: "forged" };
     record.decision = "MERGED_SAFE_STATE";
     const { globalHash: _oldHash, ...core } = record;
     record.globalHash = globalRecordHash(record.previousGlobalHash, core);
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       UPDATE ingestion_events SET decision = ?, global_hash = ?, record_json = ? WHERE global_sequence = ?
-    `).run(record.decision, record.globalHash, JSON.stringify(record), row.global_sequence);
+    `)
+      .run(record.decision, record.globalHash, JSON.stringify(record), row.global_sequence);
     assert.equal(ledger.verifyGlobalChain().valid, false);
     ledger.close();
   } finally {
@@ -437,34 +836,30 @@ test("legacy database trust migration requires a complete matching external key 
   try {
     createLegacyKnownKeyDatabase(item.database, identity, trustedLog.publicKeyPem());
     const secondLegacyConnection = new DatabaseSync(item.database);
-    secondLegacyConnection.prepare(`
+    secondLegacyConnection
+      .prepare(`
       INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
-    `).run(
-      secondIdentity.deviceId,
-      secondIdentity.logId,
-      secondIdentity.keyId,
-      secondTrustedLog.publicKeyPem(),
-    );
+    `)
+      .run(secondIdentity.deviceId, secondIdentity.logId, secondIdentity.keyId, secondTrustedLog.publicKeyPem());
     secondLegacyConnection.close();
     assert.equal(existsSync(anchorPath), false);
-    assert.throws(
-      () => new LocalSyncLedger(item.database, { now }),
-      /explicit trust migration input/,
-    );
+    assert.throws(() => new LocalSyncLedger(item.database, { now }), /explicit trust migration input/);
     assert.equal(existsSync(anchorPath), false);
     assert.throws(
-      () => new LocalSyncLedger(item.database, {
-        now,
-        legacyTrustMigration: [{ identity, publicKeyPem: substitutedLog.publicKeyPem() }],
-      }),
+      () =>
+        new LocalSyncLedger(item.database, {
+          now,
+          legacyTrustMigration: [{ identity, publicKeyPem: substitutedLog.publicKeyPem() }],
+        }),
       /does not match the stored device identity and key/,
     );
     assert.equal(existsSync(anchorPath), false);
     assert.throws(
-      () => new LocalSyncLedger(item.database, {
-        now,
-        legacyTrustMigration: [{ identity, publicKeyPem: trustedLog.publicKeyPem() }],
-      }),
+      () =>
+        new LocalSyncLedger(item.database, {
+          now,
+          legacyTrustMigration: [{ identity, publicKeyPem: trustedLog.publicKeyPem() }],
+        }),
       /explicitly cover every stored device key/,
     );
     assert.equal(existsSync(anchorPath), false);
@@ -516,9 +911,11 @@ test("global verification derives the decision from the signed operation", () =>
     record.decision = "MERGED_SAFE_STATE";
     const { globalHash: _oldHash, ...core } = record;
     record.globalHash = globalRecordHash(record.previousGlobalHash, core);
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       UPDATE ingestion_events SET decision = ?, global_hash = ?, record_json = ? WHERE global_sequence = ?
-    `).run(record.decision, record.globalHash, JSON.stringify(record), row.global_sequence);
+    `)
+      .run(record.decision, record.globalHash, JSON.stringify(record), row.global_sequence);
     assert.equal(ledger.verifyGlobalChain().valid, false);
     ledger.close();
   } finally {
@@ -536,8 +933,7 @@ test("global verification binds indexed row identity columns to the audit record
     const ledger = new LocalSyncLedger(item.database, { now });
     ledger.registerDevice(identity, log.publicKeyPem());
     assert.equal(ledger.ingest(log.events(), log.checkpoint()).status, "INGESTED");
-    ledger.database.prepare("UPDATE ingestion_events SET source_event_id = ?")
-      .run("corrupted-source-event-id");
+    ledger.database.prepare("UPDATE ingestion_events SET source_event_id = ?").run("corrupted-source-event-id");
     assert.equal(ledger.verifyGlobalChain().valid, false);
     ledger.close();
   } finally {
@@ -571,21 +967,23 @@ test("global verification binds source events to the stored signed device chain"
     record.decision = "MERGED_SAFE_STATE";
     const { globalHash: _oldHash, ...core } = record;
     record.globalHash = globalRecordHash(record.previousGlobalHash, core);
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       UPDATE ingestion_events
       SET source_event_id = ?, source_event_digest = ?, source_chain_hash = ?, source_event_json = ?,
           decision = ?, global_hash = ?, record_json = ?
       WHERE global_sequence = ?
-    `).run(
-      forkEvent.eventId,
-      forkEvent.proof.eventDigest,
-      forkEvent.proof.chainHash,
-      JSON.stringify(forkEvent),
-      record.decision,
-      record.globalHash,
-      JSON.stringify(record),
-      row.global_sequence,
-    );
+    `)
+      .run(
+        forkEvent.eventId,
+        forkEvent.proof.eventDigest,
+        forkEvent.proof.chainHash,
+        JSON.stringify(forkEvent),
+        record.decision,
+        record.globalHash,
+        JSON.stringify(record),
+        row.global_sequence,
+      );
     const verification = ledger.verifyGlobalChain();
     assert.equal(verification.valid, false);
     assert.equal(verification.reason, "SIGNED_DEVICE_CHAIN_MISMATCH");
@@ -619,9 +1017,11 @@ test("global verification checks every retained prefix checkpoint", () => {
     assert.equal(ledger.ingest(acceptedEventsOne, acceptedCheckpointOne).status, "INGESTED");
     assert.equal(ledger.ingest(acceptedLog.events(), acceptedCheckpointTwo).status, "INGESTED");
 
-    const rows = ledger.database.prepare(`
+    const rows = ledger.database
+      .prepare(`
       SELECT global_sequence, record_json FROM ingestion_events ORDER BY global_sequence
-    `).all() as unknown as Array<{ global_sequence: number; record_json: string }>;
+    `)
+      .all() as unknown as Array<{ global_sequence: number; record_json: string }>;
     let previousGlobalHash = JSON.parse(rows[0]!.record_json).previousGlobalHash;
     for (let index = 0; index < rows.length; index += 1) {
       const row = rows[index]!;
@@ -635,35 +1035,39 @@ test("global verification checks every retained prefix checkpoint", () => {
       record.decision = "MERGED_SAFE_STATE";
       const { globalHash: _oldHash, ...core } = record;
       record.globalHash = globalRecordHash(previousGlobalHash, core);
-      ledger.database.prepare(`
+      ledger.database
+        .prepare(`
         UPDATE ingestion_events
         SET source_event_id = ?, source_event_digest = ?, source_chain_hash = ?, source_event_json = ?,
             decision = ?, previous_global_hash = ?, global_hash = ?, record_json = ?
         WHERE global_sequence = ?
-      `).run(
-        forkEvent.eventId,
-        forkEvent.proof.eventDigest,
-        forkEvent.proof.chainHash,
-        JSON.stringify(forkEvent),
-        record.decision,
-        record.previousGlobalHash,
-        record.globalHash,
-        JSON.stringify(record),
-        row.global_sequence,
-      );
+      `)
+        .run(
+          forkEvent.eventId,
+          forkEvent.proof.eventDigest,
+          forkEvent.proof.chainHash,
+          JSON.stringify(forkEvent),
+          record.decision,
+          record.previousGlobalHash,
+          record.globalHash,
+          JSON.stringify(record),
+          row.global_sequence,
+        );
       previousGlobalHash = record.globalHash;
     }
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       UPDATE device_checkpoints
       SET checkpoint_digest = ?, chain_head = ?, previous_checkpoint_hash = ?, checkpoint_json = ?
       WHERE device_id = ? AND tree_size = 2
-    `).run(
-      alternateCheckpointTwo.digest,
-      alternateCheckpointTwo.chainHead,
-      alternateCheckpointTwo.previousCheckpointHash,
-      JSON.stringify(alternateCheckpointTwo),
-      identity.deviceId,
-    );
+    `)
+      .run(
+        alternateCheckpointTwo.digest,
+        alternateCheckpointTwo.chainHead,
+        alternateCheckpointTwo.previousCheckpointHash,
+        JSON.stringify(alternateCheckpointTwo),
+        identity.deviceId,
+      );
     assert.equal(ledger.verifyGlobalChain().valid, false);
     ledger.close();
   } finally {
@@ -686,9 +1090,11 @@ test("global verification rejects a retained checkpoint whose non-null parent is
     ledger.registerDevice(identity, log.publicKeyPem());
     assert.equal(ledger.ingest(firstEvents, parentCheckpoint).status, "INGESTED");
     assert.equal(ledger.ingest(log.events(), childCheckpoint).status, "INGESTED");
-    const removed = ledger.database.prepare(`
+    const removed = ledger.database
+      .prepare(`
       DELETE FROM device_checkpoints WHERE checkpoint_digest = ?
-    `).run(parentCheckpoint.digest);
+    `)
+      .run(parentCheckpoint.digest);
     assert.equal(removed.changes, 1);
     const verification = ledger.verifyGlobalChain();
     assert.equal(verification.valid, false);
@@ -713,9 +1119,11 @@ test("global verification rejects a self-consistent ledger signed by a substitut
     const ledger = new LocalSyncLedger(item.database, { now });
     ledger.registerDevice(identity, trustedLog.publicKeyPem());
     assert.equal(ledger.ingest(trustedLog.events(), trustedLog.checkpoint()).status, "INGESTED");
-    const row = ledger.database.prepare(`
+    const row = ledger.database
+      .prepare(`
       SELECT global_sequence, record_json FROM ingestion_events
-    `).get() as { global_sequence: number; record_json: string };
+    `)
+      .get() as { global_sequence: number; record_json: string };
     const record = JSON.parse(row.record_json);
     record.sourceEventId = attackerEvent.eventId;
     record.sourceEventDigest = attackerEvent.proof.eventDigest;
@@ -724,37 +1132,43 @@ test("global verification rejects a self-consistent ledger signed by a substitut
     record.decision = "MERGED_SAFE_STATE";
     const { globalHash: _oldHash, ...core } = record;
     record.globalHash = globalRecordHash(record.previousGlobalHash, core);
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       UPDATE ingestion_events
       SET source_event_id = ?, source_event_digest = ?, source_chain_hash = ?, source_event_json = ?,
           decision = ?, global_hash = ?, record_json = ?
       WHERE global_sequence = ?
-    `).run(
-      attackerEvent.eventId,
-      attackerEvent.proof.eventDigest,
-      attackerEvent.proof.chainHash,
-      JSON.stringify(attackerEvent),
-      record.decision,
-      record.globalHash,
-      JSON.stringify(record),
-      row.global_sequence,
-    );
+    `)
+      .run(
+        attackerEvent.eventId,
+        attackerEvent.proof.eventDigest,
+        attackerEvent.proof.chainHash,
+        JSON.stringify(attackerEvent),
+        record.decision,
+        record.globalHash,
+        JSON.stringify(record),
+        row.global_sequence,
+      );
     ledger.database.prepare("DELETE FROM device_checkpoints WHERE device_id = ?").run(identity.deviceId);
-    ledger.database.prepare(`
+    ledger.database
+      .prepare(`
       INSERT INTO device_checkpoints (
         device_id, checkpoint_digest, tree_size, chain_head, previous_checkpoint_hash, checkpoint_json
       ) VALUES (?, ?, ?, ?, ?, ?)
-    `).run(
-      attackerCheckpoint.deviceId,
-      attackerCheckpoint.digest,
-      attackerCheckpoint.treeSize,
-      attackerCheckpoint.chainHead,
-      attackerCheckpoint.previousCheckpointHash,
-      JSON.stringify(attackerCheckpoint),
-    );
-    ledger.database.prepare(`
+    `)
+      .run(
+        attackerCheckpoint.deviceId,
+        attackerCheckpoint.digest,
+        attackerCheckpoint.treeSize,
+        attackerCheckpoint.chainHead,
+        attackerCheckpoint.previousCheckpointHash,
+        JSON.stringify(attackerCheckpoint),
+      );
+    ledger.database
+      .prepare(`
       UPDATE known_device_keys SET public_key_pem = ? WHERE device_id = ?
-    `).run(attackerLog.publicKeyPem(), identity.deviceId);
+    `)
+      .run(attackerLog.publicKeyPem(), identity.deviceId);
 
     const anchorPath = trustAnchorPathForDatabase(item.database)!;
     const anchorFile = readFileSync(anchorPath, "utf8");
@@ -797,11 +1211,13 @@ test("tracked public evidence reads back through independent public keys", () =>
   const root = resolve(import.meta.dirname, "../../..");
   const evidence = JSON.parse(readFileSync(resolve(root, "metadata/offline-sync-verification.json"), "utf8")) as OfflineSyncVerificationEvidence;
   const events = readFileSync(resolve(root, evidence.artifacts.deviceEvents), "utf8")
-    .trim().split("\n").map(line => JSON.parse(line) as SignedDeviceEvent);
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line) as SignedDeviceEvent);
   assert.equal(evidence.status, "VERIFIED");
   assert.equal(evidence.observations.externalEffectStarts, 0);
   for (const device of evidence.devices) {
-    const deviceEvents = events.filter(event => event.deviceId === device.deviceId);
+    const deviceEvents = events.filter((event) => event.deviceId === device.deviceId);
     const publicKey = readFileSync(resolve(root, device.publicKeyPath), "utf8");
     assert.equal(verifyDeviceChain(deviceEvents, device.checkpoint, publicKey).valid, true);
   }

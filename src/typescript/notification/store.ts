@@ -22,25 +22,18 @@
 // event_uuid_v7=01a04ce0-0e77-76e2-b032-8dc5fd1e2f77
 // state_transition=SHARED_PARENT_ALLOWED -> CALLER_OWNED_PRIVATE_PARENT_REQUIRED occurred_at=2026-08-29T09:35:47.319Z
 // machine-contract: SQLite receives a reviewed regular path only from a directory owned by the current user with no group or other access; environment input cannot select the path.
-import { chmodSync, existsSync, lstatSync, mkdirSync, realpathSync, statSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+// information_uuid_v5=e4ef6246-133f-58d8-9433-a3a29df2eb40
+// event_uuid_v7=01a04d0d-7648-762e-8124-3cef35f835f9
+// state_transition=PATH_VALIDATED_BEFORE_SQLITE_OPEN -> GUARDED_SINGLE_LINK_IDENTITY_RECHECKED occurred_at=2026-08-29T10:25:23.016Z
+// machine-contract: a disk-backed SQLite file stays pinned by a reviewed descriptor until DatabaseSync opens the same named inode; no schema or pragma write begins before the post-open identity check succeeds.
+import { closeSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import type { EffectStartStatus } from "../governance/replay-verification.ts";
-import {
-  provenanceDetails,
-  provenanceFromDetails,
-  type InputProvenance,
-} from "./input-provenance.ts";
-import type {
-  ClaimResult,
-  ControlState,
-  EffectState,
-  NotificationIntent,
-  NotificationTarget,
-  TransitionRecord,
-} from "./types.ts";
+import { provenanceDetails, provenanceFromDetails, type InputProvenance } from "./input-provenance.ts";
+import { assertNotificationStorageDescriptor, containedNotificationStoragePath, openNotificationStorageGuard } from "./storage-path.ts";
+import type { ClaimResult, ControlState, EffectState, NotificationIntent, NotificationTarget, TransitionRecord } from "./types.ts";
 import { StateConflictError } from "./types.ts";
 
 interface IntentRow {
@@ -86,72 +79,35 @@ export interface StoredEffectClaimEvidence {
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const repositoryStorageRoot = join(repositoryRoot, ".local");
-const DATABASE_FILENAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.sqlite$/;
-
-function requirePrivateDirectory(path: string): void {
-  const stats = statSync(path);
-  if (!stats.isDirectory()) throw new TypeError("database parent must be a directory");
-  if (typeof process.getuid === "function" && stats.uid !== process.getuid()) {
-    throw new TypeError("database parent must be owned by the current user");
-  }
-  if ((stats.mode & 0o077) !== 0) throw new TypeError("database parent must be private to the current user");
-}
 
 function containedDatabasePath(candidate: string): string {
   if (candidate === ":memory:") return candidate;
-  const filename = basename(candidate);
-  if (!DATABASE_FILENAME.test(filename)) {
-    throw new TypeError("database path must end in a simple .sqlite filename");
-  }
+  return containedNotificationStoragePath(candidate, "database", { repositoryStorageRoot });
+}
 
-  // Only this fixed application directory may be created. Caller-selected parents must already exist.
-  mkdirSync(repositoryStorageRoot, { recursive: true, mode: 0o700 });
-  chmodSync(repositoryStorageRoot, 0o700);
-  const requestedPath = resolve(candidate);
-  const localRoot = resolve(repositoryStorageRoot);
-  const temporaryRoot = resolve(tmpdir());
-  const fromLocalRoot = relative(localRoot, requestedPath);
-  const fromTemporaryRoot = relative(temporaryRoot, requestedPath);
-  const isBelowLocalRoot = fromLocalRoot !== ""
-    && fromLocalRoot !== ".."
-    && !fromLocalRoot.startsWith(`..${sep}`)
-    && !isAbsolute(fromLocalRoot);
-  const isBelowTemporaryRoot = fromTemporaryRoot !== ""
-    && fromTemporaryRoot !== ".."
-    && !fromTemporaryRoot.startsWith(`..${sep}`)
-    && !isAbsolute(fromTemporaryRoot);
-  const lexicalRoot = isBelowLocalRoot ? localRoot : isBelowTemporaryRoot ? temporaryRoot : null;
-  if (lexicalRoot === null) throw new TypeError("database path is outside the allowed storage roots");
+function openContainedDatabase(candidate: string): DatabaseSync {
+  const path = containedDatabasePath(candidate);
+  if (path === ":memory:") return new DatabaseSync(path);
 
-  const canonicalRoot = realpathSync(lexicalRoot);
-  const canonicalParent = realpathSync(dirname(requestedPath));
-  const fromCanonicalRoot = relative(canonicalRoot, canonicalParent);
-  if (fromCanonicalRoot === ".." || fromCanonicalRoot.startsWith(`..${sep}`) || isAbsolute(fromCanonicalRoot)) {
-    throw new TypeError("database path resolves outside its allowed storage root");
+  const guard = openNotificationStorageGuard(path, "database");
+  let database: DatabaseSync | null = null;
+  try {
+    database = new DatabaseSync(path);
+    assertNotificationStorageDescriptor(path, guard, "database");
+    return database;
+  } catch (error) {
+    database?.close();
+    throw error;
+  } finally {
+    closeSync(guard);
   }
-  if (lexicalRoot === temporaryRoot) {
-    const rootStats = statSync(canonicalRoot);
-    const rootIsPrivate = (rootStats.mode & 0o077) === 0;
-    const rootIsSticky = (rootStats.mode & 0o1000) !== 0;
-    if (!rootIsPrivate && !rootIsSticky) throw new TypeError("temporary storage root must be private or sticky");
-    if (fromCanonicalRoot === "" || fromCanonicalRoot.includes(sep)) {
-      throw new TypeError("database parent must be one direct private child of the temporary root");
-    }
-  }
-  requirePrivateDirectory(canonicalParent);
-
-  const safePath = join(canonicalParent, filename);
-  if (existsSync(safePath) && lstatSync(safePath).isSymbolicLink()) {
-    throw new TypeError("database path must not be a symbolic link");
-  }
-  return safePath;
 }
 
 export class NotificationStore {
   readonly database: DatabaseSync;
 
   constructor(path: string) {
-    this.database = new DatabaseSync(containedDatabasePath(path));
+    this.database = openContainedDatabase(path);
     this.database.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL;");
     this.database.exec(`
       CREATE TABLE IF NOT EXISTS intents (
@@ -195,7 +151,9 @@ export class NotificationStore {
     `);
     const effectColumns = this.database.prepare("PRAGMA table_info(effects)").all() as Array<{ name: string }>;
     if (!effectColumns.some((column) => column.name === "start_status")) {
-      this.database.exec("ALTER TABLE effects ADD COLUMN start_status TEXT NOT NULL DEFAULT 'UNKNOWN' CHECK (start_status IN ('STARTED', 'NOT_STARTED', 'UNKNOWN'))");
+      this.database.exec(
+        "ALTER TABLE effects ADD COLUMN start_status TEXT NOT NULL DEFAULT 'UNKNOWN' CHECK (start_status IN ('STARTED', 'NOT_STARTED', 'UNKNOWN'))",
+      );
     }
     this.database.exec("UPDATE effects SET start_status = 'STARTED' WHERE outcome = 'CONFIRMED_PRESENT' AND start_status = 'UNKNOWN'");
   }
@@ -213,21 +171,14 @@ export class NotificationStore {
         }
         return { intent: existing, transition: null };
       }
-      this.database.prepare(`
+      this.database
+        .prepare(`
         INSERT INTO intents (
           intent_id, logical_operation_id, title, body, target, payload_digest,
           control_state, effect_state, created_at, updated_at, revision
         ) VALUES (?, ?, ?, ?, ?, ?, 'PROPOSED', 'NOT_STARTED', ?, ?, 1)
-      `).run(
-        record.intentId,
-        record.logicalOperationId,
-        record.title,
-        record.body,
-        record.target,
-        record.payloadDigest,
-        record.now,
-        record.now,
-      );
+      `)
+        .run(record.intentId, record.logicalOperationId, record.title, record.body, record.target, record.payloadDigest, record.now, record.now);
       const transition: TransitionRecord = {
         eventId: record.eventId,
         intentId: record.intentId,
@@ -263,11 +214,13 @@ export class NotificationStore {
   }
 
   getInputProvenanceEvidence(intentId: string): StoredInputProvenanceEvidence | null {
-    const row = this.database.prepare(`
+    const row = this.database
+      .prepare(`
       SELECT event_id, details_json FROM attempts
       WHERE intent_id = ? AND kind = 'intent-created'
       ORDER BY occurred_at ASC, rowid ASC LIMIT 1
-    `).get(intentId) as { event_id: string; details_json: string } | undefined;
+    `)
+      .get(intentId) as { event_id: string; details_json: string } | undefined;
     if (!row) return null;
     return Object.freeze({
       eventId: row.event_id,
@@ -276,10 +229,12 @@ export class NotificationStore {
   }
 
   getLatestEffectClaimEvidence(intentId: string): StoredEffectClaimEvidence | null {
-    const row = this.database.prepare(`
+    const row = this.database
+      .prepare(`
       SELECT effect_event_id, started_at, start_status FROM effects
       WHERE intent_id = ? ORDER BY started_at DESC, rowid DESC LIMIT 1
-    `).get(intentId) as { effect_event_id: string; started_at: number; start_status: EffectStartStatus } | undefined;
+    `)
+      .get(intentId) as { effect_event_id: string; started_at: number; start_status: EffectStartStatus } | undefined;
     return row ? Object.freeze({ eventId: row.effect_event_id, startedAt: row.started_at, startStatus: row.start_status }) : null;
   }
 
@@ -287,28 +242,24 @@ export class NotificationStore {
     return this.transaction(() => {
       const before = this.requireIntent(intentId);
       if (
-        before.controlState === "USER_APPROVED"
-        && before.effectState === "NOT_STARTED"
-        && (before.approvalExpiresAt === null || before.approvalExpiresAt <= now)
+        before.controlState === "USER_APPROVED" &&
+        before.effectState === "NOT_STARTED" &&
+        (before.approvalExpiresAt === null || before.approvalExpiresAt <= now)
       ) {
         if (this.countEffectStarts(intentId) !== 0) {
           throw new StateConflictError("expired approval cannot be reprepared after an effect start");
         }
-        this.database.prepare(`
+        this.database
+          .prepare(`
           UPDATE intents SET control_state = 'DRY_RUN',
             approval_event_id = NULL, approval_target = NULL, approval_payload_digest = NULL,
             approval_expires_at = NULL, updated_at = ?, revision = revision + 1
           WHERE intent_id = ?
-        `).run(now, intentId);
-        const transition = this.makeTransition(
-          before,
-          eventId,
-          now,
-          "expired-approval-reprepared",
-          "DRY_RUN",
-          "NOT_STARTED",
-          { expiredApprovalEventId: before.approvalEventId },
-        );
+        `)
+          .run(now, intentId);
+        const transition = this.makeTransition(before, eventId, now, "expired-approval-reprepared", "DRY_RUN", "NOT_STARTED", {
+          expiredApprovalEventId: before.approvalEventId,
+        });
         this.insertAttempt(transition);
         return { intent: this.requireIntent(intentId), transition };
       }
@@ -328,12 +279,14 @@ export class NotificationStore {
       if (before.effectState !== "NOT_STARTED" || this.countEffectStarts(intentId) !== 0) {
         throw new StateConflictError("approval safety invariant requires zero prior effect starts");
       }
-      this.database.prepare(`
+      this.database
+        .prepare(`
         UPDATE intents SET
           control_state = 'USER_APPROVED', approval_event_id = ?, approval_target = target,
           approval_payload_digest = payload_digest, approval_expires_at = ?, updated_at = ?, revision = revision + 1
         WHERE intent_id = ?
-      `).run(eventId, expiresAt, now, intentId);
+      `)
+        .run(eventId, expiresAt, now, intentId);
       const transition = this.makeTransition(before, eventId, now, "user-approved", "USER_APPROVED", before.effectState, {
         approvalExpiresAt: expiresAt,
         payloadDigest: before.payloadDigest,
@@ -366,22 +319,26 @@ export class NotificationStore {
         throw new StateConflictError("execution safety invariant requires zero prior effect starts");
       }
       if (
-        before.approvalExpiresAt === null
-        || before.approvalExpiresAt <= now
-        || before.approvalTarget !== before.target
-        || before.approvalPayloadDigest !== before.payloadDigest
+        before.approvalExpiresAt === null ||
+        before.approvalExpiresAt <= now ||
+        before.approvalTarget !== before.target ||
+        before.approvalPayloadDigest !== before.payloadDigest
       ) {
         const result = this.transition(before, eventId, now, "approval-expired-or-mismatched", "ABORTED", before.effectState, {});
         return { status: "APPROVAL_EXPIRED", intent: result.intent, transition: result.transition! };
       }
-      this.database.prepare(`
+      this.database
+        .prepare(`
         UPDATE intents SET control_state = 'EXECUTING', effect_state = 'AMBIGUOUS', updated_at = ?, revision = revision + 1
         WHERE intent_id = ?
-      `).run(now, intentId);
-      this.database.prepare(`
+      `)
+        .run(now, intentId);
+      this.database
+        .prepare(`
         INSERT INTO effects (effect_event_id, intent_id, started_at, start_status, outcome, receipt_json)
         VALUES (?, ?, ?, 'UNKNOWN', 'AMBIGUOUS', NULL)
-      `).run(eventId, intentId, now);
+      `)
+        .run(eventId, intentId, now);
       const transition = this.makeTransition(before, eventId, now, "execution-claimed", "EXECUTING", "AMBIGUOUS", {
         approvalEventId: before.approvalEventId,
       });
@@ -396,15 +353,28 @@ export class NotificationStore {
       if (before.controlState !== "EXECUTING" || before.effectState !== "AMBIGUOUS") {
         throw new StateConflictError(`reconcile requires EXECUTING/AMBIGUOUS, got ${before.controlState}/${before.effectState}`);
       }
-      return this.transition(before, eventId, now, "reconcile-started", "EXECUTING", "RECONCILING", {} as Record<string, never>) as { intent: NotificationIntent; transition: TransitionRecord };
+      return this.transition(before, eventId, now, "reconcile-started", "EXECUTING", "RECONCILING", {} as Record<string, never>) as {
+        intent: NotificationIntent;
+        transition: TransitionRecord;
+      };
     });
   }
 
-  completePresent(intentId: string, eventId: string, now: number, receipt: Record<string, unknown>): { intent: NotificationIntent; transition: TransitionRecord } {
+  completePresent(
+    intentId: string,
+    eventId: string,
+    now: number,
+    receipt: Record<string, unknown>,
+  ): { intent: NotificationIntent; transition: TransitionRecord } {
     return this.finish(intentId, eventId, now, "effect-confirmed-present", "VERIFIED", "CONFIRMED_PRESENT", receipt);
   }
 
-  completeAbsent(intentId: string, eventId: string, now: number, receipt: Record<string, unknown>): { intent: NotificationIntent; transition: TransitionRecord } {
+  completeAbsent(
+    intentId: string,
+    eventId: string,
+    now: number,
+    receipt: Record<string, unknown>,
+  ): { intent: NotificationIntent; transition: TransitionRecord } {
     return this.finish(intentId, eventId, now, "effect-confirmed-absent", "ABORTED", "CONFIRMED_ABSENT", receipt);
   }
 
@@ -414,7 +384,10 @@ export class NotificationStore {
       if (before.controlState !== "EXECUTING" || before.effectState !== "RECONCILING") {
         throw new StateConflictError("only a reconciling intent can return to ambiguous");
       }
-      return this.transition(before, eventId, now, "reconcile-inconclusive", "EXECUTING", "AMBIGUOUS", {}) as { intent: NotificationIntent; transition: TransitionRecord };
+      return this.transition(before, eventId, now, "reconcile-inconclusive", "EXECUTING", "AMBIGUOUS", {}) as {
+        intent: NotificationIntent;
+        transition: TransitionRecord;
+      };
     });
   }
 
@@ -436,8 +409,7 @@ export class NotificationStore {
         throw new StateConflictError("a started effect cannot be downgraded to not started");
       }
       if (latest.startStatus === startStatus) return { intent: before, transition: null };
-      this.database.prepare("UPDATE effects SET start_status = ? WHERE effect_event_id = ?")
-        .run(startStatus, latest.eventId);
+      this.database.prepare("UPDATE effects SET start_status = ? WHERE effect_event_id = ?").run(startStatus, latest.eventId);
       const transition = this.recordAttempt(before, eventId, now, "effect-start-assessed", {
         fromStartStatus: latest.startStatus,
         toStartStatus: startStatus,
@@ -474,21 +446,15 @@ export class NotificationStore {
       if (before.controlState !== "ABORTED" || before.effectState !== "CONFIRMED_ABSENT") {
         throw new StateConflictError("retry reset requires ABORTED/CONFIRMED_ABSENT");
       }
-      this.database.prepare(`
+      this.database
+        .prepare(`
         UPDATE intents SET control_state = 'PROPOSED', effect_state = 'NOT_STARTED',
           approval_event_id = NULL, approval_target = NULL, approval_payload_digest = NULL,
           approval_expires_at = NULL, updated_at = ?, revision = revision + 1
         WHERE intent_id = ?
-      `).run(now, intentId);
-      const transition = this.makeTransition(
-        before,
-        eventId,
-        now,
-        "confirmed-absent-reproposed-after-six-checks",
-        "PROPOSED",
-        "NOT_STARTED",
-        details,
-      );
+      `)
+        .run(now, intentId);
+      const transition = this.makeTransition(before, eventId, now, "confirmed-absent-reproposed-after-six-checks", "PROPOSED", "NOT_STARTED", details);
       this.insertAttempt(transition);
       return { intent: this.requireIntent(intentId), transition };
     });
@@ -500,10 +466,12 @@ export class NotificationStore {
   }
 
   countEffectStarts(intentId: string): number {
-    const row = this.database.prepare(`
+    const row = this.database
+      .prepare(`
       SELECT count(*) AS count FROM effects
       WHERE intent_id = ? AND start_status != 'NOT_STARTED'
-    `).get(intentId) as { count: number };
+    `)
+      .get(intentId) as { count: number };
     return Number(row.count);
   }
 
@@ -521,11 +489,14 @@ export class NotificationStore {
       if (before.controlState !== "EXECUTING" || !["AMBIGUOUS", "RECONCILING"].includes(before.effectState)) {
         throw new StateConflictError(`completion requires executing ambiguous effect, got ${before.controlState}/${before.effectState}`);
       }
-      const latest = this.database.prepare(`
+      const latest = this.database
+        .prepare(`
         SELECT effect_event_id FROM effects WHERE intent_id = ? ORDER BY started_at DESC, rowid DESC LIMIT 1
-      `).get(intentId) as { effect_event_id: string } | undefined;
+      `)
+        .get(intentId) as { effect_event_id: string } | undefined;
       if (!latest) throw new StateConflictError("effect claim is missing");
-      this.database.prepare("UPDATE effects SET outcome = ?, receipt_json = ? WHERE effect_event_id = ?")
+      this.database
+        .prepare("UPDATE effects SET outcome = ?, receipt_json = ? WHERE effect_event_id = ?")
         .run(effect, JSON.stringify(receipt), latest.effect_event_id);
       return this.transition(before, eventId, now, kind, control, effect, {
         receiptDigest: JSON.stringify(receipt).length,
@@ -542,9 +513,11 @@ export class NotificationStore {
     effect: EffectState,
     details: Record<string, string | number | boolean | null>,
   ): { intent: NotificationIntent; transition: TransitionRecord } {
-    this.database.prepare(`
+    this.database
+      .prepare(`
       UPDATE intents SET control_state = ?, effect_state = ?, updated_at = ?, revision = revision + 1 WHERE intent_id = ?
-    `).run(control, effect, now, before.intentId);
+    `)
+      .run(control, effect, now, before.intentId);
     const transition = this.makeTransition(before, eventId, now, kind, control, effect, details);
     this.insertAttempt(transition);
     return { intent: this.requireIntent(before.intentId), transition };
@@ -579,36 +552,30 @@ export class NotificationStore {
     kind: string,
     details: Record<string, string | number | boolean | null>,
   ): TransitionRecord {
-    const transition = this.makeTransition(
-      before,
-      eventId,
-      now,
-      kind,
-      before.controlState,
-      before.effectState,
-      details,
-    );
+    const transition = this.makeTransition(before, eventId, now, kind, before.controlState, before.effectState, details);
     this.insertAttempt(transition);
     return transition;
   }
 
   private insertAttempt(record: TransitionRecord): void {
-    this.database.prepare(`
+    this.database
+      .prepare(`
       INSERT INTO attempts (
         event_id, intent_id, kind, occurred_at, from_control, to_control,
         from_effect, to_effect, details_json
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      record.eventId,
-      record.intentId,
-      record.kind,
-      record.occurredAt,
-      record.fromControl,
-      record.toControl,
-      record.fromEffect,
-      record.toEffect,
-      JSON.stringify(record.details),
-    );
+    `)
+      .run(
+        record.eventId,
+        record.intentId,
+        record.kind,
+        record.occurredAt,
+        record.fromControl,
+        record.toControl,
+        record.fromEffect,
+        record.toEffect,
+        JSON.stringify(record.details),
+      );
   }
 
   private requireIntent(intentId: string): NotificationIntent {

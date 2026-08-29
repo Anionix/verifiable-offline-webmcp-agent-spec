@@ -17,16 +17,44 @@
 // event_uuid_v7=01a04ce0-0e78-72d0-a80a-bc3fc49c7256
 // state_transition=CONSTRUCTOR_ONLY_SYMLINK_CHECK -> PER_IO_NOFOLLOW_AND_PRIVATE_PARENT occurred_at=2026-08-29T09:35:47.320Z
 // machine-contract: replacing an audit path after construction remains rejected, and a shared temporary root never qualifies as a storage parent.
+// information_uuid_v5=f38bf817-15be-5398-bd7e-78bc788498ec
+// event_uuid_v7=01a04cf4-5c1a-740e-bf0b-21652882816d
+// state_transition=REVIEW_COMMENT_TRACKED -> CROSS_PLATFORM_BOUNDARY_TESTED occurred_at=2026-08-29T09:57:57.921Z
+// machine-contract: simulated Windows skips meaningless POSIX mode bits while macOS and Linux retain private-parent enforcement; a linked repository root is rejected without touching its target.
+// information_uuid_v5=9a7359d0-121f-561a-b05d-2dae29b22bec
+// event_uuid_v7=01a04d0d-7648-762e-8124-3cf06ef35603
+// state_transition=HARDLINKED_EXTERNAL_FILE_WRITABLE -> HARDLINK_REJECTED_WITH_VICTIM_UNCHANGED occurred_at=2026-08-29T10:25:23.016Z
+// machine-contract: audit and SQLite candidates with multiple links fail before storage writes; external victim bytes, SHA-256, and mode remain identical, including an audit-path replacement after construction.
+// information_uuid_v5=83951c9f-4ece-576e-bacc-8224d32a3b99
+// event_uuid_v7=01a04d24-0955-78ae-9c7c-218287ed5acb
+// state_transition=REJECTED_TMPDIR_TAINT_FIXTURE -> REJECTED_REPOSITORY_SIBLING_FIXTURE occurred_at=2026-08-29T10:50:05.633Z
+// machine-contract: the outside-root negative test uses a repository-relative sibling path so the CodeQL temporary-file model measures only reachable storage operations; runtime containment rejection remains unchanged.
 import assert from "node:assert/strict";
-import { chmodSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import {
+  chmodSync,
+  closeSync,
+  linkSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-verification.ts";
 import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
+import { assertNotificationStorageDescriptor, containedNotificationStoragePath, openNotificationStorageGuard } from "../notification/storage-path.ts";
 import { NotificationStore } from "../notification/store.ts";
 import type { NotificationIntent } from "../notification/types.ts";
 import { uuidV7 } from "../uuid.ts";
@@ -64,13 +92,26 @@ function fixture(name: string): Fixture {
   };
 }
 
+function fileSnapshot(path: string): { content: Buffer; sha256: string; mode: number } {
+  const content = readFileSync(path);
+  return {
+    content,
+    sha256: createHash("sha256").update(content).digest("hex"),
+    mode: statSync(path).mode & 0o777,
+  };
+}
+
+function assertFileUnchanged(path: string, before: ReturnType<typeof fileSnapshot>): void {
+  const after = fileSnapshot(path);
+  assert.deepEqual(after.content, before.content);
+  assert.equal(after.sha256, before.sha256);
+  assert.equal(after.mode, before.mode);
+}
+
 test("notification storage rejects paths outside its fixed local and test roots", () => {
-  const outsideTemporaryRoot = join(dirname(tmpdir()), "notification-outside.sqlite");
+  const outsideTemporaryRoot = resolve("untrusted-outside-root", "notification-outside.sqlite");
   assert.throws(() => new NotificationStore(outsideTemporaryRoot), /outside the allowed storage roots/);
-  assert.throws(
-    () => new AuditLog(outsideTemporaryRoot.replace(/\.sqlite$/, ".ndjson")),
-    /outside the allowed storage roots/,
-  );
+  assert.throws(() => new AuditLog(outsideTemporaryRoot.replace(/\.sqlite$/, ".ndjson")), /outside the allowed storage roots/);
 });
 
 test("notification storage rejects unexpected filenames and symbolic links before I/O", () => {
@@ -123,15 +164,105 @@ test("notification storage rejects a parent symlink that escapes an allowed root
   try {
     const link = join(directory, "outside");
     symlinkSync(process.cwd(), link, "dir");
+    assert.throws(() => new NotificationStore(join(link, "queue.sqlite")), /resolves outside its allowed storage root/);
+    assert.throws(() => new AuditLog(join(link, "audit.ndjson")), /resolves outside its allowed storage root/);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage applies mode bits only on POSIX platforms", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-platform-policy-"));
+  try {
+    chmodSync(directory, 0o755);
+    const options = {
+      repositoryStorageRoot: join(directory, "repository-local"),
+      platform: "win32" as const,
+    };
+    assert.doesNotThrow(() => containedNotificationStoragePath(join(directory, "audit.ndjson"), "audit", options));
+    assert.doesNotThrow(() => containedNotificationStoragePath(join(directory, "queue.sqlite"), "database", options));
     assert.throws(
-      () => new NotificationStore(join(link, "queue.sqlite")),
-      /resolves outside its allowed storage root/,
-    );
-    assert.throws(
-      () => new AuditLog(join(link, "audit.ndjson")),
-      /resolves outside its allowed storage root/,
+      () => containedNotificationStoragePath(join(directory, "audit.ndjson"), "audit", { ...options, platform: "darwin" }),
+      /private to the current user/,
     );
   } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a linked repository root without touching its target", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-linked-root-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-linked-target-"));
+  try {
+    const storageRoot = join(directory, ".local");
+    const beforeMode = statSync(external).mode & 0o777;
+    symlinkSync(external, storageRoot, "dir");
+    const options = { repositoryStorageRoot: storageRoot, platform: "win32" as const };
+
+    assert.throws(() => containedNotificationStoragePath(join(storageRoot, "audit.ndjson"), "audit", options), /storage root must not be a symbolic link/);
+    assert.throws(() => containedNotificationStoragePath(join(storageRoot, "queue.sqlite"), "database", options), /storage root must not be a symbolic link/);
+    assert.deepEqual(readdirSync(external), []);
+    assert.equal(statSync(external).mode & 0o777, beforeMode);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects existing hard links without changing external victims", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-hardlink-path-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-hardlink-victim-"));
+  try {
+    const auditVictim = join(external, "audit-victim.txt");
+    const databaseVictim = join(external, "database-victim.txt");
+    writeFileSync(auditVictim, "audit victim\n", { mode: 0o640 });
+    writeFileSync(databaseVictim, "", { mode: 0o640 });
+    const auditBefore = fileSnapshot(auditVictim);
+    const databaseBefore = fileSnapshot(databaseVictim);
+    linkSync(auditVictim, join(directory, "audit.ndjson"));
+    linkSync(databaseVictim, join(directory, "queue.sqlite"));
+
+    assert.throws(() => new AuditLog(join(directory, "audit.ndjson")), /must not have multiple hard links/);
+    assert.throws(() => new NotificationStore(join(directory, "queue.sqlite")), /must not have multiple hard links/);
+    assertFileUnchanged(auditVictim, auditBefore);
+    assertFileUnchanged(databaseVictim, databaseBefore);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("audit I/O rejects a hard-link replacement after construction without changing its victim", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-hardlink-swap-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-hardlink-swap-victim-"));
+  try {
+    const auditPath = join(directory, "audit.ndjson");
+    const victim = join(external, "victim.txt");
+    const audit = new AuditLog(auditPath);
+    writeFileSync(victim, "", { mode: 0o640 });
+    const before = fileSnapshot(victim);
+    linkSync(victim, auditPath);
+
+    assert.throws(() => audit.append({} as never), /must not have multiple hard links/);
+    assert.throws(() => audit.verify(), /must not have multiple hard links/);
+    assertFileUnchanged(victim, before);
+    unlinkSync(auditPath);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a different regular file while the reviewed descriptor remains open", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-descriptor-swap-"));
+  const path = join(directory, "queue.sqlite");
+  const guard = openNotificationStorageGuard(path, "database");
+  try {
+    renameSync(path, join(directory, "reviewed.sqlite"));
+    writeFileSync(path, "replacement", { mode: 0o600 });
+    assert.throws(() => assertNotificationStorageDescriptor(path, guard, "database"), /changed during open/);
+  } finally {
+    closeSync(guard);
     rmSync(directory, { recursive: true, force: true });
   }
 });
@@ -139,16 +270,22 @@ test("notification storage rejects a parent symlink that escapes an allowed root
 test("engine length limits count astral Unicode characters like the input projector", () => {
   const item = fixture("unicode-length");
   try {
-    assert.doesNotThrow(() => item.engine.createIntent({
-      logicalOperationId: "unicode-length-valid",
-      title: "😀".repeat(120),
-      body: "本文",
-    }));
-    assert.throws(() => item.engine.createIntent({
-      logicalOperationId: "unicode-length-invalid",
-      title: "😀".repeat(121),
-      body: "本文",
-    }), /1-120 Unicode characters/);
+    assert.doesNotThrow(() =>
+      item.engine.createIntent({
+        logicalOperationId: "unicode-length-valid",
+        title: "😀".repeat(120),
+        body: "本文",
+      }),
+    );
+    assert.throws(
+      () =>
+        item.engine.createIntent({
+          logicalOperationId: "unicode-length-invalid",
+          title: "😀".repeat(121),
+          body: "本文",
+        }),
+      /1-120 Unicode characters/,
+    );
   } finally {
     item.close();
   }
@@ -211,10 +348,13 @@ test("an existing effect ledger migrates to conservative start assessment", () =
   }
   const migrated = new NotificationStore(databasePath);
   try {
-    const rows = (migrated.database.prepare(`
+    const rows = (
+      migrated.database
+        .prepare(`
       SELECT effect_event_id, start_status FROM effects ORDER BY started_at
-    `).all() as Array<{ effect_event_id: string; start_status: string }>)
-      .map((row) => ({ ...row }));
+    `)
+        .all() as Array<{ effect_event_id: string; start_status: string }>
+    ).map((row) => ({ ...row }));
     assert.deepEqual(rows, [
       { effect_event_id: "present-event", start_status: "STARTED" },
       { effect_event_id: "absent-event", start_status: "UNKNOWN" },
@@ -255,18 +395,17 @@ test("browser confirmation rejects fabricated counts and persists claim separate
       () => item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: [intent.intentId, intent.intentId] }),
       /duplicate notification readback detected/,
     );
-    assert.throws(
-      () => item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: ["different-intent"] }),
-      /different intent tag/,
-    );
+    assert.throws(() => item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: ["different-intent"] }), /different intent tag/);
     assert.equal(item.engine.getIntent(intent.intentId)?.effectState, "AMBIGUOUS");
     const verified = item.engine.confirmBrowserReceipt(intent.intentId, { activeTags: [intent.intentId] });
     assert.equal(verified.status, "VERIFIED");
     assert.equal(item.engine.getEffectStartCount(intent.intentId), 1);
 
-    const row = item.store.database.prepare(`
+    const row = item.store.database
+      .prepare(`
       SELECT receipt_json FROM effects WHERE intent_id = ? ORDER BY started_at DESC, rowid DESC LIMIT 1
-    `).get(intent.intentId) as { receipt_json: string };
+    `)
+      .get(intent.intentId) as { receipt_json: string };
     const receipt = JSON.parse(row.receipt_json) as {
       verification: {
         recordedClaim: { source: string; claimedPresence: string };
@@ -342,10 +481,7 @@ test("a confirmed pre-effect failure can be reproposed with a new approval", asy
     assert.equal(item.store.getLatestEffectClaimEvidence(intent.intentId)?.startStatus, "NOT_STARTED");
     const confirmedAbsent = item.engine.getIntent(intent.intentId)!;
     item.now.value += 1;
-    item.engine.resetAfterConfirmedAbsent(
-      intent.intentId,
-      validReplayEvidence(item.engine, confirmedAbsent, item.now.value),
-    );
+    item.engine.resetAfterConfirmedAbsent(intent.intentId, validReplayEvidence(item.engine, confirmedAbsent, item.now.value));
     await item.engine.preview(intent.intentId);
     item.engine.approve(intent.intentId);
     adapter.mode = "success";
@@ -371,9 +507,10 @@ test("a failed replay gate remains stopped before a second effect claim", async 
     evidence.permission.state = "DENIED";
     assert.throws(
       () => item.engine.resetAfterConfirmedAbsent(intent.intentId, evidence),
-      (error: unknown) => error instanceof ReplayBlockedError
-        && error.evaluation.decision === "STOP"
-        && error.evaluation.gates.find((gate) => gate.gate === "PERMISSION")?.status === "BLOCKED",
+      (error: unknown) =>
+        error instanceof ReplayBlockedError &&
+        error.evaluation.decision === "STOP" &&
+        error.evaluation.gates.find((gate) => gate.gate === "PERMISSION")?.status === "BLOCKED",
     );
     assert.equal(item.engine.getIntent(intent.intentId)?.effectState, "CONFIRMED_ABSENT");
     assert.equal(item.engine.getEffectStartCount(intent.intentId), 0);
@@ -451,14 +588,7 @@ test("an expired approval is explicitly reprepared, reapproved, and started with
       .prepare("SELECT kind FROM attempts WHERE intent_id = ? ORDER BY rowid")
       .all(intent.intentId)
       .map((row) => (row as { kind: string }).kind);
-    assert.deepEqual(kinds, [
-      "intent-created",
-      "dry-run-reviewed",
-      "user-approved",
-      "expired-approval-reprepared",
-      "user-approved",
-      "execution-claimed",
-    ]);
+    assert.deepEqual(kinds, ["intent-created", "dry-run-reviewed", "user-approved", "expired-approval-reprepared", "user-approved", "execution-claimed"]);
   } finally {
     item.close();
   }
@@ -473,14 +603,13 @@ test("approval and execution fail closed when persisted state contradicts the ef
       body: "不整合を停止",
     });
     await item.engine.preview(intent.intentId);
-    item.store.database.prepare(`
+    item.store.database
+      .prepare(`
       INSERT INTO effects (effect_event_id, intent_id, started_at, start_status, outcome, receipt_json)
       VALUES (?, ?, ?, 'UNKNOWN', 'AMBIGUOUS', NULL)
-    `).run(uuidV7(item.now.value), intent.intentId, item.now.value);
-    assert.throws(
-      () => item.engine.approve(intent.intentId),
-      /approval safety invariant requires zero prior effect starts/,
-    );
+    `)
+      .run(uuidV7(item.now.value), intent.intentId, item.now.value);
+    assert.throws(() => item.engine.approve(intent.intentId), /approval safety invariant requires zero prior effect starts/);
     assert.equal(item.engine.getIntent(intent.intentId)?.controlState, "DRY_RUN");
   } finally {
     item.close();

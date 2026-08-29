@@ -1,15 +1,17 @@
 ---
 title: "Publication copy for the fictional Kyoto booking retry demo"
 information_uuid_v5: "22ea7511-834f-5b4f-b08b-9d6e95328540"
-event_uuid_v7: "01a04c63-6328-755b-8203-403c69022f3a"
-occurred_at: "2026-08-29T07:19:37.000Z"
-state: "YOUTUBE_PUBLIC_DEVPOST_VIDEO_LINKED"
-state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED -> THUMBNAIL_SAVED_AND_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04cf7-edba-71cd-b1c5-c8271758d1b4"
+occurred_at: "2026-08-29T10:01:51.802Z"
+state: "YOUTUBE_PUBLIC_READBACK_VERIFIED_ARTIFACT_IDENTITY_UNMEASURED"
+state_transition: "NOT_AUTHORED -> JUDGING_CRITERIA_BOUND -> TITLE_CHECKED -> REVIEW_READY -> DEVPOST_PROJECT_PAGE_PUBLISHED -> THUMBNAIL_SAVED_AND_SOURCE_MERGED -> YOUTUBE_PUBLIC_VERIFIED -> DEVPOST_VIDEO_LINKED_FINAL_SUBMISSION_PENDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED"
 ---
 
 # Publication copy
 
 <!-- machine-contract: This file records the public YouTube video and the Devpost project-page readback. It is not evidence of final challenge submission. Keep the project name and owner-only submission answers unresolved, and never cross the final-submit boundary without a new owner confirmation. -->
+<!-- information_uuid_v5=8e656bba-df14-5ee2-9348-f6239fb7edf9 event_uuid_v7=01a04cf7-edba-71cd-b1c5-c8271758d1b4 state_transition=SELF_CERTIFIED_ARTIFACT_BINDING -> ARTIFACT_TO_VIDEO_IDENTITY_UNMEASURED occurred_at=2026-08-29T10:01:51.802Z -->
+<!-- machine-contract: Public playback, title, duration, and subtitles remain readback facts. The local file digest and public YouTube identifier are not asserted to identify the same artifact without an independent upload-operation receipt. -->
 
 ## YouTube
 
@@ -182,7 +184,7 @@ WebMCP, JavaScript, TypeScript, Vite, IndexedDB, Service Worker, ChatGPT Sites, 
 ## Current publication boundary
 
 - Canva candidate 4 was owner-selected and saved as editable design `DAHTp751k_A`; the 1280×720 derivative is preserved, but YouTube's custom-thumbnail chooser did not open in the connected browser. The public video therefore uses an automatically generated thumbnail.
-- The exact 150-second local video, SHA-256 `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`, is public at https://youtu.be/tdSvJw4ghX8. An anonymous request returned HTTP 200 and YouTube's public metadata returned the expected title. Upload processing and copyright checks completed without an issue.
+- The locally measured final video is 150 seconds and has SHA-256 `3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`. Separately, https://youtu.be/tdSvJw4ghX8 returned HTTP 200, anonymous playback, the expected title, and a 150-second public duration; upload processing and copyright checks completed without an issue. No independent upload-operation receipt is retained in this repository, so the local artifact-to-public-video identity is `UNMEASURED` and the two records are not asserted to describe the same file.
 - English narration and short English captions remain in the video. The separate Japanese SubRip file was uploaded and YouTube Studio reported the Japanese subtitle track as published.
 - The Devpost update for project `1405191` returned version 6. A subsequent readback confirmed the attached YouTube URL, unchanged name `未定`, state `published`, and WebMCP Challenge `submitted_at: null`; the read tool itself does not expose a version field.
 - Final Devpost submission has not occurred. The next allowed action is owner review of unresolved submission answers; the final-submit action remains outside this run.

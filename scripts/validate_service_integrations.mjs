@@ -24,6 +24,10 @@
 // event_uuid_v7=01a04cd1-2d21-7be7-80ef-28439e6ddfa3
 // state_transition=DYNAMIC_VALIDATOR_INPUTS -> FIXED_SECURITY_CONTRACTS occurred_at=2026-08-29T09:19:32.129Z
 // machine-contract: JSON Schema patterns and UUIDv5 identities are fixed review-time contracts; unrecognized values fail closed and are never compiled or treated as cryptographic authority.
+// information_uuid_v5=c2da2f0e-eb8c-577e-abdc-d29159355cca
+// event_uuid_v7=01a04cfc-c4d6-71b3-8624-f9e37f1008f2
+// state_transition=FIRST_APPROVAL_ARRAY_ACCEPTED -> EXACT_DEVPOST_CONDITION_REQUIRED occurred_at=2026-08-29T10:07:09.014Z
+// machine-contract: exactly one allOf branch whose if.properties.serviceId.const is devpost must bind the fixed draft-update and final-submission gates; moved, duplicated, or missing branches fail closed.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -492,6 +496,16 @@ function countAxis(services, field, allowed) {
   return counts;
 }
 
+function devpostApprovalConditions(serviceSchema) {
+  if (!Array.isArray(serviceSchema?.allOf)) return [];
+  return serviceSchema.allOf.filter((condition) => condition?.if?.properties?.serviceId?.const === "devpost");
+}
+
+function hasExactDevpostApprovalContract(serviceSchema) {
+  const conditions = devpostApprovalConditions(serviceSchema);
+  return conditions.length === 1 && isDeepStrictEqual(conditions[0]?.then?.properties?.approvalGates?.const, EXPECTED_APPROVAL_GATES.devpost);
+}
+
 function safeArtifactPath(relativePath) {
   const absolute = resolve(ROOT, relativePath);
   record(absolute.startsWith(`${ROOT}${sep}`), `artifact path escapes repository: ${relativePath}`);
@@ -714,11 +728,31 @@ if (registry && schema) {
     isDeepStrictEqual(schema.$defs?.approvalGate?.properties?.state?.enum, APPROVAL_STATES),
     "JSON Schema approval state enum differs from the machine contract",
   );
-  const devpostApprovalContract = schema.$defs?.service?.allOf?.map((condition) => condition?.then?.properties?.approvalGates?.const).find(Array.isArray);
+  const serviceSchema = schema.$defs?.service;
+  const devpostConditions = devpostApprovalConditions(serviceSchema);
+  record(devpostConditions.length === 1, "JSON Schema must contain exactly one approval-gate condition targeted to serviceId=devpost");
   record(
-    isDeepStrictEqual(devpostApprovalContract, EXPECTED_APPROVAL_GATES.devpost),
+    hasExactDevpostApprovalContract(serviceSchema),
     "JSON Schema Devpost approval gates differ from the plan-authorized draft and separately approved final submission contract",
   );
+
+  const validDevpostFixture = structuredClone(serviceSchema ?? {});
+  record(hasExactDevpostApprovalContract(validDevpostFixture), "Devpost approval selector rejects its fixed positive control");
+
+  const movedDevpostFixture = structuredClone(validDevpostFixture);
+  for (const condition of devpostApprovalConditions(movedDevpostFixture)) condition.if.properties.serviceId.const = "shopify";
+  record(!hasExactDevpostApprovalContract(movedDevpostFixture), "Devpost approval selector accepts gates moved to another service");
+
+  const duplicatedDevpostFixture = structuredClone(validDevpostFixture);
+  const duplicatedCondition = devpostApprovalConditions(duplicatedDevpostFixture)[0];
+  if (duplicatedCondition) duplicatedDevpostFixture.allOf.push(structuredClone(duplicatedCondition));
+  record(!hasExactDevpostApprovalContract(duplicatedDevpostFixture), "Devpost approval selector accepts duplicate Devpost conditions");
+
+  const missingDevpostFixture = structuredClone(validDevpostFixture);
+  missingDevpostFixture.allOf = (missingDevpostFixture.allOf ?? []).filter(
+    (condition) => condition?.if?.properties?.serviceId?.const !== "devpost",
+  );
+  record(!hasExactDevpostApprovalContract(missingDevpostFixture), "Devpost approval selector accepts a missing Devpost condition");
 
   const services = Array.isArray(registry.services) ? registry.services : [];
   const actualServiceIds = services.map((service) => service?.serviceId);

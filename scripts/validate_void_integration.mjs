@@ -9,6 +9,12 @@
 // machine-contract: every tracked Dependabot advisory must resolve to a patched package version without force or legacy-peer bypasses; publication state remains separate.
 // event_uuid_v7=01a04cd1-2d20-795f-907d-b2a323d46fc0 state_transition=DYNAMIC_SCHEMA_AND_EXECUTABLE -> FIXED_VALIDATOR_BOUNDARY occurred_at=2026-08-29T09:19:32.128Z
 // machine-contract: only reviewed Void schema patterns may execute, and the version check uses the current Node executable with one fixed local module path; package metadata never selects a command.
+// information_uuid_v5=59aace12-7f9d-59bb-9b87-55c42e4f5c53
+// event_uuid_v7=01a04cfc-c4d4-7d80-af61-0a7e1146082b state_transition=DIST_ASSUMED_PRESENT -> STANDALONE_VALIDATION_BUILDS_FIRST occurred_at=2026-08-29T10:07:09.012Z
+// machine-contract: npm run validate:void must build the deterministic web artifact before reading dist, and a tracked clean-checkout test must prove the command succeeds without copied ignored artifacts.
+// information_uuid_v5=5b035010-7491-5f10-a312-2fcf372317f3
+// event_uuid_v7=01a04cfc-c4d5-73b4-8ef0-f22de3c54e65 state_transition=GLOBAL_REGISTRATION_ASSERTED -> HOST_OBSERVATION_UNVERIFIED occurred_at=2026-08-29T10:07:09.013Z
+// machine-contract: repository evidence proves the pinned project package and local invocation only; REGISTERED_ENABLED_RESTART_REQUIRED is retained as a host-reported observation and never proves another checkout's Codex-wide registration.
 
 import { constants, accessSync, existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
@@ -37,6 +43,8 @@ const EXPECTED_OUTPUT_DIR = "dist/client";
 const EXPECTED_BUILD_COMMAND = "npm run build:web";
 const EXPECTED_COMPATIBILITY_DATE = "2026-05-22";
 const EXPECTED_VOID_BIN_RELATIVE = "dist/cli/cli.mjs";
+const EXPECTED_HOST_REPORTED_CODEX_MCP_STATE = "REGISTERED_ENABLED_RESTART_REQUIRED";
+const EXPECTED_REPOSITORY_CODEX_MCP_STATE = "HOST_OBSERVATION_UNVERIFIED";
 const EXPECTED_INFORMATION_UUID_V5 = "22fa5437-e104-5ea2-acfe-fe57cc2553f2";
 const EXPECTED_UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const EXPECTED_BINDINGS = ["ai", "db", "kv", "storage"];
@@ -214,8 +222,9 @@ const EXPECTED_DEPENDABOT_ALERTS = [
 ];
 const EXPECTED_PACKAGE_SCRIPTS = {
   "mcp:void": "void mcp",
-  "validate:void": "node scripts/validate_void_integration.mjs",
-  "build:void:static": "npm run build:web && npm run validate:void",
+  "validate:void": "npm run build:web && node scripts/validate_void_integration.mjs",
+  "test:void:clean": "node scripts/test_validate_void_clean_checkout.mjs",
+  "build:void:static": "npm run validate:void",
   "deploy:void:static": "npm run build:void:static && void deploy --dir dist/client",
 };
 const SAFE_SCRIPT_PATTERN = /^node scripts\/[a-z0-9_-]+\.mjs$/u;
@@ -430,6 +439,8 @@ const packagePath = resolve(ROOT, "package.json");
 const lockPath = resolve(ROOT, "package-lock.json");
 const gitignorePath = resolve(ROOT, ".gitignore");
 const viteConfigPath = resolve(ROOT, "vite.config.js");
+const readmePath = resolve(ROOT, "README.md");
+const cleanCheckoutTestPath = resolve(ROOT, "scripts/test_validate_void_clean_checkout.mjs");
 const evidencePath = resolve(ROOT, "metadata/void-integration.json");
 const evidenceSchemaPath = resolve(ROOT, "schemas/void-integration.schema.json");
 
@@ -438,6 +449,7 @@ const packageJson = readJson(packagePath, "package.json");
 const packageLock = readJson(lockPath, "package-lock.json");
 const evidence = readJson(evidencePath, "Void integration evidence");
 readJson(evidenceSchemaPath, "Void integration evidence schema");
+const readme = readFileSync(readmePath, "utf8");
 
 record(config.$schema === EXPECTED_SCHEMA_REF, `void.json must reference ${EXPECTED_SCHEMA_REF}`);
 const schemaPath = resolve(ROOT, config.$schema);
@@ -537,8 +549,21 @@ record(
   "Void evidence package integrity differs from package-lock.json",
 );
 record(evidence.installation?.state === "CONFIRMED", "Void evidence must record the verified local installation");
-record(evidence.codexMcp?.state === "REGISTERED_ENABLED_RESTART_REQUIRED", "Void evidence must preserve the Codex restart boundary");
+record(
+  evidence.codexMcp?.state === EXPECTED_HOST_REPORTED_CODEX_MCP_STATE,
+  "Void evidence must preserve the historical host-reported Codex registration state",
+);
+record(evidence.codexMcp?.command === "npx", "Void evidence must identify the historical host registration command separately from the project script");
 record(isDeepStrictEqual(evidence.codexMcp?.args, ["-y", `void@${EXPECTED_VERSION}`, "mcp"]), "Void evidence MCP arguments must pin the installed version");
+record(evidence.codexMcp?.secretsConfigured === false, "Void host registration evidence must not claim configured secrets");
+record(
+  readme.includes(`\`${EXPECTED_HOST_REPORTED_CODEX_MCP_STATE}\``) && readme.includes(`\`${EXPECTED_REPOSITORY_CODEX_MCP_STATE}\``),
+  "README must distinguish the recorded host observation from the repository-reproducible Codex registration state",
+);
+record(
+  readme.includes("does not register Void in Codex globally") && readme.includes("Codex全体へVoidを登録する操作ではありません"),
+  "README must state in both languages that the tracked project command is not a global Codex registration",
+);
 record(evidence.staticAdapter?.state === "VALIDATED_NOT_DEPLOYED", "Void static adapter must remain explicitly not deployed");
 record(evidence.staticAdapter?.artifactDirectory === EXPECTED_OUTPUT_DIR, "Void evidence output directory differs from void.json");
 record(evidence.staticAdapter?.voidPluginInExistingViteGraph === false, "Void evidence cannot claim plugin insertion into the current Vite graph");
@@ -579,6 +604,12 @@ record(!/[;&|`$<>\\\n\r]/u.test(buildScript), "build:web must not contain shell 
 for (const [scriptName, expectedCommand] of Object.entries(EXPECTED_PACKAGE_SCRIPTS)) {
   record(packageJson.scripts?.[scriptName] === expectedCommand, `${scriptName} must be exactly: ${expectedCommand}`);
 }
+record(existsSync(cleanCheckoutTestPath), "the tracked clean-checkout Void validation test is missing");
+const cleanCheckoutTest = readFileSync(cleanCheckoutTestPath, "utf8");
+record(
+  cleanCheckoutTest.includes("CLEAN_CHECKOUT_BUILDS_BEFORE_VOID_VALIDATION") && cleanCheckoutTest.includes('["run", "validate:void"]'),
+  "the clean-checkout test must invoke the documented standalone Void validation from a fixture without dist",
+);
 const deployCommand = packageJson.scripts?.["deploy:void:static"] ?? "";
 record(deployCommand.endsWith("void deploy --dir dist/client"), "Void deploy must use pre-built static directory mode");
 record(

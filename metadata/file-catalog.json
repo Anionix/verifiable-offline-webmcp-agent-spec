@@ -186,8 +186,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "cefb0064e28e8856d038237456b33b6bafad3d916550762c22c5eef8c56ccb2e",
-      "bytes": 139,
+      "sha256": "7e4dfef4d0914f46b14dd114e1389508c64311a7d99cec25b967282e446c7215",
+      "bytes": 147,
       "mediaType": "application/octet-stream",
       "category": "root",
       "identity": {
@@ -4596,8 +4596,8 @@
     },
     {
       "path": "scripts/build_manifest.py",
-      "sha256": "687e415cc028af60a019c1de2b1bcac5a27d254ecfea12e45e0d0fb91cf1b7fa",
-      "bytes": 9077,
+      "sha256": "501778645f53e966f2f50d570c4974cd40e3a2c084f985687d90c9640e4ec351",
+      "bytes": 9245,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {
@@ -4805,8 +4805,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "a9cece57cceea39b3da62b338851874159ca190f305e2bee9ce014b8f356d190",
-      "bytes": 70796,
+      "sha256": "55f18259ff634c375786c03332a49b224f41668d31e366b0e6a7a95849055c0b",
+      "bytes": 70988,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

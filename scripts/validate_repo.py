@@ -24,7 +24,9 @@
 # information_uuid_v5=8d79ed21-27ce-52d4-9513-e2b024ae670a
 # event_uuid_v7=01a04b38-0e40-7ae1-8778-eb130910efa5
 # state_transition=HOST_STATE_UNCHECKED -> HOST_STATE_EXCLUDED occurred_at=2026-08-29T01:52:40.000Z
-# machine-contract: generated integrity records never include mutable host state from .wrangler, .local, dist, or node_modules.
+# machine-contract: generated integrity records never include mutable host state from .vercel, .wrangler, .local, dist, or node_modules.
+# event_uuid_v7=01a04bdb-34bf-766c-b47a-d92e201fd28f
+# state_transition=VERCEL_PROJECT_LINKED -> VERCEL_HOST_STATE_EXCLUDED occurred_at=2026-08-29T04:50:55.000Z
 # information_uuid_v5=8ef00763-b59a-5f86-b841-bf5cee364100
 # event_uuid_v7=01a04bc8-7f33-7fe3-8877-477e7f8b995a
 # state_transition=AUDIO_TIMED_PENDING_FINAL_VIDEO -> FINAL_VIDEO_VERIFIED occurred_at=2026-08-29T04:30:26.100Z
@@ -50,7 +52,7 @@ from referencing import Registry, Resource
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
 JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
-IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".wrangler", "dist", "node_modules", "__pycache__"}
+IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "__pycache__"}
 SRT_TIMING = re.compile(
     r"(?P<start_h>\d{2}):(?P<start_m>\d{2}):(?P<start_s>\d{2}),(?P<start_ms>\d{3})"
     r" --> "
@@ -273,7 +275,7 @@ def main():
     # portable repository receipt. Check both generated integrity records so a
     # future manifest regeneration cannot silently publish machine-specific data.
     host_generated_start = len(errors)
-    host_generated_parts = {".wrangler", ".local", "dist", "node_modules"}
+    host_generated_parts = {".vercel", ".wrangler", ".local", "dist", "node_modules"}
     try:
         catalog = load_json(ROOT / "metadata/file-catalog.json")
         catalog_paths = [record["path"] for record in catalog["files"]]

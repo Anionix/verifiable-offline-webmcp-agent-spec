@@ -760,8 +760,6 @@ def main():
             devpost_public_readback["updateReceipt"]["version"] != 11
             or public_project["projectId"] != "1405191"
             or public_project["name"] != "Kyoto Booking Retry Proof"
-            or public_project["challenge"]["submittedAt"] is not None
-            or public_project["challenge"]["submissionState"] != "FINAL_SUBMISSION_NOT_PROVEN"
             or public_html["url"] != "https://devpost.com/software/project-y79pb23hj1mz"
             or public_html["statusCode"] != 200
             or public_html["documentTitle"] != "Kyoto Booking Retry Proof | Devpost"
@@ -881,8 +879,87 @@ def main():
         else:
             errors.append("Devpost evidence has an unsupported provider-owned submission state")
 
+        def devpost_provider_consistency(local_record: dict[str, Any], provider_record: dict[str, Any]):
+            consistency_errors: list[str] = []
+            local_submission = local_record["submission"]
+            provider_identity = provider_record["identity"]
+            provider_transition = provider_record["machineContract"]["stateTransition"]
+            provider_challenge = provider_record["authenticatedReadback"]["project"]["challenge"]
+            provider_receipt = provider_record.get("submissionReceipt")
+            try:
+                require_uuid7_time(
+                    provider_identity["observationUuidV7"],
+                    provider_identity["observedAt"],
+                    "Devpost provider readback",
+                )
+            except Exception as exc:
+                consistency_errors.append(str(exc))
+            if (
+                provider_transition["eventUuidV7"] != provider_identity["observationUuidV7"]
+                or provider_transition["occurredAt"] != provider_identity["observedAt"]
+            ):
+                consistency_errors.append("Devpost provider transition differs from its observation identity")
+
+            if local_submission["devpostOwnedStatus"] == "FINAL_SUBMISSION_PENDING":
+                if (
+                    provider_challenge.get("submittedAt") is not None
+                    or provider_challenge.get("submissionState") != "FINAL_SUBMISSION_NOT_PROVEN"
+                    or provider_receipt is not None
+                    or provider_transition.get("from") != "PUBLIC_DESCRIPTION_VERSION_11_SAVED"
+                    or provider_transition.get("to")
+                    != "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE"
+                ):
+                    consistency_errors.append(
+                        "pending local submission disagrees with the provider pending readback boundary"
+                    )
+                return consistency_errors
+
+            if local_submission["devpostOwnedStatus"] != "FINAL_SUBMISSION_VERIFIED":
+                consistency_errors.append("local submission has an unsupported provider-owned state")
+                return consistency_errors
+            if not isinstance(provider_receipt, dict):
+                consistency_errors.append("verified local submission lacks a Devpost submit-project receipt")
+                return consistency_errors
+            try:
+                require_uuid_version(
+                    provider_receipt["evidenceIdUuidV5"], 5, "Devpost submit-project receipt"
+                )
+                require_uuid7_time(
+                    provider_receipt["observationUuidV7"],
+                    provider_receipt["observedAt"],
+                    "Devpost submit-project receipt",
+                )
+                if rfc3339_ms(provider_receipt["submittedAt"]) > rfc3339_ms(provider_receipt["observedAt"]):
+                    consistency_errors.append("Devpost submission time occurs after the submit-project receipt")
+                if rfc3339_ms(provider_receipt["observedAt"]) > rfc3339_ms(provider_identity["observedAt"]):
+                    consistency_errors.append("Devpost submit-project receipt occurs after provider readback")
+                if rfc3339_ms(provider_identity["observedAt"]) > rfc3339_ms(local_record["recordedAt"]):
+                    consistency_errors.append("Devpost provider readback occurs after the local evidence record")
+            except Exception as exc:
+                consistency_errors.append(f"Devpost verified provider receipt structure: {exc}")
+            if (
+                provider_challenge.get("submissionState") != "FINAL_SUBMISSION_VERIFIED"
+                or provider_challenge.get("submittedAt") != provider_receipt.get("submittedAt")
+                or local_submission.get("devpostSubmittedAt") != provider_receipt.get("submittedAt")
+                or local_submission.get("devpostSubmissionId") != provider_receipt.get("submissionId")
+                or local_submission.get("devpostSubmissionUrl") != provider_receipt.get("url")
+                or local_submission.get("devpostSubmitToolStatus") != "SUBMITTED"
+                or provider_receipt.get("status") != "Submitted"
+                or provider_receipt.get("challengeSlug") != "webmcp"
+                or provider_receipt.get("projectSlug") != "project-y79pb23hj1mz"
+                or provider_transition.get("from") != "FINAL_SUBMISSION_PENDING"
+                or provider_transition.get("to") != "FINAL_SUBMISSION_VERIFIED"
+            ):
+                consistency_errors.append(
+                    "verified local submission does not match the Devpost receipt and authenticated readback"
+                )
+            return consistency_errors
+
+        errors.extend(devpost_provider_consistency(devpost_evidence, devpost_public_readback))
+
         # The same schema must continue to represent the next authoritative
-        # provider state without weakening the pending/submitted exclusivity.
+        # provider state without weakening the pending/submitted exclusivity
+        # or accepting a locally forged terminal event.
         future_submitted = json.loads(json.dumps(devpost_evidence))
         future_event = {
             "eventUuidV7": "01a04d95-8641-7091-a1f0-f5fd595b8fae",
@@ -900,12 +977,63 @@ def main():
             "devpostSubmittedAt": future_submitted["recordedAt"],
             "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
             "devpostSubmissionId": 1,
-            "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+            "devpostSubmissionUrl": "https://webmcp.devpost.com/submissions/1",
             "devpostSubmitToolStatus": "SUBMITTED",
             "nextCommand": "hackathon-map",
         })
         if list(devpost_validator.iter_errors(future_submitted)):
             errors.append("Devpost schema cannot represent a complete future verified-submission state")
+
+        future_provider = json.loads(json.dumps(devpost_public_readback))
+        future_provider["identity"]["observationUuidV7"] = "01a04d95-8641-705c-8b5c-4a8dd55c0353"
+        future_provider["identity"]["observedAt"] = future_submitted["recordedAt"]
+        future_provider["machineContract"]["stateTransition"] = {
+            "eventUuidV7": future_provider["identity"]["observationUuidV7"],
+            "occurredAt": future_provider["identity"]["observedAt"],
+            "from": "FINAL_SUBMISSION_PENDING",
+            "to": "FINAL_SUBMISSION_VERIFIED",
+            "evidence": "The Devpost submit-project receipt and authenticated project readback agree on a non-null submission time.",
+        }
+        future_provider["authenticatedReadback"]["updatedAt"] = future_submitted["recordedAt"]
+        future_provider["authenticatedReadback"]["project"]["challenge"] = {
+            "slug": "webmcp",
+            "submittedAt": future_submitted["recordedAt"],
+            "submissionState": "FINAL_SUBMISSION_VERIFIED",
+        }
+        future_provider["submissionReceipt"] = {
+            "evidenceIdUuidV5": "00f7fe7a-fcae-5aab-9b5b-972dec844ec3",
+            "observationUuidV7": "01a04d95-8641-7dc2-b921-7d80f95e2aa7",
+            "observedAt": future_submitted["recordedAt"],
+            "source": "DEVPOST_SUBMIT_PROJECT",
+            "challengeSlug": "webmcp",
+            "projectSlug": "project-y79pb23hj1mz",
+            "submissionId": 1,
+            "status": "Submitted",
+            "submittedAt": future_submitted["recordedAt"],
+            "url": "https://webmcp.devpost.com/submissions/1",
+            "evidenceBoundary": "This fixture represents the provider-owned submit-project return and must agree with a later authenticated project readback.",
+        }
+        if list(devpost_public_validator.iter_errors(future_provider)):
+            errors.append("Devpost public-readback schema cannot represent a provider-verified submission")
+        if devpost_provider_consistency(future_submitted, future_provider):
+            errors.append("matching Devpost provider receipts do not verify the future submitted state")
+        if not devpost_provider_consistency(future_submitted, devpost_public_readback):
+            errors.append("locally verified Devpost evidence was accepted while provider readback remained pending")
+
+        mismatched_provider = json.loads(json.dumps(future_provider))
+        mismatched_provider["submissionReceipt"]["submissionId"] = 2
+        if not devpost_provider_consistency(future_submitted, mismatched_provider):
+            errors.append("Devpost evidence accepted a mismatched provider submission identifier")
+
+        pending_provider_with_receipt = json.loads(json.dumps(devpost_public_readback))
+        pending_provider_with_receipt["submissionReceipt"] = future_provider["submissionReceipt"]
+        if not list(devpost_public_validator.iter_errors(pending_provider_with_receipt)):
+            errors.append("Devpost public-readback schema accepted a receipt while provider state was pending")
+
+        verified_provider_without_receipt = json.loads(json.dumps(future_provider))
+        del verified_provider_without_receipt["submissionReceipt"]
+        if not list(devpost_public_validator.iter_errors(verified_provider_without_receipt)):
+            errors.append("Devpost public-readback schema accepted verified provider state without a receipt")
 
         incoherent_pending = json.loads(json.dumps(devpost_evidence))
         incoherent_pending["submission"].update({
@@ -928,7 +1056,7 @@ def main():
             "devpostSubmittedAt": missing_verified_transition["recordedAt"],
             "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
             "devpostSubmissionId": 1,
-            "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+            "devpostSubmissionUrl": "https://webmcp.devpost.com/submissions/1",
             "devpostSubmitToolStatus": "SUBMITTED",
             "nextCommand": "hackathon-map",
         })

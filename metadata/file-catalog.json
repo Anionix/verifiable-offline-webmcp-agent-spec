@@ -4463,8 +4463,8 @@
     },
     {
       "path": "schemas/devpost-public-readback.schema.json",
-      "sha256": "a9bccfad6cedfbb9866496da35361f57a00b33f4dd446c6fda5e8768557edc82",
-      "bytes": 14294,
+      "sha256": "5240f896a95cd09bfe89d35667773e05b92c7ce856f06ce916955220129b8e8f",
+      "bytes": 16775,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5223,8 +5223,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "f93918f5198fbc126368619cebbd8b6febcee965746f6d216a971b89f141e70b",
-      "bytes": 108825,
+      "sha256": "6db81b238a0075dee1df953623aefdb4c1fa388b209cf087e0914215f4e8de77",
+      "bytes": 116986,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

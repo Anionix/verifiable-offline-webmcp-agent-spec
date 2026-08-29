@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/devpost-public-readback.schema.json",
-  "$comment": "information_uuid_v5=5239a2c0-d589-56b8-b380-358a07f5f58a schema_event_uuid_v7=01a04d7a-8fe8-7fbb-9581-3cfc5c2b3eb6 record_information_uuid_v5=0c07e0df-d0fe-5ea5-8967-b7263738ab69 record_observation_uuid_v7=01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc state_transition=PUBLIC_DESCRIPTION_VERSION_11_SAVED -> PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE occurred_at=2026-08-29T12:24:33.000Z machine-contract=authenticated saved content anonymous public HTML Open Graph metadata and uploaded asset availability remain separate evidence domains and no raw authentication information or secrets are retained",
+  "$comment": "information_uuid_v5=5239a2c0-d589-56b8-b380-358a07f5f58a schema_event_uuid_v7=01a04d9a-1a20-71af-a6b1-080b61f1f60c record_information_uuid_v5=0c07e0df-d0fe-5ea5-8967-b7263738ab69 state_transition=LOCALLY_EDITABLE_VERIFIED_FIELDS -> DEVPOST_TOOL_RECEIPT_AND_AUTHENTICATED_READBACK_BOUND occurred_at=2026-08-29T12:59:00.000Z machine-contract=a verified final submission requires both a Devpost submit-project receipt and an authenticated project readback with matching submitted time and URL while pending evidence forbids any submission receipt",
   "title": "Devpost public readback evidence record",
   "type": "object",
   "additionalProperties": false,
@@ -45,10 +45,44 @@
     "uploadedAssetReadback": {
       "$ref": "#/$defs/uploadedAssetReadback"
     },
+    "submissionReceipt": {
+      "$ref": "#/$defs/submissionReceipt"
+    },
     "security": {
       "$ref": "#/$defs/security"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "authenticatedReadback": {
+            "properties": {
+              "project": {
+                "properties": {
+                  "challenge": {
+                    "properties": {
+                      "submissionState": { "const": "FINAL_SUBMISSION_NOT_PROVEN" }
+                    },
+                    "required": ["submissionState"]
+                  }
+                },
+                "required": ["challenge"]
+              }
+            },
+            "required": ["project"]
+          }
+        },
+        "required": ["authenticatedReadback"]
+      },
+      "then": {
+        "not": { "required": ["submissionReceipt"] }
+      },
+      "else": {
+        "required": ["submissionReceipt"]
+      }
+    }
+  ],
   "$defs": {
     "uuidV5": {
       "type": "string",
@@ -101,12 +135,10 @@
           "const": "0c07e0df-d0fe-5ea5-8967-b7263738ab69"
         },
         "observationUuidV7": {
-          "$ref": "#/$defs/uuidV7",
-          "const": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc"
+          "$ref": "#/$defs/uuidV7"
         },
         "observedAt": {
-          "$ref": "#/$defs/millisecondDateTime",
-          "const": "2026-08-29T12:24:33.000Z"
+          "$ref": "#/$defs/millisecondDateTime"
         }
       }
     },
@@ -135,18 +167,16 @@
       "required": ["eventUuidV7", "occurredAt", "from", "to", "evidence"],
       "properties": {
         "eventUuidV7": {
-          "$ref": "#/$defs/uuidV7",
-          "const": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc"
+          "$ref": "#/$defs/uuidV7"
         },
         "occurredAt": {
-          "$ref": "#/$defs/millisecondDateTime",
-          "const": "2026-08-29T12:24:33.000Z"
+          "$ref": "#/$defs/millisecondDateTime"
         },
         "from": {
-          "const": "PUBLIC_DESCRIPTION_VERSION_11_SAVED"
+          "enum": ["PUBLIC_DESCRIPTION_VERSION_11_SAVED", "FINAL_SUBMISSION_PENDING"]
         },
         "to": {
-          "const": "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE"
+          "enum": ["PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE", "FINAL_SUBMISSION_VERIFIED"]
         },
         "evidence": {
           "$ref": "#/$defs/nonEmptyText"
@@ -195,8 +225,7 @@
           "const": "AUTHENTICATED_READBACK"
         },
         "updatedAt": {
-          "$ref": "#/$defs/millisecondDateTime",
-          "const": "2026-08-29T12:23:58.494Z"
+          "$ref": "#/$defs/millisecondDateTime"
         },
         "project": {
           "$ref": "#/$defs/project"
@@ -257,6 +286,12 @@
       }
     },
     "challenge": {
+      "oneOf": [
+        { "$ref": "#/$defs/pendingChallenge" },
+        { "$ref": "#/$defs/verifiedChallenge" }
+      ]
+    },
+    "pendingChallenge": {
       "type": "object",
       "additionalProperties": false,
       "required": ["slug", "submittedAt", "submissionState"],
@@ -269,6 +304,22 @@
         },
         "submissionState": {
           "const": "FINAL_SUBMISSION_NOT_PROVEN"
+        }
+      }
+    },
+    "verifiedChallenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "submittedAt", "submissionState"],
+      "properties": {
+        "slug": {
+          "const": "webmcp"
+        },
+        "submittedAt": {
+          "$ref": "#/$defs/millisecondDateTime"
+        },
+        "submissionState": {
+          "const": "FINAL_SUBMISSION_VERIFIED"
         }
       }
     },
@@ -465,6 +516,61 @@
           "const": "INCONCLUSIVE"
         },
         "reason": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "submissionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceIdUuidV5",
+        "observationUuidV7",
+        "observedAt",
+        "source",
+        "challengeSlug",
+        "projectSlug",
+        "submissionId",
+        "status",
+        "submittedAt",
+        "url",
+        "evidenceBoundary"
+      ],
+      "properties": {
+        "evidenceIdUuidV5": {
+          "$ref": "#/$defs/uuidV5"
+        },
+        "observationUuidV7": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/millisecondDateTime"
+        },
+        "source": {
+          "const": "DEVPOST_SUBMIT_PROJECT"
+        },
+        "challengeSlug": {
+          "const": "webmcp"
+        },
+        "projectSlug": {
+          "const": "project-y79pb23hj1mz"
+        },
+        "submissionId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "const": "Submitted"
+        },
+        "submittedAt": {
+          "$ref": "#/$defs/millisecondDateTime"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^/]*devpost\\.com/"
+        },
+        "evidenceBoundary": {
           "$ref": "#/$defs/nonEmptyText"
         }
       }

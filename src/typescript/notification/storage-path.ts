@@ -32,10 +32,19 @@
 // event_uuid_v7=01a04d47-a0d8-7ba5-9dde-01bf920d3fc4
 // state_transition=OVERBROAD_STORAGE_CLAIM -> FINAL_LINK_SCOPE_EXPLICIT occurred_at=2026-08-29T11:28:55.000Z
 // machine-contract: final-name proof does not claim to solve concurrent parent replacement or to expose SQLite's internal handle; those independent boundaries remain fail-open risks tracked separately.
-import { closeSync, constants, fchmodSync, fstatSync, lstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
+// information_uuid_v5=77d013eb-4de8-5cee-9ad6-80d2caf3566e
+// event_uuid_v7=01a04d54-cedc-7a4a-8fab-4b84061d412d
+// state_transition=DANGLING_LINK_MISTAKEN_FOR_ABSENT_FILE -> NAMED_ENTRY_REJECTED_BEFORE_EXCLUSIVE_CREATE occurred_at=2026-08-29T11:43:18.748Z
+// machine-contract: ENOENT means a storage file is absent only when lstat also finds no named entry; writable guards create exclusively, then bind the still-open descriptor to the reviewed name before any bytes are written.
+// information_uuid_v5=88edc2ed-d5db-5ebf-b557-ea6cee221669
+// event_uuid_v7=01a04d5a-11db-7e3a-b13e-96c11c361add
+// state_transition=WINDOWS_CREATE_NEW_FOLLOWS_REPARSE_POINT -> RANDOM_STAGE_HARDLINK_PUBLISH occurred_at=2026-08-29T11:49:03.579Z
+// machine-contract: Windows never applies O_CREAT to the caller-selected final name; a 128-bit random staging file is opened first, then link publishes it only if the final directory entry is absent, and the open descriptor is identity-bound after the staging name is removed.
+import { randomBytes } from "node:crypto";
+import { closeSync, constants, fchmodSync, fstatSync, linkSync, lstatSync, mkdirSync, openSync, realpathSync, statSync, unlinkSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 export type NotificationStorageKind = "audit" | "database";
 
@@ -47,6 +56,8 @@ export interface StoragePathOptions {
 
 export interface StorageDescriptorOptions {
   platform?: NodeJS.Platform;
+  /** Deterministic test seam at the final-name absence/publication boundary. */
+  afterStorageAbsenceObserved?: (path: string) => void;
 }
 
 const STORAGE_CONFIG = {
@@ -92,13 +103,66 @@ function requireNamedStorageFile(path: string, kind: NotificationStorageKind): S
   return named;
 }
 
-function openExistingStorageDescriptor(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): number | null {
+function namedStorageFileIsAbsent(path: string, kind: NotificationStorageKind): boolean {
   try {
-    return openSync(path, constants.O_RDONLY | noFollowFlag(platform) | constants.O_NONBLOCK);
+    requireNamedStorageFile(path, kind);
+    return false;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return true;
+    throw error;
+  }
+}
+
+function openExistingStorageDescriptor(
+  path: string,
+  kind: NotificationStorageKind,
+  platform: NodeJS.Platform,
+  accessFlags = constants.O_RDONLY,
+): number | null {
+  try {
+    return openSync(path, accessFlags | noFollowFlag(platform) | constants.O_NONBLOCK);
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") return null;
+    if (code === "ENOENT") {
+      if (namedStorageFileIsAbsent(path, kind)) return null;
+      throw new TypeError(`${kind} path changed during open`, { cause: error });
+    }
     if (code === "ELOOP") throw new TypeError(`${kind} path must not be a symbolic link`, { cause: error });
+    throw error;
+  }
+}
+
+function createWindowsStorageDescriptor(path: string, kind: NotificationStorageKind, accessFlags: number): number {
+  const stagingPath = join(dirname(path), `.${basename(path)}.${randomBytes(16).toString("hex")}.tmp`);
+  let descriptor: number | null = null;
+  let stagingNameExists = false;
+  try {
+    descriptor = openSync(stagingPath, accessFlags | constants.O_CREAT | constants.O_EXCL, 0o600);
+    stagingNameExists = true;
+    requireSingleLinkRegularFile(fstatSync(descriptor), kind);
+    try {
+      linkSync(stagingPath, path);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+        if (!namedStorageFileIsAbsent(path, kind)) {
+          throw new TypeError(`${kind} path changed during exclusive publication`, { cause: error });
+        }
+        throw new TypeError(`${kind} path changed during exclusive publication`, { cause: error });
+      }
+      throw error;
+    }
+    unlinkSync(stagingPath);
+    stagingNameExists = false;
+    return descriptor;
+  } catch (error) {
+    if (descriptor !== null) closeSync(descriptor);
+    if (stagingNameExists) {
+      try {
+        unlinkSync(stagingPath);
+      } catch (cleanupError) {
+        if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") throw cleanupError;
+      }
+    }
     throw error;
   }
 }
@@ -135,27 +199,55 @@ export function assertNotificationStorageDescriptor(
   }
 }
 
-export function openNotificationStorageGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number {
+export function openExistingNotificationStorageGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number | null {
+  const platform = options.platform ?? process.platform;
+  const descriptor = openExistingStorageDescriptor(path, kind, platform);
+  if (descriptor === null) return null;
+  try {
+    assertNotificationStorageDescriptor(path, descriptor, kind, options);
+    return descriptor;
+  } catch (error) {
+    closeSync(descriptor);
+    throw error;
+  }
+}
+
+function openWritableNotificationStorageGuard(path: string, kind: NotificationStorageKind, accessFlags: number, options: StorageDescriptorOptions): number {
   const platform = options.platform ?? process.platform;
   const noFollow = noFollowFlag(platform);
   let descriptor: number | null = null;
   try {
-    try {
-      // machine-contract: this path already passed fixed-root containment and private-parent checks; O_EXCL prevents pre-existing or raced aliases.
-      descriptor = openSync(path, constants.O_RDWR | constants.O_CREAT | constants.O_EXCL | noFollow, 0o600);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-      descriptor = openSync(path, constants.O_RDWR | noFollow);
+    descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
+    if (descriptor === null) {
+      options.afterStorageAbsenceObserved?.(path);
+      if (platform === "win32") {
+        descriptor = createWindowsStorageDescriptor(path, kind, accessFlags);
+      } else {
+        // machine-contract: this path already passed fixed-root containment and private-parent checks; POSIX O_NOFOLLOW plus O_EXCL prevents pre-existing or raced aliases.
+        descriptor = openSync(path, accessFlags | constants.O_CREAT | constants.O_EXCL | noFollow, 0o600);
+      }
     }
     assertNotificationStorageDescriptor(path, descriptor, kind, options);
     return descriptor;
   } catch (error) {
     if (descriptor !== null) closeSync(descriptor);
-    if ((error as NodeJS.ErrnoException).code === "ELOOP") {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT" && !namedStorageFileIsAbsent(path, kind)) {
+      throw new TypeError(`${kind} path changed during open`, { cause: error });
+    }
+    if (code === "ELOOP") {
       throw new TypeError(`${kind} path must not be a symbolic link`, { cause: error });
     }
     throw error;
   }
+}
+
+export function openNotificationStorageGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number {
+  return openWritableNotificationStorageGuard(path, kind, constants.O_RDWR, options);
+}
+
+export function openNotificationStorageAppendGuard(path: string, kind: NotificationStorageKind, options: StorageDescriptorOptions = {}): number {
+  return openWritableNotificationStorageGuard(path, kind, constants.O_APPEND | constants.O_WRONLY, options);
 }
 
 function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStorageKind, platform: NodeJS.Platform): string {
@@ -243,11 +335,8 @@ export function containedNotificationStoragePath(candidate: string, kind: Notifi
   requirePrivateDirectory(canonicalParent, kind, platform);
 
   const safePath = resolve(canonicalParent, filename);
-  const existingDescriptor = openExistingStorageDescriptor(safePath, kind, platform);
-  try {
-    if (existingDescriptor !== null) assertNotificationStorageDescriptor(safePath, existingDescriptor, kind, { platform });
-  } finally {
-    if (existingDescriptor !== null) closeSync(existingDescriptor);
-  }
+  const existingDescriptor = openExistingNotificationStorageGuard(safePath, kind, { platform });
+  // The guard already binds an existing file to its reviewed final name. A missing name remains safe only because every later writer uses exclusive creation.
+  if (existingDescriptor !== null) closeSync(existingDescriptor);
   return safePath;
 }

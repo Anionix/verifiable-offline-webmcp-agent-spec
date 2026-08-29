@@ -33,11 +33,16 @@
 // event_uuid_v7=01a04d40-5d78-7e5e-a69a-8ea902356b69
 // state_transition=WINDOWS_NOFOLLOW_ASSUMED -> WINDOWS_LINK_PATH_EXPLICITLY_REJECTED occurred_at=2026-08-29T11:20:59.000Z
 // machine-contract: the Windows branch is exercised without O_NOFOLLOW; final database and audit links must fail while ordinary single-link files remain usable and external victim bytes remain unchanged.
+// information_uuid_v5=72cc4687-1f97-5a0d-ace7-9b96164b2436
+// event_uuid_v7=01a04d54-cef5-762a-ab10-37116f6601e2
+// state_transition=DANGLING_WINDOWS_LINK_ACCEPTED -> LINK_REJECTED_WITH_EXTERNAL_TARGET_ABSENT occurred_at=2026-08-29T11:43:18.773Z
+// machine-contract: both constructor-time and later read/write checks reject dangling final links, while truly absent ordinary names remain creatable through exclusive guards.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
   chmodSync,
   closeSync,
+  existsSync,
   linkSync,
   mkdirSync,
   mkdtempSync,
@@ -59,7 +64,12 @@ import { ReplayBlockedError, type ReplayEvidence } from "../governance/replay-ve
 import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
-import { assertNotificationStorageDescriptor, containedNotificationStoragePath, openNotificationStorageGuard } from "../notification/storage-path.ts";
+import {
+  assertNotificationStorageDescriptor,
+  containedNotificationStoragePath,
+  openNotificationStorageAppendGuard,
+  openNotificationStorageGuard,
+} from "../notification/storage-path.ts";
 import { NotificationStore } from "../notification/store.ts";
 import type { NotificationIntent } from "../notification/types.ts";
 import { uuidV7 } from "../uuid.ts";
@@ -217,6 +227,109 @@ test("notification storage rejects final links when Windows cannot rely on O_NOF
     assert.throws(() => openNotificationStorageGuard(auditPath, "audit", options), /must not be a symbolic link/);
     assertFileUnchanged(databaseVictim, databaseBefore);
     assertFileUnchanged(auditVictim, auditBefore);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects dangling final links before Windows creation", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-dangling-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-windows-dangling-target-"));
+  try {
+    const databaseTarget = join(external, "missing-database.sqlite");
+    const auditTarget = join(external, "missing-audit.ndjson");
+    const databasePath = join(directory, "queue.sqlite");
+    const auditPath = join(directory, "audit.ndjson");
+    symlinkSync(databaseTarget, databasePath);
+    symlinkSync(auditTarget, auditPath);
+    const options = { platform: "win32" as const };
+
+    assert.throws(() => containedNotificationStoragePath(databasePath, "database", options), /must not be a symbolic link/);
+    assert.throws(() => containedNotificationStoragePath(auditPath, "audit", options), /must not be a symbolic link/);
+    assert.throws(() => openNotificationStorageGuard(databasePath, "database", options), /must not be a symbolic link/);
+    assert.throws(() => openNotificationStorageAppendGuard(auditPath, "audit", options), /must not be a symbolic link/);
+    assert.throws(() => new NotificationStore(databasePath), /must not be a symbolic link/);
+    assert.throws(() => new AuditLog(auditPath), /must not be a symbolic link/);
+    assert.equal(existsSync(databaseTarget), false);
+    assert.equal(existsSync(auditTarget), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("audit I/O rejects a dangling replacement without creating its target", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-dangling-swap-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-dangling-swap-target-"));
+  try {
+    const auditPath = join(directory, "audit.ndjson");
+    const missingTarget = join(external, "missing-audit.ndjson");
+    const audit = new AuditLog(auditPath);
+    symlinkSync(missingTarget, auditPath);
+
+    assert.throws(() => audit.verify(), /must not be a symbolic link/);
+    assert.throws(() => audit.append({} as never), /must not be a symbolic link/);
+    assert.equal(existsSync(missingTarget), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage creates truly absent Windows files through exclusive guards", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-create-"));
+  const databasePath = join(directory, "queue.sqlite");
+  const auditPath = join(directory, "audit.ndjson");
+  const options = { platform: "win32" as const };
+  try {
+    const databaseGuard = openNotificationStorageGuard(databasePath, "database", options);
+    const auditGuard = openNotificationStorageAppendGuard(auditPath, "audit", options);
+    closeSync(databaseGuard);
+    closeSync(auditGuard);
+    assert.equal(statSync(databasePath).isFile(), true);
+    assert.equal(statSync(auditPath).isFile(), true);
+    assert.deepEqual(readdirSync(directory).sort(), ["audit.ndjson", "queue.sqlite"]);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("Windows publication refuses dangling links inserted after absence", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-publish-race-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-windows-publish-race-target-"));
+  try {
+    const databaseTarget = join(external, "missing-database.sqlite");
+    const auditTarget = join(external, "missing-audit.ndjson");
+    const databasePath = join(directory, "queue.sqlite");
+    const auditPath = join(directory, "audit.ndjson");
+
+    assert.throws(
+      () =>
+        openNotificationStorageGuard(databasePath, "database", {
+          platform: "win32",
+          afterStorageAbsenceObserved(path) {
+            symlinkSync(databaseTarget, path);
+          },
+        }),
+      /must not be a symbolic link|changed during exclusive publication/,
+    );
+    assert.throws(
+      () =>
+        openNotificationStorageAppendGuard(auditPath, "audit", {
+          platform: "win32",
+          afterStorageAbsenceObserved(path) {
+            symlinkSync(auditTarget, path);
+          },
+        }),
+      /must not be a symbolic link|changed during exclusive publication/,
+    );
+    assert.equal(existsSync(databaseTarget), false);
+    assert.equal(existsSync(auditTarget), false);
+    assert.equal(
+      readdirSync(directory).some((name) => name.endsWith(".tmp")),
+      false,
+    );
   } finally {
     rmSync(directory, { recursive: true, force: true });
     rmSync(external, { recursive: true, force: true });

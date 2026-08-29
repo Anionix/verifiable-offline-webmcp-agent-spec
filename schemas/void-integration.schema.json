@@ -1,11 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/void-integration.schema.json",
-  "$comment": "information_uuid_v5=48462b55-a3ce-517e-9c43-8409b5619f84 event_uuid_v7=01a04c82-7268-7973-8c57-33ab9892a05c state_transition=NOT_INSTALLED -> PACKAGE_PINNED -> CODEX_MCP_REGISTERED -> STATIC_ADAPTER_VALIDATED -> READY_FOR_SEPARATE_AUTHORIZATION occurred_at=2026-08-29T07:53:32.520Z machine-contract=local installation and MCP registration do not imply provider authentication project linking publication or runtime execution",
+  "$comment": "information_uuid_v5=48462b55-a3ce-517e-9c43-8409b5619f84 event_uuid_v7=01a04cb2-3f0b-7892-bd37-f806bd1512f5 state_transition=NOT_INSTALLED -> PACKAGE_PINNED -> CODEX_MCP_REGISTERED -> STATIC_ADAPTER_VALIDATED -> DEPENDENCY_ALERTS_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> READY_FOR_SEPARATE_AUTHORIZATION occurred_at=2026-08-29T08:45:45.099Z machine-contract=local dependency remediation and MCP readiness do not imply GitHub main readback provider authentication project linking publication or runtime execution",
   "title": "Void integration evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "identity", "stateTransition", "component", "installation", "codexMcp", "staticAdapter", "providerState", "dependencyCompatibility", "dependencyAudit", "sources", "secretsIncluded"],
+  "required": [
+    "$schema",
+    "identity",
+    "stateTransition",
+    "component",
+    "installation",
+    "codexMcp",
+    "staticAdapter",
+    "providerState",
+    "dependencyCompatibility",
+    "dependencyAudit",
+    "sources",
+    "secretsIncluded"
+  ],
   "properties": {
     "$schema": { "const": "../schemas/void-integration.schema.json" },
     "identity": {
@@ -25,7 +38,7 @@
       "required": ["from", "through", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
         "from": { "const": "NOT_INSTALLED" },
-        "through": { "const": ["PACKAGE_PINNED", "CODEX_MCP_REGISTERED", "STATIC_ADAPTER_VALIDATED"] },
+        "through": { "const": ["PACKAGE_PINNED", "CODEX_MCP_REGISTERED", "STATIC_ADAPTER_VALIDATED", "DEPENDENCY_ALERTS_TRACKED", "DEPENDENCY_GRAPH_PATCHED"] },
         "to": { "const": "READY_FOR_SEPARATE_AUTHORIZATION" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
@@ -87,9 +100,9 @@
     },
     "dependencyCompatibility": {
       "const": {
-        "state": "COMPATIBLE_SET_PINNED",
-        "cloudflareVitePlugin": "1.43.0",
-        "wrangler": "4.107.0",
+        "state": "SECURITY_PATCHED_SET_PINNED",
+        "cloudflareVitePlugin": "1.54.2",
+        "wrangler": "4.127.1",
         "workersTypes": "4.20260702.1",
         "forceInstallUsed": false,
         "legacyPeerDependenciesUsed": false
@@ -98,17 +111,39 @@
     "dependencyAudit": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["capturedAt", "scope", "status", "moderate", "high", "critical", "total", "automaticFixApplied", "evidence"],
+      "required": ["capturedAt", "scope", "status", "low", "moderate", "high", "critical", "total", "automaticFixApplied", "evidence", "trackedAlerts"],
       "properties": {
         "capturedAt": { "$ref": "#/$defs/observedAt" },
         "scope": { "const": "ENTIRE_ROOT_DEVELOPMENT_DEPENDENCY_GRAPH" },
-        "status": { "const": "KNOWN_RISKS_REMAIN" },
-        "moderate": { "type": "integer", "minimum": 0 },
-        "high": { "type": "integer", "minimum": 0 },
-        "critical": { "type": "integer", "minimum": 0 },
-        "total": { "type": "integer", "minimum": 0 },
+        "status": { "const": "NO_KNOWN_VULNERABILITIES" },
+        "low": { "const": 0 },
+        "moderate": { "const": 0 },
+        "high": { "const": 0 },
+        "critical": { "const": 0 },
+        "total": { "const": 0 },
         "automaticFixApplied": { "const": false },
-        "evidence": { "type": "string", "minLength": 40 }
+        "evidence": { "type": "string", "minLength": 40 },
+        "trackedAlerts": {
+          "type": "array",
+          "minItems": 17,
+          "maxItems": 17,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["dependabotAlert", "issue", "advisory", "package", "severity", "firstPatchedVersion", "resolvedVersion", "state"],
+            "properties": {
+              "dependabotAlert": { "type": "integer", "minimum": 1 },
+              "issue": { "type": "integer", "minimum": 1 },
+              "advisory": { "type": "string", "pattern": "^GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}$" },
+              "package": { "enum": ["esbuild", "sharp", "undici", "vite", "ws"] },
+              "severity": { "enum": ["low", "medium", "high"] },
+              "firstPatchedVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+              "resolvedVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+              "state": { "const": "PATCH_VALIDATED_AWAITING_MAIN" }
+            }
+          }
+        }
       }
     },
     "sources": {

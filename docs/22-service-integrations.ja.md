@@ -60,7 +60,7 @@ state_transition: "PUBLICATION_EVIDENCE_COMMITTED -> SITES_VERSION_9_AND_VERCEL_
 
 Voidは、上の八サービスとは別の端末内開発補助として導入しました。端末内の開発依存は`0.10.12`へ完全一致で固定しています。Codex全体では`npx -y void@0.10.12 mcp`を有効化済みで、現在の処理へ途中から読み込ませず、Codex再起動後に利用します。
 
-`void.json`は`dist/client`を対象にした静的アダプターです。データベース、キーと値、保管、人工知能の各結合をすべて無効にしています。既存のVite構成`cloudflare()`と`sites()`へ`voidPlugin`を追加しません。Void配下で併用するCloudflare Vite plug-inは`1.43.0`、Wranglerは`4.107.0`に固定しています。
+`void.json`は`dist/client`を対象にした静的アダプターです。データベース、キーと値、保管、人工知能の各結合をすべて無効にしています。既存のVite構成`cloudflare()`と`sites()`へ`voidPlugin`を追加しません。Voidは安全版へ更新したルート依存を共有し、Cloudflare Vite plug-inは`1.54.2`、Wranglerは`4.127.1`、Viteは`8.2.2`です。Dependabot警告17件は課題#73〜#89へ一件ずつ結び付け、端末内の依存関係検査は既知の脆弱性0件です。GitHub上で警告が閉じることは、修正を`main`へ統合した後に別途読み戻します。
 
 ```sh
 npm run validate:void

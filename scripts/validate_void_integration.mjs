@@ -5,6 +5,8 @@
 // machine-contract: this validator may execute only `void --version`; it never authenticates, links a project, or deploys.
 // event_uuid_v7=01a04c82-7268-7de3-b005-ca9c6de8d65d state_transition=VOID_TRANSITIVE_PEER_CONFLICT -> VOID_COMPATIBILITY_SET_PINNED occurred_at=2026-08-29T07:53:32.520Z
 // machine-contract: Void 0.10.12 must retain the Cloudflare plugin and Wrangler versions whose workers-types ranges intersect; force and legacy-peer bypasses are forbidden.
+// event_uuid_v7=01a04cb2-3f0b-7892-bd37-f806bd1512f5 state_transition=DEPENDENCY_ALERTS_TRACKED -> DEPENDENCY_GRAPH_PATCHED occurred_at=2026-08-29T08:45:45.099Z
+// machine-contract: every tracked Dependabot advisory must resolve to a patched package version without force or legacy-peer bypasses; publication state remains separate.
 
 import { constants, accessSync, existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
@@ -14,9 +16,14 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_VERSION = "0.10.12";
-const EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION = "1.43.0";
-const EXPECTED_VOID_WRANGLER_VERSION = "4.107.0";
+const EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION = "1.54.2";
+const EXPECTED_VOID_WRANGLER_VERSION = "4.127.1";
 const EXPECTED_VOID_WORKERS_TYPES_VERSION = "4.20260702.1";
+const EXPECTED_VITE_VERSION = "8.2.2";
+const EXPECTED_UNDICI_VERSION = "7.29.0";
+const EXPECTED_SHARP_VERSION = "0.35.2";
+const EXPECTED_WS_VERSION = "8.21.0";
+const EXPECTED_ESBUILD_OVERRIDE_VERSION = "0.25.12";
 const EXPECTED_SCHEMA_REF = "./node_modules/void/schema.json";
 const EXPECTED_OUTPUT_DIR = "dist/client";
 const EXPECTED_BUILD_COMMAND = "npm run build:web";
@@ -24,6 +31,178 @@ const EXPECTED_COMPATIBILITY_DATE = "2026-05-22";
 const EXPECTED_INFORMATION_UUID_V5 = "22fa5437-e104-5ea2-acfe-fe57cc2553f2";
 const EXPECTED_UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const EXPECTED_BINDINGS = ["ai", "db", "kv", "storage"];
+const EXPECTED_DEPENDABOT_ALERTS = [
+  {
+    dependabotAlert: 27,
+    issue: 73,
+    advisory: "GHSA-67mh-4wv8-2f99",
+    package: "esbuild",
+    severity: "medium",
+    firstPatchedVersion: "0.25.0",
+    resolvedVersion: "0.25.12",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 26,
+    issue: 74,
+    advisory: "GHSA-m8rv-5g2x-5cg5",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 25,
+    issue: 75,
+    advisory: "GHSA-jr45-8vmc-qm54",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 24,
+    issue: 76,
+    advisory: "GHSA-v3r7-h72x-cjcm",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 23,
+    issue: 77,
+    advisory: "GHSA-8xcm-r25x-g524",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 22,
+    issue: 78,
+    advisory: "GHSA-4cwx-7wf7-3272",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.29.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 21,
+    issue: 79,
+    advisory: "GHSA-f88m-g3jw-g9cj",
+    package: "sharp",
+    severity: "high",
+    firstPatchedVersion: "0.35.0",
+    resolvedVersion: "0.35.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 20,
+    issue: 80,
+    advisory: "GHSA-g8m3-5g58-fq7m",
+    package: "undici",
+    severity: "low",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 19,
+    issue: 81,
+    advisory: "GHSA-p88m-4jfj-68fv",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 17,
+    issue: 82,
+    advisory: "GHSA-hm92-r4w5-c3mj",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 16,
+    issue: 83,
+    advisory: "GHSA-35p6-xmwp-9g52",
+    package: "undici",
+    severity: "low",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 15,
+    issue: 84,
+    advisory: "GHSA-vmh5-mc38-953g",
+    package: "undici",
+    severity: "high",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 14,
+    issue: 85,
+    advisory: "GHSA-pr7r-676h-xcf6",
+    package: "undici",
+    severity: "medium",
+    firstPatchedVersion: "7.28.0",
+    resolvedVersion: "7.29.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 13,
+    issue: 86,
+    advisory: "GHSA-v6wh-96g9-6wx3",
+    package: "vite",
+    severity: "medium",
+    firstPatchedVersion: "8.0.16",
+    resolvedVersion: "8.2.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 12,
+    issue: 87,
+    advisory: "GHSA-fx2h-pf6j-xcff",
+    package: "vite",
+    severity: "high",
+    firstPatchedVersion: "8.0.16",
+    resolvedVersion: "8.2.2",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 11,
+    issue: 88,
+    advisory: "GHSA-96hv-2xvq-fx4p",
+    package: "ws",
+    severity: "high",
+    firstPatchedVersion: "8.21.0",
+    resolvedVersion: "8.21.0",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+  {
+    dependabotAlert: 10,
+    issue: 89,
+    advisory: "GHSA-g7r4-m6w7-qqqr",
+    package: "esbuild",
+    severity: "low",
+    firstPatchedVersion: "0.28.1",
+    resolvedVersion: "0.28.1",
+    state: "PATCH_VALIDATED_AWAITING_MAIN",
+  },
+];
 const EXPECTED_PACKAGE_SCRIPTS = {
   "mcp:void": "void mcp",
   "validate:void": "node scripts/validate_void_integration.mjs",
@@ -210,25 +389,42 @@ record(validationErrors.length === 0, `void.json violates its package schema: ${
 record(packageJson.devDependencies?.void === EXPECTED_VERSION, `package.json must pin void exactly to ${EXPECTED_VERSION}`);
 record(packageLock.packages?.[""]?.devDependencies?.void === EXPECTED_VERSION, `package-lock.json root must pin void exactly to ${EXPECTED_VERSION}`);
 record(packageLock.packages?.["node_modules/void"]?.version === EXPECTED_VERSION, `package-lock.json installed Void version must be ${EXPECTED_VERSION}`);
+record(packageJson.devDependencies?.vite === EXPECTED_VITE_VERSION, `Vite must be pinned to ${EXPECTED_VITE_VERSION}`);
 record(
-  isDeepStrictEqual(packageJson.overrides?.[`void@${EXPECTED_VERSION}`], {
-    "@cloudflare/vite-plugin": EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
-    wrangler: EXPECTED_VOID_WRANGLER_VERSION,
-  }),
-  "Void must pin the compatible Cloudflare plugin and Wrangler pair without force or legacy-peer bypasses",
+  packageJson.devDependencies?.["@cloudflare/vite-plugin"] === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
+  `Cloudflare Vite plugin must be pinned to ${EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION}`,
 );
+record(packageJson.devDependencies?.wrangler === EXPECTED_VOID_WRANGLER_VERSION, `Wrangler must be pinned to ${EXPECTED_VOID_WRANGLER_VERSION}`);
 record(
-  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/vite-plugin"]?.version === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
+  packageJson.overrides?.["@esbuild-kit/core-utils"]?.esbuild === EXPECTED_ESBUILD_OVERRIDE_VERSION,
+  "the legacy esbuild consumer must resolve to a patched version",
+);
+record(packageJson.overrides?.[`void@${EXPECTED_VERSION}`] === undefined, "Void must share the patched root Cloudflare and Wrangler versions");
+record(
+  packageLock.packages?.["node_modules/@cloudflare/vite-plugin"]?.version === EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION,
   `Void must resolve @cloudflare/vite-plugin ${EXPECTED_VOID_CLOUDFLARE_PLUGIN_VERSION}`,
 );
 record(
-  packageLock.packages?.["node_modules/void/node_modules/wrangler"]?.version === EXPECTED_VOID_WRANGLER_VERSION,
+  packageLock.packages?.["node_modules/wrangler"]?.version === EXPECTED_VOID_WRANGLER_VERSION,
   `Void must resolve Wrangler ${EXPECTED_VOID_WRANGLER_VERSION}`,
 );
 record(
-  packageLock.packages?.["node_modules/@cloudflare/workers-types"]?.version === EXPECTED_VOID_WORKERS_TYPES_VERSION,
+  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/workers-types"]?.version === EXPECTED_VOID_WORKERS_TYPES_VERSION,
   `Void must resolve workers-types ${EXPECTED_VOID_WORKERS_TYPES_VERSION}`,
 );
+record(packageLock.packages?.["node_modules/vite"]?.version === EXPECTED_VITE_VERSION, `Vite must resolve ${EXPECTED_VITE_VERSION}`);
+record(packageLock.packages?.["node_modules/undici"]?.version === EXPECTED_UNDICI_VERSION, `Undici must resolve ${EXPECTED_UNDICI_VERSION}`);
+record(packageLock.packages?.["node_modules/miniflare/node_modules/sharp"]?.version === EXPECTED_SHARP_VERSION, `Sharp must resolve ${EXPECTED_SHARP_VERSION}`);
+record(packageLock.packages?.["node_modules/ws"]?.version === EXPECTED_WS_VERSION, `ws must resolve ${EXPECTED_WS_VERSION}`);
+record(
+  packageLock.packages?.["node_modules/@esbuild-kit/core-utils/node_modules/esbuild"]?.version === EXPECTED_ESBUILD_OVERRIDE_VERSION,
+  `legacy esbuild must resolve ${EXPECTED_ESBUILD_OVERRIDE_VERSION}`,
+);
+record(
+  packageLock.packages?.["node_modules/void/node_modules/@cloudflare/vite-plugin"] === undefined,
+  "Void must not retain a vulnerable nested Cloudflare plugin",
+);
+record(packageLock.packages?.["node_modules/void/node_modules/wrangler"] === undefined, "Void must not retain a vulnerable nested Wrangler");
 const installedPackage = readJson(resolve(ROOT, "node_modules/void/package.json"), "installed Void package");
 record(installedPackage.version === EXPECTED_VERSION, `installed Void package must be ${EXPECTED_VERSION}`);
 
@@ -287,10 +483,12 @@ record(
 record(evidence.dependencyCompatibility?.forceInstallUsed === false, "Void evidence cannot allow force installation");
 record(evidence.dependencyCompatibility?.legacyPeerDependenciesUsed === false, "Void evidence cannot allow legacy peer bypasses");
 const audit = evidence.dependencyAudit ?? {};
-record(audit.moderate + audit.high + audit.critical === audit.total, "Void recorded vulnerability counts do not sum to the total");
+record(audit.low + audit.moderate + audit.high + audit.critical === audit.total, "recorded vulnerability counts do not sum to the total");
+record(audit.status === "NO_KNOWN_VULNERABILITIES" && audit.total === 0, "the validated dependency graph must record zero known vulnerabilities");
+record(audit.automaticFixApplied === false, "the evidence must distinguish the reviewed update from npm audit fix");
 record(
-  audit.status === "KNOWN_RISKS_REMAIN" && audit.automaticFixApplied === false,
-  "Void dependency risks must remain explicit without an automatic breaking fix",
+  isDeepStrictEqual(audit.trackedAlerts, EXPECTED_DEPENDABOT_ALERTS),
+  "Dependabot alert, issue, advisory, package, severity, patched version, resolved version, or state differs from the reviewed mapping",
 );
 record(Array.isArray(evidence.sources) && evidence.sources.length === 4, "Void evidence must cite the four fixed primary sources");
 record(

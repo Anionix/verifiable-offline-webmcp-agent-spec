@@ -1650,8 +1650,8 @@
     },
     {
       "path": "docs/13-notification-demo.ja.md",
-      "sha256": "82e41740afa0fa69a8895627915c04412269721db5b7a69523da0aa0a4f60e36",
-      "bytes": 10567,
+      "sha256": "5bf8571b490861bf0b2cec3cdc41eea1c6edd8239f6339531e8b88f255242eb6",
+      "bytes": 11052,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -5394,8 +5394,8 @@
     },
     {
       "path": "src/typescript/README.md",
-      "sha256": "38ed32f245e6bd7b698531966c56a2baf44621934acdcf0a0c0d64b39ecfd179",
-      "bytes": 3312,
+      "sha256": "8d3aba6b95fff2d4aebf94804d855cb93892de85e81fb8a79a0dae7195ab3d38",
+      "bytes": 3545,
       "mediaType": "text/markdown",
       "category": "src",
       "identity": {
@@ -5774,8 +5774,8 @@
     },
     {
       "path": "src/typescript/notification/store.ts",
-      "sha256": "b0bacbc8dd4ceda735e6dfd9de12de8299ca292def16c9817bce748f8ddf4361",
-      "bytes": 27117,
+      "sha256": "e1805f526eec0db840debae7faa41f10b24fb6bd89a4d607df77f344d29fe97e",
+      "bytes": 27305,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6287,8 +6287,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "1ddc0280627c2c91054afafd2cbb3820d7c1633a0b5051588f5d3650a70147be",
-      "bytes": 45721,
+      "sha256": "de04ed4eadbd77bc4c5ea6810c3852a452befdc1ebd95d340658f889e9773e31",
+      "bytes": 46551,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

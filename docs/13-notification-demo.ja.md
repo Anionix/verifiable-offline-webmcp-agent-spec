@@ -33,6 +33,8 @@ English purpose: Prevent a second visible notification for the same logical oper
 | 通知アダプター | `preview`、`execute`、`reconcile`だけを公開 |
 | ブラウザー試験ページ | 通知権限要求、通知タグへの予定識別子設定、表示結果の読み戻し |
 
+参照実装のディスクSQLiteはPOSIX環境だけで使えます。WindowsではNode.jsの`DatabaseSync`が、実際に開いたSQLiteファイルを検査済みの実体へ結び付けるファイル記述子を公開していないため、ファイルを作成・書き込みする前に安全側で停止します。`:memory:`は全プラットフォームで使えます。このWindows境界は決定的な回帰試験と実Windows用の検査ジョブで確認します。
+
 制御状態と外部効果状態は分離します。
 
 ```text

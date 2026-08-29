@@ -359,6 +359,26 @@ test("notification storage rejects final links when Windows cannot rely on O_NOF
   }
 });
 
+test("disk-backed SQLite fails closed on Windows while in-memory SQLite remains available", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-sqlite-boundary-"));
+  try {
+    const databasePath = join(directory, "queue.sqlite");
+    assert.throws(
+      () => new NotificationStore(databasePath, { platform: "win32" }),
+      /disk-backed SQLite is disabled on Windows because node:sqlite DatabaseSync does not expose a bindable file handle/,
+    );
+    const memoryStore = new NotificationStore(":memory:", { platform: "win32" });
+    try {
+      assert.doesNotThrow(() => memoryStore.database.prepare("SELECT 1").get());
+    } finally {
+      memoryStore.close();
+    }
+    assert.equal(existsSync(databasePath), false);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 test("notification storage rejects dangling final links before Windows creation", () => {
   const directory = mkdtempSync(join(tmpdir(), "notification-windows-dangling-"));
   const external = mkdtempSync(join(tmpdir(), "notification-windows-dangling-target-"));

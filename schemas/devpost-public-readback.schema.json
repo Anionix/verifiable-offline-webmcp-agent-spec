@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/devpost-public-readback.schema.json",
-  "$comment": "information_uuid_v5=5239a2c0-d589-56b8-b380-358a07f5f58a schema_event_uuid_v7=01a04d9a-1a20-71af-a6b1-080b61f1f60c record_information_uuid_v5=0c07e0df-d0fe-5ea5-8967-b7263738ab69 state_transition=LOCALLY_EDITABLE_VERIFIED_FIELDS -> DEVPOST_TOOL_RECEIPT_AND_AUTHENTICATED_READBACK_BOUND occurred_at=2026-08-29T12:59:00.000Z machine-contract=a verified final submission requires both a Devpost submit-project receipt and an authenticated project readback with matching submitted time and URL while pending evidence forbids any submission receipt",
+  "$comment": "information_uuid_v5=5239a2c0-d589-56b8-b380-358a07f5f58a schema_event_uuid_v7=01a04d9a-1a20-71af-a6b1-080b61f1f60c record_information_uuid_v5=0c07e0df-d0fe-5ea5-8967-b7263738ab69 state_transition=LOCALLY_EDITABLE_VERIFIED_FIELDS -> DEVPOST_TOOL_RECEIPT_AND_AUTHENTICATED_READBACK_BOUND occurred_at=2026-08-29T12:59:00.000Z machine-contract=a verified final submission requires a Devpost submit-project receipt and an authenticated project readback that agree on project, challenge, and submitted time; the receipt alone supplies submission URL and status; pending evidence forbids any submission receipt",
   "title": "Devpost public readback evidence record",
   "type": "object",
   "additionalProperties": false,
@@ -76,10 +76,84 @@
         "required": ["authenticatedReadback"]
       },
       "then": {
-        "not": { "required": ["submissionReceipt"] }
+        "allOf": [
+          { "not": { "required": ["submissionReceipt"] } },
+          {
+            "properties": {
+              "machineContract": {
+                "properties": {
+                  "stateTransition": {
+                    "properties": {
+                      "from": { "const": "PUBLIC_DESCRIPTION_VERSION_11_SAVED" },
+                      "to": { "const": "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE" }
+                    }
+                  }
+                }
+              },
+              "anonymousPublicHtml": {
+                "properties": {
+                  "openGraph": {
+                    "properties": {
+                      "title": { "$ref": "#/$defs/staleOpenGraphTitle" },
+                      "image": { "$ref": "#/$defs/staleOpenGraphImage" }
+                    }
+                  },
+                  "uploadedAssetReference": {
+                    "properties": {
+                      "presentInHtml": { "const": false },
+                      "state": { "const": "NOT_REFERENCED" }
+                    }
+                  }
+                }
+              },
+              "uploadedAssetReadback": {
+                "properties": {
+                  "projectAssociation": {
+                    "properties": { "state": { "const": "INCONCLUSIVE" } }
+                  }
+                }
+              }
+            }
+          }
+        ]
       },
       "else": {
-        "required": ["submissionReceipt"]
+        "required": ["submissionReceipt"],
+        "properties": {
+          "machineContract": {
+            "properties": {
+              "stateTransition": {
+                "properties": {
+                  "from": { "const": "FINAL_SUBMISSION_PENDING" },
+                  "to": { "const": "FINAL_SUBMISSION_VERIFIED" }
+                }
+              }
+            }
+          },
+          "anonymousPublicHtml": {
+            "properties": {
+              "openGraph": {
+                "properties": {
+                  "title": { "$ref": "#/$defs/currentOpenGraphTitle" },
+                  "image": { "$ref": "#/$defs/currentOpenGraphImage" }
+                }
+              },
+              "uploadedAssetReference": {
+                "properties": {
+                  "presentInHtml": { "const": true },
+                  "state": { "const": "REFERENCED_AS_OPEN_GRAPH_IMAGE" }
+                }
+              }
+            }
+          },
+          "uploadedAssetReadback": {
+            "properties": {
+              "projectAssociation": {
+                "properties": { "state": { "const": "VERIFIED" } }
+              }
+            }
+          }
+        }
       }
     }
   ],
@@ -355,8 +429,7 @@
           "const": "ANONYMOUS_HTTP"
         },
         "observedAt": {
-          "$ref": "#/$defs/millisecondDateTime",
-          "const": "2026-08-29T12:24:33.000Z"
+          "$ref": "#/$defs/millisecondDateTime"
         },
         "statusCode": {
           "const": 200
@@ -395,38 +468,57 @@
       }
     },
     "observedOpenGraphTitle": {
+      "oneOf": [
+        { "$ref": "#/$defs/staleOpenGraphTitle" },
+        { "$ref": "#/$defs/currentOpenGraphTitle" }
+      ]
+    },
+    "staleOpenGraphTitle": {
       "type": "object",
       "additionalProperties": false,
       "required": ["state", "value", "classification", "evidenceBoundary"],
       "properties": {
-        "state": {
-          "const": "OBSERVED"
-        },
-        "value": {
-          "const": "未定"
-        },
-        "classification": {
-          "const": "STALE_INITIAL_PROJECT_TITLE"
-        },
-        "evidenceBoundary": {
-          "$ref": "#/$defs/nonEmptyText"
-        }
+        "state": { "const": "OBSERVED" },
+        "value": { "const": "未定" },
+        "classification": { "const": "STALE_INITIAL_PROJECT_TITLE" },
+        "evidenceBoundary": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "currentOpenGraphTitle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "value", "classification", "evidenceBoundary"],
+      "properties": {
+        "state": { "const": "OBSERVED" },
+        "value": { "const": "Kyoto Booking Retry Proof" },
+        "classification": { "const": "CURRENT_PROJECT_TITLE" },
+        "evidenceBoundary": { "$ref": "#/$defs/nonEmptyText" }
       }
     },
     "openGraphImage": {
+      "oneOf": [
+        { "$ref": "#/$defs/staleOpenGraphImage" },
+        { "$ref": "#/$defs/currentOpenGraphImage" }
+      ]
+    },
+    "staleOpenGraphImage": {
       "type": "object",
       "additionalProperties": false,
       "required": ["state", "url", "classification"],
       "properties": {
-        "state": {
-          "const": "OBSERVED"
-        },
-        "url": {
-          "const": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg"
-        },
-        "classification": {
-          "const": "SHARED_DEVPOST_SOCIAL_ICON"
-        }
+        "state": { "const": "OBSERVED" },
+        "url": { "const": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg" },
+        "classification": { "const": "SHARED_DEVPOST_SOCIAL_ICON" }
+      }
+    },
+    "currentOpenGraphImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "url", "classification"],
+      "properties": {
+        "state": { "const": "OBSERVED" },
+        "url": { "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png" },
+        "classification": { "const": "PROJECT_UPLOADED_IMAGE" }
       }
     },
     "uploadedAssetReference": {
@@ -438,10 +530,10 @@
           "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png"
         },
         "presentInHtml": {
-          "const": false
+          "type": "boolean"
         },
         "state": {
-          "const": "NOT_REFERENCED"
+          "enum": ["NOT_REFERENCED", "REFERENCED_AS_OPEN_GRAPH_IMAGE"]
         }
       }
     },
@@ -496,8 +588,7 @@
           "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png"
         },
         "observedAt": {
-          "$ref": "#/$defs/millisecondDateTime",
-          "const": "2026-08-29T12:24:33.000Z"
+          "$ref": "#/$defs/millisecondDateTime"
         },
         "statusCode": {
           "const": 200
@@ -513,7 +604,7 @@
       "required": ["state", "reason"],
       "properties": {
         "state": {
-          "const": "INCONCLUSIVE"
+          "enum": ["INCONCLUSIVE", "VERIFIED"]
         },
         "reason": {
           "$ref": "#/$defs/nonEmptyText"

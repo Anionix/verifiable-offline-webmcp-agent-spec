@@ -7,9 +7,9 @@
   "identity": {
     "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "informationUuidV5": "faef02a2-712f-5fd3-b88f-dc44bc45db1f",
-    "recordEventUuidV7": "01a04d95-8640-7d6e-aca3-4fee9941e100"
+    "recordEventUuidV7": "01a04dab-38f1-7c24-92ec-322d89263c16"
   },
-  "recordedAt": "2026-08-29T12:54:00.000Z",
+  "recordedAt": "2026-08-29T13:17:42.001Z",
   "preparedFromCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
   "subject": {
     "projectId": "1405191",
@@ -42,12 +42,19 @@
         "from": "SUBMISSION_PREPARED",
         "to": "FINAL_SUBMISSION_PENDING",
         "evidence": "Authenticated Devpost readback returned submittedAt null, and every observed claim now resolves to a SHA-256-verified file blob in commit 89d803fb822fc2d2a6182cecdb90eb0dfa5317da; final challenge submission remains pending."
+      },
+      {
+        "eventUuidV7": "01a04dab-38f1-7c24-92ec-322d89263c16",
+        "occurredAt": "2026-08-29T13:17:42.001Z",
+        "from": "FINAL_SUBMISSION_PENDING",
+        "to": "FINAL_SUBMISSION_VERIFIED",
+        "evidence": "Devpost submit-project returned submission 1158722 with status Submitted, authenticated readback confirmed submittedAt 2026-08-29T13:14:00.129Z, and later anonymous HTML exposed the current hotel title and uploaded image."
       }
     ],
     "invariants": [
       "Only a Devpost-owned readback with non-null submitted_at proves final challenge submission.",
       "The local workflow state records preparation progress but does not persist Devpost-owned submission truth.",
-      "Every observed claim resolves through one contextIdUuidV5 to a repository path, an existing Git commit containing that file blob, and the same current and committed SHA-256 digest.",
+      "Every historical observed claim resolves through one contextIdUuidV5 to a repository path, an existing Git commit containing that file blob, and its recorded SHA-256 digest.",
       "Every observed, unmeasured, and not-applicable claim remains in a separate collection.",
       "WebMCP exposes check, prepare, status, and cancellation preview only; confirmation, payment, and cancellation mutation remain unavailable.",
       "The running demo never represents a real booking, payment, hotel, email, cancellation, or personal record."
@@ -170,19 +177,22 @@
       "sourceIds": [
         "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa"
       ]
-    }
-  ],
-  "unmeasured": [
+    },
     {
       "claimIdUuidV5": "75985999-129c-546a-aa8b-2c5010510fe0",
-      "state": "INCONCLUSIVE",
-      "claim": "Association of the public uploaded image URL with the Devpost project card or Open Graph image.",
-      "reason": "The asset URL returned HTTP 200, but anonymous project HTML did not reference it and exposed the shared Devpost social image instead.",
+      "observationEventUuidV7": "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc",
+      "observedAt": "2026-08-29T12:24:33.000Z",
+      "state": "OBSERVED",
+      "contextIdUuidV5": "0b62bf24-d69f-593b-8b2c-4d2d70363dd8",
+      "claim": "At the pre-submission public readback, association of the uploaded image URL with the Devpost project Open Graph image was INCONCLUSIVE.",
+      "evidenceBoundary": "This is a historical observation: the asset returned HTTP 200, while the 2026-08-29T12:24:33.000Z anonymous HTML exposed the shared Devpost image and did not reference the uploaded URL.",
       "sourceIds": [
         "3aea8b81-0fc6-530a-a9d9-8fa2733838bd",
         "81cc0c9e-4c75-5c53-aaa0-9cf770497aaa"
       ]
-    },
+    }
+  ],
+  "unmeasured": [
     {
       "claimIdUuidV5": "5f9d6ae8-3729-5cfd-be33-76d07eb08a29",
       "state": "INCONCLUSIVE",
@@ -241,7 +251,7 @@
     "height": 941,
     "contentType": "image/png",
     "publicUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
-    "publicationState": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_INCONCLUSIVE",
+    "publicationState": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_VERIFIED",
     "content": "AI-edited crop-and-reframe derivative of a public fictional-hotel demo screenshot in RETRY_RECOGNIZED, showing two attempts, one booking, and one effect start.",
     "provenance": {
       "sourceUrl": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
@@ -257,9 +267,9 @@
   "submission": {
     "draftFile": "devpost-submission.md",
     "workflowStateFile": ".devpost-hackathon-state.json",
-    "localStatus": "READY",
-    "devpostSubmittedAt": null,
-    "devpostOwnedStatus": "FINAL_SUBMISSION_PENDING",
+    "localStatus": "SUBMITTED",
+    "devpostSubmittedAt": "2026-08-29T13:14:00.129Z",
+    "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
     "requiredOwnerAnswers": [],
     "confirmedAnswers": {
       "informationUuidV5": "38c68b77-906e-5988-9869-76a4caceb8a5",
@@ -273,6 +283,9 @@
       }
     },
     "optionalOwnerAnswers": [],
-    "nextCommand": "submit-project"
+    "nextCommand": "hackathon-map",
+    "devpostSubmissionId": 1158722,
+    "devpostSubmissionUrl": "https://devpost.com/software/project-y79pb23hj1mz",
+    "devpostSubmitToolStatus": "SUBMITTED"
   }
 }

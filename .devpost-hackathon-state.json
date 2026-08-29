@@ -18,7 +18,7 @@
     "ai_usage": "Artificial-intelligence tools produced clearly labelled explanatory media and helped verify the project. They do not approve or commit the simulated booking, and the runtime uses no model application programming interface key.",
     "codex_usage": "Codex helped implement, review, test, package, publish, and verify the hotel retry demo; its in-app browser discovered and executed the four bounded WebMCP tools."
   },
-  "current_stage": "submit-project",
+  "current_stage": "hackathon-map",
   "completed_stages": [
     "start-hackathon",
     "review-hackathon-rules",
@@ -29,7 +29,8 @@
     "build-spec",
     "build-checklist",
     "build-project",
-    "prepare-submission"
+    "prepare-submission",
+    "submit-project"
   ],
   "rules_acknowledged": true,
   "learning": {
@@ -47,13 +48,17 @@
   },
   "submission": {
     "draft_file": "devpost-submission.md",
-    "status": "ready",
+    "status": "submitted",
     "last_project_version": 11,
-    "last_project_readback_at": "2026-08-29T12:24:33.000Z",
+    "last_project_readback_at": "2026-08-29T13:17:42.000Z",
     "public_page_state": "HOTEL_TITLE_AND_60_SECOND_TEST_PUBLIC",
-    "public_open_graph_state": "STALE_TITLE_AND_DEFAULT_IMAGE",
-    "thumbnail_project_association": "INCONCLUSIVE",
-    "final_submission_state": "FINAL_SUBMISSION_PENDING"
+    "public_open_graph_state": "HOTEL_TITLE_AND_UPLOADED_IMAGE_CURRENT",
+    "thumbnail_project_association": "VERIFIED",
+    "final_submission_state": "FINAL_SUBMISSION_VERIFIED",
+    "submission_id": 1158722,
+    "submitted_at": "2026-08-29T13:14:00.129Z",
+    "submission_url": "https://devpost.com/software/project-y79pb23hj1mz",
+    "submit_tool_status": "Submitted"
   },
-  "next_command": "submit-project"
+  "next_command": "hackathon-map"
 }

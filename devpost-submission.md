@@ -1,16 +1,16 @@
 ---
-title: "Kyoto Booking Retry Proof — Devpost submission packet"
+title: "Kyoto Booking Retry Proof — Devpost submission record"
 information_uuid_v5: "faef02a2-712f-5fd3-b88f-dc44bc45db1f"
-event_uuid_v7: "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42"
-occurred_at: "2026-08-29T12:24:33.000Z"
-state_transition: "GENERIC_PROJECT_COPY -> HOTEL_DEMO_ALIGNED -> VERSION_11_60_SECOND_TEST_PUBLIC -> OPEN_GRAPH_STALE_PROJECT_IMAGE_ASSOCIATION_INCONCLUSIVE -> FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04da9-0f6d-7c34-9f87-568058d8b8fe"
+occurred_at: "2026-08-29T13:15:20.301Z"
+state_transition: "GENERIC_PROJECT_COPY -> HOTEL_DEMO_ALIGNED -> VERSION_11_60_SECOND_TEST_PUBLIC -> OPEN_GRAPH_STALE_PROJECT_IMAGE_ASSOCIATION_INCONCLUSIVE -> FINAL_SUBMISSION_PENDING -> FINAL_SUBMISSION_VERIFIED"
 ---
 
 # Title
 
 Kyoto Booking Retry Proof
 
-<!-- machine-contract: This document is the hotel-demo submission packet for Devpost project 1405191. It is not proof of final WebMCP Challenge submission. Only a later Devpost readback with non-null submitted_at may establish that fact. -->
+<!-- machine-contract: Devpost submission 1158722 is verified only because the submit-project receipt and authenticated project readback agree on the project, challenge, and non-null submitted_at value. The receipt alone supplies the submission URL and status. -->
 
 ## One-line Summary
 
@@ -144,18 +144,19 @@ The public video is 150 seconds. Public readback confirms anonymous playback, En
 4. `RETRY_RECOGNIZED` with attempts `2`, bookings `1`, effect starts `1`, and the proof panel.
 5. Four WebMCP capability cards and the honest service-state table.
 
-The proposed Devpost thumbnail is the actual public hotel demo in `RETRY_RECOGNIZED`, stored at `docs/assets/devpost-hotel-thumbnail.png`. Its SHA-256 is `c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10`. The upload receipt returned `https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png`, which returned anonymous HTTP 200. Anonymous project-page HTML still exposes Devpost's default `og:image`, so the uploaded asset's association with the public project card is `INCONCLUSIVE`, not claimed as complete.
+The proposed Devpost thumbnail is an AI-edited crop-and-reframe derivative of the public hotel demo in `RETRY_RECOGNIZED`, stored at `docs/assets/devpost-hotel-thumbnail.png`. Its SHA-256 is `c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10`. The upload receipt returned `https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png`, which returned anonymous HTTP 200. The initial anonymous project readback did not associate it with the project; the later post-submit readback referenced the exact URL as `og:image`, verifying the association at that later observation time.
 
-## Submission Readiness Notes
+## Final Submission Notes
 
 - Devpost project: https://devpost.com/software/project-y79pb23hj1mz
 - Devpost project identifier: `1405191`
 - Current project title: `Kyoto Booking Retry Proof`
 - Current tagline: `WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.`
 - The hotel-copy update operation returned version `8`; the complete technology/link update advanced the project to version `9`; the judge-readable heading and retry-list update returned version `10`; the public 60-second reproduction steps returned version `11`.
-- Authenticated readback and anonymous HTML confirm the page title, heading, tagline, 153-test description, public links, video, and four reproduction steps. Anonymous HTML still reports `og:title` as the old `未定` value.
-- The hotel-demo image upload succeeded and its content-delivery URL returned anonymous HTTP 200. Anonymous HTML still uses Devpost's default `og:image`, so public project-image association remains `INCONCLUSIVE` until a later Devpost-owned readback proves it.
-- The WebMCP Challenge `submitted_at` field was `null` in the latest readback. Final challenge submission is therefore still pending.
+- Authenticated readback and anonymous HTML confirm the page title, heading, tagline, 153-test description, public links, video, and four reproduction steps.
+- Fresh anonymous HTML at `2026-08-29T13:17:42.000Z` reports `og:title` as `Kyoto Booking Retry Proof` and `og:image` as the exact uploaded hotel-image URL, closing the earlier stale-title and image-association gaps.
+- Devpost submission `1158722` returned status `Submitted`; authenticated readback confirmed `submitted_at` as `2026-08-29T13:14:00.129Z` for challenge `webmcp`.
+- Final submission URL: https://devpost.com/software/project-y79pb23hj1mz
 - Official deadline readback: `2026-09-03T20:00:00Z` (`2026-09-04 05:00` in Japan).
 
 ### Judging alignment
@@ -174,11 +175,11 @@ The proposed Devpost thumbnail is the actual public hotel demo in `RETRY_RECOGNI
 - Native WebMCP discovery and execution in the connected Google Chrome session remain `INCONCLUSIVE`; the ChatGPT in-app browser execution is the bounded confirmed result.
 - Physical keyboard traversal and screen-reader operation remain `INCONCLUSIVE` because no independent hardware-keyboard or VoiceOver session was recorded.
 - The local final-video SHA-256 and the public YouTube identifier are not bound by an independent upload receipt, so artifact identity remains `UNMEASURED`.
-- Devpost's visible page title and heading show `Kyoto Booking Retry Proof`, but its anonymous Open Graph title remains `未定`; the uploaded hotel image is public while its project-card association remains `INCONCLUSIVE`.
+- Devpost's visible page title, heading, Open Graph title, and uploaded-image Open Graph reference were aligned in the post-submit anonymous readback.
 - The running demo does not make, pay for, email, cancel, or contact any real service.
-- Final Devpost challenge submission remains pending until the submit operation succeeds and Devpost readback shows a non-null submission time.
+- Final Devpost challenge submission is provider-verified; this does not change the separate `INCONCLUSIVE` and `UNMEASURED` limits above.
 
-## TODO Official Form Fields
+## Submitted Official Form Fields
 
 The owner confirmed the four required personal answers. Because the submitter type is Individual, the optional organization field is not applicable and will be omitted.
 
@@ -187,14 +188,14 @@ The owner confirmed the four required personal answers. Because the submitter ty
 | `28249` | Submitter Type | Yes | Individual | OWNER CONFIRMED |
 | `28250` | Country of residence | Yes | Japan | OWNER CONFIRMED |
 | `28251` | Organization | No | Omitted | NOT APPLICABLE FOR INDIVIDUAL |
-| `28252` | App Status | Yes | Existing | READY |
-| `28253` | Existing-project update | No | Added the fictional Kyoto hotel retry experience, four hotel-specific WebMCP capabilities, human-only confirmation, browser-local recovery, responsive and offline behavior, public Sites and Vercel deployments, verification evidence, and the 150-second narrated video during the submission period. | READY |
-| `28254` | Live URL | Yes | https://kyoto-booking-retry-proof.anionix.chatgpt.site | READY |
-| `28255` | Testing instructions | No | Follow **Fast public test** above and verify `RETRY_RECOGNIZED`, attempts 2, bookings 1, effect starts 1, and chain `Valid`. | READY |
-| `28256` | Public repository | Yes | https://github.com/Anionix/verifiable-offline-webmcp-agent-spec | READY |
-| `28257` | Tested agents or clients | Yes | OpenAI Codex in-app browser for WebMCP discovery and execution; Google Chrome for ordinary page interaction. Native Chrome WebMCP execution remains `INCONCLUSIVE`. | READY |
-| `28258` | Artificial-intelligence tools | Yes | OpenAI Codex and ChatGPT, Higgsfield, OpenArt, HeyGen, Canva, and vidIQ. | READY |
+| `28252` | App Status | Yes | Existing | SUBMITTED |
+| `28253` | Existing-project update | No | Added the fictional Kyoto hotel retry experience, four hotel-specific WebMCP capabilities, human-only confirmation, browser-local recovery, responsive and offline behavior, public Sites and Vercel deployments, verification evidence, and the 150-second narrated video during the submission period. | SUBMITTED |
+| `28254` | Live URL | Yes | https://kyoto-booking-retry-proof.anionix.chatgpt.site | SUBMITTED |
+| `28255` | Testing instructions | No | Follow **Fast public test** above and verify `RETRY_RECOGNIZED`, attempts 2, bookings 1, effect starts 1, and chain `Valid`. | SUBMITTED |
+| `28256` | Public repository | Yes | https://github.com/Anionix/verifiable-offline-webmcp-agent-spec | SUBMITTED |
+| `28257` | Tested agents or clients | Yes | OpenAI Codex in-app browser for WebMCP discovery and execution; Google Chrome for ordinary page interaction. Native Chrome WebMCP execution remains `INCONCLUSIVE`. | SUBMITTED |
+| `28258` | Artificial-intelligence tools | Yes | OpenAI Codex and ChatGPT, Higgsfield, OpenArt, HeyGen, Canva, and vidIQ. | SUBMITTED |
 | `28259` | Learning level | Yes | Significant | OWNER CONFIRMED |
 | `28260` | Career artificial-intelligence value | Yes | Yes | OWNER CONFIRMED |
 
-Project video URL: https://youtu.be/tdSvJw4ghX8 (`READY_AND_LINKED`).
+Project video URL: https://youtu.be/tdSvJw4ghX8 (`SUBMITTED_AND_LINKED`).

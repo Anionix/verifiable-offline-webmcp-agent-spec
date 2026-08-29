@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build:web": "node scripts/build_web_site.mjs",
+    "release:hotel": "node scripts/build_hotel_release.mjs",
     "build:vercel": "node scripts/build_vercel_site.mjs",
     "validate:hotel": "npm run build:web && npm run validate:hotel:portable && npm run validate:hotel:sites",
     "validate:hotel:portable": "node scripts/validate_hotel_portable_validator.mjs",

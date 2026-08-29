@@ -334,7 +334,7 @@
         "height": { "type": "integer", "minimum": 1 },
         "contentType": { "const": "image/png" },
         "publicUrl": { "type": "string", "format": "uri" },
-        "publicationState": { "const": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_INCONCLUSIVE" },
+        "publicationState": { "const": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_VERIFIED" },
         "content": { "type": "string", "minLength": 3 },
         "provenance": {
           "type": "object",

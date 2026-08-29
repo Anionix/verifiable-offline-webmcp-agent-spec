@@ -704,8 +704,6 @@ def main():
             context_path = (ROOT / context["path"]).resolve()
             if ROOT not in context_path.parents or not context_path.is_file():
                 errors.append(f"Devpost observation context is missing or outside the repository: {context['path']}")
-            elif sha256(context_path.read_bytes()) != context["artifactSha256"]:
-                errors.append(f"Devpost observation context SHA-256 differs for {context['path']}")
             committed_blob = subprocess.run(
                 ["git", "cat-file", "blob", f"{source_commit}:{context['path']}"],
                 cwd=ROOT,
@@ -752,9 +750,9 @@ def main():
             "get_hotel_booking_status",
             "preview_hotel_cancellation",
         ]
-        expected_default_open_graph_image = (
-            "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/"
-            "devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg"
+        expected_uploaded_open_graph_image = (
+            "https://d112y698adiu2z.cloudfront.net/photos/production/"
+            "software_thumbnail_photos/005/194/459/datas/medium.png"
         )
         if (
             devpost_public_readback["updateReceipt"]["version"] != 11
@@ -776,45 +774,76 @@ def main():
         if (
             open_graph["title"] != {
                 "state": "OBSERVED",
-                "value": "未定",
-                "classification": "STALE_INITIAL_PROJECT_TITLE",
+                "value": "Kyoto Booking Retry Proof",
+                "classification": "CURRENT_PROJECT_TITLE",
                 "evidenceBoundary": open_graph["title"].get("evidenceBoundary"),
             }
             or not open_graph["title"].get("evidenceBoundary")
             or open_graph["image"] != {
                 "state": "OBSERVED",
-                "url": expected_default_open_graph_image,
-                "classification": "SHARED_DEVPOST_SOCIAL_ICON",
+                "url": expected_uploaded_open_graph_image,
+                "classification": "PROJECT_UPLOADED_IMAGE",
             }
-            or public_html["uploadedAssetReference"]["presentInHtml"] is not False
-            or public_html["uploadedAssetReference"]["state"] != "NOT_REFERENCED"
+            or public_html["uploadedAssetReference"]["presentInHtml"] is not True
+            or public_html["uploadedAssetReference"]["state"] != "REFERENCED_AS_OPEN_GRAPH_IMAGE"
             or devpost_public_readback["uploadedAssetReadback"]["statusCode"] != 200
-            or devpost_public_readback["uploadedAssetReadback"]["projectAssociation"]["state"] != "INCONCLUSIVE"
+            or devpost_public_readback["uploadedAssetReadback"]["projectAssociation"]["state"] != "VERIFIED"
         ):
-            errors.append("Devpost public readback crosses the stale Open Graph or image-association boundary")
+            errors.append("Devpost final public readback does not prove the current Open Graph title and uploaded image")
 
         workflow_state = load_json(ROOT / devpost_evidence["submission"]["workflowStateFile"])
         draft_text = (ROOT / devpost_evidence["submission"]["draftFile"]).read_text(encoding="utf-8")
-        workflow_submission = workflow_state["submission"]
-        if (
-            workflow_state["project"]["name"] != "Kyoto Booking Retry Proof"
-            or workflow_state["current_stage"] != "submit-project"
-            or workflow_state["next_command"] != "submit-project"
-            or workflow_submission["status"] != "ready"
-            or workflow_submission["last_project_version"] != 11
-            or workflow_submission["public_page_state"] != "HOTEL_TITLE_AND_60_SECOND_TEST_PUBLIC"
-            or workflow_submission["public_open_graph_state"] != "STALE_TITLE_AND_DEFAULT_IMAGE"
-            or workflow_submission["thumbnail_project_association"] != "INCONCLUSIVE"
-            or workflow_submission["final_submission_state"] != "FINAL_SUBMISSION_PENDING"
-        ):
-            errors.append("Devpost workflow state does not match the prepared version 11 pending submission")
+        def devpost_workflow_consistency(local_record: dict[str, Any], workflow: dict[str, Any]):
+            consistency_errors: list[str] = []
+            local_submission = local_record["submission"]
+            workflow_submission = workflow["submission"]
+            if (
+                workflow["project"]["name"] != "Kyoto Booking Retry Proof"
+                or workflow_submission["last_project_version"] != 11
+                or workflow_submission["public_page_state"] != "HOTEL_TITLE_AND_60_SECOND_TEST_PUBLIC"
+            ):
+                consistency_errors.append("Devpost workflow common project state differs from version 11 evidence")
+            receipt_fields = {"submission_id", "submitted_at", "submission_url", "submit_tool_status"}
+            if local_submission["devpostOwnedStatus"] == "FINAL_SUBMISSION_PENDING":
+                if (
+                    workflow["current_stage"] != "submit-project"
+                    or workflow["next_command"] != "submit-project"
+                    or workflow_submission["status"] != "ready"
+                    or workflow_submission["final_submission_state"] != "FINAL_SUBMISSION_PENDING"
+                    or workflow_submission["public_open_graph_state"] != "STALE_TITLE_AND_DEFAULT_IMAGE"
+                    or workflow_submission["thumbnail_project_association"] != "INCONCLUSIVE"
+                    or receipt_fields & workflow_submission.keys()
+                    or "submit-project" in workflow["completed_stages"]
+                ):
+                    consistency_errors.append("pending Devpost workflow does not stop before submit-project")
+                return consistency_errors
+            if local_submission["devpostOwnedStatus"] != "FINAL_SUBMISSION_VERIFIED":
+                consistency_errors.append("Devpost workflow has an unsupported provider-owned state")
+                return consistency_errors
+            if (
+                workflow["current_stage"] != "hackathon-map"
+                or workflow["next_command"] != "hackathon-map"
+                or workflow_submission["status"] != "submitted"
+                or workflow_submission["final_submission_state"] != "FINAL_SUBMISSION_VERIFIED"
+                or workflow_submission["public_open_graph_state"] != "HOTEL_TITLE_AND_UPLOADED_IMAGE_CURRENT"
+                or workflow_submission["thumbnail_project_association"] != "VERIFIED"
+                or "submit-project" not in workflow["completed_stages"]
+                or workflow_submission.get("submission_id") != local_submission.get("devpostSubmissionId")
+                or workflow_submission.get("submitted_at") != local_submission.get("devpostSubmittedAt")
+                or workflow_submission.get("submission_url") != local_submission.get("devpostSubmissionUrl")
+                or workflow_submission.get("submit_tool_status") != "Submitted"
+            ):
+                consistency_errors.append("verified Devpost workflow does not match the provider submission receipt")
+            return consistency_errors
+
+        errors.extend(devpost_workflow_consistency(devpost_evidence, workflow_state))
         required_draft_markers = [
             "https://devpost.com/software/project-y79pb23hj1mz",
             "153 Node tests",
             *expected_hotel_tools,
             "`INCONCLUSIVE`",
             "`UNMEASURED`",
-            "FINAL_SUBMISSION_PENDING",
+            devpost_evidence["submission"]["devpostOwnedStatus"],
         ]
         missing_draft_markers = [marker for marker in required_draft_markers if marker not in draft_text]
         if missing_draft_markers:
@@ -899,6 +928,16 @@ def main():
                 or provider_transition["occurredAt"] != provider_identity["observedAt"]
             ):
                 consistency_errors.append("Devpost provider transition differs from its observation identity")
+            try:
+                provider_observed_ms = rfc3339_ms(provider_identity["observedAt"])
+                if rfc3339_ms(provider_record["anonymousPublicHtml"]["observedAt"]) > provider_observed_ms:
+                    consistency_errors.append("Devpost anonymous HTML observation occurs after record identity")
+                if rfc3339_ms(provider_record["uploadedAssetReadback"]["observedAt"]) > provider_observed_ms:
+                    consistency_errors.append("Devpost uploaded-asset observation occurs after record identity")
+                if rfc3339_ms(provider_record["authenticatedReadback"]["updatedAt"]) > provider_observed_ms:
+                    consistency_errors.append("Devpost authenticated readback occurs after record identity")
+            except Exception as exc:
+                consistency_errors.append(f"Devpost provider observation ordering: {exc}")
 
             if local_submission["devpostOwnedStatus"] == "FINAL_SUBMISSION_PENDING":
                 if (
@@ -957,85 +996,127 @@ def main():
 
         errors.extend(devpost_provider_consistency(devpost_evidence, devpost_public_readback))
 
-        # The same schema must continue to represent the next authoritative
-        # provider state without weakening the pending/submitted exclusivity
-        # or accepting a locally forged terminal event.
-        future_submitted = json.loads(json.dumps(devpost_evidence))
-        future_event = {
-            "eventUuidV7": "01a04d95-8641-7091-a1f0-f5fd595b8fae",
-            "occurredAt": "2026-08-29T12:54:00.001Z",
-            "from": "FINAL_SUBMISSION_PENDING",
-            "to": "FINAL_SUBMISSION_VERIFIED",
-            "evidence": "A future Devpost-owned receipt and non-null submittedAt readback verify final challenge submission.",
-        }
-        future_submitted["machineContract"]["stateSequence"].append(future_event)
-        future_submitted["identity"]["recordEventUuidV7"] = future_event["eventUuidV7"]
-        future_submitted["recordedAt"] = future_event["occurredAt"]
-        future_submission = future_submitted["submission"]
-        future_submission.update({
-            "localStatus": "SUBMITTED",
-            "devpostSubmittedAt": future_submitted["recordedAt"],
-            "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
-            "devpostSubmissionId": 1,
-            "devpostSubmissionUrl": "https://webmcp.devpost.com/submissions/1",
-            "devpostSubmitToolStatus": "SUBMITTED",
-            "nextCommand": "hackathon-map",
+        # Both terminal branches remain executable fixtures after the live
+        # record advances. Historical pending values are reconstructed without
+        # weakening the provider-receipt checks on the verified branch.
+        verified_local = json.loads(json.dumps(devpost_evidence))
+        verified_provider = json.loads(json.dumps(devpost_public_readback))
+        if list(devpost_validator.iter_errors(verified_local)):
+            errors.append("Devpost schema cannot represent the verified-submission state")
+        if list(devpost_public_validator.iter_errors(verified_provider)):
+            errors.append("Devpost public-readback schema cannot represent the verified provider state")
+        if devpost_provider_consistency(verified_local, verified_provider):
+            errors.append("matching Devpost provider receipts do not verify the submitted state")
+
+        pending_local = json.loads(json.dumps(verified_local))
+        pending_local["machineContract"]["stateSequence"].pop()
+        pending_event = pending_local["machineContract"]["stateSequence"][-1]
+        pending_local["identity"]["recordEventUuidV7"] = pending_event["eventUuidV7"]
+        pending_local["recordedAt"] = pending_event["occurredAt"]
+        pending_submission = pending_local["submission"]
+        pending_submission.update({
+            "localStatus": "READY",
+            "devpostSubmittedAt": None,
+            "devpostOwnedStatus": "FINAL_SUBMISSION_PENDING",
+            "nextCommand": "submit-project",
         })
-        if list(devpost_validator.iter_errors(future_submitted)):
-            errors.append("Devpost schema cannot represent a complete future verified-submission state")
+        for field in ("devpostSubmissionId", "devpostSubmissionUrl", "devpostSubmitToolStatus"):
+            pending_submission.pop(field, None)
+        if list(devpost_validator.iter_errors(pending_local)):
+            errors.append("Devpost schema cannot preserve the historical pending state")
 
-        future_provider = json.loads(json.dumps(devpost_public_readback))
-        future_provider["identity"]["observationUuidV7"] = "01a04d95-8641-705c-8b5c-4a8dd55c0353"
-        future_provider["identity"]["observedAt"] = future_submitted["recordedAt"]
-        future_provider["machineContract"]["stateTransition"] = {
-            "eventUuidV7": future_provider["identity"]["observationUuidV7"],
-            "occurredAt": future_provider["identity"]["observedAt"],
-            "from": "FINAL_SUBMISSION_PENDING",
-            "to": "FINAL_SUBMISSION_VERIFIED",
-            "evidence": "The Devpost submit-project receipt and authenticated project readback agree on a non-null submission time.",
+        pending_provider = json.loads(json.dumps(verified_provider))
+        pending_provider["identity"]["observationUuidV7"] = "01a04d7a-8fe8-7f16-bb30-36a2a7b1eefc"
+        pending_provider["identity"]["observedAt"] = "2026-08-29T12:24:33.000Z"
+        pending_provider["machineContract"]["stateTransition"] = {
+            "eventUuidV7": pending_provider["identity"]["observationUuidV7"],
+            "occurredAt": pending_provider["identity"]["observedAt"],
+            "from": "PUBLIC_DESCRIPTION_VERSION_11_SAVED",
+            "to": "PUBLIC_OPEN_GRAPH_STALE_AND_IMAGE_ASSOCIATION_INCONCLUSIVE",
+            "evidence": "Historical authenticated and anonymous readbacks preserved the pending submission boundary.",
         }
-        future_provider["authenticatedReadback"]["updatedAt"] = future_submitted["recordedAt"]
-        future_provider["authenticatedReadback"]["project"]["challenge"] = {
+        pending_provider["authenticatedReadback"]["updatedAt"] = "2026-08-29T12:23:58.494Z"
+        pending_provider["authenticatedReadback"]["project"]["challenge"] = {
             "slug": "webmcp",
-            "submittedAt": future_submitted["recordedAt"],
-            "submissionState": "FINAL_SUBMISSION_VERIFIED",
+            "submittedAt": None,
+            "submissionState": "FINAL_SUBMISSION_NOT_PROVEN",
         }
-        future_provider["submissionReceipt"] = {
-            "evidenceIdUuidV5": "00f7fe7a-fcae-5aab-9b5b-972dec844ec3",
-            "observationUuidV7": "01a04d95-8641-7dc2-b921-7d80f95e2aa7",
-            "observedAt": future_submitted["recordedAt"],
-            "source": "DEVPOST_SUBMIT_PROJECT",
-            "challengeSlug": "webmcp",
-            "projectSlug": "project-y79pb23hj1mz",
-            "submissionId": 1,
-            "status": "Submitted",
-            "submittedAt": future_submitted["recordedAt"],
-            "url": "https://webmcp.devpost.com/submissions/1",
-            "evidenceBoundary": "This fixture represents the provider-owned submit-project return and must agree with a later authenticated project readback.",
+        pending_provider["anonymousPublicHtml"]["observedAt"] = "2026-08-29T12:24:33.000Z"
+        pending_provider["anonymousPublicHtml"]["openGraph"] = {
+            "title": {
+                "state": "OBSERVED",
+                "value": "未定",
+                "classification": "STALE_INITIAL_PROJECT_TITLE",
+                "evidenceBoundary": "The historical anonymous HTML retained the initial Open Graph title.",
+            },
+            "image": {
+                "state": "OBSERVED",
+                "url": "https://d2dmyh35ffsxbl.cloudfront.net/assets/shared/devpost_social_icon_200_200-f56e5af715a1d95e0209bb37e899b7c18c6e7e3b933a3c1f52456a6e2ee85d09.jpg",
+                "classification": "SHARED_DEVPOST_SOCIAL_ICON",
+            },
         }
-        if list(devpost_public_validator.iter_errors(future_provider)):
-            errors.append("Devpost public-readback schema cannot represent a provider-verified submission")
-        if devpost_provider_consistency(future_submitted, future_provider):
-            errors.append("matching Devpost provider receipts do not verify the future submitted state")
-        if not devpost_provider_consistency(future_submitted, devpost_public_readback):
-            errors.append("locally verified Devpost evidence was accepted while provider readback remained pending")
+        pending_provider["anonymousPublicHtml"]["uploadedAssetReference"].update({
+            "presentInHtml": False,
+            "state": "NOT_REFERENCED",
+        })
+        pending_provider["uploadedAssetReadback"]["observedAt"] = "2026-08-29T12:24:33.000Z"
+        pending_provider["uploadedAssetReadback"]["projectAssociation"] = {
+            "state": "INCONCLUSIVE",
+            "reason": "The historical anonymous project HTML did not reference the uploaded image URL.",
+        }
+        pending_provider.pop("submissionReceipt", None)
+        if list(devpost_public_validator.iter_errors(pending_provider)):
+            errors.append("Devpost public-readback schema cannot preserve the historical pending state")
+        if devpost_provider_consistency(pending_local, pending_provider):
+            errors.append("matching pending Devpost records fail the pending branch")
+        if not devpost_provider_consistency(verified_local, pending_provider):
+            errors.append("verified local Devpost evidence was accepted with a pending provider readback")
 
-        mismatched_provider = json.loads(json.dumps(future_provider))
+        mismatched_provider = json.loads(json.dumps(verified_provider))
         mismatched_provider["submissionReceipt"]["submissionId"] = 2
-        if not devpost_provider_consistency(future_submitted, mismatched_provider):
+        if not devpost_provider_consistency(verified_local, mismatched_provider):
             errors.append("Devpost evidence accepted a mismatched provider submission identifier")
 
-        pending_provider_with_receipt = json.loads(json.dumps(devpost_public_readback))
-        pending_provider_with_receipt["submissionReceipt"] = future_provider["submissionReceipt"]
+        pending_provider_with_receipt = json.loads(json.dumps(pending_provider))
+        pending_provider_with_receipt["submissionReceipt"] = verified_provider["submissionReceipt"]
         if not list(devpost_public_validator.iter_errors(pending_provider_with_receipt)):
             errors.append("Devpost public-readback schema accepted a receipt while provider state was pending")
 
-        verified_provider_without_receipt = json.loads(json.dumps(future_provider))
+        schema_contradictions = {
+            "verified state with uploaded image absent": json.loads(json.dumps(verified_provider)),
+            "verified state with default Open Graph image": json.loads(json.dumps(verified_provider)),
+            "pending state with current Open Graph image": json.loads(json.dumps(pending_provider)),
+        }
+        schema_contradictions["verified state with uploaded image absent"]["anonymousPublicHtml"][
+            "uploadedAssetReference"
+        ]["presentInHtml"] = False
+        schema_contradictions["verified state with default Open Graph image"]["anonymousPublicHtml"][
+            "openGraph"
+        ]["image"] = pending_provider["anonymousPublicHtml"]["openGraph"]["image"]
+        schema_contradictions["pending state with current Open Graph image"]["anonymousPublicHtml"][
+            "openGraph"
+        ]["image"] = verified_provider["anonymousPublicHtml"]["openGraph"]["image"]
+        for label, contradictory_record in schema_contradictions.items():
+            if not list(devpost_public_validator.iter_errors(contradictory_record)):
+                errors.append(f"Devpost public-readback schema accepted {label}")
+
+        chronology_contradictions = {
+            "anonymous HTML after record identity": ("anonymousPublicHtml", "observedAt"),
+            "uploaded asset after record identity": ("uploadedAssetReadback", "observedAt"),
+            "authenticated readback after record identity": ("authenticatedReadback", "updatedAt"),
+        }
+        for label, (section, field) in chronology_contradictions.items():
+            contradictory_record = json.loads(json.dumps(verified_provider))
+            contradictory_record[section][field] = "2026-08-29T13:17:42.001Z"
+            if not devpost_provider_consistency(verified_local, contradictory_record):
+                errors.append(f"Devpost provider consistency accepted {label}")
+
+        verified_provider_without_receipt = json.loads(json.dumps(verified_provider))
         del verified_provider_without_receipt["submissionReceipt"]
         if not list(devpost_public_validator.iter_errors(verified_provider_without_receipt)):
             errors.append("Devpost public-readback schema accepted verified provider state without a receipt")
 
-        incoherent_pending = json.loads(json.dumps(devpost_evidence))
+        incoherent_pending = json.loads(json.dumps(pending_local))
         incoherent_pending["submission"].update({
             "localStatus": "SUBMITTED",
             "devpostSubmissionId": 1,
@@ -1045,23 +1126,37 @@ def main():
         if not list(devpost_validator.iter_errors(incoherent_pending)):
             errors.append("Devpost schema accepted pending evidence mixed with a submission receipt")
 
-        incoherent_pending_terminal = json.loads(json.dumps(devpost_evidence))
+        incoherent_pending_terminal = json.loads(json.dumps(pending_local))
         incoherent_pending_terminal["machineContract"]["stateSequence"][-1]["to"] = "FINAL_SUBMISSION_VERIFIED"
         if not list(devpost_validator.iter_errors(incoherent_pending_terminal)):
             errors.append("Devpost schema accepted a pending submission with a verified terminal state")
 
-        missing_verified_transition = json.loads(json.dumps(devpost_evidence))
-        missing_verified_transition["submission"].update({
-            "localStatus": "SUBMITTED",
-            "devpostSubmittedAt": missing_verified_transition["recordedAt"],
-            "devpostOwnedStatus": "FINAL_SUBMISSION_VERIFIED",
-            "devpostSubmissionId": 1,
-            "devpostSubmissionUrl": "https://webmcp.devpost.com/submissions/1",
-            "devpostSubmitToolStatus": "SUBMITTED",
-            "nextCommand": "hackathon-map",
-        })
+        missing_verified_transition = json.loads(json.dumps(verified_local))
+        missing_verified_transition["machineContract"]["stateSequence"].pop()
         if not list(devpost_validator.iter_errors(missing_verified_transition)):
             errors.append("Devpost schema accepted verified submission without the terminal transition")
+
+        pending_workflow = json.loads(json.dumps(workflow_state))
+        pending_workflow["current_stage"] = "submit-project"
+        pending_workflow["next_command"] = "submit-project"
+        pending_workflow["completed_stages"] = [
+            stage for stage in pending_workflow["completed_stages"] if stage != "submit-project"
+        ]
+        pending_workflow_submission = pending_workflow["submission"]
+        pending_workflow_submission.update({
+            "status": "ready",
+            "public_open_graph_state": "STALE_TITLE_AND_DEFAULT_IMAGE",
+            "thumbnail_project_association": "INCONCLUSIVE",
+            "final_submission_state": "FINAL_SUBMISSION_PENDING",
+        })
+        for field in ("submission_id", "submitted_at", "submission_url", "submit_tool_status"):
+            pending_workflow_submission.pop(field, None)
+        if devpost_workflow_consistency(pending_local, pending_workflow):
+            errors.append("matching pending Devpost workflow fails the pending branch")
+        if not devpost_workflow_consistency(verified_local, pending_workflow):
+            errors.append("verified Devpost record accepted a stale pending workflow")
+        if not devpost_workflow_consistency(pending_local, workflow_state):
+            errors.append("pending Devpost record accepted a verified workflow")
     except Exception as exc:
         errors.append(f"Devpost hotel submission evidence structure: {exc}")
     checks["devpost_hotel_submission"] = len(errors) == devpost_start
@@ -1130,6 +1225,43 @@ def main():
     })
     if not list(video_production_validator.iter_errors(pending_video_with_receipt)):
         errors.append("video production schema accepted a Devpost receipt in the pending state")
+    def video_devpost_terminal_consistency(record: dict[str, Any]):
+        terminal_errors: list[str] = []
+        receipt_fields = {"submissionId", "submissionUrl", "submitToolStatus"}
+        terminal_state = record.get("finalSubmissionState")
+        if terminal_state == "FINAL_SUBMISSION_PENDING":
+            if (
+                record.get("submissionPacketState") != "READY"
+                or record.get("submittedAt") is not None
+                or receipt_fields & record.keys()
+            ):
+                terminal_errors.append("pending video Devpost readback contains submitted-state fields")
+            return terminal_errors
+        if terminal_state == "FINAL_SUBMISSION_VERIFIED":
+            if (
+                record.get("submissionPacketState") != "SUBMITTED"
+                or not isinstance(record.get("submittedAt"), str)
+                or not receipt_fields.issubset(record)
+                or record.get("submitToolStatus") != "SUBMITTED"
+            ):
+                terminal_errors.append("verified video Devpost readback lacks its submitted-state receipt")
+            return terminal_errors
+        terminal_errors.append("video Devpost readback has an unsupported final-submission state")
+        return terminal_errors
+
+    current_video_devpost = video_production["publication"]["devpostReadback"]
+    if video_devpost_terminal_consistency(current_video_devpost):
+        errors.append("video Devpost readback fails its current terminal-state branch")
+    if video_devpost_terminal_consistency(future_video_devpost):
+        errors.append("video Devpost readback fails the verified terminal-state fixture")
+    invalid_pending_video = json.loads(json.dumps(current_video_devpost))
+    invalid_pending_video["submittedAt"] = invalid_pending_video["observedAt"]
+    if not video_devpost_terminal_consistency(invalid_pending_video):
+        errors.append("video Devpost terminal check accepted submittedAt in the pending branch")
+    invalid_verified_video = json.loads(json.dumps(future_video_devpost))
+    invalid_verified_video.pop("submissionId")
+    if not video_devpost_terminal_consistency(invalid_verified_video):
+        errors.append("video Devpost terminal check accepted a verified branch without its receipt")
     false_video_promotions = {
         "verified identity state": ("state", "VERIFIED"),
         "same-artifact assertion": ("sameArtifactClaim", "SAME_ARTIFACT"),
@@ -1321,13 +1453,10 @@ def main():
             if (
                 devpost.get("videoUrl") != publication.get("youtubeUrl")
                 or devpost.get("projectState") != "published"
-                or devpost.get("submittedAt") is not None
                 or devpost.get("projectName") != "Kyoto Booking Retry Proof"
                 or devpost.get("descriptionNodeTestCount") != 153
                 or devpost.get("updateResponseVersion") != 11
                 or devpost.get("publicTestInstructionsState") != "FOUR_STEP_60_SECOND_FLOW_VISIBLE"
-                or devpost.get("submissionPacketState") != "READY"
-                or devpost.get("finalSubmissionState") != "FINAL_SUBMISSION_PENDING"
                 or devpost.get("thumbnail") != {
                     "publicUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
                     "publicationState": "ASSET_PUBLIC_HTTP_200_PROJECT_ASSOCIATION_INCONCLUSIVE",

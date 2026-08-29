@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04d83-09ef-7f89-93c7-8141a6367e07"
-observed_at: "2026-08-29T12:33:48.661Z"
-state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING"
+event_uuid_v7: "01a04dab-38f0-7145-8324-579d5c07b2e6"
+observed_at: "2026-08-29T13:17:42.000Z"
+state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -71,7 +71,7 @@ Voidの認証、プロジェクト接続、配置は未実施です。`npm run d
 
 機械可読の状態は[`metadata/void-integration.json`](../metadata/void-integration.json)で確認できます。導入済みと公開済みを同じ状態にはしません。
 
-Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)の画面題名と見出しを`Kyoto Booking Retry Proof`にし、京都のホテル二重予約防止に絞った説明、ChatGPT Sites、Vercel、公開リポジトリ、一般公開した[YouTube動画](https://youtu.be/tdSvJw4ghX8)を反映しました。版8で説明を153件のNode試験へ合わせ、版9で技術、リンク、動画を統一し、版10で冒頭の式、見出し、再送結果リスト、版11で60秒の四手順を整えました。`RETRY_RECOGNIZED`、2試行、予約1件、処理開始1回が読める実画面画像のアップロードは成功し、[配信URL](https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png)の匿名HTTP 200を確認しました。ただし、キャッシュ回避した匿名HTMLでも`og:title`は旧名`未定`、`og:image`はDevpost既定画像です。画像ファイルの公開からプロジェクトとの関連付けを推測せず、状態を`INCONCLUSIVE`とします。提出回答はIndividual、Japan、Existing、Significant、Yesまで揃っています。最新の読み戻しでもWebMCP Challengeの`submitted_at`は`null`なので、一般プロジェクトページの更新と提出準備を最終送信とは扱いません。
+Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)の画面題名と見出しを`Kyoto Booking Retry Proof`にし、京都のホテル二重予約防止に絞った説明、ChatGPT Sites、Vercel、公開リポジトリ、一般公開した[YouTube動画](https://youtu.be/tdSvJw4ghX8)を反映しました。版8で説明を153件のNode試験へ合わせ、版9で技術、リンク、動画を統一し、版10で冒頭の式、見出し、再送結果リスト、版11で60秒の四手順を整えました。提出後の匿名HTMLでは`og:title`も`Kyoto Booking Retry Proof`、`og:image`も[アップロード済みホテル画像](https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png)になりました。提出番号`1158722`は`Submitted`で、送信応答と認証済みプロジェクト読み戻しの`submitted_at`は`2026-08-29T09:14:00.129-04:00`で一致しました。
 
 YouTubeでは、`WebMCP vs Duplicate Bookings: A Live Demo`を一般公開しました。公開プレーヤーの表示時間は2分30秒です。アップロードと高精細処理は完了し、著作権検査は問題なしでした。英語音声と画面へ焼き込んだ英語字幕に加え、日本語字幕トラックも公開済みです。Canvaで選んだ専用サムネイルは端末内に準備済みですが、ブラウザーのファイル選択が失敗したため未反映で、現在はYouTubeが自動生成したサムネイルを使っています。この失敗から専用サムネイルの外部公開成功は推測しません。
 

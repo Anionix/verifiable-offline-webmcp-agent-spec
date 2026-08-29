@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04d83-0a65-7e65-9f05-14465dac2f3f"
-observed_at: "2026-08-29T12:33:48.661Z"
-status: "dependency-patched-sites-version-11-vercel-deployment-8kb6-ready-five-files-matched-carried-forward-browser-proof-youtube-public-artifact-identity-unmeasured-devpost-version-11-sixty-second-test-image-association-inconclusive-final-submission-pending"
+event_uuid_v7: "01a04dab-38f0-7c3c-9226-e891c7e82046"
+observed_at: "2026-08-29T13:17:42.000Z"
+status: "dependency-patched-sites-version-11-vercel-deployment-8kb6-ready-five-files-matched-carried-forward-browser-proof-youtube-public-artifact-identity-unmeasured-devpost-version-11-sixty-second-test-final-submission-provider-verified-title-image-current"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -83,7 +83,7 @@ Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../met
 - Vercelでは直前配置`dpl_4uthDyjgSi1KxbssW9t5u18xJbLs`で同じ再送収束を実測しました。現行配置`dpl_8kb6oNsU2dFwEu997zbj4zpeuWSL`はソース`037496f6db7281b7b1a9ecd9b3dfc71d407feeb6`を使い、`2026-08-29T12:30:35.535Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)と[配置固有URL](https://kyoto-booking-retry-proof-4p3pru70s-aniotajp-1978s-projects.vercel.app)から取得した五つのファイルは端末内成果物と一致し、提供元の警告・エラー読み戻しはともに0件でした。機能要約値`06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132`は直前配置と同じなので実操作証拠を引き継ぎますが、現行配置で新たに実操作したとは主張しません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧済みで、現在も別プロジェクトです。
 - 端末内で検査した最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、公開Site画面録画は113.2秒（75.5%）です。端末内ファイルのSHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。これとは別に、[YouTube](https://youtu.be/tdSvJw4ghX8)で`WebMCP vs Duplicate Bookings: A Live Demo`の一般公開、150秒の再生時間、匿名再生、英語字幕と日本語字幕トラック、処理完了、著作権検査の問題なしを読み戻しました。リポジトリ内にはアップロード操作由来の独立した受領記録がないため、端末内ファイルと公開動画が同一成果物であることは`UNMEASURED`であり、同一だとは断定しません。時間の一致と編集可能な自己記録は成果物同一性の根拠にしません。
 - Canvaで選んだ専用サムネイルは端末内に準備済みです。ただしYouTube画面のブラウザー用ファイル選択が失敗し、専用画像は反映できなかったため、現在はYouTubeが自動生成したサムネイルを使っています。これはYouTubeだけの状態です。
-- Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)は、画面の題名と見出しを`Kyoto Booking Retry Proof`にし、京都のホテル二重予約防止に絞った説明、公開URL、YouTube動画、153件のNode試験を反映しました。版8で説明、版9で技術・リンク・動画、版10で冒頭の式・見出し・再送結果リスト、版11で60秒の四手順を整えています。実際の公開ホテル画面を使った画像のアップロードは成功し、[配信URL](https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png)の匿名HTTP 200を確認しました。ただし、キャッシュ回避した匿名HTMLでも`og:title`は旧名`未定`、`og:image`はDevpost既定画像であるため、画像とプロジェクトの関連付けは`INCONCLUSIVE`です。提出回答はIndividual、Japan、Existing、Significant、Yesまで揃っています。最新の`submitted_at`は`null`なので、提出パケットは`READY`ですが、最終送信はまだ行っていません。
+- Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)は、画面の題名と見出しを`Kyoto Booking Retry Proof`にし、京都のホテル二重予約防止に絞った説明、公開URL、YouTube動画、153件のNode試験を反映しました。版8で説明、版9で技術・リンク・動画、版10で冒頭の式・見出し・再送結果リスト、版11で60秒の四手順を整えています。提出後の匿名HTMLでは`og:title`も`Kyoto Booking Retry Proof`、`og:image`も[アップロード済みホテル画像](https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png)になりました。提出番号`1158722`は`Submitted`で、送信応答と認証済みプロジェクト読み戻しの`submitted_at`は`2026-08-29T09:14:00.129-04:00`で一致しました。
 
 ## 構築と検査
 

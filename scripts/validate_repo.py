@@ -35,6 +35,9 @@
 # event_uuid_v7=01a04c63-6328-7ecf-9db0-2d826f35eece
 # state_transition=PUBLICATION_FAIL_CLOSED -> PUBLICATION_READBACK_VERIFIED occurred_at=2026-08-29T07:19:37.000Z
 # machine-contract: a public-video claim requires owner approval, anonymous playback evidence, matching local duration, published Japanese subtitles, explicit thumbnail fallback, and a Devpost readback whose challenge submission remains unsubmitted.
+# event_uuid_v7=01a04c84-1a18-7719-84d1-c65cfd9a1db5
+# state_transition=VOID_NOT_INSTALLED -> VOID_LOCAL_ADAPTER_EVIDENCE_VALIDATED occurred_at=2026-08-29T07:55:20.984Z
+# machine-contract: Void package and MCP registration evidence stays separate from provider authentication, project linking, publication, and runtime execution.
 from __future__ import annotations
 
 import argparse
@@ -531,6 +534,23 @@ def main():
             errors.append("deployed-current hotel evidence must match the live version source and both artifact digests")
     elif live_hotel["status"] == "CURRENT_ARTIFACT_VERIFIED":
         errors.append("a non-deployed candidate cannot claim the current artifact is live-verified")
+    void_evidence = load_json(ROOT / "metadata/void-integration.json")
+    void_evidence_validator = Draft202012Validator(
+        schemas["void-integration"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in void_evidence_validator.iter_errors(void_evidence):
+        errors.append(f"schema metadata/void-integration.json: {e.message}")
+    void_identity = void_evidence["identity"]
+    void_transition = void_evidence["stateTransition"]
+    if void_identity["observationUuidV7"] != void_transition["eventId"]:
+        errors.append("Void observation and transition event identifiers differ")
+    if void_identity["observedAt"] != void_transition["occurredAt"]:
+        errors.append("Void observation and transition times differ")
+    void_audit = void_evidence["dependencyAudit"]
+    if void_audit["moderate"] + void_audit["high"] + void_audit["critical"] != void_audit["total"]:
+        errors.append("Void dependency audit severity counts do not sum to the recorded total")
+    if void_evidence["providerState"]["deploymentExecutionCount"] != 0:
+        errors.append("Void integration evidence cannot claim a deployment before provider publication evidence exists")
     video_production = load_json(ROOT / "metadata/demo-video-production.json")
     video_production_validator = Draft202012Validator(
         schemas["demo-video-production"], registry=schema_registry, format_checker=format_checker

@@ -5,6 +5,8 @@
 # event_uuid_v7=01a04b93-947d-7143-8e2a-4ef233e51598 state_transition=SOURCE_QUALITY_UNMEASURED -> BOUNDED_SOURCE_QUALITY_GATE occurred_at=2026-08-29T03:32:38.141Z
 # machine-contract: the portable client and Sites package must pass independently before repository validation can succeed.
 # machine-contract: Oxlint checks hotel JavaScript, Biome checks hotel markup and styles, and Oxfmt checks only the newly governed formatting surface before repository validation proceeds.
+# event_uuid_v7=01a04c82-7268-7d00-91c5-62daa23328c state_transition=VOID_STATIC_ADAPTER_STANDALONE -> VOID_STATIC_ADAPTER_IN_FULL_GATE occurred_at=2026-08-29T07:53:32.520Z
+# machine-contract: the full repository gate verifies the pinned Void CLI and pre-built dist/client adapter without authenticating, linking a project, or deploying.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$ROOT/.local"
@@ -12,6 +14,7 @@ export UV_CACHE_DIR="${UV_CACHE_DIR:-$ROOT/.local/uv-cache}"
 npm --prefix "$ROOT" run quality:check
 uv run --frozen python "$ROOT/scripts/validate_repo.py" --report "$ROOT/.local/build-report.json"
 node "$ROOT/scripts/build_web_site.mjs"
+node "$ROOT/scripts/validate_void_integration.mjs"
 node "$ROOT/scripts/validate_hotel_portable_validator.mjs"
 node "$ROOT/scripts/validate_hotel_sites_validator.mjs"
 node "$ROOT/scripts/validate_service_integrations.mjs"

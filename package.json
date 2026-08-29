@@ -14,15 +14,19 @@
     "validate:integrations": "npm run build:web && node scripts/validate_service_integrations.mjs",
     "validate:vercel": "npm run build:web && node scripts/validate_vercel_site.mjs && node scripts/validate_service_integrations.mjs",
     "lint": "npm run lint:oxlint && npm run lint:biome",
-    "lint:oxlint": "oxlint --deny-warnings --report-unused-disable-directives examples/hotel-booking-demo src/typescript/hotel src/typescript/test/hotel-booking-*.test.js src/typescript/test/webmcp-hotel-adapter.test.js scripts/*hotel*.mjs scripts/build_web_site.mjs scripts/validate_service_integrations.mjs scripts/validate_source_quality_tools.mjs",
+    "lint:oxlint": "oxlint --deny-warnings --report-unused-disable-directives examples/hotel-booking-demo src/typescript/hotel src/typescript/test/hotel-booking-*.test.js src/typescript/test/webmcp-hotel-adapter.test.js scripts/*hotel*.mjs scripts/build_web_site.mjs scripts/validate_service_integrations.mjs scripts/validate_source_quality_tools.mjs scripts/validate_void_integration.mjs",
     "lint:biome": "biome lint --reporter=concise",
-    "format:check": "oxfmt --check .oxlintrc.json .oxfmtrc.json biome.json package.json scripts/validate_source_quality_tools.mjs src/typescript/test/hotel-booking-visualization.test.js",
-    "format:write": "oxfmt --write .oxlintrc.json .oxfmtrc.json biome.json package.json scripts/validate_source_quality_tools.mjs src/typescript/test/hotel-booking-visualization.test.js",
+    "format:check": "oxfmt --check .oxlintrc.json .oxfmtrc.json biome.json package.json void.json scripts/validate_source_quality_tools.mjs scripts/validate_void_integration.mjs src/typescript/test/hotel-booking-visualization.test.js",
+    "format:write": "oxfmt --write .oxlintrc.json .oxfmtrc.json biome.json package.json void.json scripts/validate_source_quality_tools.mjs scripts/validate_void_integration.mjs src/typescript/test/hotel-booking-visualization.test.js",
     "quality:versions": "node scripts/validate_source_quality_tools.mjs",
     "quality:check": "npm run quality:versions && npm run lint && npm run format:check",
     "lsp:biome": "biome lsp-proxy",
     "lsp:oxlint": "oxlint --lsp",
     "lsp:oxfmt": "oxfmt --lsp",
+    "mcp:void": "void mcp",
+    "validate:void": "node scripts/validate_void_integration.mjs",
+    "build:void:static": "npm run build:web && npm run validate:void",
+    "deploy:void:static": "npm run build:void:static && void deploy --dir dist/client",
     "validate": "make validate",
     "test": "make validate"
   },
@@ -34,6 +38,13 @@
     "oxfmt": "0.65.0",
     "oxlint": "1.80.0",
     "vite": "8.0.13",
+    "void": "0.10.12",
     "wrangler": "4.92.0"
+  },
+  "overrides": {
+    "void@0.10.12": {
+      "@cloudflare/vite-plugin": "1.43.0",
+      "wrangler": "4.107.0"
+    }
   }
 }

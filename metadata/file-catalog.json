@@ -186,8 +186,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a229ca2c7542b685f7adcaf464ac46eab5abedd84febc8c2f2fe7e9b6ea69fb5",
-      "bytes": 3818,
+      "sha256": "b5d27ab9651f53060443998a951aca1ed9d7526fbcfe40446dd72f1bc6d8ed97",
+      "bytes": 4512,
       "mediaType": "application/yaml",
       "category": ".github",
       "identity": {
@@ -5603,8 +5603,8 @@
     },
     {
       "path": "src/typescript/notification/audit-log.ts",
-      "sha256": "270e35ff185185ae001717574974db0d4b380abaf247e6b8a22f023dd40a164c",
-      "bytes": 5370,
+      "sha256": "436389eaa886570e1fa23579ad3dd0f462540826a23eb10d3c736c85035be27e",
+      "bytes": 5082,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -5755,8 +5755,8 @@
     },
     {
       "path": "src/typescript/notification/storage-path.ts",
-      "sha256": "67b0fd59224ab4e4f484e69272728b292f513243674d40b9a7f58e5c802940f7",
-      "bytes": 13435,
+      "sha256": "5ad5a43932a0c65dd0854808062fe4b3f1b8c26ab514a630271bb47d4ff48af6",
+      "bytes": 17763,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6287,8 +6287,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "9e24175c7948a379703a38da53b5a59d4ff853825273662acc1e6321cd3a8a10",
-      "bytes": 33297,
+      "sha256": "36c9aa5a10b16fa8c598939dd8113971528f2c9ad2c9de26e6ddefe873694484",
+      "bytes": 38514,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

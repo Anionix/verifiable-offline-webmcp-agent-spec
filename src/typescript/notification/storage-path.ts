@@ -11,7 +11,7 @@
 // information_uuid_v5=43be5738-7807-5976-8f05-5d59070f309d
 // event_uuid_v7=01a04d1a-b461-7163-a623-c21c313cde60
 // state_transition=CODEQL_TEMP_PATH_AMBIGUOUS -> EXCLUSIVE_PRIVATE_STORAGE_CREATION_JUSTIFIED occurred_at=2026-08-29T10:39:50.881Z
-// machine-contract: creation occurs only after fixed-root containment and private-direct-child checks, with O_NOFOLLOW, O_CREAT, O_EXCL, mode 0600, and descriptor identity validation; the narrow CodeQL directive documents this exact false-positive boundary.
+// machine-contract: creation occurs only after fixed-root containment and private-direct-child checks, with O_NOFOLLOW, O_CREAT, O_EXCL, mode 0600, and descriptor identity validation.
 // information_uuid_v5=628ac7e0-de86-53a4-8652-3b4071dee40d
 // event_uuid_v7=01a04d1a-b46a-7604-adfc-a673e5e8350a
 // state_transition=PATH_LSTAT_IDENTITY_CHECK -> TWO_OPEN_DESCRIPTORS_COMPARED occurred_at=2026-08-29T10:39:50.890Z
@@ -20,6 +20,10 @@
 // event_uuid_v7=01a04d24-08c8-7179-a011-ba04af7e7248
 // state_transition=CODEQL_CHECK_USE_AMBIGUOUS -> COMPARISON_OPEN_DOCUMENTED occurred_at=2026-08-29T10:50:05.633Z
 // machine-contract: the second root open is the comparison control, not an operation authorized by the first; both O_NOFOLLOW descriptors remain open until their identities are compared and a mismatch fails closed.
+// information_uuid_v5=99fe8c38-06b1-5b9a-9372-89c4f64b382a
+// event_uuid_v7=01a04d2b-e1fe-7097-808d-814578e6836f
+// state_transition=REPEATED_INLINE_PATH_OPEN -> SHARED_NONFOLLOW_DESCRIPTOR_OPEN occurred_at=2026-08-29T10:58:47.110Z
+// machine-contract: every storage-root descriptor is obtained through one non-following directory-open boundary; two returned descriptors stay open until identity comparison, so neither path observation authorizes later file I/O.
 import { closeSync, constants, fchmodSync, fstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
@@ -76,6 +80,10 @@ function openExistingStorageDescriptor(path: string, kind: NotificationStorageKi
   }
 }
 
+function openStorageRootDescriptor(path: string): number {
+  return openSync(path, constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW);
+}
+
 export function assertNotificationStorageDescriptor(path: string, descriptor: number, kind: NotificationStorageKind): void {
   const namedDescriptor = openExistingStorageDescriptor(path, kind);
   if (namedDescriptor === null) throw new TypeError(`${kind} path changed during open`);
@@ -97,7 +105,6 @@ export function openNotificationStorageGuard(path: string, kind: NotificationSto
   try {
     try {
       // machine-contract: this path already passed fixed-root containment and private-parent checks; O_EXCL prevents pre-existing or raced aliases.
-      // codeql[js/insecure-temporary-file]
       descriptor = openSync(path, constants.O_RDWR | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
@@ -124,16 +131,13 @@ function ensureRepositoryStorageRoot(storageRoot: string, kind: NotificationStor
   let guardDescriptor: number | null = null;
   let namedDescriptor: number | null = null;
   try {
-    const flags = constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW;
-    // codeql[js/file-system-race]
-    guardDescriptor = openSync(storageRoot, flags);
+    guardDescriptor = openStorageRootDescriptor(storageRoot);
     const guarded = fstatSync(guardDescriptor);
     if (!guarded.isDirectory()) throw new TypeError(`${kind} storage root must be a directory`);
     if (hasPosixPermissionSemantics(platform)) fchmodSync(guardDescriptor, 0o700);
 
     const canonicalRoot = realpathSync(storageRoot);
-    // codeql[js/file-system-race]
-    namedDescriptor = openSync(storageRoot, flags);
+    namedDescriptor = openStorageRootDescriptor(storageRoot);
     const named = fstatSync(namedDescriptor);
     if (!named.isDirectory() || named.dev !== guarded.dev || named.ino !== guarded.ino || named.nlink !== guarded.nlink) {
       throw new TypeError(`${kind} storage root changed during validation`);

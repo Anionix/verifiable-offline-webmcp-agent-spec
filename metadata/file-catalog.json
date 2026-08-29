@@ -5584,8 +5584,8 @@
     },
     {
       "path": "src/typescript/notification/storage-path.ts",
-      "sha256": "d9a9ab76d7825725d26f7aece9a8f1ae33954acc8ae92bcc77737550f1a23840",
-      "bytes": 10669,
+      "sha256": "5e06d145ce4c9b71b973d01370815122c915df38ca249f85aa295b58ea61990d",
+      "bytes": 11034,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

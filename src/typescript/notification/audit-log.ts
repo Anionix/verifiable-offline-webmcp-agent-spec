@@ -22,7 +22,13 @@ import { appendFileSync, closeSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson } from "../canonical.ts";
-import { containedNotificationStoragePath, openExistingNotificationStorageGuard, openNotificationStorageAppendGuard } from "./storage-path.ts";
+import {
+  captureNotificationStorageParent,
+  containedNotificationStoragePath,
+  openExistingNotificationStorageGuard,
+  openNotificationStorageAppendGuard,
+  type StorageParentIdentity,
+} from "./storage-path.ts";
 import type { TransitionRecord } from "./types.ts";
 
 interface AuditLine extends TransitionRecord {
@@ -41,8 +47,8 @@ function containedAuditPath(candidate: string): string {
   return containedNotificationStoragePath(candidate, "audit", { repositoryStorageRoot });
 }
 
-function readAuditText(path: string): string | null {
-  const descriptor = openExistingNotificationStorageGuard(path, "audit");
+function readAuditText(path: string, expectedParent: StorageParentIdentity): string | null {
+  const descriptor = openExistingNotificationStorageGuard(path, "audit", { expectedParent });
   if (descriptor === null) return null;
   try {
     return readFileSync(descriptor, "utf8");
@@ -51,8 +57,8 @@ function readAuditText(path: string): string | null {
   }
 }
 
-function appendAuditText(path: string, text: string): void {
-  const descriptor = openNotificationStorageAppendGuard(path, "audit");
+function appendAuditText(path: string, text: string, expectedParent: StorageParentIdentity): void {
+  const descriptor = openNotificationStorageAppendGuard(path, "audit", { expectedParent });
   try {
     appendFileSync(descriptor, text, { encoding: "utf8" });
   } finally {
@@ -62,9 +68,11 @@ function appendAuditText(path: string, text: string): void {
 
 export class AuditLog {
   readonly path: string;
+  private readonly parentIdentity: StorageParentIdentity;
 
   constructor(path: string) {
     this.path = containedAuditPath(path);
+    this.parentIdentity = captureNotificationStorageParent(this.path, "audit");
   }
 
   append(record: TransitionRecord): AuditLine {
@@ -72,12 +80,12 @@ export class AuditLog {
     const core = { ...record, previousHash };
     const eventHash = hash(canonicalJson(core));
     const line: AuditLine = { ...core, eventHash };
-    appendAuditText(this.path, JSON.stringify(line) + "\n");
+    appendAuditText(this.path, JSON.stringify(line) + "\n", this.parentIdentity);
     return line;
   }
 
   verify(): { valid: boolean; count: number; lastHash: string } {
-    const text = readAuditText(this.path);
+    const text = readAuditText(this.path, this.parentIdentity);
     if (text === null) return { valid: true, count: 0, lastHash: "" };
     let previousHash = "";
     let count = 0;
@@ -97,7 +105,7 @@ export class AuditLog {
   readIntentCreation(intentId: string): TransitionRecord | null {
     const verification = this.verify();
     if (!verification.valid) throw new Error("audit chain is invalid");
-    const text = readAuditText(this.path);
+    const text = readAuditText(this.path, this.parentIdentity);
     if (text === null) return null;
     for (const raw of text.split("\n")) {
       if (!raw.trim()) continue;

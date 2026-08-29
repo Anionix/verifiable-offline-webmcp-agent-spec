@@ -37,6 +37,14 @@
 // event_uuid_v7=01a04d54-cef5-762a-ab10-37116f6601e2
 // state_transition=DANGLING_WINDOWS_LINK_ACCEPTED -> LINK_REJECTED_WITH_EXTERNAL_TARGET_ABSENT occurred_at=2026-08-29T11:43:18.773Z
 // machine-contract: both constructor-time and later read/write checks reject dangling final links, while truly absent ordinary names remain creatable through exclusive guards.
+// information_uuid_v5=80129980-2b52-5f15-9419-2e7d8ecc4436
+// event_uuid_v7=01a04d46-6a82-75a1-8ee4-fd9364c93d58
+// state_transition=PARENT_REPLACEMENT_INJECTED -> AUDIT_AND_SQLITE_IO_REJECTED occurred_at=2026-08-29T14:45:01.000Z
+// machine-contract: a replaced or linked parent cannot redirect audit bytes or SQLite sidecars; every entry point rejects before opening the final file.
+// information_uuid_v5=1c70b4af-8b42-5f0a-8bca-cf80b09ba8bc
+// event_uuid_v7=01a04f52-4a68-7af0-a2ea-6c30b4be7a7a
+// state_transition=ABSENCE_SEAM_PARENT_SWAP -> CREATE_REJECTED_BEFORE_EXTERNAL_ENTRY occurred_at=2026-08-30T00:12:01.000Z
+// machine-contract: when a missing notification file is observed, a parent replacement at the deterministic seam is rejected before POSIX or Windows creation can place a file in the replacement directory.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -44,6 +52,7 @@ import {
   closeSync,
   existsSync,
   linkSync,
+  lstatSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -65,6 +74,7 @@ import { AuditLog } from "../notification/audit-log.ts";
 import { NotificationEngine } from "../notification/engine.ts";
 import { SimulatedNotificationAdapter } from "../notification/simulated-adapter.ts";
 import {
+  captureNotificationStorageParent,
   assertNotificationStorageDescriptor,
   containedNotificationStoragePath,
   openNotificationStorageAppendGuard,
@@ -183,6 +193,122 @@ test("notification storage rejects a parent symlink that escapes an allowed root
     assert.throws(() => new AuditLog(join(link, "audit.ndjson")), /resolves outside its allowed storage root/);
   } finally {
     rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects a replaced parent before audit or SQLite I/O", () => {
+  const auditDirectory = mkdtempSync(join(tmpdir(), "notification-parent-replacement-audit-"));
+  const auditMovedDirectory = `${auditDirectory}-moved`;
+  const auditExternal = mkdtempSync(join(tmpdir(), "notification-parent-replacement-audit-target-"));
+  const databaseDirectory = mkdtempSync(join(tmpdir(), "notification-parent-replacement-database-"));
+  const databaseMovedDirectory = `${databaseDirectory}-moved`;
+  const databaseExternal = mkdtempSync(join(tmpdir(), "notification-parent-replacement-database-target-"));
+  const auditPath = join(auditDirectory, "audit.ndjson");
+  const databasePath = join(databaseDirectory, "queue.sqlite");
+  const externalAuditPath = join(auditExternal, "audit.ndjson");
+  const externalDatabaseFiles = ["queue.sqlite", "queue.sqlite-wal", "queue.sqlite-shm", "queue.sqlite-journal"].map((name) => join(databaseExternal, name));
+  try {
+    const audit = new AuditLog(auditPath);
+    writeFileSync(externalAuditPath, "external audit victim\n", { mode: 0o600 });
+    const auditBefore = fileSnapshot(externalAuditPath);
+    for (const path of externalDatabaseFiles) writeFileSync(path, `external ${path}\n`, { mode: 0o600 });
+    const databaseBefore = externalDatabaseFiles.map((path) => fileSnapshot(path));
+
+    renameSync(auditDirectory, auditMovedDirectory);
+    symlinkSync(auditExternal, auditDirectory, "dir");
+
+    assert.throws(() => audit.verify(), /audit parent must not be a symbolic link|audit parent changed during operation|audit parent must be a non-link directory/);
+    assert.throws(() => audit.append({} as never), /audit parent must not be a symbolic link|audit parent changed during operation|audit parent must be a non-link directory/);
+    assert.throws(
+      () =>
+        new NotificationStore(databasePath, {
+          afterParentIdentityCaptured() {
+            renameSync(databaseDirectory, databaseMovedDirectory);
+            symlinkSync(databaseExternal, databaseDirectory, "dir");
+          },
+        }),
+      /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
+    );
+
+    assertFileUnchanged(externalAuditPath, auditBefore);
+    externalDatabaseFiles.forEach((path, index) => assertFileUnchanged(path, databaseBefore[index]));
+  } finally {
+    if (lstatSync(auditDirectory, { throwIfNoEntry: false })?.isSymbolicLink()) unlinkSync(auditDirectory);
+    if (lstatSync(databaseDirectory, { throwIfNoEntry: false })?.isSymbolicLink()) unlinkSync(databaseDirectory);
+    rmSync(auditDirectory, { recursive: true, force: true });
+    rmSync(databaseDirectory, { recursive: true, force: true });
+    rmSync(auditMovedDirectory, { recursive: true, force: true });
+    rmSync(databaseMovedDirectory, { recursive: true, force: true });
+    rmSync(auditExternal, { recursive: true, force: true });
+    rmSync(databaseExternal, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rechecks a replaced parent before absent-file creation", () => {
+  for (const platform of ["darwin", "win32"] as const) {
+    const directory = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-`));
+    const movedDirectory = `${directory}-moved`;
+    const external = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-target-`));
+    const path = join(directory, "queue.sqlite");
+    const victim = join(external, "queue.sqlite");
+    try {
+      writeFileSync(victim, "external victim\n", { mode: 0o600 });
+      const before = fileSnapshot(victim);
+      const expectedParent = captureNotificationStorageParent(path, "database", { platform });
+
+      assert.throws(
+        () =>
+          openNotificationStorageGuard(path, "database", {
+            platform,
+            expectedParent,
+            afterStorageAbsenceObserved() {
+              renameSync(directory, movedDirectory);
+              symlinkSync(external, directory, "dir");
+            },
+          }),
+        /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
+      );
+      assertFileUnchanged(victim, before);
+      assert.equal(existsSync(join(external, "queue.sqlite-wal")), false);
+      assert.equal(existsSync(join(external, "queue.sqlite-shm")), false);
+      assert.equal(existsSync(join(external, "queue.sqlite-journal")), false);
+    } finally {
+      if (lstatSync(directory, { throwIfNoEntry: false })?.isSymbolicLink()) unlinkSync(directory);
+      rmSync(directory, { recursive: true, force: true });
+      rmSync(movedDirectory, { recursive: true, force: true });
+      rmSync(external, { recursive: true, force: true });
+    }
+  }
+});
+
+test("notification storage rejects a different regular parent before I/O", () => {
+  const auditDirectory = mkdtempSync(join(tmpdir(), "notification-parent-identity-audit-"));
+  const auditMovedDirectory = `${auditDirectory}-moved`;
+  const databaseDirectory = mkdtempSync(join(tmpdir(), "notification-parent-identity-database-"));
+  const databaseMovedDirectory = `${databaseDirectory}-moved`;
+  const audit = new AuditLog(join(auditDirectory, "audit.ndjson"));
+  const databasePath = join(databaseDirectory, "queue.sqlite");
+  try {
+    renameSync(auditDirectory, auditMovedDirectory);
+    mkdirSync(auditDirectory, { mode: 0o700 });
+    assert.throws(() => audit.verify(), /audit parent changed during validation|audit parent changed during operation/);
+    assert.throws(() => audit.append({} as never), /audit parent changed during validation|audit parent changed during operation/);
+
+    assert.throws(
+      () =>
+        new NotificationStore(databasePath, {
+          afterParentIdentityCaptured() {
+            renameSync(databaseDirectory, databaseMovedDirectory);
+            mkdirSync(databaseDirectory, { mode: 0o700 });
+          },
+        }),
+      /database parent changed during validation|database parent changed during operation/,
+    );
+  } finally {
+    rmSync(auditDirectory, { recursive: true, force: true });
+    rmSync(databaseDirectory, { recursive: true, force: true });
+    rmSync(auditMovedDirectory, { recursive: true, force: true });
+    rmSync(databaseMovedDirectory, { recursive: true, force: true });
   }
 });
 

@@ -14,7 +14,7 @@
 // machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
 // event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
 // state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
-// machine-contract: the current Vercel receipt binds exact committed source, five anonymous remote hashes, a fresh-storage retry flow, and explicit recovery from an accidental notification-project deployment.
+// machine-contract: the current Vercel receipt binds a clean provider Git commit, five anonymous remote hashes, carried fresh-storage proof only by identical functional digest, and recovery from an accidental notification-project deployment.
 // event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
 // state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
 // machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
@@ -112,19 +112,21 @@ const EXPECTED_VERCEL_ARTIFACT = {
 const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
-  deploymentId: "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
-  deployedSourceCommit: "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
-  uniqueUrl: "https://kyoto-booking-retry-proof-43zea0856-aniotajp-1978s-projects.vercel.app",
+  deploymentId: "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
+  sourceState: "CLEAN_COMMIT",
+  providerGitCommit: "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
+  providerGitDirty: false,
+  uniqueUrl: "https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app",
   publicAlias: "https://kyoto-booking-retry-proof.vercel.app",
   state: "READY",
   target: "production",
   source: "cli",
-  createdAtUnixMs: 1787994594530,
-  createdAt: "2026-08-29T09:09:54.530Z",
-  buildingAtUnixMs: 1787994595509,
-  buildingAt: "2026-08-29T09:09:55.509Z",
-  readyAtUnixMs: 1787994601421,
-  readyAt: "2026-08-29T09:10:01.421Z",
+  createdAtUnixMs: 1788010530590,
+  createdAt: "2026-08-29T13:35:30.590Z",
+  buildingAtUnixMs: 1788010531648,
+  buildingAt: "2026-08-29T13:35:31.648Z",
+  readyAtUnixMs: 1788010538108,
+  readyAt: "2026-08-29T13:35:38.108Z",
   aliasError: null,
 };
 
@@ -165,8 +167,8 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
   deploymentId: "dpl_4uthDyjgSi1KxbssW9t5u18xJbLs",
   evidenceState: "CARRIED_FORWARD_BY_IDENTICAL_FUNCTIONAL_DIGEST",
   testedFunctionalDigest: "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
-  appliesToDeploymentId: "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
-  appliesToDeployedSourceCommit: "51fdc38fa4c4cf9d66473bdb22f35ecb93a444cf",
+  appliesToDeploymentId: "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
+  appliesToFunctionalSourceCommit: "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
   storageState: "FRESH",
   input: {
     checkIn: "2026-12-10",
@@ -194,12 +196,12 @@ const EXPECTED_VERCEL_BROWSER_FLOW = {
 
 const EXPECTED_VERCEL_OBSERVABILITY = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
-  readyBoundaryDeploymentId: "dpl_F5TbHqiTPomnF6zzt4F3RFJHvVEe",
+  readyBoundaryDeploymentId: "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
   environment: "production",
   queryMode: "READY_TO_QUERY_BOUNDED_MAX_ONE_HOUR",
-  queryExecutedAt: "2026-08-29T09:10:40.000Z",
-  windowStart: "2026-08-29T09:10:01.421Z",
-  windowEnd: "2026-08-29T09:10:40.000Z",
+  queryExecutedAt: "2026-08-29T13:37:06.000Z",
+  windowStart: "2026-08-29T13:35:38.108Z",
+  windowEnd: "2026-08-29T13:37:06.000Z",
   queriedLevels: ["error", "warning"],
   runtimeErrorClusters: 0,
   matchingLogEntries: 0,
@@ -618,8 +620,8 @@ if (vercelDeployment && vercelDeploymentSchema) {
     "Carried Vercel browser evidence does not name the current deployment",
   );
   record(
-    vercelDeployment.browserFlow?.appliesToDeployedSourceCommit === vercelDeployment.deployment?.deployedSourceCommit,
-    "Carried Vercel browser evidence does not name the current deployed source",
+    vercelDeployment.browserFlow?.appliesToFunctionalSourceCommit === vercelDeployment.artifact?.sourceCommit,
+    "Carried Vercel browser evidence does not name the functional source commit",
   );
   record(
     vercelDeployment.browserFlow?.testedFunctionalDigest === vercelDeployment.artifact?.functionalDigest,
@@ -697,13 +699,17 @@ if (vercelDeployment && vercelDeploymentSchema) {
 if (hotelVerification && vercelDeployment) {
   const aggregateObservedAt = hotelVerification.observedAt;
   checkUuidV7Time(hotelVerification.identity?.observationUuidV7 ?? "", aggregateObservedAt ?? "", "hotel publication aggregate");
-  const claimedProviderObservations = [
-    hotelVerification.liveDeployment?.observedAt,
-    vercelDeployment.identity?.observedAt,
-    vercelDeployment.remoteArtifacts?.remoteHashReadbackAt,
-    vercelDeployment.postDeployObservability?.queryExecutedAt,
-    vercelDeployment.restoredNotificationDeployment?.recoveryObservedAt,
-  ];
+  const claimedProviderObservations = [hotelVerification.liveDeployment?.observedAt];
+  // machine-contract: a newer standalone Vercel receipt is not retroactively
+  // claimed by the older Sites aggregate while its vercelDeployment field is null.
+  if (hotelVerification.vercelDeployment !== undefined && hotelVerification.vercelDeployment !== null) {
+    claimedProviderObservations.push(
+      vercelDeployment.identity?.observedAt,
+      vercelDeployment.remoteArtifacts?.remoteHashReadbackAt,
+      vercelDeployment.postDeployObservability?.queryExecutedAt,
+      vercelDeployment.restoredNotificationDeployment?.recoveryObservedAt,
+    );
+  }
   const aggregateTime = Date.parse(aggregateObservedAt);
   record(Number.isFinite(aggregateTime), "hotel publication aggregate has an invalid observation time");
   for (const providerObservedAt of claimedProviderObservations) {

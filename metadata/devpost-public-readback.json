@@ -1,0 +1,137 @@
+{
+  "$schema": "../schemas/devpost-public-readback.schema.json",
+  "format": {
+    "name": "OpenKnowledgeFormat-inspired evidence record",
+    "version": "0.2",
+    "profile": "devpost-public-readback"
+  },
+  "identity": {
+    "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "uuidV5Name": "evidence/devpost-public-readback-project-1405191-version-11",
+    "informationUuidV5": "0c07e0df-d0fe-5ea5-8967-b7263738ab69",
+    "observationUuidV7": "01a04dab-38f0-700a-a4e6-7ab111c7e4f2",
+    "observedAt": "2026-08-29T13:17:42.000Z"
+  },
+  "preparedFromCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+  "machineContract": {
+    "stateTransition": {
+      "eventUuidV7": "01a04dab-38f0-700a-a4e6-7ab111c7e4f2",
+      "occurredAt": "2026-08-29T13:17:42.000Z",
+      "from": "FINAL_SUBMISSION_PENDING",
+      "to": "FINAL_SUBMISSION_VERIFIED",
+      "evidence": "The Devpost submit-project receipt returned submission 1158722 with status Submitted, authenticated readback returned the same non-null submittedAt value, and a later anonymous page readback exposed the current hotel title and uploaded hotel image in Open Graph metadata."
+    },
+    "invariants": [
+      "A version 11 update receipt and authenticated content readback prove a saved public description, not final challenge submission.",
+      "Only a non-null Devpost submittedAt value proves final WebMCP Challenge submission; null keeps that claim unproven.",
+      "Anonymous public HTML and the authenticated project readback remain separate time-stamped observations.",
+      "An exact uploaded-image URL in the project Open Graph metadata proves public project association only at that observation time.",
+      "The anonymous Open Graph title is recorded separately from the visible document title and heading.",
+      "The retry counts describe a fictional device-local demonstration, not a real hotel reservation."
+    ]
+  },
+  "updateReceipt": {
+    "evidenceIdUuidV5": "2ea3bd29-ff3f-54d3-a466-6d236fbe0605",
+    "uuidV5Name": "source/devpost-update-receipt-project-1405191-version-11",
+    "projectId": "1405191",
+    "version": 11,
+    "state": "PUBLIC_DESCRIPTION_VERSION_11_SAVED",
+    "evidenceBoundary": "The receipt proves the accepted update version. The authenticated readback separately proves the resulting project fields."
+  },
+  "authenticatedReadback": {
+    "evidenceIdUuidV5": "6af32503-a2b6-5a42-b7d1-7c88caa6c08c",
+    "uuidV5Name": "source/devpost-authenticated-project-readback-1405191-version-11",
+    "accessMode": "AUTHENTICATED_READBACK",
+    "updatedAt": "2026-08-29T13:15:20.301Z",
+    "project": {
+      "projectId": "1405191",
+      "slug": "project-y79pb23hj1mz",
+      "name": "Kyoto Booking Retry Proof",
+      "tagline": "WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.",
+      "descriptionMarkers": {
+        "nodeTests": "153 Node tests",
+        "quickStart": "Try it in about 60 seconds",
+        "preparedState": "PREPARED",
+        "retryState": "RETRY_RECOGNIZED",
+        "resultCounts": "attempts2 bookings1 effectStarts1"
+      },
+      "videoUrl": "https://youtu.be/tdSvJw4ghX8",
+      "challenge": {
+        "slug": "webmcp",
+        "submittedAt": "2026-08-29T13:14:00.129Z",
+        "submissionState": "FINAL_SUBMISSION_VERIFIED"
+      }
+    },
+    "evidenceBoundary": "The authenticated readback reports the project content and non-null submittedAt value without retaining credentials, cookies, tokens, headers, or account details."
+  },
+  "anonymousPublicHtml": {
+    "evidenceIdUuidV5": "fb461104-72be-5f26-a478-7c13a89cd356",
+    "uuidV5Name": "source/devpost-anonymous-public-html-project-y79pb23hj1mz",
+    "url": "https://devpost.com/software/project-y79pb23hj1mz",
+    "accessMode": "ANONYMOUS_HTTP",
+    "observedAt": "2026-08-29T13:17:42.000Z",
+    "statusCode": 200,
+    "documentTitle": "Kyoto Booking Retry Proof | Devpost",
+    "h1": "Kyoto Booking Retry Proof",
+    "openGraph": {
+      "title": {
+        "state": "OBSERVED",
+        "value": "Kyoto Booking Retry Proof",
+        "classification": "CURRENT_PROJECT_TITLE",
+        "evidenceBoundary": "The fresh anonymous HTML contained the same hotel name in the document title, visible heading, and og:title."
+      },
+      "image": {
+        "state": "OBSERVED",
+        "url": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+        "classification": "PROJECT_UPLOADED_IMAGE"
+      }
+    },
+    "uploadedAssetReference": {
+      "searchedUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+      "presentInHtml": true,
+      "state": "REFERENCED_AS_OPEN_GRAPH_IMAGE"
+    },
+    "visibleEvidence": {
+      "quickStartHeading": "Try it in about 60 seconds",
+      "quickStartVisible": true,
+      "stepCount": 4,
+      "webMcpTools": [
+        "check_existing_hotel_booking",
+        "prepare_hotel_booking",
+        "get_hotel_booking_status",
+        "preview_hotel_cancellation"
+      ],
+      "nodeTestMarker": "153 Node tests",
+      "nodeTestCount": 153
+    },
+    "evidenceBoundary": "This anonymous readback proves the returned public HTML, visible markers, current Open Graph title, and exact uploaded-image reference only at the stated observation time."
+  },
+  "uploadedAssetReadback": {
+    "evidenceIdUuidV5": "ec8bc0f3-3a11-5edd-bb9f-49f5628c003d",
+    "uuidV5Name": "source/devpost-uploaded-thumbnail-005-194-459",
+    "url": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/194/459/datas/medium.png",
+    "observedAt": "2026-08-29T13:17:42.000Z",
+    "statusCode": 200,
+    "projectAssociation": {
+      "state": "VERIFIED",
+      "reason": "The asset URL returned HTTP 200 and the fresh anonymous project HTML referenced the exact URL as og:image."
+    }
+  },
+  "submissionReceipt": {
+    "evidenceIdUuidV5": "a171cf6a-3150-51fe-8fba-25fcbe12e5e7",
+    "observationUuidV7": "01a04da9-0f6d-752d-b739-cc864dc5d475",
+    "observedAt": "2026-08-29T13:15:20.301Z",
+    "source": "DEVPOST_SUBMIT_PROJECT",
+    "challengeSlug": "webmcp",
+    "projectSlug": "project-y79pb23hj1mz",
+    "submissionId": 1158722,
+    "status": "Submitted",
+    "submittedAt": "2026-08-29T13:14:00.129Z",
+    "url": "https://devpost.com/software/project-y79pb23hj1mz",
+    "evidenceBoundary": "This records the Devpost submit-project result and is verified by a later authenticated project readback with the same non-null submittedAt value."
+  },
+  "security": {
+    "rawAuthenticationInformationIncluded": false,
+    "secretsIncluded": false
+  }
+}

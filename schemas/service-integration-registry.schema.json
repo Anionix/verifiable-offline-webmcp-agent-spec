@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
-  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04c90-5270-7f9d-ad8a-fb909710bf85 state_transition=DEVPOST_DRAFT_APPROVAL_AMBIGUOUS -> DEVPOST_DRAFT_AUTHORIZED_BY_PLAN occurred_at=2026-08-29T08:08:41.840Z machine-contract=the Devpost draft update is authorized by the accepted implementation plan while final challenge submission still requires separate user approval",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04da7-d641-7851-8db8-310cc4b3efc7 state_transition=DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED_REAPPROVAL_REQUIRED occurred_at=2026-08-29T13:14:00.129Z machine-contract=Devpost submission 1158722 is provider verified while later resubmission remains behind the separate approval gate",
   "title": "Service integration registry",
   "type": "object",
   "additionalProperties": false,
@@ -57,10 +57,10 @@
       ],
       "properties": {
         "from": {
-          "const": "DEVPOST_PROJECT_PAGE_PUBLISHED"
+          "const": "DEVPOST_VERSION_11_60_SECOND_TEST_PUBLIC_OPEN_GRAPH_STALE_FINAL_SUBMISSION_PENDING"
         },
         "to": {
-          "const": "YOUTUBE_PUBLIC_AND_DEVPOST_VIDEO_LINKED"
+          "const": "DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED_REAPPROVAL_REQUIRED"
         },
         "eventId": {
           "$ref": "#/$defs/uuidV7"

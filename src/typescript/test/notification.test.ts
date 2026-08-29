@@ -29,6 +29,10 @@
 // event_uuid_v7=01a04d24-0955-78ae-9c7c-218287ed5acb
 // state_transition=REJECTED_TMPDIR_TAINT_FIXTURE -> REJECTED_REPOSITORY_SIBLING_FIXTURE occurred_at=2026-08-29T10:50:05.633Z
 // machine-contract: the outside-root negative test uses a repository-relative sibling path so the CodeQL temporary-file model measures only reachable storage operations; runtime containment rejection remains unchanged.
+// information_uuid_v5=f1067880-6f05-5541-8fe2-b16ebff23f6a
+// event_uuid_v7=01a04d40-5d78-7e5e-a69a-8ea902356b69
+// state_transition=WINDOWS_NOFOLLOW_ASSUMED -> WINDOWS_LINK_PATH_EXPLICITLY_REJECTED occurred_at=2026-08-29T11:20:59.000Z
+// machine-contract: the Windows branch is exercised without O_NOFOLLOW; final database and audit links must fail while ordinary single-link files remain usable and external victim bytes remain unchanged.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -39,6 +43,7 @@ import {
   mkdtempSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   renameSync,
   rmSync,
   statSync,
@@ -185,6 +190,60 @@ test("notification storage applies mode bits only on POSIX platforms", () => {
       () => containedNotificationStoragePath(join(directory, "audit.ndjson"), "audit", { ...options, platform: "darwin" }),
       /private to the current user/,
     );
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("notification storage rejects final links when Windows cannot rely on O_NOFOLLOW", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-link-"));
+  const external = mkdtempSync(join(tmpdir(), "notification-windows-link-victim-"));
+  try {
+    const databaseVictim = join(external, "database-victim.txt");
+    const auditVictim = join(external, "audit-victim.txt");
+    const databasePath = join(directory, "queue.sqlite");
+    const auditPath = join(directory, "audit.ndjson");
+    writeFileSync(databaseVictim, "database victim\n", { mode: 0o600 });
+    writeFileSync(auditVictim, "audit victim\n", { mode: 0o600 });
+    const databaseBefore = fileSnapshot(databaseVictim);
+    const auditBefore = fileSnapshot(auditVictim);
+    symlinkSync(databaseVictim, databasePath);
+    symlinkSync(auditVictim, auditPath);
+    const options = { platform: "win32" as const };
+
+    assert.throws(() => containedNotificationStoragePath(databasePath, "database", options), /must not be a symbolic link/);
+    assert.throws(() => containedNotificationStoragePath(auditPath, "audit", options), /must not be a symbolic link/);
+    assert.throws(() => openNotificationStorageGuard(databasePath, "database", options), /must not be a symbolic link/);
+    assert.throws(() => openNotificationStorageGuard(auditPath, "audit", options), /must not be a symbolic link/);
+    assertFileUnchanged(databaseVictim, databaseBefore);
+    assertFileUnchanged(auditVictim, auditBefore);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("notification storage keeps ordinary Windows storage files usable", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-regular-"));
+  const databasePath = join(directory, "queue.sqlite");
+  const auditPath = join(directory, "audit.ndjson");
+  try {
+    writeFileSync(databasePath, "", { mode: 0o600 });
+    writeFileSync(auditPath, "", { mode: 0o600 });
+    const options = { platform: "win32" as const };
+    const canonicalDirectory = realpathSync(directory);
+    assert.equal(containedNotificationStoragePath(databasePath, "database", options), join(canonicalDirectory, "queue.sqlite"));
+    assert.equal(containedNotificationStoragePath(auditPath, "audit", options), join(canonicalDirectory, "audit.ndjson"));
+
+    const databaseGuard = openNotificationStorageGuard(databasePath, "database", options);
+    const auditGuard = openNotificationStorageGuard(auditPath, "audit", options);
+    try {
+      assert.doesNotThrow(() => assertNotificationStorageDescriptor(databasePath, databaseGuard, "database", options));
+      assert.doesNotThrow(() => assertNotificationStorageDescriptor(auditPath, auditGuard, "audit", options));
+    } finally {
+      closeSync(databaseGuard);
+      closeSync(auditGuard);
+    }
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

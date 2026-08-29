@@ -167,8 +167,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "df0400591b30901cafa58093d6d1b6954c13f9e24f33c44bf5f0d755201eb6cf",
-      "bytes": 2266,
+      "sha256": "a229ca2c7542b685f7adcaf464ac46eab5abedd84febc8c2f2fe7e9b6ea69fb5",
+      "bytes": 3818,
       "mediaType": "application/yaml",
       "category": ".github",
       "identity": {
@@ -5584,8 +5584,8 @@
     },
     {
       "path": "src/typescript/notification/storage-path.ts",
-      "sha256": "5e06d145ce4c9b71b973d01370815122c915df38ca249f85aa295b58ea61990d",
-      "bytes": 11034,
+      "sha256": "67b0fd59224ab4e4f484e69272728b292f513243674d40b9a7f58e5c802940f7",
+      "bytes": 13435,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6116,8 +6116,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "b1e24aa2115935a2018485c89530972cb7239645685698dbc204fff348b92954",
-      "bytes": 29896,
+      "sha256": "9e24175c7948a379703a38da53b5a59d4ff853825273662acc1e6321cd3a8a10",
+      "bytes": 33297,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

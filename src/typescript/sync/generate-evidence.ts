@@ -6,6 +6,7 @@ import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sha256Hex } from "./crypto.ts";
 import { runOfflineSyncSimulation } from "./simulation.ts";
+import { trustAnchorPathForDatabase } from "./synchronizer.ts";
 import { SYNC_VERSION, type OfflineSyncVerificationEvidence } from "./types.ts";
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
@@ -20,7 +21,12 @@ const keyPaths = [
   resolve(repositoryRoot, "data/audit/keys/offline-device-b-public-key.pem"),
 ] as const;
 
-for (const path of [databasePath, `${databasePath}-wal`, `${databasePath}-shm`]) rmSync(path, { force: true });
+for (const path of [
+  databasePath,
+  `${databasePath}-wal`,
+  `${databasePath}-shm`,
+  trustAnchorPathForDatabase(databasePath)!,
+]) rmSync(path, { force: true });
 const result = runOfflineSyncSimulation(databasePath);
 const reviews = result.dangerousReviews;
 if (

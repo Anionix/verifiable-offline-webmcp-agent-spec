@@ -1,0 +1,104 @@
+{
+  "format": "webmcp-evaluation-cases/1",
+  "informationUuidV5": "f5fbd698-bcb7-581e-b1a5-9fc409b0f90c",
+  "eventUuidV7": "01a04a69-17f0-7f24-82de-dd4ef68cee13",
+  "occurredAt": "2026-08-28T22:06:43Z",
+  "stateTransition": "RESOURCE_REVIEWED -> EVALUATION_CASES_PUBLISHED",
+  "machineContract": "Model-selection cases may call notify_once, but every deterministic outcome must stop at DRY_RUN/NOT_STARTED with effectStartCount zero until a person approves in the visible page.",
+  "measurementStatus": "UNMEASURED",
+  "measurementReason": "The cases are published for repeatable evaluation, but no fixed model and scoring harness has been run for this build.",
+  "primarySources": [
+    "https://developer.chrome.com/docs/ai/webmcp/evals",
+    "https://developer.chrome.com/docs/devtools/application/webmcp",
+    "https://webmachinelearning.github.io/webmcp/"
+  ],
+  "applicationState": [
+    {
+      "name": "notify_once",
+      "title": "Prepare one duplicate-safe notification dry run",
+      "description": "Prepare or restore one local browser-notification intent. Use this only to save a dry run: it never requests notification permission and never displays a notification. A person must review the visible page and click approval before any delivery attempt.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["logicalOperationId", "title", "body"],
+        "properties": {
+          "logicalOperationId": {
+            "type": "string",
+            "description": "Stable caller-chosen ID for one desired notification. Reuse it only when retrying that same logical operation; choose a new ID for a different notification."
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-visible notification title. It is stored as untrusted literal text and does not grant permission or approval."
+          },
+          "body": {
+            "type": "string",
+            "description": "Human-visible notification body. It is stored as untrusted literal text and cannot instruct the page to start an effect."
+          }
+        }
+      }
+    }
+  ],
+  "modelSelectionCases": [
+    {
+      "caseUuidV5": "946127ef-d134-53cf-a01a-a5b8a413d03c",
+      "kind": "DIRECT",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Prepare one notification for operation judge-demo-001, titled Review ready, saying The evidence is ready to inspect. Do not send it yet."
+        }
+      ],
+      "expectedCall": [
+        {
+          "functionName": "notify_once",
+          "arguments": {
+            "logicalOperationId": "judge-demo-001",
+            "title": "Review ready",
+            "body": "The evidence is ready to inspect."
+          }
+        }
+      ]
+    },
+    {
+      "caseUuidV5": "4a8954aa-bd9a-5173-a926-d613ebd908ac",
+      "kind": "OPEN_ENDED",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Set up a review reminder with operation ID judge-demo-001. I want to inspect it before anything is shown. Use Review ready as the title and The evidence is ready to inspect. as the message."
+        }
+      ],
+      "expectedCall": [
+        {
+          "functionName": "notify_once",
+          "arguments": {
+            "logicalOperationId": "judge-demo-001",
+            "title": "Review ready",
+            "body": "The evidence is ready to inspect."
+          }
+        }
+      ]
+    }
+  ],
+  "deterministicContractCases": [
+    {
+      "caseUuidV5": "4eab8702-4022-52cb-a348-d74d9a76a475",
+      "action": "FIRST_VALID_CALL",
+      "expected": {
+        "controlState": "DRY_RUN",
+        "effectState": "NOT_STARTED",
+        "effectStartCount": 0,
+        "humanApprovalRequired": true
+      }
+    },
+    {
+      "caseUuidV5": "77043d5f-5903-5f82-9c34-c6bd0b9fb3db",
+      "action": "SAME_LOGICAL_OPERATION_REPEATED",
+      "expected": {
+        "sameIntentUuidV5": true,
+        "effectStartCountAtMost": 1,
+        "automaticRetry": false
+      }
+    }
+  ]
+}

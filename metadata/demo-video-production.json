@@ -1,0 +1,366 @@
+{
+  "$schema": "../schemas/demo-video-production.schema.json",
+  "identity": {
+    "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
+    "observationUuidV7": "01a04c37-78f9-7972-b402-46d5ee4909a9"
+  },
+  "updatedAt": "2026-08-29T06:31:43.000Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED",
+  "billingBoundary": {
+    "additionalPurchaseAuthorized": false,
+    "subscriptionChangeAuthorized": false,
+    "higgsfieldTrialStateSource": "User report and current Higgsfield account readback; remaining time is not inferred.",
+    "startingCredits": 100,
+    "estimatedCredits": 67.5,
+    "unlimitedAllowanceAvailable": false
+  },
+  "mediaCapabilities": [
+    {
+      "capabilityId": "c92c7f99-c82a-5d1a-8fdc-0b8aa99832b5",
+      "service": "Higgsfield",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 46,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:balance", "WRITE:generate_video", "WRITE:subtitle_timing"],
+      "productionUseState": "USED",
+      "reasonCode": "VIDEO_AND_AUDIO_TIMING_ASSETS_PRESERVED"
+    },
+    {
+      "capabilityId": "0d325ce9-7a64-5be5-b436-c4c889c88f33",
+      "service": "OpenArt",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 16,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:get_account", "WRITE:generate_reference_image"],
+      "productionUseState": "USED",
+      "reasonCode": "REFERENCE_IMAGE_PRESERVED"
+    },
+    {
+      "capabilityId": "93b37586-ca08-5981-8879-2e136843dbe4",
+      "service": "Magnific",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 70,
+      "authenticationState": "UNVERIFIED",
+      "verifiedOperations": [],
+      "productionUseState": "NOT_USED",
+      "reasonCode": "AUTHENTICATION_RETRY_DID_NOT_COMPLETE"
+    },
+    {
+      "capabilityId": "6e837fcb-0eb9-59fa-bb2c-4c155b92f150",
+      "service": "vidIQ",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 52,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:balance", "WRITE:generate_titles"],
+      "productionUseState": "USED",
+      "reasonCode": "TITLE_CANDIDATES_GENERATED_ONE_CALL"
+    },
+    {
+      "capabilityId": "b30ec6ce-a80f-5319-be12-a1c59c34f826",
+      "service": "HeyGen",
+      "localPluginState": "NOT_INSTALLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 38,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:get_account", "READ:get_voice", "READ:list_voices", "WRITE:create_speech"],
+      "productionUseState": "USED",
+      "reasonCode": "STOCK_VOICE_AUDIO_PRESERVED"
+    },
+    {
+      "capabilityId": "e8c065e6-5f6d-50cc-95a9-46e44f85f7a3",
+      "service": "Canva",
+      "localPluginState": "INSTALLED_ENABLED",
+      "taskAttachmentState": "ATTACHED",
+      "taskCallable": true,
+      "callableToolCount": 32,
+      "authenticationState": "CONFIRMED",
+      "verifiedOperations": ["READ:search", "WRITE:generate_design"],
+      "productionUseState": "USED",
+      "reasonCode": "THUMBNAIL_CANDIDATES_GENERATED_SELECTION_PENDING"
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "f48d8156-7356-5214-8e9e-e426757cbb57",
+      "service": "OpenArt",
+      "kind": "REFERENCE_IMAGE",
+      "status": "COMPLETED",
+      "prompt": "Realistic cinematic reference image of a fictional adult international traveler at a generic Japanese airport, navy jacket, muted vermilion scarf, smartphone in hand, calm but concerned expression, no logos, no readable personal information, no real hotel or airline branding, 16:9.",
+      "createdAt": "2026-08-29T00:21:07Z",
+      "remoteId": "oaFI2L4uldBbTUKpxIoN",
+      "localPath": ".local/video-production/openart-traveler-reference.png",
+      "sha256": "e0e8a63b7645ab9616c0e925ade051c4ac03052631d73796b91dec194a6398cd",
+      "disclosure": "AI-generated fictional adult and generic airport; no real person, hotel, airline, or personal information."
+    },
+    {
+      "assetId": "90b68cc3-d891-501d-a996-a43de1ca8497",
+      "service": "Higgsfield",
+      "kind": "VIDEO_SCENE",
+      "status": "COMPLETED",
+      "prompt": "Same fictional traveler in a generic Japanese airport; unstable Wi-Fi freezes a generic Japanese hotel booking page immediately after submit; restrained acting; no brands or personal information.",
+      "createdAt": "2026-08-29T01:05:11Z",
+      "remoteId": "d789caa7-f08a-4722-a29c-6e10cad63457",
+      "localPath": ".local/video-production/higgsfield-scene-01-lost-response.mp4",
+      "sha256": "4aeaeb5ff946bf3d75bcadd7778197e40884b2ddb19c9fddfe8b4b4c9a953dff",
+      "disclosure": "AI-generated dramatization / Fictional booking"
+    },
+    {
+      "assetId": "da5ddae0-5134-5daa-9f39-9dd225ff79da",
+      "service": "Higgsfield",
+      "kind": "VIDEO_SCENE",
+      "status": "COMPLETED",
+      "prompt": "Same fictional traveler sees two generic hotel confirmation notifications and looks mildly worried; restrained acting; no brands or personal information.",
+      "createdAt": "2026-08-29T01:05:11Z",
+      "remoteId": "84c531ad-4530-4223-b047-9056e6f9410b",
+      "localPath": ".local/video-production/higgsfield-scene-02-duplicate-alert.mp4",
+      "sha256": "6ca61f5392c4f1a3a022de216b64793cd02ae1f999ecd6311bbc8c1e8617bcca",
+      "disclosure": "AI-generated dramatization / Fictional booking"
+    },
+    {
+      "assetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+      "service": "HeyGen",
+      "kind": "VOICE",
+      "status": "COMPLETED",
+      "prompt": "English narration from media/demo-video/narration.en.txt, using a stock public English voice at 0.95 speed; no voice clone and no avatar.",
+      "createdAt": "2026-08-29T02:44:35Z",
+      "remoteId": "76c97614-ce81-46e7-8c5c-8014acf25a18",
+      "localPath": ".local/video-production/heygen-narration-en.mp3",
+      "sha256": "1acecfe48d3d673e2312fd8aee0b68485f003e32944c058997bc08b7f41e0fa6",
+      "disclosure": "The creation time is the provider object's HTTP Last-Modified value. The remote ID is the audio URL object ID, not the lost generation request ID. The downloaded file is audio/mpeg despite the provider URL ending in .wav.",
+      "voiceEvidence": {
+        "voiceId": "330290724a1b470fb63153f34d4c0183",
+        "voiceName": "Annie - Lifelike",
+        "voiceType": "STOCK_PUBLIC",
+        "voiceCloneUsed": false,
+        "avatarUsed": false,
+        "durationSeconds": 148.192625,
+        "byteLength": 4742164,
+        "codec": "mp3",
+        "sampleRateHertz": 44100,
+        "channels": 1,
+        "audioUrlObjectId": "76c97614-ce81-46e7-8c5c-8014acf25a18",
+        "providerObjectLastModifiedAt": "2026-08-29T02:44:35Z",
+        "generationRequestId": null,
+        "generationRequestIdState": "NOT_RETAINED"
+      }
+    },
+    {
+      "assetId": "7594f33f-5af6-5485-9731-fa8d97ad4a85",
+      "service": "Higgsfield",
+      "kind": "SUBTITLE",
+      "status": "COMPLETED",
+      "prompt": "Use local faster-whisper only as the word clock for the preserved HeyGen narration, then align every caption token back to the authored English narration. Keep each burned-in caption to at most three words and fifteen characters.",
+      "createdAt": null,
+      "remoteId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
+      "localPath": "media/demo-video/subtitles.en.srt",
+      "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+      "disclosure": "The exact remote creation time was not returned. Timing came from the preserved audio, and the English cues were verified in the completed 150-second cut.",
+      "subtitleEvidence": {
+        "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+        "timingMethod": "FASTER_WHISPER_LOCAL",
+        "authoredTextAligned": true,
+        "similarity": 0.9631901840490797,
+        "timedWords": 325,
+        "captionCount": 184,
+        "remoteMediaId": "0ab0cbca-188e-4d08-bb2e-c6e099e430aa",
+        "observedAt": "2026-08-29T06:20:27.000Z",
+        "finalVideoVerified": true
+      }
+    },
+    {
+      "assetId": "2c7342a8-27a7-5132-bb4b-268c05735a7d",
+      "service": "LOCAL",
+      "kind": "SUBTITLE",
+      "status": "COMPLETED",
+      "prompt": "Translate the authored English narration into concise Japanese, then reuse the audio-derived English cue boundaries without generating or changing the voice.",
+      "createdAt": null,
+      "remoteId": null,
+      "localPath": "media/demo-video/subtitles.ja.srt",
+      "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
+      "disclosure": "Locally authored Japanese subtitles aligned to the preserved narration clock and verified to end before the completed video; retained separately for the video host.",
+      "subtitleEvidence": {
+        "sourceAudioAssetId": "20bd8ced-436d-59a5-8e66-4130120dcf76",
+        "timingMethod": "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES",
+        "authoredTextAligned": true,
+        "similarity": null,
+        "timedWords": null,
+        "captionCount": 28,
+        "remoteMediaId": null,
+        "observedAt": "2026-08-29T06:20:27.000Z",
+        "finalVideoVerified": true
+      }
+    },
+    {
+      "assetId": "68efaedc-f21a-5545-9ee3-d92a88cb3b87",
+      "service": "LOCAL",
+      "kind": "SCREEN_RECORDING",
+      "status": "COMPLETED",
+      "prompt": "Record the public ChatGPT Site from EMPTY through preparation, human confirmation, reload restoration, and RETRY_RECOGNIZED without generated-image processing.",
+      "createdAt": "2026-08-29T04:30:19Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-recording-public-v5-onscreen.mov",
+      "sha256": "620694856c71aa58093a285046ca7df1c5a0a1f29ba16cc146ab112c3ad4c229",
+      "disclosure": "Actual public ChatGPT Sites screen recording. The booking is fictional; no personal information, payment, real hotel, or external reservation is present.",
+      "videoEvidence": {
+        "durationSeconds": 130.013333,
+        "width": 2892,
+        "height": 1716,
+        "frameRate": 60,
+        "hasAudio": false,
+        "englishCaptionsBurned": false,
+        "siteRecordingSeconds": 130.013333,
+        "actualSiteRecordingPermille": 1000,
+        "verifiedAt": "2026-08-29T04:34:59Z"
+      }
+    },
+    {
+      "assetId": "13808dd2-96b3-5153-801c-cd9b6ea57cc2",
+      "service": "LOCAL",
+      "kind": "SCREEN_RECORDING",
+      "status": "COMPLETED",
+      "prompt": "Record the public Site proof panel, ordinary-versus-WebMCP retry comparison, four safe tools, and honest service-state table without generated-image processing.",
+      "createdAt": "2026-08-29T04:32:20Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-recording-public-v5-proof.mov",
+      "sha256": "81742df21b13b6e3c5234cca33d825b3227c989a982ec2ee722800bea2ec6e5e",
+      "disclosure": "Actual public ChatGPT Sites screen recording of local proof and integration states; unknown service results remain visibly unknown.",
+      "videoEvidence": {
+        "durationSeconds": 60.033333,
+        "width": 2892,
+        "height": 1716,
+        "frameRate": 60,
+        "hasAudio": false,
+        "englishCaptionsBurned": false,
+        "siteRecordingSeconds": 60.033333,
+        "actualSiteRecordingPermille": 1000,
+        "verifiedAt": "2026-08-29T04:34:59Z"
+      }
+    },
+    {
+      "assetId": "960d59ae-160c-50f8-ab2a-8990518569de",
+      "service": "LOCAL",
+      "kind": "SCREEN_CAPTURE",
+      "status": "COMPLETED",
+      "prompt": "Capture the public ChatGPT Sites version 7 service table after the Vercel deployment and independent live run were verified.",
+      "createdAt": "2026-08-29T05:27:06Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-public-v7-service-table.png",
+      "sha256": "4e4b9f541a5527e65e70e0b426ecdd96c7e22dfe44fed078244e02d69ef3e955",
+      "disclosure": "Actual public ChatGPT Sites capture. It records Sites and Vercel as current-artifact verified while preserving unknown and not-published states for the other services."
+    },
+    {
+      "assetId": "ae8d8512-f2c9-5c66-b161-e727bb079c8c",
+      "service": "LOCAL",
+      "kind": "SCREEN_CAPTURE",
+      "status": "COMPLETED",
+      "prompt": "Capture the public ChatGPT Sites version 7 retry result after the second identical attempt was recognized without starting another simulated booking.",
+      "createdAt": "2026-08-29T05:46:07Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/site-public-v7-retry-result.png",
+      "sha256": "435fd077c9f3cd2123785230dc663c248b01d8502188940f31d35d56e15e1e43",
+      "disclosure": "Actual public ChatGPT Sites version 7 capture of a fictional booking. It shows RETRY_RECOGNIZED, two attempts, one simulated booking, and one effect start; no personal information, payment, real hotel, or external reservation is present."
+    },
+    {
+      "assetId": "f62d632a-118f-59be-b1aa-e32b75b93286",
+      "service": "vidIQ",
+      "kind": "TITLE_SET",
+      "status": "COMPLETED",
+      "prompt": "Generate five English long-form YouTube title candidates for a 150-second WebMCP Challenge demo about a lost hotel-booking response and a verified two-attempts-to-one-booking result.",
+      "createdAt": null,
+      "remoteId": null,
+      "localPath": "media/demo-video/publication-copy.md",
+      "sha256": "6939d21cd001cd7ae17968f924ec1259401ad765e5b4bbcc0ac7a3fe5ba5a496",
+      "disclosure": "One vidIQ call returned five scored candidates and used five credits. The selected title scored 86; a score-90 candidate was rejected because its wording overstated the demonstrated scope."
+    },
+    {
+      "assetId": "dbffe266-6b45-50e3-aa68-9d209554d01b",
+      "service": "Canva",
+      "kind": "THUMBNAIL",
+      "status": "COMPLETED",
+      "prompt": "Generate a clean 16:9 YouTube thumbnail candidate showing two attempts converging into one fictional booking, using large ivory, navy, vermilion, and green typography without people, brands, or invented product screenshots.",
+      "createdAt": null,
+      "remoteId": "dg-9b48aa63-51c6-4a59-81aa-3e79675256bf",
+      "localPath": ".local/video-production/canva-thumbnail-candidate-4.png",
+      "sha256": "54a6f4242642af85aa863ea8fa814b9df271cda19e15927b53f2d3c5271d3e4c",
+      "disclosure": "Temporary Canva candidate 4. It is not yet selected, saved to the Canva account, uploaded to Devpost, or used on a public video."
+    },
+    {
+      "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",
+      "service": "LOCAL",
+      "kind": "FINAL_VIDEO",
+      "status": "COMPLETED",
+      "prompt": "Assemble two disclosed fictional Higgsfield scenes, 113.2 seconds of public Site screen recording, current version 7 public Site service-table and retry-result captures, the measured HeyGen stock voice, and short burned-in English captions into one review video.",
+      "createdAt": "2026-08-29T06:19:46Z",
+      "remoteId": null,
+      "localPath": ".local/video-production/webmcp-hotel-demo-final-v10.mp4",
+      "sha256": "3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7",
+      "disclosure": "Final local review video: AI-generated dramatization is labeled during the first 20 seconds. It retains 113.2 seconds of public Site screen recording and ends with actual public Sites version 7 service-table and retry-result captures. The narration audio packet digest and subtitle clock are unchanged.",
+      "videoEvidence": {
+        "durationSeconds": 150,
+        "width": 1920,
+        "height": 1080,
+        "frameRate": 30,
+        "hasAudio": true,
+        "englishCaptionsBurned": true,
+        "siteRecordingSeconds": 113.2,
+        "actualSiteRecordingPermille": 755,
+        "verifiedAt": "2026-08-29T06:20:27.000Z"
+      }
+    }
+  ],
+  "productionFiles": [
+    {
+      "fileId": "7d3809b1-e151-5991-94cd-047dc1b927af",
+      "kind": "STORYBOARD",
+      "path": "media/demo-video/storyboard.md",
+      "sha256": "cdd9c0c8c90d0fc01c3c5fe43dedf6e7e6de2e574ad85c074849042d41a4eadc",
+      "status": "FINAL",
+      "requiresAudioRetiming": false
+    },
+    {
+      "fileId": "f3efcb83-4fa6-5f89-a55e-4cb921cd2ea8",
+      "kind": "NARRATION_EN",
+      "path": "media/demo-video/narration.en.txt",
+      "sha256": "cb8b88c6dead055790b2477f8ef135694a4ed42d48be7d52066c44a9f519119b",
+      "status": "FINAL",
+      "requiresAudioRetiming": false
+    },
+    {
+      "fileId": "4a96147c-83db-5c87-b46d-b1fc4afd2d4a",
+      "kind": "SUBTITLES_EN",
+      "path": "media/demo-video/subtitles.en.srt",
+      "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+      "status": "FINAL",
+      "requiresAudioRetiming": false
+    },
+    {
+      "fileId": "8e3b3333-ca44-59e3-902a-276d8fb3bf8f",
+      "kind": "SUBTITLES_JA",
+      "path": "media/demo-video/subtitles.ja.srt",
+      "sha256": "d882a16aec67bf5b4ba225d8fe28131a5e54abda35f0e1f2a87f3d37f8f0b7b6",
+      "status": "FINAL",
+      "requiresAudioRetiming": false
+    }
+  ],
+  "productionPlan": {
+    "plannedDurationSeconds": 150,
+    "plannedActualSiteRecordingSeconds": 113,
+    "plannedActualSiteRecordingPermille": 753,
+    "voiceState": "MEASURED",
+    "captionTimingState": "FINAL_VIDEO_VERIFIED"
+  },
+  "publication": {
+    "youtubeUrl": null,
+    "status": "NOT_STARTED",
+    "requiresSeparateApproval": true
+  }
+}

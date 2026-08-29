@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d state_transition=LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY -> CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z machine-contract=Exact committed source requires provider READY readback five anonymous remote hashes a fresh-storage retry flow and a post-ready lookback while accidental notification-project deployment and immediate restoration remain explicit",
+  "title": "Vercel hotel deployment receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "receiptVersion",
+    "identity",
+    "stateTransition",
+    "provider",
+    "artifact",
+    "deployment",
+    "remoteArtifacts",
+    "anonymousHttp",
+    "browserFlow",
+    "postDeployObservability",
+    "restoredNotificationDeployment",
+    "evidenceSources",
+    "secretsIncluded"
+  ],
+  "properties": {
+    "$schema": { "const": "../schemas/vercel-hotel-deployment.schema.json" },
+    "receiptVersion": { "const": "1.1.0" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "stateTransition": { "$ref": "#/$defs/stateTransition" },
+    "provider": { "$ref": "#/$defs/provider" },
+    "artifact": { "$ref": "#/$defs/artifact" },
+    "deployment": { "$ref": "#/$defs/deployment" },
+    "remoteArtifacts": { "$ref": "#/$defs/remoteArtifacts" },
+    "anonymousHttp": { "$ref": "#/$defs/anonymousHttp" },
+    "browserFlow": { "$ref": "#/$defs/browserFlow" },
+    "postDeployObservability": { "$ref": "#/$defs/postDeployObservability" },
+    "restoredNotificationDeployment": { "$ref": "#/$defs/restoredNotificationDeployment" },
+    "evidenceSources": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/evidenceSource" }
+    },
+    "secretsIncluded": { "const": false }
+  },
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sourceCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "projectId": {
+      "type": "string",
+      "pattern": "^prj_[A-Za-z0-9]+$"
+    },
+    "deploymentId": {
+      "type": "string",
+      "pattern": "^dpl_[A-Za-z0-9]+$"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "namespace", "observedAt"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "namespace": { "$ref": "#/$defs/uuidV5" },
+        "observedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
+      "properties": {
+        "from": { "const": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY" },
+        "to": { "const": "CURRENT_HOTEL_ARTIFACT_REDEPLOY_VERIFIED" },
+        "eventId": { "$ref": "#/$defs/uuidV7" },
+        "occurredAt": { "$ref": "#/$defs/observedAt" },
+        "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "teamId"],
+      "properties": {
+        "name": { "const": "Vercel" },
+        "teamId": { "type": "string", "pattern": "^team_[A-Za-z0-9]+$" }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceCommit", "functionalDigest", "functionalDigestScope"],
+      "properties": {
+        "sourceCommit": { "$ref": "#/$defs/sourceCommit" },
+        "functionalDigest": { "$ref": "#/$defs/sha256" },
+        "functionalDigestScope": {
+          "const": {
+            "algorithm": "SHA-256",
+            "root": "dist/client",
+            "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+            "excludedPaths": [".assetsignore", "service-integrations.json"]
+          }
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectId",
+        "projectName",
+        "deploymentId",
+        "deployedSourceCommit",
+        "uniqueUrl",
+        "publicAlias",
+        "state",
+        "target",
+        "source",
+        "createdAtUnixMs",
+        "createdAt",
+        "buildingAtUnixMs",
+        "buildingAt",
+        "readyAtUnixMs",
+        "readyAt",
+        "aliasError"
+      ],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/projectId" },
+        "projectName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "deployedSourceCommit": { "$ref": "#/$defs/sourceCommit" },
+        "uniqueUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
+        "publicAlias": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
+        "state": { "const": "READY" },
+        "target": { "const": "production" },
+        "source": { "const": "cli" },
+        "createdAtUnixMs": { "type": "integer", "minimum": 0 },
+        "createdAt": { "$ref": "#/$defs/observedAt" },
+        "buildingAtUnixMs": { "type": "integer", "minimum": 0 },
+        "buildingAt": { "$ref": "#/$defs/observedAt" },
+        "readyAtUnixMs": { "type": "integer", "minimum": 0 },
+        "readyAt": { "$ref": "#/$defs/observedAt" },
+        "aliasError": { "type": "null" }
+      }
+    },
+    "remoteArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "requestPath", "localPath", "statusCode", "sha256"],
+      "properties": {
+        "name": { "enum": ["document", "application-script", "application-style", "service-worker", "service-integration-registry"] },
+        "requestPath": { "type": "string", "pattern": "^/[A-Za-z0-9._/-]*$" },
+        "localPath": { "type": "string", "pattern": "^dist/client/[A-Za-z0-9._/-]+$" },
+        "statusCode": { "const": 200 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "remoteArtifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deploymentId", "baseUrl", "hashEvidenceState", "remoteHashReadbackAt", "artifacts"],
+      "properties": {
+        "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "baseUrl": { "type": "string", "format": "uri" },
+        "hashEvidenceState": { "enum": ["LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY", "REMOTE_HASHES_READ_BACK_AND_MATCHED"] },
+        "remoteHashReadbackAt": { "type": ["string", "null"], "format": "date-time" },
+        "artifacts": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/remoteArtifact" }
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "statusCode"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^/[A-Za-z0-9._/-]*$" },
+        "statusCode": { "type": "integer", "minimum": 100, "maximum": 599 }
+      }
+    },
+    "anonymousHttp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entrypoint", "browserRequests", "serviceWorker"],
+      "properties": {
+        "entrypoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "url", "statusCode", "authentication"],
+          "properties": {
+            "method": { "const": "GET" },
+            "url": { "type": "string", "format": "uri" },
+            "statusCode": { "const": 200 },
+            "authentication": { "const": "ANONYMOUS" }
+          }
+        },
+        "browserRequests": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/request" }
+        },
+        "serviceWorker": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "statusCode", "serviceWorkerAllowed"],
+          "properties": {
+            "path": { "const": "/service-worker.js" },
+            "statusCode": { "const": 200 },
+            "serviceWorkerAllowed": { "const": "/" }
+          }
+        }
+      }
+    },
+    "browserFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "testedUrl",
+        "deploymentId",
+        "storageState",
+        "input",
+        "stateSequence",
+        "humanConfirmationRequired",
+        "attempts",
+        "bookings",
+        "effectStarts",
+        "confirmationNumber",
+        "reservationUuidV5",
+        "latestEventUuidV7",
+        "auditEvents",
+        "chainValid",
+        "chainHeadSha256",
+        "chainHeadPrefix",
+        "reloadRestored",
+        "errors",
+        "warnings"
+      ],
+      "properties": {
+        "testedUrl": { "type": "string", "format": "uri" },
+        "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "storageState": { "const": "FRESH" },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["checkIn", "checkOut", "adults", "rooms", "language"],
+          "properties": {
+            "checkIn": { "type": "string", "format": "date" },
+            "checkOut": { "type": "string", "format": "date" },
+            "adults": { "const": 2 },
+            "rooms": { "const": 1 },
+            "language": { "const": "en" }
+          }
+        },
+        "stateSequence": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "enum": ["PREPARED", "COMMITTED", "RETRY_RECOGNIZED"] }
+        },
+        "humanConfirmationRequired": { "const": true },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "bookings": { "type": "integer", "minimum": 0 },
+        "effectStarts": { "type": "integer", "minimum": 0 },
+        "confirmationNumber": { "type": "string", "pattern": "^FKR-[0-9A-F]{10}$" },
+        "reservationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "latestEventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "auditEvents": { "type": "integer", "minimum": 0 },
+        "chainValid": { "type": "boolean" },
+        "chainHeadSha256": { "$ref": "#/$defs/sha256" },
+        "chainHeadPrefix": { "type": "string", "pattern": "^[0-9a-f]{12}$" },
+        "reloadRestored": { "type": "boolean" },
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "postDeployObservability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectId",
+        "environment",
+        "queryMode",
+        "queryExecutedAt",
+        "windowStart",
+        "windowEnd",
+        "queriedLevels",
+        "runtimeErrorClusters",
+        "matchingLogEntries",
+        "conclusion"
+      ],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/projectId" },
+        "environment": { "const": "production" },
+        "queryMode": { "const": "ONE_HOUR_LOOKBACK_EXECUTED_AFTER_READY" },
+        "queryExecutedAt": { "$ref": "#/$defs/observedAt" },
+        "windowStart": { "$ref": "#/$defs/observedAt" },
+        "windowEnd": { "$ref": "#/$defs/observedAt" },
+        "queriedLevels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "enum": ["error", "warning"] }
+        },
+        "runtimeErrorClusters": { "type": "integer", "minimum": 0 },
+        "matchingLogEntries": { "type": "integer", "minimum": 0 },
+        "conclusion": { "const": "ONE_HOUR_LOOKBACK_RETURNED_NO_RUNTIME_ERRORS_OR_WARNING_ERROR_LOGS" }
+      }
+    },
+    "restoredNotificationDeployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectId", "projectName", "deploymentId", "state", "sourceCommit", "publicAlias", "aliasState", "recoveryReason", "restorationAction", "anonymousStatusCode", "verifiedContent", "recoveryObservedAt"],
+      "properties": {
+        "projectId": { "$ref": "#/$defs/projectId" },
+        "projectName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "state": { "const": "READY" },
+        "sourceCommit": { "$ref": "#/$defs/sourceCommit" },
+        "publicAlias": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
+        "aliasState": { "const": "RESTORED_TO_DEPLOYMENT" },
+        "recoveryReason": { "const": "ACCIDENTAL_HOTEL_DEPLOYMENT_TO_NOTIFICATION_PROJECT" },
+        "restorationAction": { "const": "PROMOTE_SAVED_ORIGINAL_DEPLOYMENT_IMMEDIATELY" },
+        "anonymousStatusCode": { "const": 200 },
+        "verifiedContent": { "const": "NOTIFICATION_DEMO" },
+        "recoveryObservedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "evidenceSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "kind", "supports"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/uuidV5" },
+        "kind": {
+          "enum": [
+            "VERCEL_PROVIDER_READBACK",
+            "ANONYMOUS_HTTP_READBACK",
+            "BROWSER_RUNTIME_READBACK",
+            "VERCEL_OBSERVABILITY_READBACK",
+            "RESTORED_NOTIFICATION_READBACK"
+          ]
+        },
+        "supports": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3, "maxLength": 100 }
+        }
+      }
+    }
+  }
+}

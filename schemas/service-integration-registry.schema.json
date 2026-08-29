@@ -1,0 +1,532 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04c37-8898-746a-b87b-4a4beb6cbf29 state_transition=SITES_AND_VERCEL_CURRENT_VERIFIED -> DEVPOST_PROJECT_PAGE_PUBLISHED occurred_at=2026-08-29T06:31:43.000Z machine-contract=Sites and Vercel remain current-artifact verified; the Devpost project page is public with current links while video publication and final submission remain separate gates",
+  "title": "Service integration registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "version",
+    "identity",
+    "stateTransition",
+    "services",
+    "summary",
+    "artifacts"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../schemas/service-integration-registry.schema.json"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registryId",
+        "evidenceEventId",
+        "namespace",
+        "observedAt"
+      ],
+      "properties": {
+        "registryId": {
+          "$ref": "#/$defs/uuidV5"
+        },
+        "evidenceEventId": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "namespace": {
+          "const": "47f3e535-0e27-559a-9556-aa79a84f95eb"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/observedAt"
+        }
+      }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "eventId",
+        "occurredAt",
+        "machineContract"
+      ],
+      "properties": {
+        "from": {
+          "const": "SITES_AND_VERCEL_CURRENT_VERIFIED"
+        },
+        "to": {
+          "const": "DEVPOST_PROJECT_PAGE_PUBLISHED"
+        },
+        "eventId": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "occurredAt": {
+          "$ref": "#/$defs/observedAt"
+        },
+        "machineContract": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/service"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "optionalClientCopy"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/repositoryPath"
+          }
+        },
+        "optionalClientCopy": {
+          "const": "dist/client/service-integrations.json"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "uuidV7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(metadata|schemas|scripts|docs)/[A-Za-z0-9._/-]+$"
+    },
+    "verifiedAuthOperation": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 120,
+      "pattern": "^(READ|WRITE):[a-z][a-z0-9_.:-]*$"
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "serviceId",
+        "displayName",
+        "integrationSurfaceId",
+        "evidenceEventId",
+        "observedAt",
+        "pluginRef",
+        "pluginState",
+        "installationEvidence",
+        "authenticationState",
+        "publicationState",
+        "runtimeState",
+        "approvalGates",
+        "verifiedAuthOperations",
+        "artifactCommit",
+        "artifactSha256",
+        "reasonCode",
+        "roles",
+        "limitations",
+        "sources"
+      ],
+      "properties": {
+        "serviceId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "integrationSurfaceId": {
+          "$ref": "#/$defs/uuidV5"
+        },
+        "evidenceEventId": {
+          "$ref": "#/$defs/uuidV7"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/observedAt"
+        },
+        "pluginRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[a-z0-9-]+@(?:openai-bundled|openai-curated-remote)$"
+        },
+        "pluginState": {
+          "enum": [
+            "ACTIVE",
+            "INSTALLED_INACTIVE",
+            "NOT_INSTALLED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "installationEvidence": {
+          "$ref": "#/$defs/installationEvidence"
+        },
+        "authenticationState": {
+          "enum": [
+            "CONFIRMED",
+            "UNVERIFIED",
+            "REJECTED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "publicationState": {
+          "enum": [
+            "CURRENT_ARTIFACT",
+            "BASELINE_ONLY",
+            "NOT_PUBLISHED",
+            "UNVERIFIED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "runtimeState": {
+          "enum": [
+            "CURRENT_ARTIFACT_VERIFIED",
+            "BASELINE_ONLY",
+            "INCONCLUSIVE",
+            "NOT_RUN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "approvalGates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/approvalGate"
+          }
+        },
+        "verifiedAuthOperations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/verifiedAuthOperation"
+          }
+        },
+        "artifactCommit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "artifactSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reasonCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 100,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 220
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 260
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          }
+        }
+      }
+    },
+    "approvalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "state"
+      ],
+      "properties": {
+        "action": {
+          "enum": [
+            "OWNER_ONLY_DEPLOYMENT",
+            "PUBLIC_DEPLOYMENT",
+            "PRODUCTION_DEPLOYMENT",
+            "DRAFT_UPDATE",
+            "FINAL_SUBMISSION",
+            "COMMERCE_WRITE"
+          ]
+        },
+        "state": {
+          "enum": [
+            "AUTHORIZED_BY_PLAN",
+            "AUTHORIZED_BY_USER",
+            "REQUIRES_SEPARATE_APPROVAL",
+            "OUT_OF_SCOPE",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "installationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "localPluginState",
+        "localPluginRef",
+        "localPluginVersion",
+        "taskAttachmentState",
+        "taskCallable",
+        "callableToolCount",
+        "restartState"
+      ],
+      "properties": {
+        "localPluginState": {
+          "enum": [
+            "INSTALLED_ENABLED",
+            "INSTALLED_DISABLED",
+            "NOT_INSTALLED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "localPluginRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9-]+@(?:openai-bundled|openai-curated|openai-curated-remote)$"
+        },
+        "localPluginVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "taskAttachmentState": {
+          "enum": [
+            "ATTACHED",
+            "NOT_ATTACHED",
+            "UNKNOWN"
+          ]
+        },
+        "taskCallable": {
+          "type": "boolean"
+        },
+        "callableToolCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "restartState": {
+          "enum": [
+            "NOT_REQUIRED",
+            "REQUIRED_AFTER_INSTALL",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalServices",
+        "pluginState",
+        "authenticationState",
+        "publicationState",
+        "runtimeState"
+      ],
+      "properties": {
+        "totalServices": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pluginState": {
+          "$ref": "#/$defs/pluginStateCounts"
+        },
+        "authenticationState": {
+          "$ref": "#/$defs/authenticationStateCounts"
+        },
+        "publicationState": {
+          "$ref": "#/$defs/publicationStateCounts"
+        },
+        "runtimeState": {
+          "$ref": "#/$defs/runtimeStateCounts"
+        }
+      }
+    },
+    "pluginStateCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ACTIVE",
+        "INSTALLED_INACTIVE",
+        "NOT_INSTALLED",
+        "NOT_APPLICABLE"
+      ],
+      "properties": {
+        "ACTIVE": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "INSTALLED_INACTIVE": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_INSTALLED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "authenticationStateCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "CONFIRMED",
+        "UNVERIFIED",
+        "REJECTED",
+        "NOT_APPLICABLE"
+      ],
+      "properties": {
+        "CONFIRMED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "UNVERIFIED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "REJECTED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "publicationStateCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "CURRENT_ARTIFACT",
+        "BASELINE_ONLY",
+        "NOT_PUBLISHED",
+        "UNVERIFIED",
+        "NOT_APPLICABLE"
+      ],
+      "properties": {
+        "CURRENT_ARTIFACT": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "BASELINE_ONLY": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_PUBLISHED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "UNVERIFIED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "runtimeStateCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "CURRENT_ARTIFACT_VERIFIED",
+        "BASELINE_ONLY",
+        "INCONCLUSIVE",
+        "NOT_RUN",
+        "NOT_APPLICABLE"
+      ],
+      "properties": {
+        "CURRENT_ARTIFACT_VERIFIED": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "BASELINE_ONLY": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "INCONCLUSIVE": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_RUN": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

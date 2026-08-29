@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-tool-input.schema.json",
+  "title": "Fictional Kyoto Hotel WebMCP Tool Inputs",
+  "description": "Strict inputs for the four non-payment, non-cancellation hotel demo tools.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["informationUuidV5", "toolSchemas"],
+  "properties": {
+    "informationUuidV5": {
+      "const": "28fb7822-b70d-5554-9a3b-b4dd4b1792e3"
+    },
+    "toolSchemas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_existing_hotel_booking",
+        "prepare_hotel_booking",
+        "get_hotel_booking_status",
+        "preview_hotel_cancellation"
+      ],
+      "properties": {
+        "check_existing_hotel_booking": { "$ref": "#/$defs/bookingInput" },
+        "prepare_hotel_booking": { "$ref": "#/$defs/bookingInput" },
+        "get_hotel_booking_status": { "$ref": "#/$defs/bookingInput" },
+        "preview_hotel_cancellation": { "$ref": "#/$defs/bookingInput" }
+      }
+    }
+  },
+  "$defs": {
+    "bookingInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hotelId", "roomPlanId", "checkInDate", "checkOutDate", "adults", "rooms"],
+      "properties": {
+        "hotelId": { "const": "fictional-kyoto-ryokan" },
+        "roomPlanId": { "const": "standard-flexible" },
+        "checkInDate": { "type": "string", "format": "date", "description": "Inclusive check-in date in YYYY-MM-DD." },
+        "checkOutDate": { "type": "string", "format": "date", "description": "Exclusive check-out date in YYYY-MM-DD." },
+        "adults": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "rooms": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "preferredLanguage": { "type": "string", "enum": ["en", "ja"], "default": "en" }
+      }
+    }
+  }
+}

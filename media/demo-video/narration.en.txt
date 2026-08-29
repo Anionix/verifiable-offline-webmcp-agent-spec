@@ -1,0 +1,34 @@
+# information_uuid_v5=0a150978-b7cd-5c08-b0fd-cbf33bf3c465
+# event_uuid_v7=01a04b82-30cb-7a22-8283-4342067d2217
+# occurred_at=2026-08-29T03:13:38.507Z
+# state_transition=NOT_AUTHORED -> SCRIPT_DRAFTED -> STOCK_VOICE_AUDIO_MEASURED
+# machine-contract=Speak only the fourteen numbered lines in one unchanged preset voice; do not clone a voice, add personal data, or claim a deployment that the visible current-state table does not prove. This file contains no editorial time targets; media/demo-video/subtitles.en.srt is the audio-derived clock.
+# production_state=MEASURED; stock-voice speech is 148.192625 seconds, and exact word timing comes from the preserved audio through local faster-whisper alignment.
+
+01 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] A traveler submits a Japanese hotel form over an unstable airport connection; the booking reaches the device, but the success response disappears.
+
+02 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] She cannot tell whether it worked; a second try can create two reservations, while Japanese cancellation screens make the cleanup slow and stressful.
+
+03 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] This fictional demo begins with one question: did my hotel booking go through; it uses no real hotel, payment, personal data, email, or outside reservation.
+
+04 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] The traveler chooses dates, adults, and rooms; the page checks one to fourteen nights, two adults per room, the fixed price, and the cancellation deadline.
+
+05 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] First WebMCP checks for the same booking, then it prepares validated details for one hundred twenty seconds; preparation alone never confirms, charges, or cancels anything.
+
+06 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] Only this visible human button can confirm the fictional booking; the four WebMCP tools can check, prepare, recover status, and preview cancellation terms, nothing more.
+
+07 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] Now the simulated booking is stored once, but the success response is hidden; reloading the page still restores the local state from this browser.
+
+08 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] We send the same request again; the existing confirmation number returns, with two attempts, one simulated booking, and one confirmation number.
+
+09 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] The normalized hotel, plan, dates, adults, and rooms create one stable UUID version five; display language never changes that identity.
+
+10 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] Browser storage adds unique constraints for booking details and confirmation number; repeated clicks, reloads, and two tabs still converge on one record.
+
+11 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] Each state change receives a time-ordered UUID version seven; SHA-256 links each event to the previous one, while the effect-start count stays at one.
+
+12 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] The live table keeps installation, sign-in, publishing, and runtime checks separate; local success never pretends that a public deployment already happened.
+
+13 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] ChatGPT Sites is the intended home and Vercel the backup; this recording must show their current measured states, with unknown results left unknown.
+
+14 [clear calm travel explainer, neutral English accent, warm steady timbre, measured pace, starts speaking immediately] For a visitor far from home, a safe retry means one answer, not two bills and a difficult cancellation; recover certainty without duplicating the booking.

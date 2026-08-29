@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 160,
+  "proseWrap": "preserve",
+  "sortPackageJson": false,
+  "ignorePatterns": [".local/**", "dist/**", "node_modules/**"]
+}

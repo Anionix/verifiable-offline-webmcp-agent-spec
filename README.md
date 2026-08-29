@@ -15,8 +15,12 @@ effect_start_semantics_event_uuid_v7: "01a04993-3867-7e11-b120-01b3bab8ec62"
 slo_gate_event_uuid_v7: "01a049ad-1379-780b-9344-3df2682e855c"
 slo_gate_review_fix_event_uuid_v7: "01a049ba-c4e3-753e-8c7d-c353034a2a3b"
 final_verification_event_uuid_v7: "01a049d1-b7e1-7443-a30b-4620165c8b17"
+service_integration_event_uuid_v7: "01a04aa0-782f-7b3e-8cec-6cb8a87937df"
+hotel_booking_event_uuid_v7: "01a04bd0-b895-79bc-8843-f27240958e9a"
+source_quality_event_uuid_v7: "01a04b93-947d-7143-8e2a-4ef233e51598"
+publication_state_event_uuid_v7: "01a04c50-33a1-7536-aa11-e25a6e5ca58d"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T18:56:12.003Z"
+updated_at: "2026-08-29T06:58:39.649Z"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -34,7 +38,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 
 このリポジトリは、モバイル優先・オフライン対応・検証可能なエージェント設計を、英日併記、JSON-LD、PROV-O、DCAT風catalog、JSON Schema、UUIDv5/v7、形式仕様、実行可能な参照コードでまとめたものです。「Open Knowledge Format」という単一の公式標準への適合を主張するものではありません。
 
-> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。`0.2.0`の二重送信防止通知デモは、このMacで実通知1件と同一操作再試行後の1件維持まで検証済みです。ネイティブWebMCP対応は引き続き`INCONCLUSIVE`です。既知の欠陥と未実装範囲は[GitHub Issues](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues)で公開します。
+> **公開状態 / Public status:** これは設計仕様と参照実装であり、実働製品ではありません。訪日旅行者向けホテルデモは、所有者限定の[ChatGPT Sites本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)で四つのWebMCP機能、二回の試行から一件への収束、同じ確認番号、再読込まで確認済みです。一般公開、Vercelの更新、実ホテル予約、決済、取消はまだ行っていません。`0.2.0`通知デモの既存証拠は変更せず保存しています。
 
 ## Architectural stance / 設計の立場
 
@@ -68,6 +72,9 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 14. [`docs/19-slo-gate-reference.ja.md`](docs/19-slo-gate-reference.ja.md) — six hard operational-quality gates with deterministic counterexamples / 6つの運用品質判定と固定した反例
 15. [`formal/wolfram/ReferenceModel.wl`](formal/wolfram/ReferenceModel.wl)
 16. [`docs/20-final-verification.ja.md`](docs/20-final-verification.ja.md) — bounded browser observation, two formal checks, and the 67-test public-evidence boundary / ブラウザー実測・二つの形式検証・67件の公開証拠境界
+17. [`docs/21-review-thread-reconciliation.ja.md`](docs/21-review-thread-reconciliation.ja.md) — 32 review findings bound to fixes and regression evidence / 32件のレビューを修正と回帰証拠へ結合
+18. [`docs/22-service-integrations.ja.md`](docs/22-service-integrations.ja.md) — eight service boundaries and the everyday value of preventing duplicate sends / 8サービスの境界と二重送信防止の生活価値
+19. [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md) — fictional Kyoto hotel retry demo, four-tool boundary, and local verification / 架空の京都宿再送デモ、四機能境界、ローカル検証
 
 ## Machine-readable assets / 機械可読asset
 
@@ -79,6 +86,9 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `data/audit/*.json|ndjson` — signed sample log, Merkle checkpoint, inclusion proof, tamper report
 - `metadata/file-catalog.json` — UUIDv5/v7 and temporal metadata for every project file
 - `metadata/final-verification.json` — bounded WebMCP observation, formal results, 67-test count, and zero-effect final evidence
+- `metadata/service-integration-registry.json` — eight official resource services, truthful readiness states, and illustrative duplicate-risk scenarios
+- `metadata/hotel-booking-verification.json` — local browser, offline, responsive, and design-fidelity evidence for the fictional hotel demo
+- `metadata/demo-video-production.json` — generated-media prompts, service identifiers, billing boundary, local paths, and SHA-256 values without committing the video files
 - `MANIFEST.sha256` — artifact integrity manifest
 
 The four 1.0.0 governance slices bind security, replay, operational-quality, browser-observation, and formal-evidence claims. The catalog contains **67 implemented and automated tests, with no partial or specification-only records**. Critical commit tools remain inside policy control; replay requires six fresh checks; an external effect needs independent readback rather than a tool claim alone; and six hard mathematical gates stop unsafe capacity, calibration, probability, or provenance inputs. Production operational quality remains `UNMEASURED`, and native WebMCP conformance remains `INCONCLUSIVE`. See [`src/typescript/governance/security-boundary.ts`](src/typescript/governance/security-boundary.ts), [`src/typescript/governance/replay-verification.ts`](src/typescript/governance/replay-verification.ts), [`src/typescript/governance/slo-gates.ts`](src/typescript/governance/slo-gates.ts), [`metadata/final-verification.json`](metadata/final-verification.json), and [`docs/test-catalog.md`](docs/test-catalog.md).
@@ -91,7 +101,59 @@ make validate
 
 The validation pipeline parses all JSON/NDJSON/YAML, checks schemas and cross-references, verifies UUID versions and UUIDv7 timestamps, runs TypeScript golden vectors, verifies Ed25519 signatures/hash chains/Merkle roots, runs the independent reachability model, and rebuilds the final evidence in memory for a byte-for-byte comparison.
 
-`make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
+`make validate` only checks tracked artifacts; it does not regenerate them. After an intentional source change, run `make regenerate`, review the diff, and then run `make validate` twice. Dependency versions are fixed by `uv.lock`, the root `package-lock.json`, `src/typescript/package-lock.json`, `.python-version`, and `.node-version`.
+
+The bounded source-quality gate uses Oxlint for the hotel JavaScript, Biome for the hotel page markup and styles, and Oxfmt for the newly governed formatting surface. It avoids rewriting historical files while making the current demo mechanically reviewable.
+
+```bash
+npm run quality:check
+npm run lsp:oxlint
+npm run lsp:oxfmt
+npm run lsp:biome
+```
+
+Each `lsp:*` command starts one code-analysis server for editor integration and keeps running until the editor stops it. The fixed versions and integrity values are recorded in `package-lock.json`.
+
+<!-- information_uuid_v5=81366b7a-5c59-5af5-be85-e988d824320c -->
+<!-- event_uuid_v7=01a04aa0-782f-7b3e-8cec-6cb8a87937df state_transition=SERVICE_BOUNDARIES_DOCUMENTED -> EVERYDAY_DUPLICATE_VALUE_VISIBLE occurred_at=2026-08-28T23:07:05.647Z -->
+<!-- machine-contract=Every service example is illustrative and unobserved; current deployment state comes from metadata/service-integration-registry.json. -->
+
+## Everyday value of duplicate prevention / 二重送信を防ぐ生活価値
+
+A lost response must not turn one human intention into two real-world effects. The concrete risks are easy to recognize: an OpenAI or Chrome agent repeats a notification or form; a page hosted on Cloudflare, Vercel, Render, or Netlify repeats an alert, job, or booking after a network or process interruption; a Shopify cart receives two items instead of one; or a Devpost submission helper sends the same version update twice. Preventing the second effect reduces extra cost, correction work, confusion, and trust loss.
+
+応答が消えても、1回の意思を現実の2回の結果にしてはいけません。OpenAIやGoogle Chromeでは通知・フォームの再実行、Cloudflare・Vercel・Render・Netlifyでは通信切替、二度押し、処理再開後の警告・仕事・予約の重複、Shopifyでは1個のつもりが2個になるカート操作、Devpostでは版更新通知の重複が想定例です。いずれも各サービスで観測した事故ではなく、設計を確認するための例です。詳細な状態と承認境界は[`docs/22-service-integrations.ja.md`](docs/22-service-integrations.ja.md)、機械可読の正本は[`metadata/service-integration-registry.json`](metadata/service-integration-registry.json)にあります。
+
+今回の限定したローカル確認では、アプリ内ブラウザーから同じ`notify_once`操作を2回呼び、同じUUIDv5 Intentと外部効果開始数`0`を確認しました。これは共通成果物の確認であり、各外部サービスでの本番実証ではありません。
+
+## Fictional Kyoto hotel retry demo / 架空の京都宿・再送デモ
+
+This English-first, Japanese-supported demo answers one ordinary travel problem: the booking reached the device, but the success response disappeared. Dates, adults, rooms, the fictional hotel, and its fixed plan form one UUIDv5 identity; presentation language is excluded. A visible human button alone can commit the simulated booking. A retry then recovers the same confirmation number and displays `2 attempts → 1 simulated booking → 1 confirmation number`.
+
+英語を主表示、日本語を補助表示にした架空予約デモです。料金は一室一泊12,000円、1〜14泊、大人1〜4人、部屋1〜2室、一室最大2人です。無料取消期限と想定料金は表示だけで、予約状態を変えません。個人情報、決済、実ホテル、メール、外部予約、実際の取消は扱いません。
+
+```bash
+npm ci
+npm run build:web
+npm run validate:hotel
+```
+
+The shared build produces `dist/client/**` for Vercel, Netlify, and Render configuration checks, `dist/server/index.js` for the Cloudflare-compatible Sites package, and `dist/.openai/hosting.json` for the owning Site. The page registers exactly these four WebMCP capabilities:
+
+- `check_existing_hotel_booking`
+- `prepare_hotel_booking`
+- `get_hotel_booking_status`
+- `preview_hotel_cancellation`
+
+Confirmation, payment, and cancellation mutation are deliberately absent. IndexedDB unique constraints, UUIDv7 events, and a SHA-256 forward chain protect the local result across repeated clicks, two tabs, reload, and retry. ChatGPT Sites and Vercel do not share browser storage, so the page explicitly says the fictional result belongs only to this device and deployment.
+
+Local evidence currently passes 135 Node tests, TypeScript checking, four-tool discovery and execution in the in-app browser, a WebMCP preparation that enables the separate human confirmation button, arbitrary-input reload restoration, production-build offline reload, and 320/375/390/768-pixel overflow checks. The booking test also counts the physical IndexedDB booking rows and finds exactly one.
+
+Public ChatGPT Sites version 8 uses exact source commit `370c2d9fb0b1a1a4938bbb0ba2c50b38d30a93d6` in deployment `appgdep_6a928039357c8191947ea3a0115e91a7` at the existing [public URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). A fresh browser-storage run on version 8 reached `PREPARED → COMMITTED → RETRY_RECOGNIZED` with two attempts, one booking, one effect start, and the same result after reload. The anonymous [Vercel hotel demo](https://kyoto-booking-retry-proof.vercel.app) independently uses the same source commit in deployment `dpl_5pmmidN9UqT7ofDQrGgMPQ4umspN`: it returned HTTP 200, five delivered files matched the local release, and its own fresh browser-storage run produced the same retry-safe result.
+
+One deployment operation mistakenly targeted the legacy notification project. Its production alias was immediately restored to deployment `dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`; the anonymous URL returned HTTP 200 and showed the notification demo again.
+
+A locally verified 150-second 1920×1080 review video version 10 combines 20 disclosed seconds of fictional generated dramatization with 113.2 seconds (75.5%) of actual public Site screen recording, then shows current public Sites version 7 service-state and retry-result captures. It preserves audible English narration, burned-in English captions, and a separate Japanese subtitle file. The [public Devpost project page](https://devpost.com/software/project-y79pb23hj1mz) contains the current explanation and live links and returns HTTP 200 without sign-in; its name remains `未定`, its video URL is empty, and `submitted_at` is `null`, so final hackathon submission has not occurred. Keyboard traversal, screen-reader behavior, Chrome-native WebMCP execution, video publication, and final Devpost submission remain `INCONCLUSIVE` or not started until their separate checks and approvals are recorded. See [`metadata/hotel-booking-verification.json`](metadata/hotel-booking-verification.json), [`metadata/vercel-hotel-deployment.json`](metadata/vercel-hotel-deployment.json), [`metadata/demo-video-production.json`](metadata/demo-video-production.json), and [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md).
 
 ## Duplicate-safe notification demo / 二重送信防止通知デモ
 

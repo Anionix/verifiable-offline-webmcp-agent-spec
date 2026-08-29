@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-booking-verification.schema.json",
+  "$comment": "information_uuid_v5=fc8aed56-70ce-53ce-96f9-f7e8a34728cb event_uuid_v7=01a04c50-33a1-7536-aa11-e25da967ba60 state_transition=PUBLIC_VERSION_8_SITES_VERCEL_DEVPOST_CURRENT_VERIFIED -> PUBLIC_VERSION_8_SITES_RETRY_FLOW_VERIFIED occurred_at=2026-08-29T06:58:39.649Z machine-contract=deployed-current evidence binds the exact Sites source commit package digest current public retry flow and separate Devpost submission boundary",
+  "title": "Hotel booking demo verification record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "observedAt", "sourceCommit", "sourceState", "artifactDigest", "artifactDigestScope", "fullClientArtifactDigest", "fullClientArtifactDigestScope", "fullSitesPackageDigest", "fullSitesPackageDigestScope", "stateTransition", "scope", "liveDeployment", "checks", "designFidelity"],
+  "properties": {
+    "$schema": { "const": "../schemas/hotel-booking-verification.schema.json" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
+    "sourceState": { "enum": ["WORKTREE_CANDIDATE", "COMMITTED_CANDIDATE", "DEPLOYED_CURRENT"] },
+    "artifactDigest": { "$ref": "#/$defs/sha256" },
+    "artifactDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist/client",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": [".assetsignore", "service-integrations.json"]
+      }
+    },
+    "fullClientArtifactDigest": { "$ref": "#/$defs/sha256" },
+    "fullClientArtifactDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist/client",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": []
+      }
+    },
+    "fullSitesPackageDigest": { "$ref": "#/$defs/sha256" },
+    "fullSitesPackageDigestScope": {
+      "const": {
+        "algorithm": "SHA-256",
+        "root": "dist",
+        "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+        "excludedPaths": []
+      }
+    },
+    "stateTransition": { "type": "string", "minLength": 3 },
+    "scope": { "type": "string", "minLength": 3 },
+    "liveDeployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionalSourceCommit", "deployedVersionSourceCommit", "functionalArtifactDigest", "fullSitesPackageDigest", "versionId", "versionNumber", "deploymentId", "providerArchiveContentHash", "url", "accessMode", "status", "observedAt", "evidence"],
+      "properties": {
+        "functionalSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "deployedVersionSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "functionalArtifactDigest": { "$ref": "#/$defs/sha256" },
+        "fullSitesPackageDigest": { "$ref": "#/$defs/sha256" },
+        "versionId": { "type": "string", "minLength": 3 },
+        "versionNumber": { "type": "integer", "minimum": 1 },
+        "deploymentId": { "type": "string", "minLength": 3 },
+        "providerArchiveContentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "url": { "type": "string", "format": "uri" },
+        "accessMode": { "enum": ["OWNER_ONLY", "PUBLIC"] },
+        "status": { "enum": ["PREVIOUS_ARTIFACT_VERIFIED", "CURRENT_ARTIFACT_VERIFIED"] },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "evidence": { "type": "string", "minLength": 3 }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["checkId", "name", "status", "evidence"],
+        "properties": {
+          "checkId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+          "name": { "type": "string", "minLength": 3 },
+          "status": { "enum": ["PASS", "FAIL", "UNMEASURED", "INCONCLUSIVE"] },
+          "evidence": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "designFidelity": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pointId", "concept", "implementation", "status"],
+        "properties": {
+          "pointId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+          "concept": { "type": "string", "minLength": 3 },
+          "implementation": { "type": "string", "minLength": 3 },
+          "status": { "enum": ["MATCHED", "INTENTIONAL_DEVIATION"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    }
+  }
+}

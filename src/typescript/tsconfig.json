@@ -15,6 +15,7 @@
   "include": [
     "**/*.ts",
     "notification/input-projection.js",
+    "hotel/*.js",
     "webmcp/notification-adapter.js",
     "../../examples/offline-sync-demo/visual-state.js",
     "../../examples/online-planner-demo/visual-state.js"

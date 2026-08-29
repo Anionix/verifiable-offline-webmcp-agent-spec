@@ -1,0 +1,13 @@
+# information_uuid_v5=a03bf4f4-6f9c-59c3-8ab8-6edc063564da
+# event_uuid_v7=01a04a96-683f-7928-8d59-6b6b4754a279 state_transition=STATIC_ASSET_SET -> PORTABLE_SECURITY_HEADERS_READY occurred_at=2026-08-28T22:56:06Z
+# machine-contract: Cloudflare Workers Static Assets and Netlify apply these headers without a dynamic server or catch-all rewrite.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+
+/service-worker.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /

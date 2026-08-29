@@ -5,7 +5,35 @@
   "type": "module",
   "description": "Verifiable Offline WebMCP Agent Architecture",
   "scripts": {
+    "dev": "vite",
+    "build:web": "node scripts/build_web_site.mjs",
+    "build:vercel": "node scripts/build_vercel_site.mjs",
+    "validate:hotel": "npm run build:web && npm run validate:hotel:portable && npm run validate:hotel:sites",
+    "validate:hotel:portable": "node scripts/validate_hotel_portable_validator.mjs",
+    "validate:hotel:sites": "node scripts/validate_hotel_sites_validator.mjs",
+    "validate:integrations": "npm run build:web && node scripts/validate_service_integrations.mjs",
+    "validate:vercel": "npm run build:web && node scripts/validate_vercel_site.mjs && node scripts/validate_service_integrations.mjs",
+    "lint": "npm run lint:oxlint && npm run lint:biome",
+    "lint:oxlint": "oxlint --deny-warnings --report-unused-disable-directives examples/hotel-booking-demo src/typescript/hotel src/typescript/test/hotel-booking-*.test.js src/typescript/test/webmcp-hotel-adapter.test.js scripts/*hotel*.mjs scripts/build_web_site.mjs scripts/validate_service_integrations.mjs scripts/validate_source_quality_tools.mjs",
+    "lint:biome": "biome lint --reporter=concise",
+    "format:check": "oxfmt --check .oxlintrc.json .oxfmtrc.json biome.json package.json scripts/validate_source_quality_tools.mjs src/typescript/test/hotel-booking-visualization.test.js",
+    "format:write": "oxfmt --write .oxlintrc.json .oxfmtrc.json biome.json package.json scripts/validate_source_quality_tools.mjs src/typescript/test/hotel-booking-visualization.test.js",
+    "quality:versions": "node scripts/validate_source_quality_tools.mjs",
+    "quality:check": "npm run quality:versions && npm run lint && npm run format:check",
+    "lsp:biome": "biome lsp-proxy",
+    "lsp:oxlint": "oxlint --lsp",
+    "lsp:oxfmt": "oxfmt --lsp",
     "validate": "make validate",
     "test": "make validate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.11",
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@openai/sites-vite-plugin": "0.2.0",
+    "fake-indexeddb": "6.2.4",
+    "oxfmt": "0.65.0",
+    "oxlint": "1.80.0",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
   }
 }

@@ -1,0 +1,432 @@
+{
+  "$schema": "../schemas/service-integration-registry.schema.json",
+  "version": "1.0.0",
+  "identity": {
+    "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
+    "evidenceEventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "observedAt": "2026-08-29T06:31:43.000Z"
+  },
+  "stateTransition": {
+    "from": "SITES_AND_VERCEL_CURRENT_VERIFIED",
+    "to": "DEVPOST_PROJECT_PAGE_PUBLISHED",
+    "eventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
+    "occurredAt": "2026-08-29T06:31:43.000Z",
+    "machineContract": "Sites and Vercel remain current-artifact verified. The Devpost project page now has current live links, while video publication and final hackathon submission remain separate actions."
+  },
+  "services": [
+    {
+      "serviceId": "chatgpt-sites",
+      "displayName": "ChatGPT Sites",
+      "integrationSurfaceId": "58dcb1cc-e3a8-5329-836d-11299b1ee1e7",
+      "evidenceEventId": "01a04bce-e62c-70e3-8983-07fa829542f3",
+      "observedAt": "2026-08-29T04:37:25.000Z",
+      "pluginRef": "sites@openai-bundled",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "sites@openai-bundled",
+        "localPluginVersion": "0.1.46",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 23,
+        "restartState": "NOT_REQUIRED"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "CURRENT_ARTIFACT",
+      "runtimeState": "CURRENT_ARTIFACT_VERIFIED",
+      "approvalGates": [
+        {
+          "action": "OWNER_ONLY_DEPLOYMENT",
+          "state": "AUTHORIZED_BY_PLAN"
+        },
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "AUTHORIZED_BY_USER"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_sites",
+        "WRITE:create_site",
+        "READ:get_site",
+        "WRITE:create_source_repository_write_credential",
+        "WRITE:save_site_version",
+        "WRITE:deploy_private_site_version",
+        "WRITE:update_site_access",
+        "WRITE:deploy_site_version",
+        "READ:get_deployment_status"
+      ],
+      "artifactCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PUBLIC_SITE_CURRENT_VERIFIED",
+      "roles": [
+        "Primary publication target for the hotel duplicate-booking demo.",
+        "Package the shared client with the ChatGPT Sites worker entry point."
+      ],
+      "limitations": [
+        "The current artifact is live at https://kyoto-booking-retry-proof.anionix.chatgpt.site with public access, anonymous loading, and the full fictional retry flow screen-recorded.",
+        "Public Sites access does not authorize Vercel production, video publication, or final Devpost submission."
+      ],
+      "sources": [
+        "https://learn.chatgpt.com/docs/sites"
+      ]
+    },
+    {
+      "serviceId": "vercel",
+      "displayName": "Vercel",
+      "integrationSurfaceId": "55a56d54-713f-524f-98de-ac3da90e3310",
+      "evidenceEventId": "01a04be5-0163-714b-a6ff-62c559d227b8",
+      "observedAt": "2026-08-29T05:01:34.435Z",
+      "pluginRef": "vercel@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "vercel@openai-curated-remote",
+        "localPluginVersion": "0.21.4",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 24,
+        "restartState": "NOT_REQUIRED"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "CURRENT_ARTIFACT",
+      "runtimeState": "CURRENT_ARTIFACT_VERIFIED",
+      "approvalGates": [
+        {
+          "action": "PRODUCTION_DEPLOYMENT",
+          "state": "AUTHORIZED_BY_USER"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_teams",
+        "READ:list_projects",
+        "READ:list_deployments",
+        "READ:get_deployment",
+        "WRITE:create_project",
+        "WRITE:deploy_production",
+        "WRITE:promote_deployment"
+      ],
+      "artifactCommit": "5ce64bc9a814200467d384bba9d9de364df6fcf6",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PUBLIC_HOTEL_ARTIFACT_VERIFIED",
+      "roles": [
+        "Backup public host for the same static client artifact.",
+        "Provide an anonymous-access fallback for judges."
+      ],
+      "limitations": [
+        "The current hotel artifact is live at https://kyoto-booking-retry-proof.vercel.app with anonymous 200 access, the human-only confirmation boundary, safe retry, and reload restoration verified.",
+        "The older notification demo remains separately live at https://verifiable-offline-webmcp-agent-spe.vercel.app; browser storage is not shared with ChatGPT Sites."
+      ],
+      "sources": [
+        "https://vercel.com/docs/deployments"
+      ]
+    },
+    {
+      "serviceId": "cloudflare",
+      "displayName": "Cloudflare",
+      "integrationSurfaceId": "09ea90ae-2124-5a5b-8785-32207039c516",
+      "evidenceEventId": "01a04b2c-f2e7-7227-a2b9-f479f2462acf",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "cloudflare@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "cloudflare@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 3,
+        "restartState": "NOT_REQUIRED"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:get_account"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "CURRENT_ARTIFACT_NOT_DEPLOYED",
+      "roles": [
+        "Supply the worker-compatible build format used by ChatGPT Sites.",
+        "Remain a possible future publication host."
+      ],
+      "limitations": [
+        "No current hotel artifact has been deployed to a Cloudflare account.",
+        "The account read proves authentication only; no hotel artifact was deployed."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/workers/vite-plugin/"
+      ]
+    },
+    {
+      "serviceId": "netlify",
+      "displayName": "Netlify",
+      "integrationSurfaceId": "51b6046b-7f07-5b65-8540-d485c604dd73",
+      "evidenceEventId": "01a04b2c-f2e7-7ecb-b42a-80409928ec15",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "netlify@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "netlify@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 9,
+        "restartState": "REQUIRED_AFTER_INSTALL"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:get_projects"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "STATIC_CONFIGURATION_ONLY",
+      "roles": [
+        "Check that the portable static client can be configured for Netlify."
+      ],
+      "limitations": [
+        "Only the repository publish path and bounded configuration syntax were checked; no provider-side configuration validation was run.",
+        "No Netlify deployment or runtime check was performed; external-service verification remains NOT_RUN."
+      ],
+      "sources": [
+        "https://docs.netlify.com/deploy/create-deploys/"
+      ]
+    },
+    {
+      "serviceId": "render",
+      "displayName": "Render",
+      "integrationSurfaceId": "8b31e6c4-5e59-5c7a-9bb4-46e98effe450",
+      "evidenceEventId": "01a04b2c-f2e7-71ad-98a1-3c3b3a8886d2",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "app-6a624c56bfe081918f7544f7d58f6faf@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "render@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 22,
+        "restartState": "REQUIRED_AFTER_INSTALL"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_PUBLISHED",
+      "runtimeState": "NOT_RUN",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_workspaces"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "STATIC_CONFIGURATION_ONLY",
+      "roles": [
+        "Check that the portable static client can be configured as a Render static site."
+      ],
+      "limitations": [
+        "Only the repository publish path and bounded configuration syntax were checked; no provider-side configuration validation was run.",
+        "No Render deployment or runtime check was performed; external-service verification remains NOT_RUN, and no credential value is stored."
+      ],
+      "sources": [
+        "https://render.com/docs/static-sites"
+      ]
+    },
+    {
+      "serviceId": "shopify",
+      "displayName": "Shopify",
+      "integrationSurfaceId": "8c25b751-b30b-5b44-9af6-be825955f1e6",
+      "evidenceEventId": "01a04b2c-f2e7-7d78-83c2-4fe0cb2811db",
+      "observedAt": "2026-08-29T01:40:32.103Z",
+      "pluginRef": "shopify@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "shopify@openai-curated",
+        "localPluginVersion": "bd2122cb",
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 27,
+        "restartState": "REQUIRED_AFTER_INSTALL"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "NOT_APPLICABLE",
+      "runtimeState": "NOT_APPLICABLE",
+      "approvalGates": [
+        {
+          "action": "COMMERCE_WRITE",
+          "state": "OUT_OF_SCOPE"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:get_shop_info"
+      ],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "HOTEL_BOOKING_OUTSIDE_COMMERCE_SCOPE",
+      "roles": [
+        "Explain the boundary between hotel booking and Shopify commerce tools."
+      ],
+      "limitations": [
+        "The hotel demo does not call Shopify catalog, cart, checkout, or order-history tools.",
+        "No hotel booking capability is claimed for Shopify WebMCP."
+      ],
+      "sources": [
+        "https://shopify.dev/docs/api/web-mcp"
+      ]
+    },
+    {
+      "serviceId": "google-chrome",
+      "displayName": "Google Chrome",
+      "integrationSurfaceId": "7968f6bc-3ff9-5700-be56-7e1e04c3392d",
+      "evidenceEventId": "01a04bce-e62c-70e3-8983-07fbaa9f6212",
+      "observedAt": "2026-08-29T04:37:25.000Z",
+      "pluginRef": "chrome@openai-bundled",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "INSTALLED_ENABLED",
+        "localPluginRef": "chrome@openai-bundled",
+        "localPluginVersion": "26.825.32147",
+        "taskAttachmentState": "NOT_ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 1,
+        "restartState": "NOT_REQUIRED"
+      },
+      "authenticationState": "NOT_APPLICABLE",
+      "publicationState": "NOT_APPLICABLE",
+      "runtimeState": "INCONCLUSIVE",
+      "approvalGates": [
+        {
+          "action": "PUBLIC_DEPLOYMENT",
+          "state": "NOT_APPLICABLE"
+        }
+      ],
+      "verifiedAuthOperations": [],
+      "artifactCommit": null,
+      "artifactSha256": null,
+      "reasonCode": "PUBLIC_PAGE_VERIFIED_NATIVE_WEBMCP_INCONCLUSIVE",
+      "roles": [
+        "Inspect WebMCP tool discovery, execution, and history in a browser."
+      ],
+      "limitations": [
+        "Google Chrome loaded the current public page without sign-in and displayed EMPTY, the retry comparison, and four safe tool cards.",
+        "document.modelContext was undefined in that Chrome page, so native WebMCP discovery and execution remain inconclusive."
+      ],
+      "sources": [
+        "https://developer.chrome.com/docs/ai/webmcp",
+        "https://developer.chrome.com/docs/devtools/application/webmcp"
+      ]
+    },
+    {
+      "serviceId": "devpost",
+      "displayName": "Devpost",
+      "integrationSurfaceId": "3e8ffb12-0a3e-5c18-9dc4-81d59d91ef48",
+      "evidenceEventId": "01a04c37-8898-75c8-843c-d1bf5500d7c9",
+      "observedAt": "2026-08-29T06:31:43.000Z",
+      "pluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
+      "pluginState": "ACTIVE",
+      "installationEvidence": {
+        "localPluginState": "NOT_INSTALLED",
+        "localPluginRef": null,
+        "localPluginVersion": null,
+        "taskAttachmentState": "ATTACHED",
+        "taskCallable": true,
+        "callableToolCount": 21,
+        "restartState": "NOT_APPLICABLE"
+      },
+      "authenticationState": "CONFIRMED",
+      "publicationState": "CURRENT_ARTIFACT",
+      "runtimeState": "NOT_APPLICABLE",
+      "approvalGates": [
+        {
+          "action": "DRAFT_UPDATE",
+          "state": "AUTHORIZED_BY_PLAN"
+        },
+        {
+          "action": "FINAL_SUBMISSION",
+          "state": "REQUIRES_SEPARATE_APPROVAL"
+        }
+      ],
+      "verifiedAuthOperations": [
+        "READ:list_my_projects",
+        "READ:get_project",
+        "READ:get_submission_requirements",
+        "READ:get_judging_criteria",
+        "WRITE:update_project"
+      ],
+      "artifactCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PROJECT_PAGE_CURRENT_FINAL_SUBMISSION_PENDING",
+      "roles": [
+        "Provide the challenge resources and hold the submission draft.",
+        "Receive final public links only after separate approval."
+      ],
+      "limitations": [
+        "Project page version 5 is publicly readable at https://devpost.com/software/project-y79pb23hj1mz with the current description and live links; its undecided name remains unchanged.",
+        "The video URL is empty and the WebMCP Challenge submitted_at value is null, so no final hackathon submission is claimed."
+      ],
+      "sources": [
+        "https://webmcp.devpost.com/resources"
+      ]
+    }
+  ],
+  "summary": {
+    "totalServices": 8,
+    "pluginState": {
+      "ACTIVE": 8,
+      "INSTALLED_INACTIVE": 0,
+      "NOT_INSTALLED": 0,
+      "NOT_APPLICABLE": 0
+    },
+    "authenticationState": {
+      "CONFIRMED": 7,
+      "UNVERIFIED": 0,
+      "REJECTED": 0,
+      "NOT_APPLICABLE": 1
+    },
+    "publicationState": {
+      "CURRENT_ARTIFACT": 3,
+      "BASELINE_ONLY": 0,
+      "NOT_PUBLISHED": 3,
+      "UNVERIFIED": 0,
+      "NOT_APPLICABLE": 2
+    },
+    "runtimeState": {
+      "CURRENT_ARTIFACT_VERIFIED": 2,
+      "BASELINE_ONLY": 0,
+      "INCONCLUSIVE": 1,
+      "NOT_RUN": 3,
+      "NOT_APPLICABLE": 2
+    }
+  },
+  "artifacts": {
+    "required": [
+      "metadata/service-integration-registry.json",
+      "schemas/service-integration-registry.schema.json",
+      "metadata/vercel-hotel-deployment.json",
+      "schemas/vercel-hotel-deployment.schema.json",
+      "scripts/validate_service_integrations.mjs",
+      "docs/22-service-integrations.ja.md"
+    ],
+    "optionalClientCopy": "dist/client/service-integrations.json"
+  }
+}

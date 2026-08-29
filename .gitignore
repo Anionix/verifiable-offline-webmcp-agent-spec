@@ -9,6 +9,9 @@ __pycache__/
 .env
 .env.*
 coverage/
+dist/
 .tlc/
 states/
 .playwright-mcp/
+.wrangler/
+.vercel

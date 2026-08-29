@@ -2,6 +2,10 @@
 // event_uuid_v7=01a04961-5917-787f-b8d8-1900d1f6ce10
 // state_transition=PROPOSED -> EXECUTING occurred_at=2026-08-28T17:18:31.000Z
 // machine-contract: DISCOVER -> LOOK_UP_CONTRACT -> PROJECT_CAPABILITIES -> CHECK_AUTHORITY -> PROPOSAL_ONLY; untrusted data can never add authority or expose a commit tool.
+// information_uuid_v5=5d103a11-f19a-5f3f-96e7-c0c0913ef27e
+// event_uuid_v7=01a049ff-0405-706b-86aa-20c06de08924
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:44.613Z
+// machine-contract: registry identity, generic secret fields/values, safe evaluation time, and both mutation sets are checked before authority can be ALLOW.
 import { createHash, timingSafeEqual, type KeyObject } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { verifyBase64 } from "../sync/crypto.ts";
@@ -89,17 +93,22 @@ export interface UntrustedData {
 }
 
 const SHA_256 = /^[0-9a-f]{64}$/;
-const SECRET_NAME = new RegExp([
+const SECRET_FIELD_NAME = new RegExp(`^(?:${[
   "password",
   "passphrase",
+  "authorization",
+  "credential",
+  "secret",
+  "token",
   "access[-_ ]?token",
   "api[-_ ]?key",
   ["private", "key"].join("[-_ ]?"),
-].join("|"), "iu");
+].join("|")})$`, "iu");
 const SECRET_VALUE_MARKERS = [
   ["BEGIN", "PRIVATE", "KEY"].join(" "),
   "BEARER ",
 ];
+const SECRET_VALUE_PATTERN = /(?:\bBasic\s+[A-Za-z0-9+/]{8,}={0,2}\b|\bsk-[A-Za-z0-9_-]{12,}\b|\bgh[pousr]_[A-Za-z0-9]{20,}\b|\bAKIA[0-9A-Z]{16}\b|\bxox[baprs]-[A-Za-z0-9-]{10,}\b)/iu;
 const MANDATE_DOMAIN = Buffer.from("GOVERNED-MANDATE-v1\0", "utf8");
 
 function digest(value: CanonicalValue): string {
@@ -134,8 +143,8 @@ export function validateGovernedToolContract(contract: GovernedToolContract): vo
   }
   uniqueSorted(contract.semantics.readSet, "readSet");
   uniqueSorted(contract.semantics.writeSet, "writeSet");
-  if (isMutation(contract) && contract.semantics.writeSet.length === 0) {
-    throw new TypeError("mutation contract requires a non-empty writeSet");
+  if (isMutation(contract) && (contract.semantics.readSet.length === 0 || contract.semantics.writeSet.length === 0)) {
+    throw new TypeError("mutation contract requires non-empty readSet and writeSet");
   }
   if (isCritical(contract) && contract.policy.humanApproval === "AUTO") {
     throw new TypeError("critical tools cannot use automatic approval");
@@ -160,6 +169,7 @@ export function discoverPlannerTools(options: {
   const tools = planner.map((id) => {
     const contract = options.contracts.get(id);
     if (!contract) throw new TypeError(`contract lookup failed for ${id}`);
+    if (contract.tool.id !== id) throw new TypeError(`contract identity does not match lookup key ${id}`);
     validateGovernedToolContract(contract);
     if (contract.plannerSurface !== "PROPOSAL_ONLY") {
       throw new TypeError(`planner tool ${id} is not proposal-only`);
@@ -208,6 +218,7 @@ export function criticalAuthorityDecision(
   trustedPublicKey?: KeyObject | string,
 ): AuthorityDecision {
   validateGovernedToolContract(contract);
+  if (!Number.isSafeInteger(nowEpochMs) || nowEpochMs < 0) return "DENY";
   if (!isCritical(contract)) return "ALLOW";
   if (typeof mandate === "string") {
     // machine-contract: UUIDv5 and UUIDv7 are trace identifiers only, never bearer authority.
@@ -255,7 +266,7 @@ export function evaluateHostAuthority(input: {
 function inspectPlannerValue(value: unknown, path: string): void {
   if (typeof value === "string") {
     const upper = value.toLocaleUpperCase("en-US");
-    if (SECRET_NAME.test(path) || SECRET_VALUE_MARKERS.some((marker) => upper.includes(marker))) {
+    if (SECRET_VALUE_MARKERS.some((marker) => upper.includes(marker)) || SECRET_VALUE_PATTERN.test(value)) {
       throw new TypeError(`secret-like planner value rejected at ${path}`);
     }
     return;
@@ -266,7 +277,7 @@ function inspectPlannerValue(value: unknown, path: string): void {
   }
   if (value && typeof value === "object") {
     for (const [key, item] of Object.entries(value)) {
-      if (SECRET_NAME.test(key)) throw new TypeError(`secret-like planner field rejected at ${path}.${key}`);
+      if (SECRET_FIELD_NAME.test(key)) throw new TypeError(`secret-like planner field rejected at ${path}.${key}`);
       inspectPlannerValue(item, `${path}.${key}`);
     }
   }

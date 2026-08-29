@@ -1,14 +1,43 @@
 // information_uuid_v5=86f82995-5b21-5d8a-ba1d-d26329db64d6
 // event_uuid_v7=01a0491b-3dba-7e97-ba92-5d4a2509759c
 // machine-contract: UNTRUSTED_BATCH -> VERIFIED -> INGESTED | DUPLICATE | QUARANTINED; this boundary has no external-effect execution capability.
+// information_uuid_v5=3a0187cc-7497-5325-a2ad-3df91330e778
+// event_uuid_v7=01a049ff-0159-7193-b343-dc803d80f4e0
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.929Z
+// machine-contract: every unsigned global projection is re-bound to the stored signed source event before the global chain can verify.
+// information_uuid_v5=4d52b526-114b-5826-8d53-ab6e4dadc476
+// event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:42:18.694Z
+// machine-contract: legacy rows report a signed-source rebind requirement and verified duplicate ingestion repairs them without advancing the global sequence.
+// information_uuid_v5=e7c27b84-7f90-5d05-b838-d5467ac7ee41
+// information_uuid_v5=b7c65009-e07f-5668-8618-1b8cff72fa1a
+// event_uuid_v7=01a04a2c-246b-7e0e-bc66-2a7ff653aef0
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:00:02.027Z
+// machine-contract: the signed operation determines the decision, and every duplicated SQLite identity column must equal the canonical audit record.
+// information_uuid_v5=62165297-6dec-5f97-a77b-3eb1892678eb
+// event_uuid_v7=01a04a3b-7a18-7745-9b09-d8e5a2a74866
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:16:47.000Z
+// machine-contract: individually valid source signatures verify as a complete device chain against every stored full-size signed checkpoint.
+// information_uuid_v5=6bf6cd1e-2220-5770-a630-6bb7eeb0c1ee
+// event_uuid_v7=01a04a4c-1be8-7fcc-a67f-5eaff2cc8030
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:34:57.000Z
+// machine-contract: every retained checkpoint verifies its signed event prefix, and retained checkpoint links form one nonbranching monotonic chain.
+// information_uuid_v5=c2e27d1a-220f-5c4a-b6f6-7075bf2c5733
+// event_uuid_v7=01a04a5a-ece0-7715-a44c-3fe4200880af
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:51:08.000Z
+// machine-contract: only an explicitly null parent creates a checkpoint root; a non-null parent missing from the retained ledger invalidates verification.
+// information_uuid_v5=133e9b91-5738-5e1c-8bcd-567a65bba243
+// event_uuid_v7=01a04a5f-6d38-7fc8-89b3-1e7daabc661d
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T21:56:03.000Z
+// machine-contract: a database key is trusted only when its identity and normalized public-key digest match the separately persisted trust anchor.
 import { createPublicKey } from "node:crypto";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { CanonicalValue } from "../canonical.ts";
+import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion, uuidV7 } from "../uuid.ts";
 import { globalGenesisHash, globalRecordHash, sha256Hex } from "./crypto.ts";
-import { verifyDeviceChain } from "./device-log.ts";
+import { verifyDeviceChain, verifySignedDeviceEvent } from "./device-log.ts";
 import {
   SYNC_VERSION,
   type DangerousReview,
@@ -30,17 +59,108 @@ interface KnownKeyRow {
   public_key_pem: string;
 }
 
+interface TrustedDeviceKeyAnchor {
+  deviceId: string;
+  logId: string;
+  keyId: string;
+  publicKeySha256: string;
+}
+
+const SHA_256 = /^[0-9a-f]{64}$/;
+const TRUST_ANCHOR_FILE_FIELDS = ["schemaVersion", "digestAlgorithm", "anchors"] as const;
+const TRUST_ANCHOR_FIELDS = ["deviceId", "logId", "keyId", "publicKeySha256"] as const;
+
+function hasExactFields(value: unknown, fields: readonly string[]): value is Record<string, unknown> {
+  return value !== null
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && Object.keys(value).length === fields.length
+    && Object.keys(value).every(key => fields.includes(key));
+}
+
+export function trustAnchorPathForDatabase(databasePath: string): string | null {
+  return databasePath === ":memory:" ? null : `${databasePath}.trusted-keys.json`;
+}
+
+function readTrustedKeyAnchors(path: string | null): Map<string, TrustedDeviceKeyAnchor> {
+  if (path === null || !existsSync(path)) return new Map();
+  let value: unknown;
+  try {
+    value = JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    throw new Error("trusted device key anchor file is unreadable");
+  }
+  if (
+    !hasExactFields(value, TRUST_ANCHOR_FILE_FIELDS)
+    || value.schemaVersion !== SYNC_VERSION
+    || value.digestAlgorithm !== "SHA-256"
+    || !Array.isArray(value.anchors)
+  ) throw new Error("trusted device key anchor file has an invalid contract");
+  const anchors = new Map<string, TrustedDeviceKeyAnchor>();
+  const logIds = new Set<string>();
+  const keyIds = new Set<string>();
+  for (const item of value.anchors) {
+    if (
+      !hasExactFields(item, TRUST_ANCHOR_FIELDS)
+      || typeof item.deviceId !== "string"
+      || typeof item.logId !== "string"
+      || typeof item.keyId !== "string"
+      || typeof item.publicKeySha256 !== "string"
+      || ![item.deviceId, item.logId, item.keyId].every(identifier => isUuidVersion(identifier, 5))
+      || !SHA_256.test(item.publicKeySha256)
+      || anchors.has(item.deviceId)
+      || logIds.has(item.logId)
+      || keyIds.has(item.keyId)
+    ) throw new Error("trusted device key anchor file contains an invalid or duplicate entry");
+    const anchor = {
+      deviceId: item.deviceId,
+      logId: item.logId,
+      keyId: item.keyId,
+      publicKeySha256: item.publicKeySha256,
+    };
+    anchors.set(anchor.deviceId, anchor);
+    logIds.add(anchor.logId);
+    keyIds.add(anchor.keyId);
+  }
+  return anchors;
+}
+
 interface EventRow {
   device_id: string;
   device_sequence: number;
+  source_event_id: string;
   source_chain_hash: string;
   source_event_digest: string;
-  record_json: string;
+  source_event_json: string | null;
 }
 
 interface CheckpointRow {
   checkpoint_digest: string;
   tree_size: number;
+}
+
+interface CheckpointMembershipRow {
+  device_id: string;
+  checkpoint_digest: string;
+  tree_size: number;
+  chain_head: string;
+  previous_checkpoint_hash: string | null;
+  checkpoint_json: string;
+}
+
+interface IngestionAuditRow {
+  global_sequence: number;
+  ingestion_event_id: string;
+  ingested_at: number;
+  device_id: string;
+  device_sequence: number;
+  source_event_id: string;
+  source_event_digest: string;
+  source_chain_hash: string;
+  source_event_json: string | null;
+  decision: IngestionDecision;
+  previous_global_hash: string;
+  global_hash: string;
 }
 
 function nowIso(epochMs: number): string {
@@ -50,10 +170,20 @@ function nowIso(epochMs: number): string {
 export class LocalSyncLedger {
   readonly database: DatabaseSync;
   readonly #now: () => number;
+  readonly #trustAnchorPath: string | null;
+  readonly #trustedKeyAnchors: Map<string, TrustedDeviceKeyAnchor>;
+  #anchorWriteSequence = 0;
 
-  constructor(path: string, options: { now?: () => number } = {}) {
+  constructor(path: string, options: { now?: () => number; trustAnchorPath?: string } = {}) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     this.#now = options.now ?? Date.now;
+    this.#trustAnchorPath = options.trustAnchorPath ?? trustAnchorPathForDatabase(path);
+    if (
+      this.#trustAnchorPath !== null
+      && (this.#trustAnchorPath.length === 0 || (path !== ":memory:" && resolve(this.#trustAnchorPath) === resolve(path)))
+    ) throw new TypeError("trust anchor path must be a separate file");
+    if (this.#trustAnchorPath !== null) mkdirSync(dirname(this.#trustAnchorPath), { recursive: true });
+    this.#trustedKeyAnchors = readTrustedKeyAnchors(this.#trustAnchorPath);
     this.database = new DatabaseSync(path);
     this.database.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL;");
     this.database.exec(`
@@ -72,6 +202,7 @@ export class LocalSyncLedger {
         source_event_id TEXT NOT NULL UNIQUE,
         source_event_digest TEXT NOT NULL,
         source_chain_hash TEXT NOT NULL,
+        source_event_json TEXT,
         decision TEXT NOT NULL CHECK (decision IN ('MERGED_SAFE_STATE', 'HUMAN_REVIEW_REQUIRED')),
         previous_global_hash TEXT NOT NULL,
         global_hash TEXT NOT NULL UNIQUE,
@@ -120,10 +251,42 @@ export class LocalSyncLedger {
         record_json TEXT NOT NULL
       );
     `);
+    const ingestionColumns = this.database.prepare("PRAGMA table_info(ingestion_events)")
+      .all() as { name: string }[];
+    if (!ingestionColumns.some(column => column.name === "source_event_json")) {
+      this.database.exec("ALTER TABLE ingestion_events ADD COLUMN source_event_json TEXT");
+    }
   }
 
   close(): void {
     this.database.close();
+  }
+
+  #persistTrustedKeyAnchors(): void {
+    if (this.#trustAnchorPath === null) return;
+    const contents = JSON.stringify({
+      schemaVersion: SYNC_VERSION,
+      digestAlgorithm: "SHA-256",
+      anchors: [...this.#trustedKeyAnchors.values()].sort((left, right) => left.deviceId.localeCompare(right.deviceId)),
+    }, null, 2) + "\n";
+    const temporaryPath = `${this.#trustAnchorPath}.${process.pid}.${this.#anchorWriteSequence++}.tmp`;
+    writeFileSync(temporaryPath, contents, { encoding: "utf8", mode: 0o600, flag: "wx" });
+    try {
+      renameSync(temporaryPath, this.#trustAnchorPath);
+    } catch (error) {
+      rmSync(temporaryPath, { force: true });
+      throw error;
+    }
+  }
+
+  #knownKeyMatchesAnchor(known: KnownKeyRow): boolean {
+    const anchor = this.#trustedKeyAnchors.get(known.device_id);
+    return Boolean(
+      anchor
+      && anchor.logId === known.log_id
+      && anchor.keyId === known.key_id
+      && anchor.publicKeySha256 === sha256Hex(known.public_key_pem),
+    );
   }
 
   registerDevice(identity: DeviceIdentity, publicKeyPem: string): void {
@@ -133,6 +296,21 @@ export class LocalSyncLedger {
     const publicKey = createPublicKey(publicKeyPem);
     if (publicKey.asymmetricKeyType !== "ed25519") throw new TypeError("registered key must be Ed25519");
     const normalizedPem = publicKey.export({ type: "spki", format: "pem" }).toString();
+    const requestedAnchor: TrustedDeviceKeyAnchor = {
+      deviceId: identity.deviceId,
+      logId: identity.logId,
+      keyId: identity.keyId,
+      publicKeySha256: sha256Hex(normalizedPem),
+    };
+    const anchored = this.#trustedKeyAnchors.get(identity.deviceId);
+    if (anchored && (
+      anchored.logId !== requestedAnchor.logId
+      || anchored.keyId !== requestedAnchor.keyId
+      || anchored.publicKeySha256 !== requestedAnchor.publicKeySha256
+    )) throw new Error("device identity is already bound to different external trust material");
+    if (!anchored && [...this.#trustedKeyAnchors.values()].some(anchor => {
+      return anchor.logId === identity.logId || anchor.keyId === identity.keyId;
+    })) throw new Error("device log or key identity is already externally anchored");
     const existing = this.database.prepare("SELECT * FROM known_device_keys WHERE device_id = ?")
       .get(identity.deviceId) as KnownKeyRow | undefined;
     if (existing) {
@@ -141,8 +319,17 @@ export class LocalSyncLedger {
         || existing.key_id !== identity.keyId
         || existing.public_key_pem !== normalizedPem
       ) throw new Error("device identity is already bound to different key material");
-      return;
     }
+    if (!anchored) {
+      this.#trustedKeyAnchors.set(identity.deviceId, requestedAnchor);
+      try {
+        this.#persistTrustedKeyAnchors();
+      } catch (error) {
+        this.#trustedKeyAnchors.delete(identity.deviceId);
+        throw error;
+      }
+    }
+    if (existing) return;
     this.database.prepare(`
       INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
     `).run(identity.deviceId, identity.logId, identity.keyId, normalizedPem);
@@ -154,6 +341,9 @@ export class LocalSyncLedger {
     const known = this.database.prepare("SELECT * FROM known_device_keys WHERE device_id = ?")
       .get(first.deviceId) as KnownKeyRow | undefined;
     if (!known) return this.quarantine("UNKNOWN_KEY", first.deviceId, first.sequence, first.proof.eventDigest);
+    if (!this.#knownKeyMatchesAnchor(known)) {
+      return this.quarantine("TRUST_ANCHOR_MISMATCH", first.deviceId, first.sequence, first.proof.eventDigest);
+    }
     if (known.log_id !== first.logId || known.key_id !== first.keyId) {
       return this.quarantine("IDENTITY_MISMATCH", first.deviceId, first.sequence, first.proof.eventDigest);
     }
@@ -164,10 +354,15 @@ export class LocalSyncLedger {
 
     for (const event of events) {
       const existing = this.database.prepare(`
-        SELECT device_id, device_sequence, source_chain_hash, source_event_digest, record_json
+        SELECT device_id, device_sequence, source_event_id, source_chain_hash,
+               source_event_digest, source_event_json
         FROM ingestion_events WHERE device_id = ? AND device_sequence = ?
       `).get(event.deviceId, event.sequence) as EventRow | undefined;
-      if (existing && existing.source_chain_hash !== event.proof.chainHash) {
+      if (existing && (
+        existing.source_event_id !== event.eventId
+        || existing.source_event_digest !== event.proof.eventDigest
+        || existing.source_chain_hash !== event.proof.chainHash
+      )) {
         return this.quarantine("FORK_DETECTED", event.deviceId, event.sequence, event.proof.eventDigest);
       }
     }
@@ -205,9 +400,17 @@ export class LocalSyncLedger {
       const inserted: GlobalIngestionRecord[] = [];
       for (const event of events) {
         const duplicate = this.database.prepare(`
-          SELECT record_json FROM ingestion_events WHERE device_id = ? AND device_sequence = ?
-        `).get(event.deviceId, event.sequence) as { record_json: string } | undefined;
-        if (duplicate) continue;
+          SELECT source_event_json FROM ingestion_events WHERE device_id = ? AND device_sequence = ?
+        `).get(event.deviceId, event.sequence) as { source_event_json: string | null } | undefined;
+        if (duplicate) {
+          if (duplicate.source_event_json === null) {
+            this.database.prepare(`
+              UPDATE ingestion_events SET source_event_json = ?
+              WHERE device_id = ? AND device_sequence = ? AND source_event_json IS NULL
+            `).run(JSON.stringify(event), event.deviceId, event.sequence);
+          }
+          continue;
+        }
         const globalRow = this.database.prepare(`
           SELECT COALESCE(MAX(global_sequence), 0) + 1 AS value FROM ingestion_events
         `).get() as { value: number };
@@ -242,9 +445,9 @@ export class LocalSyncLedger {
         this.database.prepare(`
           INSERT INTO ingestion_events (
             global_sequence, ingestion_event_id, ingested_at, device_id, device_sequence,
-            source_event_id, source_event_digest, source_chain_hash, decision,
+            source_event_id, source_event_digest, source_chain_hash, source_event_json, decision,
             previous_global_hash, global_hash, record_json
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
           record.globalSequence,
           record.ingestionEventId,
@@ -254,6 +457,7 @@ export class LocalSyncLedger {
           record.sourceEventId,
           record.sourceEventDigest,
           record.sourceChainHash,
+          JSON.stringify(event),
           record.decision,
           record.previousGlobalHash,
           record.globalHash,
@@ -323,26 +527,160 @@ export class LocalSyncLedger {
     return 0;
   }
 
-  verifyGlobalChain(): { valid: boolean; count: number; lastHash: string } {
+  verifyGlobalChain(): {
+    valid: boolean;
+    count: number;
+    lastHash: string;
+    reason: "VERIFIED" | "GLOBAL_CHAIN_MISMATCH" | "LEGACY_SOURCE_REBIND_REQUIRED" | "SIGNED_SOURCE_MISMATCH" | "SIGNED_DEVICE_CHAIN_MISMATCH" | "TRUST_ANCHOR_MISMATCH";
+  } {
     let previousHash = globalGenesisHash();
     let expectedSequence = 1;
+    const deviceSources = new Map<string, SignedDeviceEvent[]>();
+    const devicePublicKeys = new Map<string, string>();
     for (const record of this.ingestionRecords()) {
       const { globalHash, ...core } = record;
       if (
         record.globalSequence !== expectedSequence
         || record.previousGlobalHash !== previousHash
         || globalRecordHash(previousHash, core as unknown as CanonicalValue) !== globalHash
-      ) return { valid: false, count: expectedSequence - 1, lastHash: previousHash };
-      const source = this.database.prepare(`
-        SELECT source_event_digest, source_chain_hash FROM ingestion_events WHERE global_sequence = ?
-      `).get(record.globalSequence) as { source_event_digest: string; source_chain_hash: string };
-      if (source.source_event_digest !== record.sourceEventDigest || source.source_chain_hash !== record.sourceChainHash) {
-        return { valid: false, count: expectedSequence - 1, lastHash: previousHash };
+      ) return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "GLOBAL_CHAIN_MISMATCH" };
+      const sourceRow = this.database.prepare(`
+        SELECT global_sequence, ingestion_event_id, ingested_at, device_id, device_sequence,
+               source_event_id, source_event_digest, source_chain_hash, source_event_json,
+               decision, previous_global_hash, global_hash
+        FROM ingestion_events WHERE global_sequence = ?
+      `).get(record.globalSequence) as IngestionAuditRow | undefined;
+      if (
+        !sourceRow
+        || sourceRow.global_sequence !== record.globalSequence
+        || sourceRow.ingestion_event_id !== record.ingestionEventId
+        || sourceRow.ingested_at !== record.ingestedAtEpochMs
+        || sourceRow.device_id !== record.deviceId
+        || sourceRow.device_sequence !== record.deviceSequence
+        || sourceRow.source_event_id !== record.sourceEventId
+        || sourceRow.source_event_digest !== record.sourceEventDigest
+        || sourceRow.source_chain_hash !== record.sourceChainHash
+        || sourceRow.decision !== record.decision
+        || sourceRow.previous_global_hash !== record.previousGlobalHash
+        || sourceRow.global_hash !== record.globalHash
+      ) return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_SOURCE_MISMATCH" };
+      const known = this.database.prepare(`
+        SELECT device_id, log_id, key_id, public_key_pem FROM known_device_keys WHERE device_id = ?
+      `).get(record.deviceId) as KnownKeyRow | undefined;
+      if (!known || !this.#knownKeyMatchesAnchor(known)) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "TRUST_ANCHOR_MISMATCH" };
       }
+      let sourceEvent: SignedDeviceEvent | null = null;
+      if (sourceRow.source_event_json === null) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "LEGACY_SOURCE_REBIND_REQUIRED" };
+      }
+      try {
+        sourceEvent = JSON.parse(sourceRow.source_event_json) as SignedDeviceEvent;
+      } catch {
+        sourceEvent = null;
+      }
+      if (
+        sourceRow.source_event_digest !== record.sourceEventDigest
+        || sourceRow.source_chain_hash !== record.sourceChainHash
+        || !sourceEvent
+        || known.log_id !== sourceEvent.logId
+        || known.key_id !== sourceEvent.keyId
+        || !verifySignedDeviceEvent(sourceEvent, known.public_key_pem)
+        || sourceEvent.eventId !== record.sourceEventId
+        || sourceEvent.deviceId !== record.deviceId
+        || sourceEvent.sequence !== record.deviceSequence
+        || sourceEvent.proof.eventDigest !== record.sourceEventDigest
+        || sourceEvent.proof.chainHash !== record.sourceChainHash
+        || canonicalJson(sourceEvent.operation as unknown as CanonicalValue) !== canonicalJson(record.operation as unknown as CanonicalValue)
+        || record.decision !== (sourceEvent.operation.type === "SAFE_TAG_ADD" ? "MERGED_SAFE_STATE" : "HUMAN_REVIEW_REQUIRED")
+      ) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_SOURCE_MISMATCH" };
+      }
+      const sources = deviceSources.get(record.deviceId) ?? [];
+      sources.push(sourceEvent);
+      deviceSources.set(record.deviceId, sources);
+      devicePublicKeys.set(record.deviceId, known.public_key_pem);
       previousHash = globalHash;
       expectedSequence += 1;
     }
-    return { valid: true, count: expectedSequence - 1, lastHash: previousHash };
+    for (const [deviceId, sourceEvents] of deviceSources) {
+      sourceEvents.sort((left, right) => left.sequence - right.sequence);
+      const checkpointRows = this.database.prepare(`
+        SELECT device_id, checkpoint_digest, tree_size, chain_head,
+               previous_checkpoint_hash, checkpoint_json
+        FROM device_checkpoints
+        WHERE device_id = ?
+        ORDER BY rowid
+      `).all(deviceId) as unknown as CheckpointMembershipRow[];
+      if (checkpointRows.length === 0) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+      }
+      const checkpoints: SignedCheckpoint[] = [];
+      for (const row of checkpointRows) {
+        let checkpoint: SignedCheckpoint | null = null;
+        try {
+          checkpoint = JSON.parse(row.checkpoint_json) as SignedCheckpoint;
+        } catch {
+          checkpoint = null;
+        }
+        if (
+          !checkpoint
+          || row.device_id !== checkpoint.deviceId
+          || row.checkpoint_digest !== checkpoint.digest
+          || row.tree_size !== checkpoint.treeSize
+          || row.chain_head !== checkpoint.chainHead
+          || row.previous_checkpoint_hash !== checkpoint.previousCheckpointHash
+          || !Number.isSafeInteger(checkpoint.treeSize)
+          || checkpoint.treeSize < 1
+          || checkpoint.treeSize > sourceEvents.length
+          || !verifyDeviceChain(
+            sourceEvents.slice(0, checkpoint.treeSize),
+            checkpoint,
+            devicePublicKeys.get(deviceId)!,
+          ).valid
+        ) {
+          return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+        }
+        checkpoints.push(checkpoint);
+      }
+      if (!checkpoints.some(checkpoint => checkpoint.treeSize === sourceEvents.length)) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+      }
+      const byDigest = new Map(checkpoints.map(checkpoint => [checkpoint.digest, checkpoint]));
+      const childByParent = new Map<string, SignedCheckpoint>();
+      const roots: SignedCheckpoint[] = [];
+      for (const checkpoint of checkpoints) {
+        if (checkpoint.previousCheckpointHash === null) {
+          roots.push(checkpoint);
+          continue;
+        }
+        const parent = byDigest.get(checkpoint.previousCheckpointHash);
+        if (!parent) {
+          return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+        }
+        if (
+          childByParent.has(parent.digest)
+          || checkpoint.treeSize < parent.treeSize
+          || checkpoint.createdAtEpochMs < parent.createdAtEpochMs
+        ) {
+          return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+        }
+        childByParent.set(parent.digest, checkpoint);
+      }
+      if (roots.length !== 1) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+      }
+      let linkedCount = 0;
+      let cursor: SignedCheckpoint | undefined = roots[0];
+      while (cursor) {
+        linkedCount += 1;
+        cursor = childByParent.get(cursor.digest);
+      }
+      if (linkedCount !== checkpoints.length) {
+        return { valid: false, count: expectedSequence - 1, lastHash: previousHash, reason: "SIGNED_DEVICE_CHAIN_MISMATCH" };
+      }
+    }
+    return { valid: true, count: expectedSequence - 1, lastHash: previousHash, reason: "VERIFIED" };
   }
 
   private applyDecision(record: GlobalIngestionRecord): void {

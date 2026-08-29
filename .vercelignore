@@ -1,0 +1,16 @@
+# information_uuid_v5=791db45e-4b88-5777-a242-a8b14627b8c5
+# event_uuid_v7=01a04bdd-82c0-7889-8eb5-f0a309640d0e state_transition=VERCEL_UPLOAD_OVERSCOPED->HOST_ARTIFACTS_EXCLUDED occurred_at=2026-08-29T04:53:23.000Z
+# machine-contract: a Vercel source upload contains repository inputs only, never local video, caches, credentials, browser state, or generated output.
+.local/
+.jj/
+.playwright-mcp/
+.tlc/
+.venv/
+.wrangler/
+coverage/
+dist/
+node_modules/
+states/
+__pycache__/
+*.log
+.DS_Store

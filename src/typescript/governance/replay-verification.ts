@@ -7,6 +7,10 @@
 // event_uuid_v7=01a04993-3867-7e11-b120-01b3bab8ec62
 // state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T18:13:00.135Z
 // machine-contract: current ABSENT does not prove historical NOT_STARTED; UNKNOWN remains non-replayable and counts conservatively.
+// information_uuid_v5=3b9a2345-e387-5f05-b9fd-11c7bc3d29f2
+// event_uuid_v7=01a049ff-0557-7a93-a1f0-0d70fa858510
+// state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:44.951Z
+// machine-contract: accepted replay evidence must be strictly later than the CONFIRMED_ABSENT freshness boundary.
 import { createHash, timingSafeEqual } from "node:crypto";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion, uuidV7EpochMs } from "../uuid.ts";
@@ -171,7 +175,7 @@ function boundEvidenceReason(
   if (!validEventTime(evidence.evidenceEventId, evidence.observedAtEpochMs)) {
     return "evidence event identifier and timestamp do not match";
   }
-  if (evidence.observedAtEpochMs < requiredFreshAfterEpochMs || evidence.observedAtEpochMs > nowEpochMs) {
+  if (evidence.observedAtEpochMs <= requiredFreshAfterEpochMs || evidence.observedAtEpochMs > nowEpochMs) {
     return "evidence is stale or from the future";
   }
   return null;

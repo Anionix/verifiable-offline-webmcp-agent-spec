@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
+  "title": "Demo video production provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "updatedAt", "stateTransition", "billingBoundary", "mediaCapabilities", "assets", "productionFiles", "productionPlan", "publication"],
+  "properties": {
+    "$schema": { "const": "../schemas/demo-video-production.schema.json" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "stateTransition": { "type": "string", "minLength": 3 },
+    "billingBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["additionalPurchaseAuthorized", "subscriptionChangeAuthorized", "higgsfieldTrialStateSource", "startingCredits", "estimatedCredits", "unlimitedAllowanceAvailable"],
+      "properties": {
+        "additionalPurchaseAuthorized": { "const": false },
+        "subscriptionChangeAuthorized": { "const": false },
+        "higgsfieldTrialStateSource": { "type": "string", "minLength": 3 },
+        "startingCredits": { "type": "number", "minimum": 0 },
+        "estimatedCredits": { "type": "number", "minimum": 0 },
+        "unlimitedAllowanceAvailable": { "type": "boolean" }
+      }
+    },
+    "mediaCapabilities": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/mediaCapability" }
+    },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "productionFiles": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/productionFile" }
+    },
+    "productionPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plannedDurationSeconds", "plannedActualSiteRecordingSeconds", "plannedActualSiteRecordingPermille", "voiceState", "captionTimingState"],
+      "properties": {
+        "plannedDurationSeconds": { "type": "integer", "minimum": 1, "maximum": 179 },
+        "plannedActualSiteRecordingSeconds": { "type": "integer", "minimum": 1, "maximum": 179 },
+        "plannedActualSiteRecordingPermille": { "type": "integer", "minimum": 700, "maximum": 1000 },
+        "voiceState": { "enum": ["NOT_GENERATED", "GENERATED", "MEASURED"] },
+        "captionTimingState": { "enum": ["PROVISIONAL", "AUDIO_TIMED_PENDING_FINAL_VIDEO", "FINAL_VIDEO_VERIFIED"] }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["youtubeUrl", "status", "requiresSeparateApproval"],
+      "properties": {
+        "youtubeUrl": { "const": null },
+        "status": { "const": "NOT_STARTED" },
+        "requiresSeparateApproval": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assetId", "service", "kind", "status", "prompt", "createdAt", "remoteId", "localPath", "sha256", "disclosure"],
+      "properties": {
+        "assetId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "service": { "enum": ["Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva", "LOCAL"] },
+        "kind": { "enum": ["REFERENCE_IMAGE", "VIDEO_SCENE", "VOICE", "SUBTITLE", "TITLE_SET", "THUMBNAIL", "SCREEN_CAPTURE", "SCREEN_RECORDING", "FINAL_VIDEO"] },
+        "status": { "enum": ["PLANNED", "SUBMITTED", "COMPLETED", "FAILED", "SKIPPED", "UNMEASURED"] },
+        "prompt": { "type": ["string", "null"] },
+        "createdAt": { "type": ["string", "null"], "format": "date-time" },
+        "remoteId": { "type": ["string", "null"] },
+        "localPath": { "type": ["string", "null"] },
+        "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "disclosure": { "type": "string", "minLength": 3 },
+        "voiceEvidence": { "$ref": "#/$defs/voiceEvidence" },
+        "subtitleEvidence": { "$ref": "#/$defs/subtitleEvidence" },
+        "videoEvidence": { "$ref": "#/$defs/videoEvidence" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "VOICE" } }, "required": ["kind"] },
+          "then": { "required": ["voiceEvidence"] },
+          "else": { "not": { "required": ["voiceEvidence"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "SUBTITLE" } }, "required": ["kind"] },
+          "then": { "required": ["subtitleEvidence"] },
+          "else": { "not": { "required": ["subtitleEvidence"] } }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": { "enum": ["SCREEN_RECORDING", "FINAL_VIDEO"] },
+              "status": { "const": "COMPLETED" }
+            },
+            "required": ["kind", "status"]
+          },
+          "then": {
+            "required": ["videoEvidence"],
+            "properties": {
+              "localPath": { "type": "string", "minLength": 1 },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          },
+          "else": { "not": { "required": ["videoEvidence"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "FINAL_VIDEO" } }, "required": ["kind"] },
+          "then": {
+            "properties": {
+              "service": { "const": "LOCAL" },
+              "status": { "const": "COMPLETED" },
+              "remoteId": { "const": null },
+              "videoEvidence": {
+                "allOf": [
+                  { "$ref": "#/$defs/videoEvidence" },
+                  {
+                    "properties": {
+                      "width": { "const": 1920 },
+                      "height": { "const": 1080 },
+                      "hasAudio": { "const": true },
+                      "englishCaptionsBurned": { "const": true }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "service": { "const": "LOCAL" } }, "required": ["service"] },
+          "then": { "properties": { "remoteId": { "const": null } } }
+        }
+      ]
+    },
+    "voiceEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["voiceId", "voiceName", "voiceType", "voiceCloneUsed", "avatarUsed", "durationSeconds", "byteLength", "codec", "sampleRateHertz", "channels", "audioUrlObjectId", "providerObjectLastModifiedAt", "generationRequestId", "generationRequestIdState"],
+      "properties": {
+        "voiceId": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+        "voiceName": { "const": "Annie - Lifelike" },
+        "voiceType": { "const": "STOCK_PUBLIC" },
+        "voiceCloneUsed": { "const": false },
+        "avatarUsed": { "const": false },
+        "durationSeconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 179 },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "codec": { "const": "mp3" },
+        "sampleRateHertz": { "const": 44100 },
+        "channels": { "const": 1 },
+        "audioUrlObjectId": { "type": "string", "format": "uuid" },
+        "providerObjectLastModifiedAt": { "type": "string", "format": "date-time" },
+        "generationRequestId": { "type": "null" },
+        "generationRequestIdState": { "const": "NOT_RETAINED" }
+      }
+    },
+    "subtitleEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceAudioAssetId", "timingMethod", "authoredTextAligned", "similarity", "timedWords", "captionCount", "remoteMediaId", "observedAt", "finalVideoVerified"],
+      "properties": {
+        "sourceAudioAssetId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "timingMethod": { "enum": ["FASTER_WHISPER_LOCAL", "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES"] },
+        "authoredTextAligned": { "const": true },
+        "similarity": { "type": ["number", "null"], "minimum": 0.9, "maximum": 1 },
+        "timedWords": { "type": ["integer", "null"], "minimum": 1 },
+        "captionCount": { "type": "integer", "minimum": 1 },
+        "remoteMediaId": { "type": ["string", "null"], "format": "uuid" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "finalVideoVerified": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "timingMethod": { "const": "FASTER_WHISPER_LOCAL" } }, "required": ["timingMethod"] },
+          "then": {
+            "properties": {
+              "similarity": { "type": "number", "minimum": 0.9, "maximum": 1 },
+              "timedWords": { "type": "integer", "minimum": 1 },
+              "remoteMediaId": { "type": "string", "format": "uuid" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "timingMethod": { "const": "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES" } }, "required": ["timingMethod"] },
+          "then": {
+            "properties": {
+              "similarity": { "const": null },
+              "timedWords": { "const": null },
+              "remoteMediaId": { "const": null }
+            }
+          }
+        }
+      ]
+    },
+    "videoEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["durationSeconds", "width", "height", "frameRate", "hasAudio", "englishCaptionsBurned", "siteRecordingSeconds", "actualSiteRecordingPermille", "verifiedAt"],
+      "properties": {
+        "durationSeconds": { "type": "number", "minimum": 1, "maximum": 179 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "frameRate": { "type": "number", "exclusiveMinimum": 0 },
+        "hasAudio": { "type": "boolean" },
+        "englishCaptionsBurned": { "type": "boolean" },
+        "siteRecordingSeconds": { "type": "number", "minimum": 1, "maximum": 179 },
+        "actualSiteRecordingPermille": { "type": "integer", "minimum": 700, "maximum": 1000 },
+        "verifiedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "productionFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "kind", "path", "sha256", "status", "requiresAudioRetiming"],
+      "properties": {
+        "fileId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "kind": { "enum": ["STORYBOARD", "NARRATION_EN", "SUBTITLES_EN", "SUBTITLES_JA"] },
+        "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9._-]+$" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "status": { "enum": ["DRAFT", "TIMED_DRAFT", "FINAL"] },
+        "requiresAudioRetiming": { "type": "boolean" }
+      }
+    },
+    "mediaCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilityId", "service", "localPluginState", "taskAttachmentState", "taskCallable", "callableToolCount", "authenticationState", "verifiedOperations", "productionUseState", "reasonCode"],
+      "properties": {
+        "capabilityId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "service": { "enum": ["Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva"] },
+        "localPluginState": { "enum": ["INSTALLED_ENABLED", "NOT_INSTALLED"] },
+        "taskAttachmentState": { "const": "ATTACHED" },
+        "taskCallable": { "const": true },
+        "callableToolCount": { "type": "integer", "minimum": 1 },
+        "authenticationState": { "enum": ["CONFIRMED", "UNVERIFIED"] },
+        "verifiedOperations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^(READ|WRITE):[a-z][a-z0-9_.:-]*$" }
+        },
+        "productionUseState": { "enum": ["USED", "NOT_USED"] },
+        "reasonCode": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+      }
+    }
+  }
+}

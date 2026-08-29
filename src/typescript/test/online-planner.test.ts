@@ -11,6 +11,11 @@ import { PREVIEW_TOOL, runOnlinePlannerSimulation, ScriptedPlannerTransport } fr
 import { PLANNER_UUID_NAMESPACE, type PlannerPolicy, type PlannerTask } from "../planner/types.ts";
 import { uuidV5 } from "../uuid.ts";
 
+// information_uuid_v5=d0df026b-55c2-53b2-8b98-8c4652df78b7
+// event_uuid_v7=01a049ff-02a9-724e-b280-7b5029b74e33
+// state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T20:10:44.265Z
+// machine-contract: overlong serialized input and any malformed function-call entry stop before a proposal is accepted.
+
 const task: PlannerTask = {
   taskId: uuidV5(PLANNER_UUID_NAMESPACE, "test/planner/task"),
   taskKind: "notification-preview",
@@ -49,6 +54,21 @@ test("preflight exposes only feasible allowlisted tools and public allowed conte
   assert.deepEqual(result.prepared.tools.map(tool => tool.name), [PREVIEW_TOOL.name]);
 });
 
+test("preflight rejects a serialized planner input above the request contract limit", () => {
+  const oversized: PlannerTask = {
+    ...task,
+    taskId: uuidV5(PLANNER_UUID_NAMESPACE, "test/planner/oversized"),
+    context: [{ key: "channel", value: "x".repeat(5_000), classification: "PUBLIC" }],
+  };
+  const result = preflightPlanner(oversized, policy, [PREVIEW_TOOL]);
+  assert.deepEqual(result, {
+    ok: false,
+    reason: "INVALID_TASK",
+    disclosedContextKeys: [],
+    exposedToolNames: [PREVIEW_TOOL.name],
+  });
+});
+
 test("strict tool arguments reject missing and extra fields", () => {
   assert.equal(validateStrictValue(PREVIEW_TOOL.inputSchema, { summary: "ok", urgency: "normal" }), true);
   assert.equal(validateStrictValue(PREVIEW_TOOL.inputSchema, { summary: "missing" }), false);
@@ -79,6 +99,26 @@ test("healthy response remains an untrusted proposal and request is constrained"
   assert.deepEqual(request.tool_choice.tools, [{ type: "function", name: PREVIEW_TOOL.name }]);
   assert.equal(canonicalJson(request as never).includes("never-send-me"), false);
   assert.equal(audit.verify().valid, true);
+});
+
+test("a malformed function-call entry cannot be discarded beside a valid call", async () => {
+  const transport = new ScriptedPlannerTransport({
+    type: "response",
+    response: {
+      status: "completed",
+      output: [
+        { type: "function_call", call_id: "call_valid", name: PREVIEW_TOOL.name, arguments: '{"summary":"ok","urgency":"low"}' },
+        { type: "function_call", name: PREVIEW_TOOL.name, arguments: "{}" },
+      ],
+      usage: { input_tokens: 3, output_tokens: 2 },
+    },
+  });
+  const result = await new OptionalResponsesPlanner({ transport, audit: new PlannerAuditLog() })
+    .propose(task, policy, [PREVIEW_TOOL]);
+  assert.equal(result.status, "STOPPED");
+  assert.equal(result.reason, "INVALID_ARGUMENTS");
+  assert.equal(result.authorizationCreated, 0);
+  assert.equal(result.externalEffectStarts, 0);
 });
 
 test("the complete scripted matrix preserves local availability and stops failures", async () => {

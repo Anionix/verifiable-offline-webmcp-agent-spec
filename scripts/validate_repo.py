@@ -5,6 +5,32 @@
 # event_uuid_v7=01a049d1-b7e1-7443-a30b-4620165c8b17
 # state_transition=EXECUTING -> READY_FOR_PUBLIC_READBACK occurred_at=2026-08-28T19:21:16.001Z
 # machine-contract: final evidence preserves native WebMCP as INCONCLUSIVE, checks two finite-state engines against 38 states, and proves 67 automated records with zero new effects.
+# information_uuid_v5=2f981a59-3d10-5036-98da-3ef8ae14f518
+# event_uuid_v7=01a049fe-fe89-7814-9487-0ad568541f20
+# state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.209Z
+# machine-contract: every live notification audit event is bound to the single scoped intent before global counts can prove duplicate suppression.
+# information_uuid_v5=3a0187cc-7497-5325-a2ad-3df91330e778
+# event_uuid_v7=01a049ff-0159-7193-b343-dc803d80f4e0
+# state_transition=DISCOVERED -> EXECUTING occurred_at=2026-08-28T20:10:43.929Z
+# machine-contract: each global ingestion record must match the signed source device, sequence, operation, digest, and chain hash.
+# information_uuid_v5=bcad8087-6a22-59b1-99f9-cb3ce9179242
+# event_uuid_v7=01a04a1b-eac6-7c5c-aa43-c19d4a593bfb
+# state_transition=REVIEW -> EXECUTING occurred_at=2026-08-28T20:42:18.694Z
+# machine-contract: every strict object schema has exactly the same declared property and required-key sets at every nesting depth.
+# information_uuid_v5=634d296a-aa05-536e-9874-70c499eee377
+# event_uuid_v7=01a04a28-9e04-7709-9ce3-49b9331fd953
+# state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T20:56:11.012Z
+# machine-contract: scalar schema lower bounds never exceed upper bounds and all numeric bounds fit JavaScript safe integers.
+# information_uuid_v5=8d79ed21-27ce-52d4-9513-e2b024ae670a
+# event_uuid_v7=01a04b38-0e40-7ae1-8778-eb130910efa5
+# state_transition=HOST_STATE_UNCHECKED -> HOST_STATE_EXCLUDED occurred_at=2026-08-29T01:52:40.000Z
+# machine-contract: generated integrity records never include mutable host state from .vercel, .wrangler, .local, dist, or node_modules.
+# event_uuid_v7=01a04bdb-34bf-766c-b47a-d92e201fd28f
+# state_transition=VERCEL_PROJECT_LINKED -> VERCEL_HOST_STATE_EXCLUDED occurred_at=2026-08-29T04:50:55.000Z
+# information_uuid_v5=8ef00763-b59a-5f86-b841-bf5cee364100
+# event_uuid_v7=01a04bc8-7f33-7fe3-8877-477e7f8b995a
+# state_transition=AUDIO_TIMED_PENDING_FINAL_VIDEO -> FINAL_VIDEO_VERIFIED occurred_at=2026-08-29T04:30:26.100Z
+# machine-contract: every completed screen or final video carries measured video evidence; a verified final cut is local, 1920x1080, audible, English-captioned, under three minutes, and at least 70 percent actual site recording.
 from __future__ import annotations
 
 import argparse
@@ -25,11 +51,64 @@ from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 SCALE = 1_000_000
-IGNORED_PARTS = {".git", ".jj", ".local", ".venv", "node_modules", "__pycache__"}
+JAVASCRIPT_MAX_SAFE_INTEGER = 9_007_199_254_740_991
+IGNORED_PARTS = {".git", ".jj", ".local", ".playwright-mcp", ".venv", ".vercel", ".wrangler", "dist", "node_modules", "__pycache__"}
+SRT_TIMING = re.compile(
+    r"(?P<start_h>\d{2}):(?P<start_m>\d{2}):(?P<start_s>\d{2}),(?P<start_ms>\d{3})"
+    r" --> "
+    r"(?P<end_h>\d{2}):(?P<end_m>\d{2}):(?P<end_s>\d{2}),(?P<end_ms>\d{3})"
+)
+
+
+def is_ignored(path: Path):
+    return any(part in IGNORED_PARTS for part in path.relative_to(ROOT).parts)
 
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def parse_subrip(path: Path):
+    """Return a strict, ordered SubRip summary for machine-checkable caption evidence."""
+    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    blocks = [block for block in re.split(r"\n{2,}", text.strip()) if block]
+    cues = []
+    previous_end = 0
+    for expected_index, block in enumerate(blocks, start=1):
+        lines = block.splitlines()
+        if len(lines) < 3 or lines[0] != str(expected_index):
+            raise ValueError(f"{path.relative_to(ROOT)} has a missing or non-sequential cue at {expected_index}")
+        timing = SRT_TIMING.fullmatch(lines[1])
+        if timing is None:
+            raise ValueError(f"{path.relative_to(ROOT)} has invalid timing at cue {expected_index}")
+
+        def milliseconds(prefix):
+            minute = int(timing[f"{prefix}_m"])
+            second = int(timing[f"{prefix}_s"])
+            if minute >= 60 or second >= 60:
+                raise ValueError(f"{path.relative_to(ROOT)} has out-of-range timing at cue {expected_index}")
+            return (
+                int(timing[f"{prefix}_h"]) * 3_600_000
+                + minute * 60_000
+                + second * 1_000
+                + int(timing[f"{prefix}_ms"])
+            )
+
+        start = milliseconds("start")
+        end = milliseconds("end")
+        caption = "\n".join(lines[2:]).strip()
+        if not caption or start >= end:
+            raise ValueError(f"{path.relative_to(ROOT)} has an empty or non-positive cue at {expected_index}")
+        if start < previous_end:
+            raise ValueError(f"{path.relative_to(ROOT)} overlaps at cue {expected_index}")
+        cues.append({"start": start, "end": end, "caption": caption})
+        previous_end = end
+    return {
+        "captionCount": len(cues),
+        "timedWords": sum(len(cue["caption"].split()) for cue in cues),
+        "lastEndMs": cues[-1]["end"] if cues else 0,
+        "cues": cues,
+    }
 
 
 def canonical_bytes(value):
@@ -104,6 +183,67 @@ def eval_ir(ir):
     return "ALLOW" if good else "DENY"
 
 
+def live_event_matches_scope(event, scoped_intent_id):
+    return event.get("intentId") == scoped_intent_id
+
+
+def sync_source_matches_record(record, source):
+    return (
+        source is not None
+        and source.get("eventId") == record.get("sourceEventId")
+        and source.get("deviceId") == record.get("deviceId")
+        and source.get("sequence") == record.get("deviceSequence")
+        and source.get("operation") == record.get("operation")
+        and source.get("proof", {}).get("eventDigest") == record.get("sourceEventDigest")
+        and source.get("proof", {}).get("chainHash") == record.get("sourceChainHash")
+    )
+
+
+def strict_parameter_contract_errors(schema, path="parameters"):
+    findings = []
+    if not isinstance(schema, dict):
+        return [f"{path} must be an object"]
+    schema_type = schema.get("type")
+    if schema_type == "string":
+        minimum = schema.get("minLength")
+        maximum = schema.get("maxLength")
+        if minimum is not None and (type(minimum) is not int or minimum < 0 or minimum > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.minLength must be a non-negative JavaScript safe integer")
+        if maximum is not None and (type(maximum) is not int or maximum < 0 or maximum > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.maxLength must be a non-negative JavaScript safe integer")
+        if type(minimum) is int and type(maximum) is int and minimum > maximum:
+            findings.append(f"{path} minLength exceeds maxLength")
+        return findings
+    if schema_type == "integer":
+        minimum = schema.get("minimum")
+        maximum = schema.get("maximum")
+        if minimum is not None and (type(minimum) is not int or abs(minimum) > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.minimum must be a JavaScript safe integer")
+        if maximum is not None and (type(maximum) is not int or abs(maximum) > JAVASCRIPT_MAX_SAFE_INTEGER):
+            findings.append(f"{path}.maximum must be a JavaScript safe integer")
+        if type(minimum) is int and type(maximum) is int and minimum > maximum:
+            findings.append(f"{path} minimum exceeds maximum")
+        return findings
+    if schema_type != "object":
+        return findings
+    properties = schema.get("properties")
+    required = schema.get("required")
+    if not isinstance(properties, dict) or not isinstance(required, list):
+        return [f"{path} object schema lacks properties or required"]
+    if any(not isinstance(name, str) for name in required):
+        return [f"{path} required entries must be strings"]
+    property_names = set(properties)
+    required_names = set(required)
+    if property_names != required_names:
+        findings.append(
+            f"{path} properties/required differ; "
+            f"missing={sorted(property_names - required_names)}, extra={sorted(required_names - property_names)}"
+        )
+    for name, child in properties.items():
+        findings.extend(strict_parameter_contract_errors(child, f"{path}.properties.{name}"))
+    return findings
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", type=Path)
@@ -113,17 +253,50 @@ def main():
 
     # Parse JSON, NDJSON, and YAML.
     for p in ROOT.rglob("*.json"):
+        if is_ignored(p):
+            continue
         try: load_json(p)
         except Exception as e: errors.append(f"JSON {p.relative_to(ROOT)}: {e}")
     for p in ROOT.rglob("*.ndjson"):
+        if is_ignored(p):
+            continue
         for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
             if line.strip():
                 try: json.loads(line)
                 except Exception as e: errors.append(f"NDJSON {p.relative_to(ROOT)}:{n}: {e}")
     for p in [*ROOT.rglob("*.yaml"), *ROOT.rglob("*.yml")]:
+        if is_ignored(p):
+            continue
         try: yaml.safe_load(p.read_text(encoding="utf-8"))
         except Exception as e: errors.append(f"YAML {p.relative_to(ROOT)}: {e}")
     checks["structured_parse"] = not errors
+
+    # Host-local caches and generated deploy state are intentionally outside the
+    # portable repository receipt. Check both generated integrity records so a
+    # future manifest regeneration cannot silently publish machine-specific data.
+    host_generated_start = len(errors)
+    host_generated_parts = {".vercel", ".wrangler", ".local", "dist", "node_modules"}
+    try:
+        catalog = load_json(ROOT / "metadata/file-catalog.json")
+        catalog_paths = [record["path"] for record in catalog["files"]]
+        manifest_paths = []
+        for line_number, line in enumerate((ROOT / "MANIFEST.sha256").read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            fields = line.split(maxsplit=1)
+            if len(fields) != 2:
+                errors.append(f"MANIFEST.sha256:{line_number}: expected digest and repository path")
+                continue
+            manifest_paths.append(fields[1])
+        for source, paths in (("metadata/file-catalog.json", catalog_paths), ("MANIFEST.sha256", manifest_paths)):
+            for repository_path in paths:
+                parts = set(repository_path.replace("\\", "/").split("/"))
+                forbidden = sorted(parts & host_generated_parts)
+                if forbidden:
+                    errors.append(f"{source}: host-generated path is forbidden: {repository_path} ({', '.join(forbidden)})")
+    except Exception as exc:
+        errors.append(f"host-generated state exclusion check: {exc}")
+    checks["host_generated_state_excluded"] = len(errors) == host_generated_start
 
     # Live browser-notification evidence: independently bind the public summary
     # to the captured transition stream without trusting the local SQLite file.
@@ -131,6 +304,12 @@ def main():
     live_path = ROOT / "data/audit/notification-demo-live-events.ndjson"
     live_events = [json.loads(line) for line in live_path.read_text(encoding="utf-8").splitlines() if line]
     live_evidence = load_json(ROOT / "metadata/notification-demo-live-verification.json")
+    scoped_intent_id = live_evidence["scope"]["intent_id"]
+    try:
+        if uuid.UUID(scoped_intent_id).version != 5:
+            raise ValueError("scoped intent ID is not UUIDv5")
+    except Exception as exc:
+        errors.append(f"live notification scoped intent UUID: {exc}")
     previous_hash = ""
     for index, event in enumerate(live_events, 1):
         event_hash = event.get("eventHash", "")
@@ -148,7 +327,14 @@ def main():
                 raise ValueError("intent ID is not UUIDv5")
         except Exception as exc:
             errors.append(f"live notification event {index} UUID: {exc}")
+        if not live_event_matches_scope(event, scoped_intent_id):
+            errors.append(f"live notification event {index} belongs to a different intent")
         previous_hash = event_hash
+    if live_events:
+        mutation = dict(live_events[0])
+        mutation["intentId"] = str(uuid.uuid5(uuid.NAMESPACE_URL, "validator-regression/different-live-intent"))
+        if live_event_matches_scope(mutation, scoped_intent_id):
+            errors.append("live notification validator accepted a different-intent mutation")
     observation = live_evidence["observations"]
     execution_claims = sum(event["kind"] == "execution-claimed" for event in live_events)
     suppressed_retries = sum(event["kind"] == "duplicate-execution-suppressed" for event in live_events)
@@ -178,6 +364,8 @@ def main():
     # and are intentionally not fetched by the offline validator.
     broken_links = []
     for p in ROOT.rglob("*.md"):
+        if is_ignored(p):
+            continue
         text = p.read_text(encoding="utf-8", errors="replace")
         text = re.sub(r"```.*?```", "", text, flags=re.S)
         for target in re.findall(r"\]\(([^)]+)\)", text):
@@ -279,12 +467,278 @@ def main():
     )
     for e in planner_request_validator.iter_errors(planner_request):
         errors.append(f"schema {planner_evidence['artifacts']['requestSample']}: {e.message}")
+    for index, tool in enumerate(planner_request["tools"]):
+        for error in strict_parameter_contract_errors(tool["parameters"], f"tools[{index}].parameters"):
+            errors.append(f"strict planner parameter contract: {error}")
+    malformed_planner_request = json.loads(json.dumps(planner_request))
+    parameter_properties = malformed_planner_request["tools"][0]["parameters"]["properties"]
+    first_parameter = next(iter(parameter_properties))
+    parameter_properties[first_parameter] = {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"nested": {"type": "string"}},
+        "required": ["different"],
+    }
+    malformed_schema_errors = list(planner_request_validator.iter_errors(malformed_planner_request))
+    malformed_contract_errors = strict_parameter_contract_errors(
+        malformed_planner_request["tools"][0]["parameters"],
+        "mutation.parameters",
+    )
+    if not malformed_schema_errors and not malformed_contract_errors:
+        errors.append("responses planner request schema accepted a malformed nested parameter schema")
+    inverted_planner_request = json.loads(json.dumps(planner_request))
+    inverted_properties = inverted_planner_request["tools"][0]["parameters"]["properties"]
+    inverted_properties[first_parameter] = {"type": "string", "minLength": 10, "maxLength": 1}
+    inverted_schema_errors = list(planner_request_validator.iter_errors(inverted_planner_request))
+    inverted_contract_errors = strict_parameter_contract_errors(
+        inverted_planner_request["tools"][0]["parameters"],
+        "mutation.invertedParameters",
+    )
+    if not inverted_schema_errors and not inverted_contract_errors:
+        errors.append("responses planner request schema accepted inverted scalar bounds")
     final_evidence = load_json(ROOT / "metadata/final-verification.json")
     final_evidence_validator = Draft202012Validator(
         schemas["final-verification"], registry=schema_registry, format_checker=format_checker
     )
     for e in final_evidence_validator.iter_errors(final_evidence):
         errors.append(f"schema metadata/final-verification.json: {e.message}")
+    review_reconciliation = load_json(ROOT / "metadata/review-thread-reconciliation.json")
+    review_reconciliation_validator = Draft202012Validator(
+        schemas["review-thread-reconciliation"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in review_reconciliation_validator.iter_errors(review_reconciliation):
+        errors.append(f"schema metadata/review-thread-reconciliation.json: {e.message}")
+    hotel_evidence = load_json(ROOT / "metadata/hotel-booking-verification.json")
+    hotel_evidence_validator = Draft202012Validator(
+        schemas["hotel-booking-verification"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in hotel_evidence_validator.iter_errors(hotel_evidence):
+        errors.append(f"schema metadata/hotel-booking-verification.json: {e.message}")
+    if hotel_evidence["sourceCommit"] == "WORKTREE" and hotel_evidence["sourceState"] != "WORKTREE_CANDIDATE":
+        errors.append("hotel WORKTREE source must remain a worktree candidate")
+    live_hotel = hotel_evidence["liveDeployment"]
+    if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":
+        if (
+            live_hotel["status"] != "CURRENT_ARTIFACT_VERIFIED"
+            or live_hotel["deployedVersionSourceCommit"] != hotel_evidence["sourceCommit"]
+            or live_hotel["functionalArtifactDigest"] != hotel_evidence["artifactDigest"]
+            or live_hotel["fullSitesPackageDigest"] != hotel_evidence["fullSitesPackageDigest"]
+        ):
+            errors.append("deployed-current hotel evidence must match the live version source and both artifact digests")
+    elif live_hotel["status"] == "CURRENT_ARTIFACT_VERIFIED":
+        errors.append("a non-deployed candidate cannot claim the current artifact is live-verified")
+    video_production = load_json(ROOT / "metadata/demo-video-production.json")
+    video_production_validator = Draft202012Validator(
+        schemas["demo-video-production"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in video_production_validator.iter_errors(video_production):
+        errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    video_start = len(errors)
+    try:
+        media_capabilities = video_production["mediaCapabilities"]
+        expected_media_services = {"Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva"}
+        if {record["service"] for record in media_capabilities} != expected_media_services:
+            errors.append("video media capability inventory must contain the exact six authorized services")
+        for record in media_capabilities:
+            if record["authenticationState"] == "CONFIRMED" and not record["verifiedOperations"]:
+                errors.append(f"confirmed media authentication lacks a verified operation: {record['service']}")
+            if record["authenticationState"] != "CONFIRMED" and record["verifiedOperations"]:
+                errors.append(f"unverified media authentication lists a successful operation: {record['service']}")
+        used_services = {record["service"] for record in media_capabilities if record["productionUseState"] == "USED"}
+        if any(record["service"] == "LOCAL" and record["remoteId"] is not None for record in video_production["assets"]):
+            errors.append("local video-production assets cannot claim a remote provider identifier")
+        asset_services = {
+            record["service"]
+            for record in video_production["assets"]
+            if record["status"] == "COMPLETED" and record["service"] in expected_media_services
+        }
+        if used_services != asset_services:
+            errors.append("used media capability services differ from completed production asset services")
+        video_assets = [
+            record for record in video_production["assets"]
+            if record["kind"] in {"SCREEN_RECORDING", "FINAL_VIDEO"}
+        ]
+        completed_video_assets = [record for record in video_assets if record["status"] == "COMPLETED"]
+        for record in completed_video_assets:
+            evidence = record.get("videoEvidence")
+            if evidence is None:
+                errors.append(f"completed {record['kind']} asset lacks measured video evidence")
+                continue
+            duration_seconds = evidence["durationSeconds"]
+            site_recording_seconds = evidence["siteRecordingSeconds"]
+            if site_recording_seconds > duration_seconds:
+                errors.append(f"{record['kind']} site-recording seconds exceed its duration")
+                continue
+            actual_permille = round(1000 * site_recording_seconds / duration_seconds)
+            if actual_permille != evidence["actualSiteRecordingPermille"]:
+                errors.append(f"{record['kind']} actual site-recording ratio is inconsistent")
+
+        final_video_assets = [record for record in video_assets if record["kind"] == "FINAL_VIDEO"]
+        for record in final_video_assets:
+            evidence = record.get("videoEvidence", {})
+            if (
+                record["service"] != "LOCAL"
+                or record["status"] != "COMPLETED"
+                or record["remoteId"] is not None
+                or evidence.get("width") != 1920
+                or evidence.get("height") != 1080
+                or evidence.get("hasAudio") is not True
+                or evidence.get("englishCaptionsBurned") is not True
+                or not isinstance(evidence.get("durationSeconds"), (int, float))
+                or evidence["durationSeconds"] >= 180
+                or not isinstance(evidence.get("actualSiteRecordingPermille"), int)
+                or evidence["actualSiteRecordingPermille"] < 700
+            ):
+                errors.append("final video must be a completed local 1920x1080 cut with audio, burned English captions, duration under 180 seconds, and at least 70 percent actual site recording")
+        production_files = video_production["productionFiles"]
+        expected_video_kinds = {"STORYBOARD", "NARRATION_EN", "SUBTITLES_EN", "SUBTITLES_JA"}
+        if {record["kind"] for record in production_files} != expected_video_kinds:
+            errors.append("video production files must contain exactly the storyboard, narration, and two subtitle drafts")
+        for record in production_files:
+            path = ROOT / record["path"]
+            if not path.is_file():
+                errors.append(f"video production file is missing: {record['path']}")
+                continue
+            if sha256(path.read_bytes()) != record["sha256"]:
+                errors.append(f"video production file digest mismatch: {record['path']}")
+        plan = video_production["productionPlan"]
+        if video_production["publication"] != {
+            "youtubeUrl": None,
+            "status": "NOT_STARTED",
+            "requiresSeparateApproval": True,
+        }:
+            errors.append("video publication must remain not started until final media and approval evidence exist")
+        planned_permille = round(
+            1000 * plan["plannedActualSiteRecordingSeconds"] / plan["plannedDurationSeconds"]
+        )
+        if planned_permille != plan["plannedActualSiteRecordingPermille"]:
+            errors.append("video production planned site-recording ratio is inconsistent")
+        if plan["plannedActualSiteRecordingPermille"] < 700:
+            errors.append("video production plan does not reserve at least 70 percent for actual site recording")
+        subtitle_records = [record for record in production_files if record["kind"].startswith("SUBTITLES_")]
+        subtitle_assets = [record for record in video_production["assets"] if record["kind"] == "SUBTITLE"]
+        subtitle_assets_by_path = {record["localPath"]: record for record in subtitle_assets}
+        subtitle_paths = {record["path"] for record in subtitle_records}
+        if len(subtitle_assets) != 2 or set(subtitle_assets_by_path) != subtitle_paths:
+            errors.append("each timed subtitle file must have one path-bound provenance asset")
+
+        voice_assets = [record for record in video_production["assets"] if record["kind"] == "VOICE"]
+        if len(voice_assets) != 1:
+            errors.append("video production must contain exactly one measured narration asset")
+            voice_asset = None
+            audio_end_ms = 0
+        else:
+            voice_asset = voice_assets[0]
+            audio_end_ms = round(1000 * voice_asset["voiceEvidence"]["durationSeconds"])
+
+        parsed_subtitles = {}
+        for record in subtitle_records:
+            path = ROOT / record["path"]
+            parsed = parse_subrip(path)
+            parsed_subtitles[record["kind"]] = parsed
+            asset = subtitle_assets_by_path.get(record["path"])
+            if asset is None:
+                continue
+            evidence = asset["subtitleEvidence"]
+            if asset["sha256"] != record["sha256"]:
+                errors.append(f"subtitle asset digest differs from production file: {record['path']}")
+            if evidence["captionCount"] != parsed["captionCount"]:
+                errors.append(f"subtitle caption count differs from file: {record['path']}")
+            if voice_asset is not None and evidence["sourceAudioAssetId"] != voice_asset["assetId"]:
+                errors.append(f"subtitle is not bound to the measured narration asset: {record['path']}")
+            if parsed["lastEndMs"] > audio_end_ms:
+                errors.append(f"subtitle ends after measured narration: {record['path']}")
+
+            if record["kind"] == "SUBTITLES_EN":
+                if evidence["timingMethod"] != "FASTER_WHISPER_LOCAL":
+                    errors.append("English subtitles must use the preserved audio-derived clock")
+                if evidence["timedWords"] != parsed["timedWords"]:
+                    errors.append("English timed-word count differs from the subtitle file")
+                if any("\n" in cue["caption"] for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must remain one line")
+                if any(len(cue["caption"].split()) > 3 for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must contain at most three words")
+                if any(len(cue["caption"]) > 15 for cue in parsed["cues"]):
+                    errors.append("English burned-in captions must contain at most fifteen characters")
+            elif record["kind"] == "SUBTITLES_JA":
+                if evidence["timingMethod"] != "AUTHORED_TRANSLATION_ON_AUDIO_TIMED_CUES":
+                    errors.append("Japanese subtitles must identify the locally authored translation timing method")
+
+        if plan["captionTimingState"] == "PROVISIONAL" and not all(
+            record["requiresAudioRetiming"] is True for record in subtitle_records
+        ):
+            errors.append("provisional subtitles must require retiming from final audio")
+        if plan["captionTimingState"] == "AUDIO_TIMED_PENDING_FINAL_VIDEO":
+            if not all(
+                record["status"] == "TIMED_DRAFT" and record["requiresAudioRetiming"] is False
+                for record in subtitle_records
+            ):
+                errors.append("audio-timed captions must be timed drafts that do not require another audio retiming")
+            if any("NOTE" in (ROOT / record["path"]).read_text(encoding="utf-8") for record in subtitle_records):
+                errors.append("audio-timed public subtitle drafts must not contain non-SubRip NOTE blocks")
+            if not subtitle_assets or any(
+                record["subtitleEvidence"]["finalVideoVerified"] is not False for record in subtitle_assets
+            ):
+                errors.append("pending final-video captions must remain marked final-video unverified")
+        if plan["captionTimingState"] == "FINAL_VIDEO_VERIFIED":
+            if not all(
+                record["status"] == "FINAL" and record["requiresAudioRetiming"] is False
+                for record in subtitle_records
+            ):
+                errors.append("final-video-verified captions must be final and must not require audio retiming")
+            if not subtitle_assets or any(
+                record["subtitleEvidence"]["finalVideoVerified"] is not True for record in subtitle_assets
+            ):
+                errors.append("final-video-verified subtitle assets must be marked verified against the final cut")
+            if len(final_video_assets) != 1:
+                errors.append("final-video-verified production must contain exactly one final-video asset")
+    except Exception as exc:
+        errors.append(f"video production evidence structure: {exc}")
+    checks["video_production_files"] = len(errors) == video_start
+    review_findings = review_reconciliation["findings"]
+    review_ids = [finding["informationUuidV5"] for finding in review_findings]
+    review_urls = [finding["reviewUrl"] for finding in review_findings]
+    if len(review_findings) != 32 or len(set(review_ids)) != len(review_findings) or len(set(review_urls)) != len(review_findings):
+        errors.append("review reconciliation must contain 32 distinct finding IDs and URLs")
+    for finding in review_findings:
+        for evidence_path in [*finding["fixEvidence"], *finding["testEvidence"]]:
+            local_path = ROOT / evidence_path.split("#", 1)[0]
+            if not local_path.is_file():
+                errors.append(f"review reconciliation evidence path is missing: {evidence_path}")
+    try:
+        review_event = uuid.UUID(review_reconciliation["identity"]["uuidV7"])
+        if review_event.version != 7 or uuid7_ms(str(review_event)) != review_reconciliation["temporal"]["epochMs"]:
+            raise ValueError("timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation UUIDv7: {exc}")
+    try:
+        review_verification = review_reconciliation["verification"]
+        verification_event = uuid.UUID(review_verification["eventUuidV7"])
+        if verification_event.version != 7 or uuid7_ms(str(verification_event)) != review_verification["epochMs"]:
+            raise ValueError("verification timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation verification UUIDv7: {exc}")
+    try:
+        for review_update in review_reconciliation["reviewUpdates"]:
+            review_update_event = uuid.UUID(review_update["eventUuidV7"])
+            if review_update_event.version != 7 or uuid7_ms(str(review_update_event)) != review_update["epochMs"]:
+                raise ValueError("review-update timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation update UUIDv7: {exc}")
+    try:
+        final_review_verification = review_reconciliation["finalVerification"]
+        final_review_event = uuid.UUID(final_review_verification["eventUuidV7"])
+        if final_review_event.version != 7 or uuid7_ms(str(final_review_event)) != final_review_verification["epochMs"]:
+            raise ValueError("final verification timestamp mismatch")
+    except Exception as exc:
+        errors.append(f"review reconciliation final UUIDv7: {exc}")
+    if review_reconciliation["summary"] != {
+        "total": len(review_findings),
+        "fixedInPatch": sum(finding["disposition"] == "FIXED_IN_PATCH" for finding in review_findings),
+        "fixedBeforePatch": sum(finding["disposition"] == "FIXED_BEFORE_PATCH" for finding in review_findings),
+        "remaining": 0,
+    }:
+        errors.append("review reconciliation summary does not match findings")
     checks["json_schema"] = not errors
 
     # Source graph and cross-reference integrity.
@@ -459,10 +913,7 @@ def main():
         if (
             record["globalSequence"] != expected_global
             or record["previousGlobalHash"] != previous_global
-            or source is None
-            or source["proof"]["eventDigest"] != record["sourceEventDigest"]
-            or source["proof"]["chainHash"] != record["sourceChainHash"]
-            or source["sequence"] != record["deviceSequence"]
+            or not sync_source_matches_record(record, source)
         ):
             errors.append(f"offline sync ingestion source/order mismatch at {expected_global}")
         core = {key: value for key, value in record.items() if key != "globalHash"}
@@ -473,6 +924,13 @@ def main():
         if record["decision"] != expected_decision:
             errors.append(f"offline sync unsafe decision at {expected_global}")
         previous_global = record_hash
+
+    if sync_ingestion:
+        mutation = json.loads(json.dumps(sync_ingestion[0]))
+        mutation["operation"] = {"type": "SAFE_TAG_ADD", "setId": "mutation", "tag": "mutation"}
+        mutation_source = event_by_id.get(mutation["sourceEventId"])
+        if sync_source_matches_record(mutation, mutation_source):
+            errors.append("offline sync validator accepted an operation-relabel mutation")
 
     observations = sync_evidence["observations"]
     codes = {record["code"] for record in sync_quarantine}
@@ -698,7 +1156,7 @@ def main():
     # No private key material.
     private_markers = ["BEGIN " + "PRIVATE KEY", "BEGIN OPENSSH " + "PRIVATE KEY", "PRIVATE " + "KEY-----"]
     for p in ROOT.rglob("*"):
-        if any(part in IGNORED_PARTS for part in p.parts):
+        if is_ignored(p):
             continue
         if p.is_file() and p.suffix.lower() not in {".zip", ".png", ".jpg"}:
             try: text = p.read_text(encoding="utf-8")

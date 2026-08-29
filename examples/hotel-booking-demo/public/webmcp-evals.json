@@ -1,0 +1,27 @@
+{
+  "informationUuidV5": "6ccf2fbe-a858-5707-9470-96318a92b49c",
+  "observationUuidV7": "01a04bd0-b895-7603-8491-8d60a19b1107",
+  "measurementStatus": "UNMEASURED",
+  "reason": "These deterministic cases are checked locally; model-selection quality remains unmeasured until a recorded ChatGPT Sites run exists.",
+  "applicationState": [
+    { "name": "check_existing_hotel_booking", "readOnly": true },
+    { "name": "prepare_hotel_booking", "readOnly": false },
+    { "name": "get_hotel_booking_status", "readOnly": true },
+    { "name": "preview_hotel_cancellation", "readOnly": true }
+  ],
+  "forbiddenTools": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"],
+  "deterministicContractCases": [
+    {
+      "caseId": "a894f7b3-b190-590d-bd7f-0062f8270f94",
+      "description": "Changing only display language retains the same UUIDv5 booking identity."
+    },
+    {
+      "caseId": "8544e552-b0a5-50f7-a8e4-e038eaa8f936",
+      "description": "Two attempts produce one simulated booking, one confirmation number, and one effect start."
+    },
+    {
+      "caseId": "96885ef9-dd98-5be2-b7c4-5e9769df5af9",
+      "description": "Cancellation preview does not change booking state."
+    }
+  ]
+}

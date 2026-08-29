@@ -14,6 +14,11 @@ import {
 import { ROOT_UUID_NAMESPACE } from "../notification/types.ts";
 import { uuidV5, uuidV7 } from "../uuid.ts";
 
+// information_uuid_v5=3b9a2345-e387-5f05-b9fd-11c7bc3d29f2
+// event_uuid_v7=01a049ff-0557-7a93-a1f0-0d70fa858510
+// state_transition=DISCOVERED -> DRY_RUN occurred_at=2026-08-28T20:10:44.951Z
+// machine-contract: replay evidence observed at the freshness boundary is stale; every accepted observation must be strictly later.
+
 const NOW = 1_788_000_000_000;
 const INTENT_ID = uuidV5(ROOT_UUID_NAMESPACE, "notification-intent/replay-verification-test");
 const PAYLOAD_DIGEST = sha256Canonical({ body: "one", target: "local-mac-notification", title: "test" });
@@ -88,6 +93,24 @@ test("TEST-OFFLINE-003: replay is allowed only after all six fresh checks pass",
     assert.equal(result.decision, "STOP", expectedGate);
     assert.equal(result.gates.find((item) => item.gate === expectedGate)?.status, "BLOCKED", expectedGate);
   }
+});
+
+test("replay rejects evidence observed in the same millisecond as the freshness boundary", () => {
+  const evidence = validReplayEvidence();
+  const result = evaluateReplayEvidence({
+    expectedIntentId: INTENT_ID,
+    expectedPayloadDigest: PAYLOAD_DIGEST,
+    expectedVersion: "0.1.0",
+    expectedPreconditionDigest: PRECONDITION_DIGEST,
+    expectedEffectStartStatus: "NOT_STARTED",
+    requiredFreshAfterEpochMs: NOW,
+    nowEpochMs: NOW,
+    evaluationEventId: uuidV7(NOW),
+    evidence,
+  });
+  assert.equal(result.decision, "STOP");
+  assert.equal(result.gates.every(gate => gate.status === "BLOCKED"), true);
+  assert.equal(result.gates.every(gate => /stale/.test(gate.reason)), true);
 });
 
 test("TEST-VERIFY-001: an observable write commits only when readback matches", () => {

@@ -1,0 +1,17 @@
+// information_uuid_v5=a5d9201a-c24c-5d2a-af2e-f4f3a2b8d3e0
+// event_uuid_v7=01a04a96-683f-7f68-a170-63d5cb47b6bd state_transition=PORTABLE_STATIC_BUILD -> CLOUDFLARE_WORKERS_STATIC_ASSETS_READY occurred_at=2026-08-28T22:56:06Z
+// event_uuid_v7=01a04bd0-b895-7ef8-8adf-a7d3c5b7b1f9 state_transition=STATIC_ASSET_ONLY -> SITES_COMPATIBLE_WORKER occurred_at=2026-08-29T01:00:00Z
+// machine-contract: the worker serves only Vite-generated static assets; no booking storage or effect runs on the server.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "verifiable-offline-webmcp-agent-spec",
+  "main": "./examples/hotel-booking-demo/worker.js",
+  "compatibility_date": "2026-05-22",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

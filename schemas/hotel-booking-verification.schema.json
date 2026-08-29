@@ -55,7 +55,7 @@
         "deploymentId": { "type": "string", "minLength": 3 },
         "providerArchiveContentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
         "url": { "type": "string", "format": "uri" },
-        "accessMode": { "const": "OWNER_ONLY" },
+        "accessMode": { "enum": ["OWNER_ONLY", "PUBLIC"] },
         "status": { "enum": ["PREVIOUS_ARTIFACT_VERIFIED", "CURRENT_ARTIFACT_VERIFIED"] },
         "observedAt": { "type": "string", "format": "date-time" },
         "evidence": { "type": "string", "minLength": 3 }

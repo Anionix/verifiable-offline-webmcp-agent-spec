@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
-  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04b5a-5d98-7af3-b83b-9c5faf116863 state_transition=APPROVAL_GATES_ENFORCED -> OWNER_ONLY_SITE_LIVE_VERIFIED occurred_at=2026-08-29T02:30:08.536Z machine-contract=owner-only live evidence never authorizes public publication submission or commerce writes",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1 state_transition=OWNER_ONLY_SITE_LIVE_VERIFIED -> PUBLIC_SITE_VERSION_4_VERIFIED occurred_at=2026-08-29T04:06:39.087Z machine-contract=public Sites authority is explicit and does not authorize Vercel deployment video publication or final submission",
   "title": "Service integration registry",
   "type": "object",
   "additionalProperties": false,
@@ -57,10 +57,10 @@
       ],
       "properties": {
         "from": {
-          "const": "APPROVAL_GATES_ENFORCED"
+          "const": "OWNER_ONLY_SITE_LIVE_VERIFIED"
         },
         "to": {
-          "const": "OWNER_ONLY_SITE_LIVE_VERIFIED"
+          "const": "PUBLIC_SITE_VERSION_4_VERIFIED"
         },
         "eventId": {
           "$ref": "#/$defs/uuidV7"

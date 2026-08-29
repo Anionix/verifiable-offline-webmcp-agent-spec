@@ -2,12 +2,12 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04ba1-cb16-7074-8cf4-03e77f94d0d8"
+    "observationUuidV7": "01a04bb2-b8ef-78c7-8b4c-3bb094273a40"
   },
-  "observedAt": "2026-08-29T03:48:09.622Z",
-  "sourceCommit": "5f603be2846735256ab1ef87fdb339af8f8d9676",
+  "observedAt": "2026-08-29T04:06:39.087Z",
+  "sourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
   "sourceState": "DEPLOYED_CURRENT",
-  "artifactDigest": "e1de0f34988839e0e94143e4eb8e389b9f552b44257da41fc509872da09ed4f7",
+  "artifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
@@ -17,36 +17,36 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "9f7b5455cc2c6b887cac9b04f4611093918e0cd75b4783b7d9d8c84a09dd95b4",
+  "fullClientArtifactDigest": "30bf0d69682e5c497da83622d54abadc164fb219c5a45c6fb4430b2cbe7d7afc",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "84bfec436c1074f610818bb124e202fbb103720791674226d9e4dcdfbc0bb3ab",
+  "fullSitesPackageDigest": "eb9b3a44a0a387b631242a561a141823b2b49ada05263ce7ec7a9c5c74823888",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_DEPLOYED -> LIVE_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
-    "functionalSourceCommit": "5f603be2846735256ab1ef87fdb339af8f8d9676",
-    "deployedVersionSourceCommit": "5f603be2846735256ab1ef87fdb339af8f8d9676",
-    "functionalArtifactDigest": "e1de0f34988839e0e94143e4eb8e389b9f552b44257da41fc509872da09ed4f7",
-    "fullSitesPackageDigest": "84bfec436c1074f610818bb124e202fbb103720791674226d9e4dcdfbc0bb3ab",
-    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_20bfe409a2708191b56d4e6d246ea21f",
-    "versionNumber": 3,
-    "deploymentId": "appgdep_6a925544c4248191ac3e9e9bbd629d52",
-    "providerArchiveContentHash": "sha256:37ac59c0c090f89a7b3000a73b1f48ce28c5a265808a574d50eea9a8c6664e0d",
+    "functionalSourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
+    "deployedVersionSourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
+    "functionalArtifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+    "fullSitesPackageDigest": "eb9b3a44a0a387b631242a561a141823b2b49ada05263ce7ec7a9c5c74823888",
+    "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_41868204179c819189641e2793e141b1",
+    "versionNumber": 4,
+    "deploymentId": "appgdep_6a925a4bc1f481918270265da3ab6801",
+    "providerArchiveContentHash": "sha256:74abc20ab9e100eeb1fc86525191a01e6172b716303d00c1eecd31dbfa8654a9",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
-    "accessMode": "OWNER_ONLY",
+    "accessMode": "PUBLIC",
     "status": "CURRENT_ARTIFACT_VERIFIED",
-    "observedAt": "2026-08-29T03:43:11.206459Z",
-    "evidence": "Sites version 3 and deployment readback identify commit 5f603be2846735256ab1ef87fdb339af8f8d9676 as the exact deployed source. The owner-only live run discovered exactly four safe tools, required the separate human confirmation button, converged two attempts to one booking and one effect start with confirmation FKR-C5E1BBD490, restored that result after reload, kept cancellation preview read-only, displayed a valid four-event UUIDv7 and SHA-256 chain, and produced zero browser console entries."
+    "observedAt": "2026-08-29T04:04:38.568575Z",
+    "evidence": "Sites version 4 and deployment readback identify commit a628eb9a91d310393a3b69b1130ab92871054d16 as the exact deployed source. Anonymous access loaded the public page. The live run displayed the ordinary-versus-WebMCP retry comparison, prepared through the visible flow, required the human confirmation button, converged two attempts to one booking and one effect start with confirmation FKR-B4C58E2002, restored the result after reload, displayed a valid four-event chain, and produced zero browser errors or warnings."
   },
   "checks": [
     {
@@ -107,13 +107,13 @@
       "checkId": "6f65cf02-40eb-51c3-bdbc-4d532082fe0e",
       "name": "Google Chrome page and WebMCP runtime",
       "status": "INCONCLUSIVE",
-      "evidence": "Chrome reached the owner-only production URL but displayed Sign in required, so live page execution was not measured. Earlier local Chrome testing restored a non-default Japanese stay with attempts=2, bookings=1, effects=1, but the native WebMCP runtime was not exposed; Chrome discovery and execution remain inconclusive."
+      "evidence": "Google Chrome loaded public Sites version 4 without sign-in and displayed EMPTY, the ordinary-versus-WebMCP retry comparison, and four safe tool cards. document.modelContext was undefined, so native WebMCP discovery and execution remain inconclusive."
     },
     {
       "checkId": "cc47b03a-10b9-5806-b327-67b2139a0b93",
       "name": "Visible local proof panel",
       "status": "PASS",
-      "evidence": "The live owner-only Sites version 3 displayed reservation UUIDv5 9494291c-89cb-555d-9ac0-5480707e1740, latest event UUIDv7 01a04b9f-a461-7974-9304-fbcc01f853f6, four events, chain head 18f47498163f..., and Valid after retry. The same panel also passed local 320 CSS-pixel wrapping without horizontal overflow."
+      "evidence": "The public Sites version 4 displayed reservation UUIDv5 f9732bc0-a163-5988-a453-fdf03fe5e39a, latest event UUIDv7 01a04bb1-e169-7aeb-9e75-b10a45194867, four events, chain head db1e4e61ac34..., and Valid after retry. The same panel also passed local 320 CSS-pixel wrapping without horizontal overflow."
     },
     {
       "checkId": "f7e5400d-3f70-57ef-aa97-17cab03c8915",
@@ -125,7 +125,7 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The owner-only production URL verifies Sites version 3 from exact source commit 5f603be2846735256ab1ef87fdb339af8f8d9676. It loaded with zero console entries, exposed exactly four safe tools, enabled the separate human confirmation button only after preparation, preserved 2 attempts -> 1 booking -> 1 effect start -> confirmation FKR-C5E1BBD490, kept cancellation preview read-only, and restored the same state after reload."
+      "evidence": "The public production URL verifies Sites version 4 from exact source commit a628eb9a91d310393a3b69b1130ab92871054d16. It loaded anonymously with zero browser errors or warnings, displayed exactly four safe tools, enabled the separate human confirmation button only after preparation, preserved 2 attempts -> 1 booking -> 1 effect start -> confirmation FKR-B4C58E2002, and restored the same state after reload."
     }
   ],
   "designFidelity": [

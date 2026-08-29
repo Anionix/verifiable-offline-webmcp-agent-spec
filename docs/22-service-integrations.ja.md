@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04b5a-5d98-7af3-b83b-9c5faf116863"
-observed_at: "2026-08-29T02:30:08.536Z"
-state_transition: "APPROVAL_GATES_ENFORCED -> OWNER_ONLY_SITE_LIVE_VERIFIED"
+event_uuid_v7: "01a04bb2-b8ef-7440-9684-f9ac00d520f8"
+observed_at: "2026-08-29T04:06:39.087Z"
+state_transition: "OWNER_ONLY_SITE_LIVE_VERIFIED -> PUBLIC_SITE_VERSION_4_VERIFIED"
 ---
 
 # サービス連携状態の読み方
@@ -39,22 +39,22 @@ state_transition: "APPROVAL_GATES_ENFORCED -> OWNER_ONLY_SITE_LIVE_VERIFIED"
 
 ## 現在の記録
 
-最新の記録更新は2026年8月29日2時30分8秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
+最新の記録更新は2026年8月29日4時6分39秒（協定世界時）です。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
 | サービス | 導入 | 認証 | 公開 | 実行 | 今回の役割 |
 |---|---|---|---|---|---|
-| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。所有者限定の本番URLで今回成果物を実行確認済み |
+| ChatGPT Sites | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `CURRENT_ARTIFACT_VERIFIED` | 主公開先。一般公開の本番URLで版4を実行確認済み |
 | Vercel | `ACTIVE` | `CONFIRMED` | `BASELINE_ONLY` | `BASELINE_ONLY` | 予備公開先。確認済みなのは古い通知実演だけ |
 | Cloudflare | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | ChatGPT Sites向け実行形式と将来の公開候補 |
 | Netlify | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
-| Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 所有者限定URLはログイン要求。端末内検査でもWebMCP機能は未露出 |
+| Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
 | Devpost | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_APPLICABLE` | 資料確認、下書き、最終提出 |
 
 DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未定`、説明・動画URLが空、最終提出前であることを確認しました。名称は利用者が決めるため変更していません。
 
-ChatGPT Sitesでは、コミット`64306a20916d9456794eb310e8f518eb6ecdb7ee`から作った成果物を[所有者限定の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。ChatGPT内ブラウザーで四つのWebMCP機能だけを発見し、準備、人間の画面操作による確定、安全な再送、状態確認、取り消し料金の読み取りを実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件で、再読込後も同じ値へ復元しました。一般公開は許可されておらず、共有範囲は所有者本人だけです。
+ChatGPT Sitesでは、コミット`a628eb9a91d310393a3b69b1130ab92871054d16`から作った版4を[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。未ログイン表示を確認し、通常の再送とWebMCPの安全な再送を並べた比較、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。
 
 Vercelの`BASELINE_ONLY`は、過去の通知実演を見たという意味です。現在のホテル成果物が公開済み、匿名で閲覧可能、または正常動作するという意味ではありません。
 
@@ -79,7 +79,7 @@ NetlifyとRenderは、リポジトリ内の公開先パスと限定した設定�
 
 Shopifyは商品検索、買い物かご、購入画面、注文履歴に関する商取引の境界を説明するだけです。ホテル予約の操作機能として接続しません。
 
-Google Chromeでは所有者限定の本番URLへ到達しましたが、`Sign in required`が表示され、今回の本番成果物の画面とWebMCP機能は確認できませんでした。以前の端末内検査では、準備、画面上の人間による確定、安全な再送、再読込まで実行し、二回の試行が予約一件と処理開始一回へ収束しました。ただし、その検査でもChromeのWebMCP実行機能はページへ露出しませんでした。したがって、Chromeでの本番画面と四機能の発見・実行は`INCONCLUSIVE`のままです。
+Google Chromeでは一般公開の版4を未ログインで表示し、初期状態、再送比較、四つの安全な機能カードを確認しました。ただし`document.modelContext`は未定義で、ChromeのWebMCP実行機能はページへ露出しませんでした。したがって、画面表示は確認済みですが、Chromeでの四機能の発見・実行は`INCONCLUSIVE`のままです。
 
 ## 外部操作の承認境界
 
@@ -88,7 +88,7 @@ Google Chromeでは所有者限定の本番URLへ到達しましたが、`Sign i
 | サービス | 操作 | 現在の承認状態 | 実行境界 |
 |---|---|---|---|
 | ChatGPT Sites | `OWNER_ONLY_DEPLOYMENT` | `AUTHORIZED_BY_PLAN` | 所有者だけが見られる初回公開は計画で許可済み |
-| ChatGPT Sites | `PUBLIC_DEPLOYMENT` | `REQUIRES_SEPARATE_APPROVAL` | 一般公開の直前に別の確認が必要 |
+| ChatGPT Sites | `PUBLIC_DEPLOYMENT` | `AUTHORIZED_BY_USER` | 利用者の「公開しながら作っていいです」を根拠に一般公開済み |
 | Vercel | `PRODUCTION_DEPLOYMENT` | `REQUIRES_SEPARATE_APPROVAL` | 本番公開の直前に別の確認が必要 |
 | Cloudflare | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は一般公開しない |
 | Netlify | `PUBLIC_DEPLOYMENT` | `OUT_OF_SCOPE` | 今回は構成確認だけで、一般公開しない |
@@ -98,7 +98,7 @@ Google Chromeでは所有者限定の本番URLへ到達しましたが、`Sign i
 | Devpost | `DRAFT_UPDATE` | `AUTHORIZED_BY_PLAN` | 下書き更新は計画で許可済み |
 | Devpost | `FINAL_SUBMISSION` | `REQUIRES_SEPARATE_APPROVAL` | 最終提出の直前に別の確認が必要 |
 
-`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在この値を使う操作はありません。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
+`AUTHORIZED_BY_USER`は、利用者が対象操作を明示的に許可した後にだけ使います。現在はChatGPT Sitesの一般公開だけに使っています。`REQUIRES_SEPARATE_APPROVAL`と`OUT_OF_SCOPE`の操作は実行しません。
 
 ## 認証を成功扱いする条件
 

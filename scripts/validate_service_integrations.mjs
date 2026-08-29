@@ -6,6 +6,9 @@
 // event_uuid_v7=01a04b38-0e40-7595-81ae-fd2db303c4ae
 // state_transition=FOUR_AXIS_RECORDED -> APPROVAL_GATES_ENFORCED occurred_at=2026-08-29T01:52:40.000Z
 // machine-contract: external writes are allowed only when the exact service/action gate records plan or user authority.
+// event_uuid_v7=01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1
+// state_transition=OWNER_ONLY_SITE_LIVE_VERIFIED -> PUBLIC_SITE_VERSION_4_VERIFIED occurred_at=2026-08-29T04:06:39.087Z
+// machine-contract: the current Sites row must identify the same functional commit and digest as the live hotel deployment receipt.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
@@ -16,6 +19,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const REGISTRY_PATH = resolve(ROOT, "metadata/service-integration-registry.json");
 const SCHEMA_PATH = resolve(ROOT, "schemas/service-integration-registry.schema.json");
+const HOTEL_VERIFICATION_PATH = resolve(ROOT, "metadata/hotel-booking-verification.json");
 const UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 
 const EXPECTED_SERVICE_IDS = [
@@ -67,7 +71,7 @@ const APPROVAL_STATES = [
 const EXPECTED_APPROVAL_GATES = {
   "chatgpt-sites": [
     { action: "OWNER_ONLY_DEPLOYMENT", state: "AUTHORIZED_BY_PLAN" },
-    { action: "PUBLIC_DEPLOYMENT", state: "REQUIRES_SEPARATE_APPROVAL" },
+    { action: "PUBLIC_DEPLOYMENT", state: "AUTHORIZED_BY_USER" },
   ],
   vercel: [{ action: "PRODUCTION_DEPLOYMENT", state: "REQUIRES_SEPARATE_APPROVAL" }],
   cloudflare: [{ action: "PUBLIC_DEPLOYMENT", state: "OUT_OF_SCOPE" }],
@@ -310,6 +314,7 @@ function checkSecretFields(value, path = "$") {
 
 const registry = readJson(REGISTRY_PATH);
 const schema = readJson(SCHEMA_PATH);
+const hotelVerification = readJson(HOTEL_VERIFICATION_PATH);
 
 if (registry && schema) {
   validateWithSchema(registry, schema, "$", schema);
@@ -432,6 +437,16 @@ if (registry && schema) {
   checkUuidV7Time(identity.evidenceEventId ?? "", identity.observedAt ?? "", "registry identity");
   record(stateTransition.eventId === identity.evidenceEventId, "state transition event differs from registry evidence event");
   record(stateTransition.occurredAt === identity.observedAt, "state transition time differs from registry observation time");
+
+  const sites = services.find((service) => service?.serviceId === "chatgpt-sites");
+  record(
+    sites?.artifactCommit === hotelVerification?.liveDeployment?.functionalSourceCommit,
+    "chatgpt-sites: artifactCommit differs from the live hotel deployment receipt",
+  );
+  record(
+    sites?.artifactSha256 === hotelVerification?.liveDeployment?.functionalArtifactDigest,
+    "chatgpt-sites: artifactSha256 differs from the live hotel deployment receipt",
+  );
 
   const computedSummary = {
     totalServices: services.length,

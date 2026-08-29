@@ -3,24 +3,24 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04b5a-5d98-7af3-b83b-9c5faf116863",
+    "evidenceEventId": "01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T02:30:08.536Z"
+    "observedAt": "2026-08-29T04:06:39.087Z"
   },
   "stateTransition": {
-    "from": "APPROVAL_GATES_ENFORCED",
-    "to": "OWNER_ONLY_SITE_LIVE_VERIFIED",
-    "eventId": "01a04b5a-5d98-7af3-b83b-9c5faf116863",
-    "occurredAt": "2026-08-29T02:30:08.536Z",
-    "machineContract": "The owner-only Site may be live and verified while public access, Vercel production, video publication, and final submission remain separately blocked."
+    "from": "OWNER_ONLY_SITE_LIVE_VERIFIED",
+    "to": "PUBLIC_SITE_VERSION_4_VERIFIED",
+    "eventId": "01a04bb2-b8ef-7ea8-9b99-6a0ab5d36ec1",
+    "occurredAt": "2026-08-29T04:06:39.087Z",
+    "machineContract": "The user authorized public Sites access. Vercel production, video publication, and final Devpost submission remain separate actions."
   },
   "services": [
     {
       "serviceId": "chatgpt-sites",
       "displayName": "ChatGPT Sites",
       "integrationSurfaceId": "58dcb1cc-e3a8-5329-836d-11299b1ee1e7",
-      "evidenceEventId": "01a04b5a-5d98-7be7-bc65-51b65100d3c0",
-      "observedAt": "2026-08-29T02:30:08.536Z",
+      "evidenceEventId": "01a04bb2-b8ef-7c84-aa63-2eb47ea1c2c2",
+      "observedAt": "2026-08-29T04:06:39.087Z",
       "pluginRef": "sites@openai-bundled",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -42,7 +42,7 @@
         },
         {
           "action": "PUBLIC_DEPLOYMENT",
-          "state": "REQUIRES_SEPARATE_APPROVAL"
+          "state": "AUTHORIZED_BY_USER"
         }
       ],
       "verifiedAuthOperations": [
@@ -52,18 +52,20 @@
         "WRITE:create_source_repository_write_credential",
         "WRITE:save_site_version",
         "WRITE:deploy_private_site_version",
+        "WRITE:update_site_access",
+        "WRITE:deploy_site_version",
         "READ:get_deployment_status"
       ],
-      "artifactCommit": "64306a20916d9456794eb310e8f518eb6ecdb7ee",
-      "artifactSha256": "435dc83c2a5d880a31b990970eef4d7b71112b66876bb7919795e16b167f28a6",
-      "reasonCode": "OWNER_ONLY_SITE_LIVE_VERIFIED",
+      "artifactCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PUBLIC_SITE_VERSION_4_VERIFIED",
       "roles": [
         "Primary publication target for the hotel duplicate-booking demo.",
         "Package the shared client with the ChatGPT Sites worker entry point."
       ],
       "limitations": [
-        "The current artifact is live at https://kyoto-booking-retry-proof.anionix.chatgpt.site but access remains owner-only.",
-        "General public access was not authorized and was not enabled."
+        "Version 4 is live at https://kyoto-booking-retry-proof.anionix.chatgpt.site with public access and an anonymous page load verified.",
+        "Public Sites access does not authorize Vercel production, video publication, or final Devpost submission."
       ],
       "sources": [
         "https://learn.chatgpt.com/docs/sites"
@@ -290,8 +292,8 @@
       "serviceId": "google-chrome",
       "displayName": "Google Chrome",
       "integrationSurfaceId": "7968f6bc-3ff9-5700-be56-7e1e04c3392d",
-      "evidenceEventId": "01a04b5a-5d98-727b-90ef-a63a007f8cf4",
-      "observedAt": "2026-08-29T02:30:08.536Z",
+      "evidenceEventId": "01a04bb2-b8ef-7441-82d2-9af0c0908385",
+      "observedAt": "2026-08-29T04:06:39.087Z",
       "pluginRef": "chrome@openai-bundled",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -315,13 +317,13 @@
       "verifiedAuthOperations": [],
       "artifactCommit": null,
       "artifactSha256": null,
-      "reasonCode": "OWNER_ONLY_SITE_REQUIRES_CHROME_SIGN_IN",
+      "reasonCode": "PUBLIC_PAGE_VERIFIED_NATIVE_WEBMCP_INCONCLUSIVE",
       "roles": [
         "Inspect WebMCP tool discovery, execution, and history in a browser."
       ],
       "limitations": [
-        "Chrome reached the owner-only production URL but displayed Sign in required; live page execution was not measured.",
-        "An earlier local Chrome page flow preserved one booking, but native WebMCP discovery remained inconclusive."
+        "Google Chrome loaded the public version 4 page without sign-in and displayed EMPTY, the retry comparison, and four safe tool cards.",
+        "document.modelContext was undefined in that Chrome page, so native WebMCP discovery and execution remain inconclusive."
       ],
       "sources": [
         "https://developer.chrome.com/docs/ai/webmcp",

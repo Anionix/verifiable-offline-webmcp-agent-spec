@@ -2,10 +2,10 @@
   "$schema": "../schemas/demo-video-production.schema.json",
   "identity": {
     "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-    "observationUuidV7": "01a04c2d-3882-7f7c-ba6a-441b69f2d53b"
+    "observationUuidV7": "01a04c37-78f9-7972-b402-46d5ee4909a9"
   },
-  "updatedAt": "2026-08-29T06:20:27.000Z",
-  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED",
+  "updatedAt": "2026-08-29T06:31:43.000Z",
+  "stateTransition": "SCRIPT_PLANNED -> REFERENCE_SELECTED -> VIDEO_GENERATION_SUBMITTED -> SOURCE_VIDEOS_PRESERVED -> SCRIPTS_DRAFTED -> MEDIA_CAPABILITIES_CHECKED -> DRAFT_FILE_DIGESTS_REFRESHED -> STOCK_VOICE_AUDIO_MEASURED -> AUDIO_TIMED_CAPTIONS_DRAFTED -> VIDEO_PLAN_REALIGNED -> CAPTION_CONTRACT_VERIFIED -> JAPANESE_CUES_BOUND_TO_ENGLISH_CLOCK -> PUBLICATION_FAIL_CLOSED -> PUBLIC_SITE_SCREEN_RECORDED -> FINAL_VIDEO_VERIFIED -> CURRENT_SERVICE_TABLE_CAPTURED -> FINAL_VIDEO_REVERIFIED -> CURRENT_RESULT_ENDING_VERIFIED -> PUBLICATION_COPY_PREPARED",
   "billingBoundary": {
     "additionalPurchaseAuthorized": false,
     "subscriptionChangeAuthorized": false,
@@ -59,9 +59,9 @@
       "taskCallable": true,
       "callableToolCount": 52,
       "authenticationState": "CONFIRMED",
-      "verifiedOperations": ["READ:balance"],
-      "productionUseState": "NOT_USED",
-      "reasonCode": "PUBLICATION_REVIEW_DEFERRED"
+      "verifiedOperations": ["READ:balance", "WRITE:generate_titles"],
+      "productionUseState": "USED",
+      "reasonCode": "TITLE_CANDIDATES_GENERATED_ONE_CALL"
     },
     {
       "capabilityId": "b30ec6ce-a80f-5319-be12-a1c59c34f826",
@@ -83,9 +83,9 @@
       "taskCallable": true,
       "callableToolCount": 32,
       "authenticationState": "CONFIRMED",
-      "verifiedOperations": ["READ:search"],
-      "productionUseState": "NOT_USED",
-      "reasonCode": "THUMBNAIL_DEFERRED_UNTIL_PUBLICATION_REVIEW"
+      "verifiedOperations": ["READ:search", "WRITE:generate_design"],
+      "productionUseState": "USED",
+      "reasonCode": "THUMBNAIL_CANDIDATES_GENERATED_SELECTION_PENDING"
     }
   ],
   "assets": [
@@ -268,6 +268,30 @@
       "localPath": ".local/video-production/site-public-v7-retry-result.png",
       "sha256": "435fd077c9f3cd2123785230dc663c248b01d8502188940f31d35d56e15e1e43",
       "disclosure": "Actual public ChatGPT Sites version 7 capture of a fictional booking. It shows RETRY_RECOGNIZED, two attempts, one simulated booking, and one effect start; no personal information, payment, real hotel, or external reservation is present."
+    },
+    {
+      "assetId": "f62d632a-118f-59be-b1aa-e32b75b93286",
+      "service": "vidIQ",
+      "kind": "TITLE_SET",
+      "status": "COMPLETED",
+      "prompt": "Generate five English long-form YouTube title candidates for a 150-second WebMCP Challenge demo about a lost hotel-booking response and a verified two-attempts-to-one-booking result.",
+      "createdAt": null,
+      "remoteId": null,
+      "localPath": "media/demo-video/publication-copy.md",
+      "sha256": "6939d21cd001cd7ae17968f924ec1259401ad765e5b4bbcc0ac7a3fe5ba5a496",
+      "disclosure": "One vidIQ call returned five scored candidates and used five credits. The selected title scored 86; a score-90 candidate was rejected because its wording overstated the demonstrated scope."
+    },
+    {
+      "assetId": "dbffe266-6b45-50e3-aa68-9d209554d01b",
+      "service": "Canva",
+      "kind": "THUMBNAIL",
+      "status": "COMPLETED",
+      "prompt": "Generate a clean 16:9 YouTube thumbnail candidate showing two attempts converging into one fictional booking, using large ivory, navy, vermilion, and green typography without people, brands, or invented product screenshots.",
+      "createdAt": null,
+      "remoteId": "dg-9b48aa63-51c6-4a59-81aa-3e79675256bf",
+      "localPath": ".local/video-production/canva-thumbnail-candidate-4.png",
+      "sha256": "54a6f4242642af85aa863ea8fa814b9df271cda19e15927b53f2d3c5271d3e4c",
+      "disclosure": "Temporary Canva candidate 4. It is not yet selected, saved to the Canva account, uploaded to Devpost, or used on a public video."
     },
     {
       "assetId": "3f11b58e-98ae-58ef-963d-baf8273c2911",

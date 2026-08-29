@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04bf8-0ad7-75c7-b142-83f5e76dfdc7 state_transition=HISTORICAL_NOTIFICATION_DEPLOYMENT_ONLY -> CURRENT_HOTEL_ARTIFACT_VERIFIED occurred_at=2026-08-29T05:22:22.039Z machine-contract=The provider unique URL identifies the deployment but requires authentication so anonymous remote file hashes and browser execution bind the same deployment through its public alias",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04c3f-8390-799c-ac51-3166e6f118cf state_transition=CURRENT_HOTEL_ARTIFACT_VERIFIED -> LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY occurred_at=2026-08-29T06:40:26.000Z machine-contract=The verified deployment remains previous while the new local hashes stage the unchanged hotel function and current Devpost project-page state for exact-source redeployment",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,
@@ -89,8 +89,8 @@
       "additionalProperties": false,
       "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
-        "from": { "const": "HISTORICAL_NOTIFICATION_DEPLOYMENT_ONLY" },
-        "to": { "const": "CURRENT_HOTEL_ARTIFACT_VERIFIED" },
+        "from": { "const": "CURRENT_HOTEL_ARTIFACT_VERIFIED" },
+        "to": { "const": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
         "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }

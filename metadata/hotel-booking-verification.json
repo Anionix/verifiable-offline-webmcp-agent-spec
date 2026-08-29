@@ -2,11 +2,11 @@
   "$schema": "../schemas/hotel-booking-verification.schema.json",
   "identity": {
     "informationUuidV5": "913faf6f-78d4-581c-8eca-900110effb30",
-    "observationUuidV7": "01a04bf8-0ad7-74ff-be5e-9afaa29d0492"
+    "observationUuidV7": "01a04c3d-df74-73cb-8f69-e143b5e03816"
   },
-  "observedAt": "2026-08-29T05:22:22.039Z",
-  "sourceCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
-  "sourceState": "DEPLOYED_CURRENT",
+  "observedAt": "2026-08-29T06:38:38.000Z",
+  "sourceCommit": "WORKTREE",
+  "sourceState": "WORKTREE_CANDIDATE",
   "artifactDigest": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
   "artifactDigestScope": {
     "algorithm": "SHA-256",
@@ -17,21 +17,21 @@
       "service-integrations.json"
     ]
   },
-  "fullClientArtifactDigest": "f3259ddadad4246f498525ab14dde56e2682f2e96e6862dd0269c137bf405a8c",
+  "fullClientArtifactDigest": "577e8699bc4032b1eba9f3c2674eb6bb21b092ab571d1607050cdc6cc0d22bc2",
   "fullClientArtifactDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist/client",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "fullSitesPackageDigest": "80eadc9a78201629c8b2b29bb405a2ebaeeeac626922c834a1ae6c89b98b746f",
+  "fullSitesPackageDigest": "46bb009521e71e1051d7218565c1af7daeb55c6faf2c8f7add711a1db1062ade",
   "fullSitesPackageDigestScope": {
     "algorithm": "SHA-256",
     "root": "dist",
     "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
     "excludedPaths": []
   },
-  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED",
+  "stateTransition": "PLANNED -> IMPLEMENTING -> LOCALLY_VERIFIED -> OWNER_ONLY_VERSION_3_LIVE_VERIFIED -> PUBLIC_VERSION_4_LIVE_VERIFIED -> PUBLIC_VERSION_5_SCREEN_RECORDED -> PUBLIC_VERSION_6_LIVE_VERIFIED -> PUBLIC_VERSION_7_SITES_AND_VERCEL_VERIFIED -> DEVPOST_STATE_TABLE_WORKTREE_CANDIDATE",
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "a628eb9a91d310393a3b69b1130ab92871054d16",
@@ -44,7 +44,7 @@
     "providerArchiveContentHash": "sha256:5429fab02e8e8a5dbf7a63605601a68deed92a917c69514f5ac32cef8ac2fcb4",
     "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
     "accessMode": "PUBLIC",
-    "status": "CURRENT_ARTIFACT_VERIFIED",
+    "status": "PREVIOUS_ARTIFACT_VERIFIED",
     "observedAt": "2026-08-29T05:22:22.039Z",
     "evidence": "Sites version 7 and deployment readback identify commit 34eaed29c397d383cff264a7b86a7ff72a28c083 as the exact deployed source and retain functional source a628eb9a91d310393a3b69b1130ab92871054d16. Anonymous access loaded EMPTY with exactly four safe tool cards and the current Sites and Vercel integration states. A fresh browser-storage run prepared through the visible flow, required the human confirmation button, restored after reload, and converged two attempts to one booking and one effect start with confirmation FKR-1852E0269A, UUIDv5 4181074b-ce92-5b97-9eef-964a6f8f064b, four audit events, SHA-256 chain head e7005aa4d4b2, and a valid chain. Browser errors and warnings were zero."
   },

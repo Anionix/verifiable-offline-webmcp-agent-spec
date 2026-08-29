@@ -1,9 +1,9 @@
 ---
 title: サービス連携状態の読み方
 information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
-event_uuid_v7: "01a04bf8-0ad7-70d1-885c-b2282c88ad31"
-observed_at: "2026-08-29T05:22:22.039Z"
-state_transition: "SITES_AND_VERCEL_CURRENT_VERIFIED -> VERSION_7_AND_VERCEL_RELEASE_READ_BACK"
+event_uuid_v7: "01a04c37-78f2-75ee-bef1-ad3a48c0dc16"
+observed_at: "2026-08-29T06:31:43.000Z"
+state_transition: "VERSION_7_AND_VERCEL_RELEASE_READ_BACK -> DEVPOST_PROJECT_PAGE_PUBLISHED"
 ---
 
 # サービス連携状態の読み方
@@ -50,9 +50,9 @@ state_transition: "SITES_AND_VERCEL_CURRENT_VERIFIED -> VERSION_7_AND_VERCEL_REL
 | Render | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_RUN` | リポジトリ内の公開先パスと設定構文だけ確認 |
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
-| Devpost | `ACTIVE` | `CONFIRMED` | `NOT_PUBLISHED` | `NOT_APPLICABLE` | 資料確認、下書き、最終提出 |
+| Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 現行説明と公開URLを載せたプロジェクトページ。最終提出は別 |
 
-DevpostではWebMCP Challengeの既存下書きを読み取り、名称が`未定`、説明・動画URLが空、最終提出前であることを確認しました。名称は利用者が決めるため変更していません。
+Devpostでは、[プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明、ChatGPT Sites、Vercel、公開リポジトリを反映しました。提供元の読み戻しは版5・状態`published`で、未ログインのHTTP 200応答も確認しました。名称は利用者が決めるため`未定`のままです。動画URLは空、WebMCP Challengeの`submitted_at`も空なので、一般プロジェクトページの公開を最終提出とは扱いません。
 
 ChatGPT Sitesでは、機能コミット`a628eb9a91d310393a3b69b1130ab92871054d16`を含む正確な配置元コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`を版7として[一般公開の本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)へ配置しました。版7で未ログイン表示、現在のSites・Vercel状態表、準備、人間の画面操作による確定、安全な再送、再読込復元を実行しました。結果は試行二回、架空予約一件、処理開始一回、確認番号一件です。完成動画の動く操作部分は同じ機能要約値を持つ版5を収録し、終盤には現在の一般公開版7から取得したサービス状態表と再送結果の実画面キャプチャを表示します。
 

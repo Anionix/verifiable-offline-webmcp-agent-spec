@@ -2,9 +2,9 @@
 title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
-event_uuid_v7: "01a04bf8-0ad7-7b8a-af15-7590b1eb0ae6"
-observed_at: "2026-08-29T05:22:22.039Z"
-status: "sites-version-7-and-vercel-live-verified-final-video-verified"
+event_uuid_v7: "01a04c37-78fb-732c-800d-cef1a0257120"
+observed_at: "2026-08-29T06:31:43.000Z"
+status: "sites-vercel-and-devpost-page-live-final-video-verified"
 ---
 
 # 訪日旅行者向け・ホテル二重予約防止デモ
@@ -82,7 +82,7 @@ Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../met
 - WebMCP比較画面とVercel状態表を含む確定コミット`34eaed29c397d383cff264a7b86a7ff72a28c083`は、ChatGPT Sites版7として一般公開済みです。未ログイン表示、人間確認境界、再送収束、再読込復元を実URLで確認しました。
 - 同じ確定コミットは、ホテル専用Vercelプロジェクトにも一般公開済みです。五つの公開ファイルを読み戻して端末内構築物との一致を確認し、旧通知実演は別プロジェクトの元の配置へ戻して上書きしていません。
 - 最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、実際の公開Site画面録画は113.2秒（75.5%）です。終盤には現在の一般公開Sites版7のサービス状態表と、`RETRY_RECOGNIZED`・試行2・予約1・処理開始1を示す再送結果キャプチャがあります。SHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。日本語字幕は別のSubRipファイルとして保持し、動画公開はまだ行っていません。
-- Devpost下書きは今回更新していません。この作業場所に`.devpost-hackathon-state.json`がないため、下書き更新の前提を満たしておらず、最終提出も行っていません。
+- Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)へ現行説明と三つの公開URLを反映し、未ログイン200応答を確認しました。名称は`未定`、動画URLは空、WebMCP Challengeへの提出時刻も空です。最終提出は行っていません。
 
 ## 構築と検査
 

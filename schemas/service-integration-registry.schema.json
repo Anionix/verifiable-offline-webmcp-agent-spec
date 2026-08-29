@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/service-integration-registry.schema.json",
-  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04be5-0163-7a97-8904-c882da28add6 state_transition=PUBLIC_SITE_CURRENT_VERIFIED -> SITES_AND_VERCEL_CURRENT_VERIFIED occurred_at=2026-08-29T05:01:34.435Z machine-contract=Sites and Vercel publication claims require separate current-artifact receipts while video publication and final submission remain separate approval gates",
+  "$comment": "information_uuid_v5=78f60de4-89ae-56bc-8e72-8ab99654c911 event_uuid_v7=01a04c37-8898-746a-b87b-4a4beb6cbf29 state_transition=SITES_AND_VERCEL_CURRENT_VERIFIED -> DEVPOST_PROJECT_PAGE_PUBLISHED occurred_at=2026-08-29T06:31:43.000Z machine-contract=Sites and Vercel remain current-artifact verified; the Devpost project page is public with current links while video publication and final submission remain separate gates",
   "title": "Service integration registry",
   "type": "object",
   "additionalProperties": false,
@@ -57,10 +57,10 @@
       ],
       "properties": {
         "from": {
-          "const": "PUBLIC_SITE_CURRENT_VERIFIED"
+          "const": "SITES_AND_VERCEL_CURRENT_VERIFIED"
         },
         "to": {
-          "const": "SITES_AND_VERCEL_CURRENT_VERIFIED"
+          "const": "DEVPOST_PROJECT_PAGE_PUBLISHED"
         },
         "eventId": {
           "$ref": "#/$defs/uuidV7"

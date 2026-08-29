@@ -3,16 +3,16 @@
   "receiptVersion": "1.0.0",
   "identity": {
     "informationUuidV5": "b5e254dc-08a3-59e9-a4dd-f2215b184964",
-    "observationUuidV7": "01a04bf8-0ad7-75c7-b142-83f5e76dfdc7",
+    "observationUuidV7": "01a04c3f-8390-799c-ac51-3166e6f118cf",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T05:22:22.039Z"
+    "observedAt": "2026-08-29T06:40:26.000Z"
   },
   "stateTransition": {
-    "from": "HISTORICAL_NOTIFICATION_DEPLOYMENT_ONLY",
-    "to": "CURRENT_HOTEL_ARTIFACT_VERIFIED",
-    "eventId": "01a04bf8-0ad7-75c7-b142-83f5e76dfdc7",
-    "occurredAt": "2026-08-29T05:22:22.039Z",
-    "machineContract": "The provider unique URL identifies the deployment but requires authentication. Anonymous remote file hashes and the complete browser retry flow therefore bind the same deployment through its public alias, alongside the post-ready one-hour lookback query and separately restored notification deployment."
+    "from": "CURRENT_HOTEL_ARTIFACT_VERIFIED",
+    "to": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY",
+    "eventId": "01a04c3f-8390-799c-ac51-3166e6f118cf",
+    "occurredAt": "2026-08-29T06:40:26.000Z",
+    "machineContract": "The verified deployment remains the previous public version while local hashes stage the unchanged hotel function plus the current Devpost project-page state for exact-source redeployment."
   },
   "provider": {
     "name": "Vercel",
@@ -46,14 +46,14 @@
   "remoteArtifacts": {
     "deploymentId": "dpl_8mKodVM7QYitgsfcWdcdGtN6QvDu",
     "baseUrl": "https://kyoto-booking-retry-proof.vercel.app",
-    "hashEvidenceState": "REMOTE_HASHES_READ_BACK_AND_MATCHED",
-    "remoteHashReadbackAt": "2026-08-29T05:20:36.214Z",
+    "hashEvidenceState": "LOCAL_BUILD_HASHES_STAGED_FOR_REDEPLOY",
+    "remoteHashReadbackAt": null,
     "artifacts": [
       { "name": "document", "requestPath": "/", "localPath": "dist/client/index.html", "statusCode": 200, "sha256": "6091acbce2127ded26bc1e03d98dcdd22296f8c4be91271711d68f739a2e2d01" },
       { "name": "application-script", "requestPath": "/assets/app.js", "localPath": "dist/client/assets/app.js", "statusCode": 200, "sha256": "14974a0f0109aa759895547049b2d40b846a9b271aa89dbaa03e570f5874ddc9" },
       { "name": "application-style", "requestPath": "/assets/index.css", "localPath": "dist/client/assets/index.css", "statusCode": 200, "sha256": "18d4ffe7171923260be7503842a8e0faf1a2b66e7e1e1606a506c58e8d4bd9ec" },
       { "name": "service-worker", "requestPath": "/service-worker.js", "localPath": "dist/client/service-worker.js", "statusCode": 200, "sha256": "9fdc8252d772e71cc462c00fe29d9ee9294460c67d46105335a1b98f4de6e610" },
-      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "a7b8a79b095d97fb58ca3497a8de3896dcdb2e08af78118b0df98ce3715ee99e" }
+      { "name": "service-integration-registry", "requestPath": "/service-integrations.json", "localPath": "dist/client/service-integrations.json", "statusCode": 200, "sha256": "561f4aba7c50b152bdb0428878f9c3e73413ebde54d3b44c25a3b70b74b9108c" }
     ]
   },
   "anonymousHttp": {

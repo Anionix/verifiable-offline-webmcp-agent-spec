@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "identity": {
     "registryId": "db7888ed-01de-5679-a9bf-3cb0a124c18b",
-    "evidenceEventId": "01a04be5-0163-7a97-8904-c882da28add6",
+    "evidenceEventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
     "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
-    "observedAt": "2026-08-29T05:01:34.435Z"
+    "observedAt": "2026-08-29T06:31:43.000Z"
   },
   "stateTransition": {
-    "from": "PUBLIC_SITE_CURRENT_VERIFIED",
-    "to": "SITES_AND_VERCEL_CURRENT_VERIFIED",
-    "eventId": "01a04be5-0163-7a97-8904-c882da28add6",
-    "occurredAt": "2026-08-29T05:01:34.435Z",
-    "machineContract": "The user authorized public builds. Sites and Vercel current hotel artifacts are anonymously verified; video publication and final Devpost submission remain separate actions."
+    "from": "SITES_AND_VERCEL_CURRENT_VERIFIED",
+    "to": "DEVPOST_PROJECT_PAGE_PUBLISHED",
+    "eventId": "01a04c37-8898-746a-b87b-4a4beb6cbf29",
+    "occurredAt": "2026-08-29T06:31:43.000Z",
+    "machineContract": "Sites and Vercel remain current-artifact verified. The Devpost project page now has current live links, while video publication and final hackathon submission remain separate actions."
   },
   "services": [
     {
@@ -340,8 +340,8 @@
       "serviceId": "devpost",
       "displayName": "Devpost",
       "integrationSurfaceId": "3e8ffb12-0a3e-5c18-9dc4-81d59d91ef48",
-      "evidenceEventId": "01a04b30-112e-7687-a596-0f32ac6721f5",
-      "observedAt": "2026-08-29T01:43:56.462Z",
+      "evidenceEventId": "01a04c37-8898-75c8-843c-d1bf5500d7c9",
+      "observedAt": "2026-08-29T06:31:43.000Z",
       "pluginRef": "app-6a330a7730c081919892632d5baaec58@openai-curated-remote",
       "pluginState": "ACTIVE",
       "installationEvidence": {
@@ -354,7 +354,7 @@
         "restartState": "NOT_APPLICABLE"
       },
       "authenticationState": "CONFIRMED",
-      "publicationState": "NOT_PUBLISHED",
+      "publicationState": "CURRENT_ARTIFACT",
       "runtimeState": "NOT_APPLICABLE",
       "approvalGates": [
         {
@@ -368,18 +368,21 @@
       ],
       "verifiedAuthOperations": [
         "READ:list_my_projects",
-        "READ:get_project"
+        "READ:get_project",
+        "READ:get_submission_requirements",
+        "READ:get_judging_criteria",
+        "WRITE:update_project"
       ],
-      "artifactCommit": null,
-      "artifactSha256": null,
-      "reasonCode": "SUBMISSION_DRAFT_READ_NOT_PUBLISHED",
+      "artifactCommit": "34eaed29c397d383cff264a7b86a7ff72a28c083",
+      "artifactSha256": "0f8b2a68e99c4464198744f0e714c4f9348401905ec4cdaff350f2619f45e470",
+      "reasonCode": "PROJECT_PAGE_CURRENT_FINAL_SUBMISSION_PENDING",
       "roles": [
         "Provide the challenge resources and hold the submission draft.",
         "Receive final public links only after separate approval."
       ],
       "limitations": [
-        "The existing WebMCP Challenge draft was read and its undecided name remains unchanged; it is not a final submitted project.",
-        "No draft write or final submission is claimed by this repository record."
+        "Project page version 5 is publicly readable at https://devpost.com/software/project-y79pb23hj1mz with the current description and live links; its undecided name remains unchanged.",
+        "The video URL is empty and the WebMCP Challenge submitted_at value is null, so no final hackathon submission is claimed."
       ],
       "sources": [
         "https://webmcp.devpost.com/resources"
@@ -401,9 +404,9 @@
       "NOT_APPLICABLE": 1
     },
     "publicationState": {
-      "CURRENT_ARTIFACT": 2,
+      "CURRENT_ARTIFACT": 3,
       "BASELINE_ONLY": 0,
-      "NOT_PUBLISHED": 4,
+      "NOT_PUBLISHED": 3,
       "UNVERIFIED": 0,
       "NOT_APPLICABLE": 2
     },

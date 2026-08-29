@@ -80,7 +80,7 @@
       "properties": {
         "assetId": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "service": { "enum": ["Higgsfield", "OpenArt", "Magnific", "vidIQ", "HeyGen", "Canva", "LOCAL"] },
-        "kind": { "enum": ["REFERENCE_IMAGE", "VIDEO_SCENE", "VOICE", "SUBTITLE", "THUMBNAIL", "SCREEN_CAPTURE", "SCREEN_RECORDING", "FINAL_VIDEO"] },
+        "kind": { "enum": ["REFERENCE_IMAGE", "VIDEO_SCENE", "VOICE", "SUBTITLE", "TITLE_SET", "THUMBNAIL", "SCREEN_CAPTURE", "SCREEN_RECORDING", "FINAL_VIDEO"] },
         "status": { "enum": ["PLANNED", "SUBMITTED", "COMPLETED", "FAILED", "SKIPPED", "UNMEASURED"] },
         "prompt": { "type": ["string", "null"] },
         "createdAt": { "type": ["string", "null"], "format": "date-time" },

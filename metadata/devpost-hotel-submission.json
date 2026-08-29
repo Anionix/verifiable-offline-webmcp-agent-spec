@@ -7,9 +7,9 @@
   "identity": {
     "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "informationUuidV5": "faef02a2-712f-5fd3-b88f-dc44bc45db1f",
-    "recordEventUuidV7": "01a04d7a-8fe8-7c9c-a38a-d4ae27adaf6f"
+    "recordEventUuidV7": "01a04d95-8640-7d6e-aca3-4fee9941e100"
   },
-  "recordedAt": "2026-08-29T12:24:33.000Z",
+  "recordedAt": "2026-08-29T12:54:00.000Z",
   "preparedFromCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
   "subject": {
     "projectId": "1405191",
@@ -37,17 +37,17 @@
         "evidence": "The local draft and workflow state contain the owner-confirmed answers, the four bounded WebMCP tools, public URLs, and explicit uncertainty boundaries."
       },
       {
-        "eventUuidV7": "01a04d7a-8fe8-7c9c-a38a-d4ae27adaf6f",
-        "occurredAt": "2026-08-29T12:24:33.000Z",
+        "eventUuidV7": "01a04d95-8640-7d6e-aca3-4fee9941e100",
+        "occurredAt": "2026-08-29T12:54:00.000Z",
         "from": "SUBMISSION_PREPARED",
         "to": "FINAL_SUBMISSION_PENDING",
-        "evidence": "Authenticated Devpost readback returned submittedAt null, so the final challenge submission remains pending and no submission receipt is recorded."
+        "evidence": "Authenticated Devpost readback returned submittedAt null, and every observed claim now resolves to a SHA-256-verified file blob in commit 89d803fb822fc2d2a6182cecdb90eb0dfa5317da; final challenge submission remains pending."
       }
     ],
     "invariants": [
       "Only a Devpost-owned readback with non-null submitted_at proves final challenge submission.",
       "The local workflow state records preparation progress but does not persist Devpost-owned submission truth.",
-      "Every observed claim resolves through one contextIdUuidV5 to a repository path, source commit, and current SHA-256 digest.",
+      "Every observed claim resolves through one contextIdUuidV5 to a repository path, an existing Git commit containing that file blob, and the same current and committed SHA-256 digest.",
       "Every observed, unmeasured, and not-applicable claim remains in a separate collection.",
       "WebMCP exposes check, prepare, status, and cancellation preview only; confirmation, payment, and cancellation mutation remain unavailable.",
       "The running demo never represents a real booking, payment, hotel, email, cancellation, or personal record."
@@ -99,25 +99,25 @@
     {
       "contextIdUuidV5": "0b62bf24-d69f-593b-8b2c-4d2d70363dd8",
       "path": "metadata/devpost-public-readback.json",
-      "sourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
       "artifactSha256": "54664946e53e068571be963ca4120a594d777db04009f63ff46a97fda07e8e2d"
     },
     {
       "contextIdUuidV5": "6c7fb53b-d39e-5fe0-bf2e-1f012f6a8151",
       "path": "devpost-submission.md",
-      "sourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
       "artifactSha256": "ab4ffe4ea43f286ac65d70d9181b7ab7ffaae949486f6189d7c0f26352df3cbe"
     },
     {
       "contextIdUuidV5": "7556df45-80bf-5905-8f90-7027436a4f69",
       "path": ".devpost-hackathon-state.json",
-      "sourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
       "artifactSha256": "e450fcb73d52ebdaa56255879fc4f520e9ef5a73b6f0f90c0703cda0303d9bcf"
     },
     {
       "contextIdUuidV5": "e7a6f585-d06c-543e-af29-975746ab0e12",
       "path": "docs/assets/devpost-hotel-thumbnail.png",
-      "sourceCommit": "037496f6db7281b7b1a9ecd9b3dfc71d407feeb6",
+      "sourceCommit": "89d803fb822fc2d2a6182cecdb90eb0dfa5317da",
       "artifactSha256": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10"
     }
   ],

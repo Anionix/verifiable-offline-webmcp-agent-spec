@@ -3759,8 +3759,8 @@
     },
     {
       "path": "metadata/devpost-hotel-submission.json",
-      "sha256": "bb6fd4bec77b2f71813c6d55c7536ebce2efb2c37151bddac42909e0654c3823",
-      "bytes": 12669,
+      "sha256": "6bf61d29a6bf0a7eb38d468cbdabe5746fd261179b0b7f2c4468e256271c372f",
+      "bytes": 12804,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "schemas/devpost-hotel-submission.schema.json",
-      "sha256": "d21b6cc4e68fc24c1d5f54b4d7ccfc4be47c2db394311510f0637435915f11e8",
-      "bytes": 15357,
+      "sha256": "b894b04ffa290bb699ecada9be3a9235cbdfb42fdc2a157ec9d2345b4a1bdc4e",
+      "bytes": 15440,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5223,8 +5223,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "135a504f9d542f2e39d16d3471b6a5b0607a53c997e9d11e63bf0529be883229",
-      "bytes": 106411,
+      "sha256": "f93918f5198fbc126368619cebbd8b6febcee965746f6d216a971b89f141e70b",
+      "bytes": 108825,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

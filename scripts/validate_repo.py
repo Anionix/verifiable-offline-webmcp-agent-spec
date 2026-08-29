@@ -658,19 +658,68 @@ def main():
 
         observation_contexts = devpost_evidence["observationContexts"]
         context_by_id = {}
+        prepared_commit = devpost_evidence["preparedFromCommit"]
+        prepared_commit_type = subprocess.run(
+            ["git", "cat-file", "-t", prepared_commit],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if prepared_commit_type.returncode != 0 or prepared_commit_type.stdout.strip() != "commit":
+            errors.append("Devpost preparedFromCommit does not identify an existing Git commit")
+        validated_context_commits: dict[str, bool] = {}
         for context in observation_contexts:
             context_id = context["contextIdUuidV5"]
             require_uuid_version(context_id, 5, "Devpost observation context")
             if context_id in context_by_id:
                 errors.append(f"Devpost observation context repeats identifier {context_id}")
             context_by_id[context_id] = context
-            if context["sourceCommit"] != devpost_evidence["preparedFromCommit"]:
-                errors.append(f"Devpost observation context {context_id} uses a different source commit")
+            source_commit = context["sourceCommit"]
+            if source_commit not in validated_context_commits:
+                commit_type = subprocess.run(
+                    ["git", "cat-file", "-t", source_commit],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                commit_exists = commit_type.returncode == 0 and commit_type.stdout.strip() == "commit"
+                is_descendant = False
+                if commit_exists and prepared_commit_type.returncode == 0:
+                    ancestry = subprocess.run(
+                        ["git", "merge-base", "--is-ancestor", prepared_commit, source_commit],
+                        cwd=ROOT,
+                        capture_output=True,
+                        check=False,
+                    )
+                    is_descendant = ancestry.returncode == 0
+                validated_context_commits[source_commit] = commit_exists and is_descendant
+                if not commit_exists:
+                    errors.append(f"Devpost observation context source is not an existing Git commit: {source_commit}")
+                elif not is_descendant:
+                    errors.append(
+                        f"Devpost observation context source {source_commit} does not descend from preparedFromCommit"
+                    )
             context_path = (ROOT / context["path"]).resolve()
             if ROOT not in context_path.parents or not context_path.is_file():
                 errors.append(f"Devpost observation context is missing or outside the repository: {context['path']}")
             elif sha256(context_path.read_bytes()) != context["artifactSha256"]:
                 errors.append(f"Devpost observation context SHA-256 differs for {context['path']}")
+            committed_blob = subprocess.run(
+                ["git", "cat-file", "blob", f"{source_commit}:{context['path']}"],
+                cwd=ROOT,
+                capture_output=True,
+                check=False,
+            )
+            if committed_blob.returncode != 0:
+                errors.append(
+                    f"Devpost observation context commit {source_commit} does not contain {context['path']}"
+                )
+            elif sha256(committed_blob.stdout) != context["artifactSha256"]:
+                errors.append(
+                    f"Devpost observation context committed blob SHA-256 differs for {context['path']}"
+                )
 
         claim_ids = []
         used_context_ids = []
@@ -836,8 +885,8 @@ def main():
         # provider state without weakening the pending/submitted exclusivity.
         future_submitted = json.loads(json.dumps(devpost_evidence))
         future_event = {
-            "eventUuidV7": "01a04d7a-8fe9-78ff-b058-fd491ddcf84b",
-            "occurredAt": "2026-08-29T12:24:33.001Z",
+            "eventUuidV7": "01a04d95-8641-7091-a1f0-f5fd595b8fae",
+            "occurredAt": "2026-08-29T12:54:00.001Z",
             "from": "FINAL_SUBMISSION_PENDING",
             "to": "FINAL_SUBMISSION_VERIFIED",
             "evidence": "A future Devpost-owned receipt and non-null submittedAt readback verify final challenge submission.",

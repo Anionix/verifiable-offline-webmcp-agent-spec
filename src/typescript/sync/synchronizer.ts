@@ -54,6 +54,10 @@
 // event_uuid_v7=01a04d19-f9ee-7c91-8f32-123033bb1b34
 // state_transition=PATH_CHECK_THEN_OPEN -> DESCRIPTOR_VERIFIED_READ occurred_at=2026-08-29T10:40:43.886Z
 // machine-contract: owner.json is opened once with O_NOFOLLOW, classified from that descriptor, and read from that same descriptor; no path observation authorizes later owner bytes.
+// information_uuid_v5=f57b26f1-6a41-5927-8a5d-5599e3b91d1e
+// event_uuid_v7=01a04d4d-b6af-73c6-a2ac-cc8f0ae2fc0f
+// state_transition=STALE_RECOVERY_OBSERVATION -> ATOMIC_QUARANTINE_IDENTITY_CHECKED occurred_at=2026-08-29T14:55:00.000Z
+// machine-contract: a recovery target is removed only after its observed directory identity and owner fingerprint survive an atomic rename to a private quarantine name; a replacement is restored and never deleted.
 import { createPublicKey } from "node:crypto";
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -108,6 +112,11 @@ interface TrustedKeyAnchorLockObservation {
 interface TrustedKeyAnchorRecoveryClaim {
   path: string;
   owner: TrustedKeyAnchorLockOwner;
+}
+
+interface TrustedKeyAnchorRemovalExpectation {
+  directoryIdentity: string;
+  fingerprint: string;
 }
 
 const SHA_256 = /^[0-9a-f]{64}$/;
@@ -227,7 +236,50 @@ function observeTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number): Trus
   };
 }
 
-function tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath: string, directoryIdentity: string): TrustedKeyAnchorRecoveryClaim | null {
+function namedPathExists(path: string): boolean {
+  return lstatSync(path, { throwIfNoEntry: false }) !== undefined;
+}
+
+function removeObservedTrustedKeyAnchorDirectory(
+  path: string,
+  expected: TrustedKeyAnchorRemovalExpectation,
+  afterObservation: ((path: string) => void) | undefined,
+): boolean {
+  const before = observeTrustedKeyAnchorLock(path, Date.now());
+  if (!before || before.directoryIdentity !== expected.directoryIdentity || before.fingerprint !== expected.fingerprint) return false;
+  afterObservation?.(path);
+
+  const quarantinePath = `${path}.quarantine-${uuidV7(Date.now())}`;
+  try {
+    renameSync(path, quarantinePath);
+  } catch (error) {
+    if (filesystemErrorCode(error) === "ENOENT") return false;
+    throw error;
+  }
+
+  let removeQuarantine = false;
+  try {
+    const isolated = observeTrustedKeyAnchorLock(quarantinePath, Date.now());
+    if (isolated?.directoryIdentity !== expected.directoryIdentity || isolated.fingerprint !== expected.fingerprint) return false;
+    rmSync(quarantinePath, { recursive: true, force: false });
+    removeQuarantine = true;
+    return true;
+  } finally {
+    if (!removeQuarantine && namedPathExists(quarantinePath) && !namedPathExists(path)) {
+      try {
+        renameSync(quarantinePath, path);
+      } catch (error) {
+        if (filesystemErrorCode(error) !== "EEXIST" && filesystemErrorCode(error) !== "ENOENT") throw error;
+      }
+    }
+  }
+}
+
+function tryAcquireTrustedKeyAnchorRecoveryClaim(
+  lockPath: string,
+  directoryIdentity: string,
+  afterObservation: ((path: string) => void) | undefined,
+): TrustedKeyAnchorRecoveryClaim | null {
   const recoveryClaimPath = `${lockPath}.recovery-${sha256Hex(directoryIdentity)}`;
   let recoveryOwner: TrustedKeyAnchorLockOwner;
   try {
@@ -241,7 +293,9 @@ function tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath: string, directoryIden
   } catch (error) {
     if (filesystemErrorCode(error) === "EEXIST") {
       const abandonedClaim = observeTrustedKeyAnchorLock(recoveryClaimPath, Date.now());
-      if (abandonedClaim?.recoverable) rmSync(recoveryClaimPath, { recursive: true, force: true });
+      if (abandonedClaim?.recoverable) {
+        removeObservedTrustedKeyAnchorDirectory(recoveryClaimPath, abandonedClaim, afterObservation);
+      }
       return null;
     }
     throw error;
@@ -250,42 +304,53 @@ function tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath: string, directoryIden
 }
 
 function releaseTrustedKeyAnchorRecoveryClaim(claim: TrustedKeyAnchorRecoveryClaim): void {
-  if (trustedKeyAnchorLockIsOwnedBy(claim.path, claim.owner)) {
-    rmSync(claim.path, { recursive: true, force: false });
-  }
+  const current = observeTrustedKeyAnchorLock(claim.path, Date.now());
+  if (!current || current.owner?.ownerProcessId !== claim.owner.ownerProcessId || current.owner.ownerEventId !== claim.owner.ownerEventId) return;
+  removeObservedTrustedKeyAnchorDirectory(claim.path, current, undefined);
 }
 
-function tryRecoverTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number): boolean {
+function tryRecoverTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number, afterObservation: ((path: string) => void) | undefined): boolean {
   const observed = observeTrustedKeyAnchorLock(lockPath, nowEpochMs);
   if (!observed?.recoverable) return false;
-  const recoveryClaim = tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath, observed.directoryIdentity);
+  const recoveryClaim = tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath, observed.directoryIdentity, afterObservation);
   if (recoveryClaim === null) return false;
   try {
     const current = observeTrustedKeyAnchorLock(lockPath, Date.now());
     if (!current?.recoverable || current.fingerprint !== observed.fingerprint) return false;
-    rmSync(lockPath, { recursive: true, force: false });
-    return true;
+    return removeObservedTrustedKeyAnchorDirectory(lockPath, current, afterObservation);
   } finally {
     releaseTrustedKeyAnchorRecoveryClaim(recoveryClaim);
   }
 }
 
-function cleanupFailedTrustedKeyAnchorLockInitialization(lockPath: string, createdDirectoryIdentity: string, attemptedOwner: TrustedKeyAnchorLockOwner): void {
-  const recoveryClaim = tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath, createdDirectoryIdentity);
+function cleanupFailedTrustedKeyAnchorLockInitialization(
+  lockPath: string,
+  createdDirectoryIdentity: string,
+  attemptedOwner: TrustedKeyAnchorLockOwner,
+  afterObservation: ((path: string) => void) | undefined,
+): void {
+  const recoveryClaim = tryAcquireTrustedKeyAnchorRecoveryClaim(lockPath, createdDirectoryIdentity, afterObservation);
   if (recoveryClaim === null) return;
   try {
     const current = observeTrustedKeyAnchorLock(lockPath, Date.now());
     if (
       current?.directoryIdentity === createdDirectoryIdentity &&
       (current.owner === null || (current.owner.ownerProcessId === attemptedOwner.ownerProcessId && current.owner.ownerEventId === attemptedOwner.ownerEventId))
-    )
-      rmSync(lockPath, { recursive: true, force: false });
+    ) {
+      removeObservedTrustedKeyAnchorDirectory(lockPath, current, afterObservation);
+    }
   } finally {
     releaseTrustedKeyAnchorRecoveryClaim(recoveryClaim);
   }
 }
 
-function withTrustedKeyAnchorLock<T>(path: string, timeoutMs: number, afterDirectoryCreated: ((lockPath: string) => void) | undefined, operation: () => T): T {
+function withTrustedKeyAnchorLock<T>(
+  path: string,
+  timeoutMs: number,
+  afterDirectoryCreated: ((lockPath: string) => void) | undefined,
+  afterRecoveryObservation: ((lockPath: string) => void) | undefined,
+  operation: () => T,
+): T {
   const lockPath = `${path}.lock`;
   const deadline = Date.now() + timeoutMs;
   let owner: TrustedKeyAnchorLockOwner | null = null;
@@ -304,13 +369,13 @@ function withTrustedKeyAnchorLock<T>(path: string, timeoutMs: number, afterDirec
         ownerFingerprint = observeTrustedKeyAnchorLock(lockPath, Date.now())?.fingerprint ?? null;
         if (ownerFingerprint === null) throw new Error("trusted device key anchor lock identity is unreadable");
       } catch (error) {
-        cleanupFailedTrustedKeyAnchorLockInitialization(lockPath, createdDirectoryIdentity, owner);
+        cleanupFailedTrustedKeyAnchorLockInitialization(lockPath, createdDirectoryIdentity, owner, afterRecoveryObservation);
         throw error;
       }
       break;
     } catch (error) {
       if (filesystemErrorCode(error) !== "EEXIST") throw error;
-      if (tryRecoverTrustedKeyAnchorLock(lockPath, Date.now())) continue;
+      if (tryRecoverTrustedKeyAnchorLock(lockPath, Date.now(), afterRecoveryObservation)) continue;
       if (Date.now() >= deadline) {
         throw new Error("timed out waiting for the trusted device key anchor lock", { cause: error });
       }
@@ -322,7 +387,10 @@ function withTrustedKeyAnchorLock<T>(path: string, timeoutMs: number, afterDirec
   } finally {
     const currentFingerprint = observeTrustedKeyAnchorLock(lockPath, Date.now())?.fingerprint ?? null;
     if (owner !== null && ownerFingerprint !== null && currentFingerprint === ownerFingerprint && trustedKeyAnchorLockIsOwnedBy(lockPath, owner)) {
-      rmSync(lockPath, { recursive: true, force: false });
+      const current = observeTrustedKeyAnchorLock(lockPath, Date.now());
+      if (!current || !removeObservedTrustedKeyAnchorDirectory(lockPath, current, afterRecoveryObservation)) {
+        throw new Error("trusted device key anchor lock ownership changed before release");
+      }
     } else {
       throw new Error("trusted device key anchor lock ownership changed before release");
     }
@@ -432,6 +500,8 @@ export interface LocalSyncLedgerOptions {
   legacyTrustMigration?: readonly LegacyTrustedDeviceInput[];
   trustAnchorLockTimeoutMs?: number;
   afterTrustAnchorLockDirectoryCreated?: (lockPath: string) => void;
+  /** Deterministic test seam immediately before a recovery target is quarantined. */
+  afterTrustAnchorRecoveryObservation?: (lockPath: string) => void;
 }
 
 interface EventRow {
@@ -482,6 +552,7 @@ export class LocalSyncLedger {
   readonly #trustAnchorPath: string | null;
   readonly #trustAnchorLockTimeoutMs: number;
   readonly #afterTrustAnchorLockDirectoryCreated: ((lockPath: string) => void) | undefined;
+  readonly #afterTrustAnchorRecoveryObservation: ((lockPath: string) => void) | undefined;
   readonly #trustedKeyAnchors: Map<string, TrustedDeviceKeyAnchor>;
   #anchorWriteSequence = 0;
 
@@ -495,6 +566,9 @@ export class LocalSyncLedger {
     this.#afterTrustAnchorLockDirectoryCreated = options.afterTrustAnchorLockDirectoryCreated;
     if (this.#afterTrustAnchorLockDirectoryCreated !== undefined && typeof this.#afterTrustAnchorLockDirectoryCreated !== "function")
       throw new TypeError("trust anchor lock directory hook must be a function");
+    this.#afterTrustAnchorRecoveryObservation = options.afterTrustAnchorRecoveryObservation;
+    if (this.#afterTrustAnchorRecoveryObservation !== undefined && typeof this.#afterTrustAnchorRecoveryObservation !== "function")
+      throw new TypeError("trust anchor recovery observation hook must be a function");
     this.#trustAnchorPath = options.trustAnchorPath ?? trustAnchorPathForDatabase(path);
     if (this.#trustAnchorPath !== null && (this.#trustAnchorPath.length === 0 || (path !== ":memory:" && resolve(this.#trustAnchorPath) === resolve(path))))
       throw new TypeError("trust anchor path must be a separate file");
@@ -628,7 +702,13 @@ export class LocalSyncLedger {
     };
     return this.#trustAnchorPath === null
       ? update()
-      : withTrustedKeyAnchorLock(this.#trustAnchorPath, this.#trustAnchorLockTimeoutMs, this.#afterTrustAnchorLockDirectoryCreated, update);
+      : withTrustedKeyAnchorLock(
+          this.#trustAnchorPath,
+          this.#trustAnchorLockTimeoutMs,
+          this.#afterTrustAnchorLockDirectoryCreated,
+          this.#afterTrustAnchorRecoveryObservation,
+          update,
+        );
   }
 
   #refreshTrustedKeyAnchors(): void {
@@ -930,6 +1010,7 @@ export class LocalSyncLedger {
           this.#trustAnchorPath,
           this.#trustAnchorLockTimeoutMs,
           this.#afterTrustAnchorLockDirectoryCreated,
+          this.#afterTrustAnchorRecoveryObservation,
           ingestUnderSerializedBoundary,
         );
   }

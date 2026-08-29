@@ -1726,8 +1726,8 @@
     },
     {
       "path": "docs/17-offline-sync-reference.ja.md",
-      "sha256": "640a208db9851cfd2e4e5ee33fac01a18b2cea675ae3299193631f5a91da3c6b",
-      "bytes": 9971,
+      "sha256": "553eab429d7e497c38f500645c5c70675ef21cc988fd90a05e0144e786a69cc1",
+      "bytes": 10470,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -6097,8 +6097,8 @@
     },
     {
       "path": "src/typescript/sync/synchronizer.ts",
-      "sha256": "321cad5d6d9ba587b215b638f37a382418058f44d1a79a933c7c1ad71267c26c",
-      "bytes": 56226,
+      "sha256": "cba962a950dd5706f511fe28ece3056dcf5f5cacde4bb9cde82bba3a3a0ab767",
+      "bytes": 59764,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6325,8 +6325,8 @@
     },
     {
       "path": "src/typescript/test/offline-sync.test.ts",
-      "sha256": "d1967268c891cd7939c4c8a1bcb1c3f8ba6033d27f825d740ef14dfb10c02696",
-      "bytes": 56470,
+      "sha256": "5e8107a38bf232252c00cca4bb63b3cde057bebc67b9dcc2cb4d1c7c107f3a0b",
+      "bytes": 61019,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

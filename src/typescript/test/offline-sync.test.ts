@@ -2,7 +2,7 @@
 // event_uuid_v7=01a0491b-3e66-7d00-a3eb-8e48125bd44f
 // machine-contract: offline divergence may merge safe tags, but duplicate, ambiguous, forked, or dangerous effect records never execute an external effect.
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -48,6 +48,18 @@ import { uuidV5 } from "../uuid.ts";
 // event_uuid_v7=01a04a5f-6d38-7fc8-89b3-1e7daabc661d
 // state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-28T21:56:03.000Z
 // machine-contract: a self-consistent SQLite rewrite signed by a substituted key fails against the separately persisted trusted-key digest.
+// information_uuid_v5=5873e905-b4fe-5cbf-b23e-e92d10068f7b
+// event_uuid_v7=01a04c90-aedf-7a0d-bb62-fe99a19ae1c3
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-29T08:09:05.503Z
+// machine-contract: a latest-only bootstrap checkpoint is accepted once through its external digest, while a missing interior parent still fails closed.
+// information_uuid_v5=542c5141-881b-506e-af3b-fa3f25439622
+// event_uuid_v7=01a04c90-aee0-7b99-9581-fa55957b08f4
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-29T08:09:05.504Z
+// machine-contract: two ledger instances created from stale anchor snapshots must persist the union and read the complete set after restart.
+// information_uuid_v5=adafdf1a-7adc-5cc3-948f-b87cc011e114
+// event_uuid_v7=01a04c90-aee1-7e37-a797-81c25dc4b222
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-29T08:09:05.505Z
+// machine-contract: a genuine legacy database without an anchor rejects implicit startup and migrates only from a complete matching external key set.
 
 function clock(start = Date.UTC(2026, 7, 28, 17, 0, 0, 0)): () => number {
   let value = start;
@@ -61,6 +73,29 @@ function fixture(name: string): { directory: string; database: string; close(): 
     database: join(directory, "sync.sqlite"),
     close: () => rmSync(directory, { recursive: true, force: true }),
   };
+}
+
+function createLegacyKnownKeyDatabase(
+  databasePath: string,
+  identity: ReturnType<typeof createDeviceIdentity>,
+  publicKeyPem: string,
+): void {
+  const database = new DatabaseSync(databasePath);
+  try {
+    database.exec(`
+      CREATE TABLE known_device_keys (
+        device_id TEXT PRIMARY KEY,
+        log_id TEXT NOT NULL UNIQUE,
+        key_id TEXT NOT NULL UNIQUE,
+        public_key_pem TEXT NOT NULL
+      );
+    `);
+    database.prepare(`
+      INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
+    `).run(identity.deviceId, identity.logId, identity.keyId, publicKeyPem);
+  } finally {
+    database.close();
+  }
 }
 
 test("each device maintains an independently verifiable Ed25519 chain and checkpoint", () => {
@@ -115,6 +150,80 @@ test("successive checkpoints at the same tree size remain linked before growth",
   }
 });
 
+test("latest-only initial synchronization binds one omitted checkpoint parent externally", () => {
+  const item = fixture("latest-only-bootstrap");
+  const now = clock();
+  const identity = createDeviceIdentity("latest-only-bootstrap");
+  const log = new SignedDeviceLog(identity, { now });
+  log.append({ type: "SAFE_TAG_ADD", setId: "bootstrap", tag: "one" });
+  log.checkpoint();
+  log.append({ type: "SAFE_TAG_ADD", setId: "bootstrap", tag: "two" });
+  log.checkpoint();
+  log.append({ type: "SAFE_TAG_ADD", setId: "bootstrap", tag: "three" });
+  const latestCheckpoint = log.checkpoint();
+  try {
+    const ledger = new LocalSyncLedger(item.database, { now });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.notEqual(latestCheckpoint.previousCheckpointHash, null);
+    assert.equal(ledger.ingest(log.events(), latestCheckpoint).status, "INGESTED");
+    assert.equal(ledger.verifyGlobalChain().valid, true);
+
+    const anchorPath = trustAnchorPathForDatabase(item.database)!;
+    const anchorFile = JSON.parse(readFileSync(anchorPath, "utf8")) as {
+      anchors: Array<{ deviceId: string; bootstrapCheckpointDigest: string | null }>;
+    };
+    assert.equal(
+      anchorFile.anchors.find(anchor => anchor.deviceId === identity.deviceId)?.bootstrapCheckpointDigest,
+      latestCheckpoint.digest,
+    );
+
+    log.append({ type: "SAFE_TAG_ADD", setId: "bootstrap", tag: "four" });
+    const nextCheckpoint = log.checkpoint();
+    assert.equal(ledger.ingest(log.events(), nextCheckpoint).status, "INGESTED");
+    assert.deepEqual(ledger.safeTags("bootstrap"), ["four", "one", "three", "two"]);
+    assert.equal(ledger.verifyGlobalChain().valid, true);
+    ledger.close();
+
+    const reopened = new LocalSyncLedger(item.database, { now });
+    assert.equal(reopened.verifyGlobalChain().valid, true);
+    reopened.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("global verification rejects a missing interior checkpoint after a normal root", () => {
+  const item = fixture("missing-interior-checkpoint");
+  const now = clock();
+  const identity = createDeviceIdentity("missing-interior-checkpoint");
+  const log = new SignedDeviceLog(identity, { now });
+  log.append({ type: "SAFE_TAG_ADD", setId: "interior", tag: "one" });
+  const rootCheckpoint = log.checkpoint();
+  const rootEvents = log.events();
+  log.append({ type: "SAFE_TAG_ADD", setId: "interior", tag: "two" });
+  const interiorCheckpoint = log.checkpoint();
+  const interiorEvents = log.events();
+  log.append({ type: "SAFE_TAG_ADD", setId: "interior", tag: "three" });
+  const headCheckpoint = log.checkpoint();
+  try {
+    const ledger = new LocalSyncLedger(item.database, { now });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(ledger.ingest(rootEvents, rootCheckpoint).status, "INGESTED");
+    assert.equal(ledger.ingest(interiorEvents, interiorCheckpoint).status, "INGESTED");
+    assert.equal(ledger.ingest(log.events(), headCheckpoint).status, "INGESTED");
+    const removed = ledger.database.prepare(`
+      DELETE FROM device_checkpoints WHERE checkpoint_digest = ?
+    `).run(interiorCheckpoint.digest);
+    assert.equal(removed.changes, 1);
+    const verification = ledger.verifyGlobalChain();
+    assert.equal(verification.valid, false);
+    assert.equal(verification.reason, "SIGNED_DEVICE_CHAIN_MISMATCH");
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
 test("global ingestion is persistent, idempotent, and preserves each device sequence", () => {
   const item = fixture("persistence");
   const now = clock();
@@ -161,6 +270,51 @@ test("global ingestion is persistent, idempotent, and preserves each device sequ
     assert.equal(reopened.externalEffectStarts(), 0);
     assert.equal(Object.getOwnPropertyNames(LocalSyncLedger.prototype).includes("execute"), false);
     assert.equal(Object.getOwnPropertyNames(LocalSyncLedger.prototype).includes("notify"), false);
+    reopened.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("stale ledger instances serialize trust-anchor updates and retain the durable union", () => {
+  const item = fixture("concurrent-trust-anchors");
+  const now = clock();
+  const identityA = createDeviceIdentity("concurrent-anchor-a");
+  const identityB = createDeviceIdentity("concurrent-anchor-b");
+  const logA = new SignedDeviceLog(identityA, { now });
+  const logB = new SignedDeviceLog(identityB, { now });
+  logA.append({ type: "SAFE_TAG_ADD", setId: "anchors", tag: "a" });
+  logB.append({ type: "SAFE_TAG_ADD", setId: "anchors", tag: "b" });
+  const checkpointA = logA.checkpoint();
+  const checkpointB = logB.checkpoint();
+  try {
+    const staleA = new LocalSyncLedger(item.database, { now });
+    const staleB = new LocalSyncLedger(item.database, { now });
+    staleA.registerDevice(identityA, logA.publicKeyPem());
+    staleB.registerDevice(identityB, logB.publicKeyPem());
+
+    const anchorPath = trustAnchorPathForDatabase(item.database)!;
+    const anchorFile = JSON.parse(readFileSync(anchorPath, "utf8")) as {
+      anchors: Array<{ deviceId: string; publicKeySha256: string }>;
+    };
+    assert.equal(existsSync(`${anchorPath}.lock`), false);
+    assert.deepEqual(
+      anchorFile.anchors.map(anchor => anchor.deviceId).sort(),
+      [identityA.deviceId, identityB.deviceId].sort(),
+    );
+    assert.deepEqual(
+      anchorFile.anchors.map(anchor => anchor.publicKeySha256).sort(),
+      [sha256Hex(logA.publicKeyPem()), sha256Hex(logB.publicKeyPem())].sort(),
+    );
+
+    assert.equal(staleA.ingest(logA.events(), checkpointA).status, "INGESTED");
+    assert.equal(staleB.ingest(logB.events(), checkpointB).status, "INGESTED");
+    staleA.close();
+    staleB.close();
+
+    const reopened = new LocalSyncLedger(item.database, { now });
+    assert.equal(reopened.verifyGlobalChain().valid, true);
+    assert.deepEqual(reopened.safeTags("anchors"), ["a", "b"]);
     reopened.close();
   } finally {
     item.close();
@@ -263,6 +417,76 @@ test("legacy source-event migration is explicit and repairable by verified reing
     const repaired = reopened.verifyGlobalChain();
     assert.equal(repaired.valid, true);
     assert.equal(repaired.reason, "VERIFIED");
+    reopened.close();
+  } finally {
+    item.close();
+  }
+});
+
+test("legacy database trust migration requires a complete matching external key set", () => {
+  const item = fixture("legacy-trust-migration");
+  const now = clock();
+  const identity = createDeviceIdentity("legacy-trust-migration");
+  const secondIdentity = createDeviceIdentity("legacy-trust-migration-second");
+  const trustedLog = new SignedDeviceLog(identity, { now });
+  const secondTrustedLog = new SignedDeviceLog(secondIdentity, { now });
+  trustedLog.append({ type: "SAFE_TAG_ADD", setId: "legacy-trust", tag: "migrated" });
+  const checkpoint = trustedLog.checkpoint();
+  const substitutedLog = new SignedDeviceLog(identity, { keys: createDeviceKeyMaterial(), now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  try {
+    createLegacyKnownKeyDatabase(item.database, identity, trustedLog.publicKeyPem());
+    const secondLegacyConnection = new DatabaseSync(item.database);
+    secondLegacyConnection.prepare(`
+      INSERT INTO known_device_keys (device_id, log_id, key_id, public_key_pem) VALUES (?, ?, ?, ?)
+    `).run(
+      secondIdentity.deviceId,
+      secondIdentity.logId,
+      secondIdentity.keyId,
+      secondTrustedLog.publicKeyPem(),
+    );
+    secondLegacyConnection.close();
+    assert.equal(existsSync(anchorPath), false);
+    assert.throws(
+      () => new LocalSyncLedger(item.database, { now }),
+      /explicit trust migration input/,
+    );
+    assert.equal(existsSync(anchorPath), false);
+    assert.throws(
+      () => new LocalSyncLedger(item.database, {
+        now,
+        legacyTrustMigration: [{ identity, publicKeyPem: substitutedLog.publicKeyPem() }],
+      }),
+      /does not match the stored device identity and key/,
+    );
+    assert.equal(existsSync(anchorPath), false);
+    assert.throws(
+      () => new LocalSyncLedger(item.database, {
+        now,
+        legacyTrustMigration: [{ identity, publicKeyPem: trustedLog.publicKeyPem() }],
+      }),
+      /explicitly cover every stored device key/,
+    );
+    assert.equal(existsSync(anchorPath), false);
+
+    const migrated = new LocalSyncLedger(item.database, {
+      now,
+      legacyTrustMigration: [
+        { identity, publicKeyPem: trustedLog.publicKeyPem() },
+        { identity: secondIdentity, publicKeyPem: secondTrustedLog.publicKeyPem() },
+      ],
+    });
+    const anchorFile = readFileSync(anchorPath, "utf8");
+    assert.match(anchorFile, new RegExp(sha256Hex(trustedLog.publicKeyPem())));
+    assert.match(anchorFile, new RegExp(sha256Hex(secondTrustedLog.publicKeyPem())));
+    assert.doesNotMatch(anchorFile, /BEGIN PUBLIC KEY/);
+    assert.equal(migrated.ingest(trustedLog.events(), checkpoint).status, "INGESTED");
+    assert.equal(migrated.verifyGlobalChain().valid, true);
+    migrated.close();
+
+    const reopened = new LocalSyncLedger(item.database, { now });
+    assert.equal(reopened.verifyGlobalChain().valid, true);
+    assert.deepEqual(reopened.safeTags("legacy-trust"), ["migrated"]);
     reopened.close();
   } finally {
     item.close();

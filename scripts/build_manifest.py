@@ -178,8 +178,8 @@ def explain_stale(expected: dict[Path, bytes]) -> None:
                 print(f"catalog changed path: {path}; fields: {', '.join(changed)}")
 
     manifest_path = ROOT / MANIFEST_NAME
-    expected_lines = set(expected[manifest_path].decode("utf-8").splitlines())
-    actual_lines = set(manifest_path.read_text(encoding="utf-8").splitlines()) if manifest_path.exists() else set()
+    expected_lines: set[str] = set(expected[manifest_path].decode("utf-8").splitlines())
+    actual_lines: set[str] = set(manifest_path.read_text(encoding="utf-8").splitlines()) if manifest_path.exists() else set()
     for line in sorted(expected_lines - actual_lines)[:20]:
         digest, _, path = line.partition("  ")
         print(f"manifest expected: {path} sha256={digest}")

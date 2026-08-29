@@ -1,0 +1,94 @@
+{
+  "$schema": "../schemas/python-type-tools.schema.json",
+  "identity": {
+    "informationUuidV5": "0295e1e4-5327-5304-8f27-a63d49de4ba3",
+    "observationUuidV7": "01a04c99-d1c3-776e-9e68-78f0ce19ce97",
+    "namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "observedAt": "2026-08-29T08:19:04.259Z"
+  },
+  "stateTransition": {
+    "from": "PYTHON_TYPE_ANALYSIS_UNCONFIGURED",
+    "through": [
+      "VERSION_PINNED",
+      "PROJECT_SCOPE_CONFIGURED",
+      "TYPE_CHECKS_PASSED"
+    ],
+    "to": "LANGUAGE_SERVER_HANDSHAKES_VERIFIED",
+    "eventId": "01a04c99-d1c3-776e-9e68-78f0ce19ce97",
+    "occurredAt": "2026-08-29T08:19:04.259Z",
+    "machineContract": "Both exact development dependency versions, both configured project checks, and both initialize and shutdown language-server handshakes must pass without a global installation or generated configuration migration."
+  },
+  "installation": {
+    "scope": "PROJECT_DEV_DEPENDENCIES",
+    "manager": "uv",
+    "configuration": "pyproject.toml",
+    "lockfile": "uv.lock",
+    "globalInstallationPerformed": false,
+    "automaticPyreflyInitExecuted": false
+  },
+  "projectScope": {
+    "pythonVersion": "3.12",
+    "includes": [
+      "scripts",
+      "formal/model-checker"
+    ],
+    "pythonFiles": [
+      "formal/model-checker/reachability.py",
+      "scripts/build_manifest.py",
+      "scripts/final_verification.py",
+      "scripts/generate_ids.py",
+      "scripts/promote_tests.py",
+      "scripts/validate_python_type_tools.py",
+      "scripts/validate_repo.py"
+    ]
+  },
+  "tools": [
+    {
+      "name": "ty",
+      "version": "0.0.75",
+      "officialStatus": "BETA",
+      "macosArm64WheelSha256": "c6ccf34169821fe0d23e3360deeef981d217963412f1d087b9bdd32ec57f7a57",
+      "typeCheckCommand": "uv run --frozen ty check",
+      "typeCheckState": "PASSED",
+      "languageServerCommand": "uv run --frozen ty server",
+      "languageServerHandshakeState": "PASSED"
+    },
+    {
+      "name": "Pyrefly",
+      "version": "1.2.0",
+      "officialStatus": "STABLE",
+      "macosArm64WheelSha256": "756f669b5555090f5c1a4fef30db1785fabe657764f7e4e6dc88994dfb8ca82d",
+      "typeCheckCommand": "uv run --frozen pyrefly check --min-severity warn",
+      "typeCheckState": "PASSED",
+      "languageServerCommand": "uv run --frozen pyrefly lsp",
+      "languageServerHandshakeState": "PASSED"
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "a921275a-04f7-537c-8a8d-b912c30fef92",
+      "title": "ty installation",
+      "url": "https://docs.astral.sh/ty/installation/",
+      "supports": ["project development dependency installation", "beta status"]
+    },
+    {
+      "sourceId": "5931a630-272e-5ccf-85c5-2192d2a497cf",
+      "title": "ty type checking",
+      "url": "https://docs.astral.sh/ty/type-checking/",
+      "supports": ["project checking command", "explicit project configuration"]
+    },
+    {
+      "sourceId": "7ce37a14-6b80-5135-9792-758cfd542711",
+      "title": "Pyrefly installation",
+      "url": "https://pyrefly.org/en/docs/installation/",
+      "supports": ["project development dependency installation", "stable release"]
+    },
+    {
+      "sourceId": "e68fea5a-7974-5cb7-ab53-d887dc0b7f4f",
+      "title": "Pyrefly editor integration",
+      "url": "https://pyrefly.org/en/docs/IDE/",
+      "supports": ["language server command", "editor integration"]
+    }
+  ],
+  "secretsIncluded": false
+}

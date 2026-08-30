@@ -644,6 +644,70 @@ test("trust-anchor lock recovers abnormal termination but never displaces a live
   }
 });
 
+// information_uuid_v5=c419ed29-a03b-5788-a865-5de3af54811b
+// event_uuid_v7=01a050a9-ebf0-7e2f-942f-85edce2b942f
+// state_transition=PARTIAL_OWNER_FILE -> GRACE_PERIOD -> STALE_OWNER_RECOVERED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a malformed regular owner file is treated as an uninitialized lock after the grace period, while unsafe owner entries remain non-recoverable.
+test("trust-anchor lock recovers a stale partially written owner file", () => {
+  const item = fixture("partial-owner-file");
+  const now = clock();
+  const identity = createDeviceIdentity("partial-owner-file");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  try {
+    mkdirSync(lockPath, { mode: 0o700 });
+    writeFileSync(join(lockPath, "owner.json"), '{"schemaVersion":1,"ownerProcessId":', { encoding: "utf8", mode: 0o600, flag: "wx" });
+    const expired = new Date(Date.now() - 60_000);
+    utimesSync(lockPath, expired, expired);
+
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 80 });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+    assert.equal(ledger.verifyGlobalChain().valid, true);
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
+// information_uuid_v5=d0a52aae-c7e2-5ec0-9b4c-fedb08e5a2c6
+// event_uuid_v7=01a050a9-ebf1-77d9-aafe-3fcce5c62453
+// state_transition=WALL_CLOCK_SHIFT_SIMULATED -> STABLE_PROCESS_START_ID -> LIVE_OWNER_PROTECTED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: changing the wall clock cannot make a same-process live owner look like a reused PID; its process-start identity is stable for the module lifetime.
+test("trust-anchor lock preserves a live owner across a wall-clock shift", () => {
+  const item = fixture("stable-process-start");
+  const now = clock();
+  const identity = createDeviceIdentity("stable-process-start");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const ownerEpochMs = Date.now();
+  const owner = {
+    schemaVersion: 1,
+    ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
+    acquiredAtEpochMs: ownerEpochMs,
+    ownerEventId: uuidV7(ownerEpochMs),
+  };
+  const originalDateNow = Date.now;
+  const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 40 });
+  try {
+    mkdirSync(lockPath, { mode: 0o700 });
+    writeFileSync(join(lockPath, "owner.json"), `${JSON.stringify(owner)}\n`, { encoding: "utf8", mode: 0o600, flag: "wx" });
+    Date.now = () => originalDateNow() + 60_000;
+    assert.throws(
+      () => ledger.registerDevice(identity, log.publicKeyPem()),
+      /timed out waiting for the trusted device key anchor lock/,
+    );
+    assert.deepEqual(JSON.parse(readFileSync(join(lockPath, "owner.json"), "utf8")), owner);
+  } finally {
+    Date.now = originalDateNow;
+    ledger.close();
+    item.close();
+  }
+});
+
 // information_uuid_v5=2ea93f2d-0e22-5253-80b4-bf94474a994e
 // event_uuid_v7=01a05066-0020-7c7d-8b7f-d9a5c7f64f4b
 // state_transition=PID_REUSE_SIMULATED -> START_ID_MISMATCH -> RECOVERED occurred_at=2026-08-30T02:00:00.000Z

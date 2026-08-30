@@ -32,6 +32,8 @@ Video binaries, credentials, environment files, personal information, and real b
 
 Run from one clean, committed source checkout. The builder stops if the working tree is dirty, if the source commit changes, if a required public-evidence digest differs, or if Gitleaks is unavailable.
 
+After a release branch is deleted, keep the source and base commits reachable from a durable annotated evidence tag so a fresh clone can validate the package by full commit hashes.
+
 ```bash
 npm ci
 npm run build:web

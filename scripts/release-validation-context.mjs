@@ -8,18 +8,20 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// machine-contract: the positive boundary covers executable TypeScript and demo source, data and schema fixtures, and named runtime/build/release metadata inputs. Unlisted documentation, metadata, and validation control remain under their own checks.
+// machine-contract: executable TypeScript, demo source, and data remain prefix-scoped; runtime schemas are explicit exact paths. Unlisted documentation, metadata, evidence schemas, and validation control remain under their own checks.
 const squashValidationInputPrefixes = Object.freeze([
   "src/typescript/",
   "examples/",
   "data/",
-  "schemas/",
 ]);
 const squashValidationInputPaths = Object.freeze([
   ".node-version",
   "index.html",
   "package.json",
   "package-lock.json",
+  "schemas/hotel-booking-tool-input.schema.json",
+  "schemas/notification-tool-input.schema.json",
+  "schemas/input-provenance.schema.json",
   "metadata/service-integration-registry.json",
   "metadata/offline-sync-verification.json",
   "metadata/online-planner-verification.json",
@@ -28,6 +30,7 @@ const squashValidationInputPaths = Object.freeze([
   "vite.config.js",
   "wrangler.jsonc",
 ]);
+// machine-contract: adding a runtime schema dependency requires a matching src/typescript/ change and an explicit exact-path allowlist update; dependency discovery is not inferred automatically.
 const squashValidationDocumentationPaths = Object.freeze([
   "examples/hotel-booking-demo/README.md",
 ]);

@@ -352,6 +352,16 @@ const directReleaseConfigurationDrifts = Object.freeze([
     current: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"current"}\n',
   },
   {
+    path: "schemas/notification-tool-input.schema.json",
+    source: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"source"}\n',
+    current: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"current"}\n',
+  },
+  {
+    path: "schemas/input-provenance.schema.json",
+    source: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"source"}\n',
+    current: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"current"}\n',
+  },
+  {
     path: "src/typescript/canonical.ts",
     source: 'export const CANONICAL_FIXTURE = "source";\n',
     current: 'export const CANONICAL_FIXTURE = "current";\n',
@@ -506,6 +516,27 @@ test("rejects checkout-only boundary changes in a squash checkout", async () => 
       },
     );
   }
+});
+
+test("accepts a checkout-only change to an unrelated media evidence schema", async () => {
+  await withRepository(
+    () =>
+      createCheckoutOnlyDriftSquashRepository({
+        commonFiles: [],
+        currentFiles: [
+          {
+            path: "schemas/demo-video-production.schema.json",
+            content: '{"$schema":"current media evidence schema"}\n',
+          },
+        ],
+      }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = runValidator({ directory, baseCommit, sourceCommit });
+
+      assert.equal(result.status, 0, output(result));
+      assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
+    },
+  );
 });
 
 test("rejects a nonexistent base commit", async () => {

@@ -308,7 +308,7 @@
         "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
         "observationUuidV7": { "const": "01a053d0-3297-722c-b7f8-5ff273c9b729" },
         "measuredAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
-        "recordedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "recordedAt": { "const": "2026-08-30T17:55:48.503Z" },
         "stateTransition": { "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED" },
         "videoId": { "const": "tdSvJw4ghX8" },
         "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },

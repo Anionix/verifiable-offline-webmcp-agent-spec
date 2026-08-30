@@ -205,7 +205,7 @@ test("notification storage rejects a parent symlink that escapes an allowed root
 // event_uuid_v7=01a05042-8899-7fbb-8aea-feab9bfd8c9f
 // state_transition=TEST_OVERRIDE_CAN_RELAX_NATIVE_POLICY -> NATIVE_WINDOWS_DISK_SQLITE_REJECTED occurred_at=2026-08-30T01:22:12.761Z
 // machine-contract: Windows rejects disk SQLite before callbacks; supported POSIX hosts execute and reject the parent replacement. Audit checks execute on every platform.
-test("notification storage rejects a replaced parent before audit or SQLite I/O", () => {
+test("notification storage rejects a replaced parent before audit or POSIX SQLite I/O", () => {
   const auditDirectory = mkdtempSync(join(tmpdir(), "notification-parent-replacement-audit-"));
   const auditMovedDirectory = `${auditDirectory}-moved`;
   const auditExternal = mkdtempSync(join(tmpdir(), "notification-parent-replacement-audit-target-"));
@@ -258,6 +258,10 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
   }
 });
 
+// information_uuid_v5=e79db72f-1acf-5165-b929-2d7ba5ec0b97
+// event_uuid_v7=01a0507a-8b97-7511-b94b-5005cdf8d4b6
+// state_transition=WINDOWS_SELECTION_OMITTED -> WINDOWS_SELECTION_INCLUDED -> JUNCTION_SAFE executed_at=2026-08-30T02:00:00.000Z
+// machine-contract: the native Windows job executes the absent-file parent replacement test with a junction that does not require symbolic-link privilege.
 test("notification storage rejects a replaced parent before bound absent-file creation", () => {
   for (const platform of ["darwin", "win32"] as const) {
     const directory = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-`));
@@ -265,6 +269,7 @@ test("notification storage rejects a replaced parent before bound absent-file cr
     const external = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-target-`));
     const path = join(directory, "queue.sqlite");
     const victim = join(external, "queue.sqlite");
+    const replacementLinkType = process.platform === "win32" ? "junction" : "dir";
     try {
       writeFileSync(victim, "external victim\n", { mode: 0o600 });
       const before = fileSnapshot(victim);
@@ -277,7 +282,7 @@ test("notification storage rejects a replaced parent before bound absent-file cr
             expectedParent,
             afterStorageAbsenceObserved() {
               renameSync(directory, movedDirectory);
-              symlinkSync(external, directory, "dir");
+              symlinkSync(external, directory, replacementLinkType);
             },
           }),
         /^TypeError: database parent changed before bound creation$/,
@@ -351,6 +356,18 @@ test("notification storage applies mode bits only on POSIX platforms", () => {
   }
 });
 
+// information_uuid_v5=1efaf8d3-d3a5-53fe-acc5-04b1f0ca0bcb
+// event_uuid_v7=01a0507a-8b97-746b-a70e-1485243fffdf
+// state_transition=CALLER_PLATFORM_OVERRIDE -> NATIVE_PLATFORM_BOUND -> OVERRIDE_REJECTED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: NotificationStore never accepts a platform override that differs from the native process platform; test-only path helpers remain separately simulatable.
+test("notification store rejects a platform override that differs from the native process", () => {
+  const foreignPlatform = process.platform === "win32" ? "darwin" : "win32";
+  assert.throws(
+    () => new NotificationStore(":memory:", { platform: foreignPlatform }),
+    /NotificationStore platform override must match the native process platform/,
+  );
+});
+
 test("notification storage rejects final links when Windows cannot rely on O_NOFOLLOW", () => {
   const directory = mkdtempSync(join(tmpdir(), "notification-windows-link-"));
   const external = mkdtempSync(join(tmpdir(), "notification-windows-link-victim-"));
@@ -384,7 +401,7 @@ test("disk-backed SQLite fails closed on Windows while in-memory SQLite remains 
   const movedDirectory = `${directory}-moved`;
   const external = mkdtempSync(join(tmpdir(), "notification-windows-sqlite-external-"));
   const filenames = ["queue.sqlite", "queue.sqlite-wal", "queue.sqlite-shm", "queue.sqlite-journal"];
-  const platforms: Array<NodeJS.Platform | undefined> = process.platform === "win32" ? [undefined, "win32", "darwin", "linux"] : ["win32"];
+  const platforms: Array<NodeJS.Platform | undefined> = process.platform === "win32" ? [undefined, "win32"] : [];
   let parentCaptureCount = 0;
   try {
     const databasePath = join(directory, "queue.sqlite");
@@ -396,6 +413,15 @@ test("disk-backed SQLite fails closed on Windows while in-memory SQLite remains 
       renameSync(directory, movedDirectory);
       symlinkSync(external, directory, "dir");
     };
+
+    if (process.platform !== "win32") {
+      assert.throws(
+        () => new NotificationStore(databasePath, { platform: "win32", afterParentIdentityCaptured }),
+        /NotificationStore platform override must match the native process platform/,
+      );
+      assert.equal(parentCaptureCount, 0);
+      return;
+    }
 
     for (const platform of platforms) {
       assert.throws(

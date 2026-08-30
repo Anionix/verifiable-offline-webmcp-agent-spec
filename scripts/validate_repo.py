@@ -570,6 +570,8 @@ def main():
                 or source_provenance.get("reproducibilityBoundary") != "FULL_SITES_PACKAGE_DIGEST"
             ):
                 errors.append("hotel CHECKOUT_TREE deployment must record an off-history provider source and full package digest boundary")
+        elif not re.fullmatch(r"[0-9a-f]{40}", hotel_evidence["sourceCommit"]):
+            errors.append("deployed-current hotel evidence must use a reachable source commit or an explicit checkout-tree boundary")
     live_hotel = hotel_evidence["liveDeployment"]
     if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":
         if (

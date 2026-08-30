@@ -14,7 +14,7 @@
 // machine-contract: the Vercel current-artifact row requires its own provider, HTTP, browser-flow, bounded-observability, and restored-notification receipt.
 // event_uuid_v7=01a04c4c-89a7-749b-996b-8f35edaa0f3d
 // state_transition=VERCEL_REDEPLOY_STAGED -> VERCEL_REDEPLOY_VERIFIED occurred_at=2026-08-29T06:54:39.527Z
-// machine-contract: the current Vercel receipt binds a provider-reported clean Git commit as an explicit off-history observation, five anonymous remote hashes, carried fresh-storage proof only by identical functional digest, and recovery from an accidental notification-project deployment.
+// machine-contract: the current Vercel receipt binds a reachable provider Git commit, five anonymous remote hashes, carried fresh-storage proof only by identical functional digest, and recovery from an accidental notification-project deployment.
 // event_uuid_v7=01a04c72-6ad0-75c6-9e90-10988cd6d33f
 // state_transition=VERCEL_REDEPLOY_VERIFIED -> PUBLICATION_RECORD_REDEPLOY_VERIFIED occurred_at=2026-08-29T07:36:02.000Z
 // machine-contract: the exact publication-record redeploy requires provider READY plus five matching public files; unchanged functional bytes carry the separately identified prior fresh-browser proof without claiming a new run.
@@ -113,8 +113,8 @@ const EXPECTED_VERCEL_DEPLOYMENT = {
   projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
   projectName: "kyoto-booking-retry-proof",
   deploymentId: "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
-  sourceState: "PROVIDER_COMMIT_OFF_HISTORY",
-  providerGitCommit: "OFF_HISTORY",
+  sourceState: "PROVIDER_COMMIT_REACHABLE",
+  providerGitCommit: "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
   providerGitCommitObservation: "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
   providerGitDirty: false,
   uniqueUrl: "https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app",
@@ -553,6 +553,28 @@ for (const [label, loadedSchema] of [
 if (vercelDeployment && vercelDeploymentSchema) {
   validateWithSchema(vercelDeployment, vercelDeploymentSchema, "$vercelDeployment", vercelDeploymentSchema);
 
+  // information_uuid_v5=0a9f796d-070b-5423-8d43-17007716714b
+  // event_uuid_v7=01a05066-0020-77b4-8956-b8e42cd3be39
+  // state_transition=SENTINEL_FUNCTIONAL_SOURCE -> HASH_ONLY_FUNCTIONAL_SOURCE -> VERIFIED occurred_at=2026-08-30T02:00:00.000Z
+  // machine-contract: provider-only uncertainty sentinels never satisfy functional or recovery source-commit fields.
+  for (const [label, path] of [
+    ["artifact source", ["artifact", "sourceCommit"]],
+    ["browser-flow source", ["browserFlow", "appliesToFunctionalSourceCommit"]],
+    ["restored-deployment source", ["restoredNotificationDeployment", "sourceCommit"]],
+  ]) {
+    for (const sentinel of ["CHECKOUT_TREE", "OFF_HISTORY"]) {
+      const candidate = structuredClone(vercelDeployment);
+      let target = candidate;
+      for (const key of path.slice(0, -1)) target = target[key];
+      target[path.at(-1)] = sentinel;
+      const beforeErrors = errors.length;
+      validateWithSchema(candidate, vercelDeploymentSchema, "$vercelDeployment", vercelDeploymentSchema);
+      const rejected = errors.length > beforeErrors;
+      errors.length = beforeErrors;
+      record(rejected, `${label} must reject ${sentinel} provider uncertainty sentinel`);
+    }
+  }
+
   const identity = vercelDeployment.identity ?? {};
   const stateTransition = vercelDeployment.stateTransition ?? {};
   record(
@@ -574,10 +596,10 @@ if (vercelDeployment && vercelDeploymentSchema) {
     "Vercel receipt project, deployment, URLs, state, source, or timestamps differ from provider readback",
   );
   record(
-    vercelDeployment.deployment?.sourceState === "PROVIDER_COMMIT_OFF_HISTORY" &&
-      vercelDeployment.deployment?.providerGitCommit === "OFF_HISTORY" &&
+    vercelDeployment.deployment?.sourceState === "PROVIDER_COMMIT_REACHABLE" &&
+      /^[0-9a-f]{40}$/u.test(vercelDeployment.deployment?.providerGitCommit ?? "") &&
       /^[0-9a-f]{40}$/u.test(vercelDeployment.deployment?.providerGitCommitObservation ?? ""),
-    "Vercel provider commit must be retained as an off-history observation, not presented as a reachable source commit",
+    "Vercel provider commit must be a reachable commit when the reviewed history contains it",
   );
   const remoteArtifacts = vercelDeployment.remoteArtifacts ?? {};
   record(remoteArtifacts.deploymentId === vercelDeployment.deployment?.deploymentId, "Vercel remote artifacts differ from the deployment ID");
@@ -884,10 +906,10 @@ if (registry && schema) {
   record(vercel?.artifactCommit === vercelDeployment?.artifact?.sourceCommit, "vercel: artifactCommit differs from the Vercel hotel deployment receipt");
   record(vercel?.artifactSha256 === vercelDeployment?.artifact?.functionalDigest, "vercel: artifactSha256 differs from the Vercel hotel deployment receipt");
   record(
-    hotelVerification?.sourceCommit === "CHECKOUT_TREE" &&
-      hotelVerification?.sourceProvenance?.providerCommitReachability === "OFF_HISTORY" &&
+    /^[0-9a-f]{40}$/u.test(hotelVerification?.sourceCommit ?? "") &&
+      hotelVerification?.sourceProvenance?.providerCommitReachability === "REACHABLE" &&
       hotelVerification?.sourceProvenance?.reproducibilityBoundary === "FULL_SITES_PACKAGE_DIGEST",
-    "hotel Sites receipt must state the off-history provider source and artifact reproducibility boundary",
+    "hotel Sites receipt must state the reachable provider source and artifact reproducibility boundary",
   );
   record(
     vercelDeployment?.artifact?.functionalDigest === hotelVerification?.artifactDigest,

@@ -186,8 +186,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "97054aed614b688df1374a87c06d68e67cf3c89c9dcbfe7196774e7a3a71760f",
-      "bytes": 5356,
+      "sha256": "d9618756c88be52ba048528cbd815ef866de8ccc505a89bf82262844339793db",
+      "bytes": 5447,
       "mediaType": "application/yaml",
       "category": ".github",
       "identity": {
@@ -1631,8 +1631,8 @@
     },
     {
       "path": "docs/13-notification-demo.en.md",
-      "sha256": "351e76044be59862c217e94ee9fd2b34123f91a7ca729b9c594e224b050e81ba",
-      "bytes": 9391,
+      "sha256": "cb4275ac8aa7e3614f3a5546dabdccc56a4daa6c60f89a4ead0b475e290eb4f3",
+      "bytes": 9739,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1650,8 +1650,8 @@
     },
     {
       "path": "docs/13-notification-demo.ja.md",
-      "sha256": "78c344d9d8f7bc100add835ae8e32f587a1bd26c3dc3b36428e197f585dcbb77",
-      "bytes": 12961,
+      "sha256": "1fe41ebbcce84af36749eafadcfae070b1f40fc8af08d6b8d60f806bad85b16f",
+      "bytes": 13391,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1726,8 +1726,8 @@
     },
     {
       "path": "docs/17-offline-sync-reference.ja.md",
-      "sha256": "553eab429d7e497c38f500645c5c70675ef21cc988fd90a05e0144e786a69cc1",
-      "bytes": 10470,
+      "sha256": "6464e8b83433924f7e0a26d00d739d3fe9774bff35dfba72b49d029e39de90e2",
+      "bytes": 10740,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1821,8 +1821,8 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "4fe78469a134cb547b0610b4d5949a2f2fc7bf56fe88eed5597d219fb9998d16",
-      "bytes": 21125,
+      "sha256": "50367bca8286d970b253295241c791406336e74fc3b0d14792bc0e3fbc96f946",
+      "bytes": 21027,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1840,8 +1840,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "97147ad8df0c4dcd116d7b5c70e25bda1064645100f4e6fbedf5b9fe6c59a2b5",
-      "bytes": 12677,
+      "sha256": "126cf937dfb39c2ff2bb6673eedb9a4f55cfdd956411f468ab7d64a7212aed88",
+      "bytes": 12654,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -3855,8 +3855,8 @@
     },
     {
       "path": "metadata/hotel-booking-verification.json",
-      "sha256": "5f7422fbf9b7590560edf59c8970723a545469573e4907a52d7227bd508d01fd",
-      "bytes": 13825,
+      "sha256": "b69a5000b0ca6324d64a56a1c5431284ea550b232486e2705493f3b0bda9e2c3",
+      "bytes": 13739,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4140,8 +4140,8 @@
     },
     {
       "path": "metadata/vercel-hotel-deployment.json",
-      "sha256": "20c4c010f7bc11a37d4e2a5522fa8729da471b0c411b9c38cce2412383e189fb",
-      "bytes": 8055,
+      "sha256": "f8bac045bc83c6884068403743c06dd24646b11877cc2bbe43f0fd71fcd2cfbf",
+      "bytes": 8076,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4558,8 +4558,8 @@
     },
     {
       "path": "schemas/hotel-booking-verification.schema.json",
-      "sha256": "562af4a5488c69d1a08632b7b43a511624329a4cd1b7a1998ed0c76eff261e0f",
-      "bytes": 6175,
+      "sha256": "6c7234b5c2906c21a3922e0f6c8a9ffee91614f42356ffa858415397d20e2316",
+      "bytes": 6129,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4957,8 +4957,8 @@
     },
     {
       "path": "schemas/vercel-hotel-deployment.schema.json",
-      "sha256": "54295fa3ec499367da1ac025345a83acfc046e07d8d45939024f14aabf776d62",
-      "bytes": 15384,
+      "sha256": "17c60a9dc64154ca5214ccb53ff4a278339fa0d4b1409729efa108989bae2264",
+      "bytes": 15441,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5147,8 +5147,8 @@
     },
     {
       "path": "scripts/test_validate_void_clean_checkout.mjs",
-      "sha256": "98a3cd0e27ee9ebde4ae052051a0b6d7fec98e598b4a1d3f4268413ab2669a4c",
-      "bytes": 3110,
+      "sha256": "b59992fafafed0373a2505ff054076244913bb3e7610f7b04a3e131de29e95b2",
+      "bytes": 3576,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5261,8 +5261,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "74c6757d39ca1f8e07c0d2557456c4c47656254fbd979dbe027b5a299ce2acb3",
-      "bytes": 131175,
+      "sha256": "c3368fc2425e8e0a3ad8bb5bab3289180b2e5511251a3cb57f5426f3b9c2223c",
+      "bytes": 131389,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {
@@ -5318,8 +5318,8 @@
     },
     {
       "path": "scripts/validate_service_integrations.mjs",
-      "sha256": "e12e9bfe0c8aaf53757b0afd57de6ee71dac020c72ba4ef71c5ca053c740a996",
-      "bytes": 48072,
+      "sha256": "d5f56329ea862ad0771ae81e4f4da1f59403e4acbac7bb10ad04d8455113c9a3",
+      "bytes": 49266,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5793,8 +5793,8 @@
     },
     {
       "path": "src/typescript/notification/store.ts",
-      "sha256": "ede0d9eb3e64db80685473c17dfc4f3dde5edcdf0aa78c0a813c63f31d6cb961",
-      "bytes": 27842,
+      "sha256": "a3676fb9c0705c3a082e8e416f760b33fd893bdbd5e9a9bf993677d82608bcc3",
+      "bytes": 27940,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6116,8 +6116,8 @@
     },
     {
       "path": "src/typescript/sync/synchronizer.ts",
-      "sha256": "cba962a950dd5706f511fe28ece3056dcf5f5cacde4bb9cde82bba3a3a0ab767",
-      "bytes": 59764,
+      "sha256": "3e4a246e2bbb84886a4b3cf84eb0567b30c21a41d52f36cb4830d433571a33dc",
+      "bytes": 63632,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6325,8 +6325,8 @@
     },
     {
       "path": "src/typescript/test/notification.test.ts",
-      "sha256": "d46b3fc5afd7b506a17e8ec73dbd2b977ba28d353dd249ba9fa5dc1da8746087",
-      "bytes": 49629,
+      "sha256": "d5f017e2cb061f2d499facb6f5ec777f100b81d907fcb1516b7975de42ed48eb",
+      "bytes": 51207,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6363,8 +6363,8 @@
     },
     {
       "path": "src/typescript/test/offline-sync.test.ts",
-      "sha256": "5e8107a38bf232252c00cca4bb63b3cde057bebc67b9dcc2cb4d1c7c107f3a0b",
-      "bytes": 61019,
+      "sha256": "86b47584cfc2376d6262649cf88d13108e825bd6255cbf6b84f94a93558556c1",
+      "bytes": 64716,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

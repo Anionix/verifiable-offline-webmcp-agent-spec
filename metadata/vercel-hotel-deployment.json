@@ -9,10 +9,10 @@
   },
   "stateTransition": {
     "from": "DEVPOST_VERSION_11_REGISTRY_CURRENT_ARTIFACT_VERIFIED",
-    "to": "PROVIDER_COMMIT_OFF_HISTORY_CURRENT_ARTIFACT_VERIFIED",
+    "to": "PROVIDER_COMMIT_REACHABLE_CURRENT_ARTIFACT_VERIFIED",
     "eventId": "01a04dbc-fbd0-7f5a-a66e-d3a9c1de9f50",
     "occurredAt": "2026-08-29T13:37:06.000Z",
-    "machineContract": "The hotel fallback is current only after provider READY, a provider-reported clean commit retained as off-history observation, five anonymous file hashes including the Devpost registry, and a bounded warning and error readback agree with the current checkout artifact digest."
+    "machineContract": "The hotel fallback is current only after provider READY, a provider-reported clean commit reachable from the reviewed main history, five anonymous file hashes including the Devpost registry, and a bounded warning and error readback agree with the current artifact digest."
   },
   "provider": {
     "name": "Vercel",
@@ -32,8 +32,8 @@
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
     "deploymentId": "dpl_ArJPwr1h3KqyxmRRfegcbX4YqTB2",
-    "sourceState": "PROVIDER_COMMIT_OFF_HISTORY",
-    "providerGitCommit": "OFF_HISTORY",
+    "sourceState": "PROVIDER_COMMIT_REACHABLE",
+    "providerGitCommit": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
     "providerGitCommitObservation": "e3d3bb7ccc142a50a2a7af29dad4cd7bb449c4cb",
     "providerGitDirty": false,
     "uniqueUrl": "https://kyoto-booking-retry-proof-kafikuvr2-aniotajp-1978s-projects.vercel.app",

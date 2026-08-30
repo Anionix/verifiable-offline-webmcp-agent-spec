@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-release-candidate.schema.json",
   "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8 state_transition=LOCAL_LIVENESS_PROVED -> PUBLIC_WEBMCP_RELEASE_READY occurred_at=2026-08-30T13:28:07.383Z machine-contract=The five hard gates are pass only when local behavior, exact public count, native tool discovery, agent read-before-retry, and the committed production deployment share one source boundary.",
+  "description": "This schema checks structure. Accepting PASS additionally requires node scripts/validate_hotel_release_candidate.mjs --check. Its native binding validation and compareStable step reject candidate reconciliation values unrelated to the separately loaded native call results. Schema-only validation is not semantic acceptance.",
   "title": "Hotel release candidate evidence",
   "type": "object",
   "additionalProperties": false,
@@ -62,7 +63,9 @@
         "publicUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" }
       }
     },
-    "browserObservation": { "$ref": "#/$defs/browserObservation" },
+    "browserObservation": {
+      "oneOf": [{ "$ref": "#/$defs/browserObservation" }, { "$ref": "#/$defs/managedBrowserObservation" }]
+    },
     "issueReadiness": {
       "type": "array",
       "minItems": 5,
@@ -188,8 +191,29 @@
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingCount": { "const": 1 },
-        "effectStartCount": { "const": 1 }
+        "effectStartCount": { "const": 1 },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "legacyStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
     },
     "finalStatus": {
       "type": "object",
@@ -201,8 +225,29 @@
         "bookingCount": { "const": 1 },
         "effectStartCount": { "const": 1 },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
-        "sameConfirmation": { "const": true }
+        "sameConfirmation": { "const": true },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "legacyFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
     },
     "recording": {
       "type": "object",
@@ -259,20 +304,102 @@
         "calledToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"] },
         "discoveryEffectCounts": { "$ref": "#/$defs/effectCounts" },
         "reconciliation": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["status", "flow", "statusCheck", "finalStatus", "sameConfirmation", "humanConfirmationBoundary", "driverAction", "agentExplanation"],
-          "properties": {
-            "status": { "const": "PASS" },
-            "flow": { "const": ["AMBIGUOUS_OUTCOME", "AGENT_WEBMCP_STATUS_CHECK", "EXISTING_RESULT_FOUND", "NO_DUPLICATE_EFFECT"] },
-            "statusCheck": { "$ref": "#/$defs/statusResult" },
-            "finalStatus": { "$ref": "#/$defs/finalStatus" },
-            "sameConfirmation": { "const": true },
-            "humanConfirmationBoundary": { "const": "visible_button_only" },
-            "driverAction": { "const": "visible_button_exercised_by_browser_driver" },
-            "agentExplanation": { "type": "string", "minLength": 50 }
-          }
+          "allOf": [
+            { "$ref": "#/$defs/browserReconciliation" },
+            {
+              "properties": {
+                "statusCheck": { "$ref": "#/$defs/legacyStatusResult" },
+                "finalStatus": { "$ref": "#/$defs/legacyFinalStatus" }
+              }
+            }
+          ]
         },
+        "recording": { "$ref": "#/$defs/recording" },
+        "status": { "const": "PASS" }
+      }
+    },
+    "browserReconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "flow", "statusCheck", "finalStatus", "sameConfirmation", "humanConfirmationBoundary", "driverAction", "agentExplanation"],
+      "properties": {
+        "status": { "const": "PASS" },
+        "flow": { "const": ["AMBIGUOUS_OUTCOME", "AGENT_WEBMCP_STATUS_CHECK", "EXISTING_RESULT_FOUND", "NO_DUPLICATE_EFFECT"] },
+        "statusCheck": { "$ref": "#/$defs/statusResult" },
+        "finalStatus": { "$ref": "#/$defs/finalStatus" },
+        "sameConfirmation": { "const": true },
+        "humanConfirmationBoundary": { "const": "visible_button_only" },
+        "driverAction": { "const": "visible_button_exercised_by_browser_driver" },
+        "agentExplanation": { "type": "string", "minLength": 50 }
+      }
+    },
+    "managedBrowserReconciliationStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "state": { "const": "COMMITTED" },
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "managedBrowserReconciliationFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
+    },
+    "managedBrowserReconciliation": {
+      "allOf": [
+        { "$ref": "#/$defs/browserReconciliation" },
+        {
+          "required": ["statusCheck", "finalStatus"],
+          "properties": {
+            "statusCheck": { "$ref": "#/$defs/managedBrowserReconciliationStatusResult" },
+            "finalStatus": { "$ref": "#/$defs/managedBrowserReconciliationFinalStatus" }
+          }
+        }
+      ]
+    },
+    "managedBrowserObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "information_uuid_v5=a0fbdc59-0d0e-5134-89b8-1d30db405e5a event_uuid_v7=01a05439-6770-7ee3-a4cf-7ac7d7ea90ef state_transition=MANAGED_NATIVE_CAPABILITY_VALIDATED -> CANDIDATE_BROWSER_OBSERVATION_BOUND occurred_at=2026-08-30T19:50:43.312Z machine-contract=The managed discovery profile is bound to the existing candidate source, test, artifact, reconciliation, and recording gates; Chrome configuration remains unmeasured.",
+      "required": [
+        "profile",
+        "url",
+        "origin",
+        "observedAt",
+        "pageSourceCommit",
+        "candidateSourceCommit",
+        "visibleToolNames",
+        "forbiddenToolNames",
+        "managedDiscovery",
+        "reconciliation",
+        "recording",
+        "status"
+      ],
+      "properties": {
+        "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" },
+        "origin": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "pageSourceCommit": { "$ref": "#/$defs/commit" },
+        "candidateSourceCommit": { "$ref": "#/$defs/commit" },
+        "visibleToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "managedDiscovery": {
+          "$ref": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-native-webmcp-reconciliation.schema.json#/$defs/managedDiscovery"
+        },
+        "reconciliation": { "$ref": "#/$defs/managedBrowserReconciliation" },
         "recording": { "$ref": "#/$defs/recording" },
         "status": { "const": "PASS" }
       }

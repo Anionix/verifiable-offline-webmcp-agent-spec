@@ -21,6 +21,7 @@ import {
   fullSitesPackageDigestScope,
   sitesPackageRoot,
 } from "./hotel-validator-common.mjs";
+import { managedEvidenceProfile, validateManagedBrowserDiscovery } from "./hotel-managed-browser-release-proof.mjs";
 import { validateReleaseContext } from "./release-validation-context.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -75,41 +76,155 @@ function assertExactArray(actual, expected, label) {
   assert.deepEqual(actual, expected, `${label} changed`);
 }
 
-function browserObservationFrom(nativeEvidence, sourceCommit) {
+function assertExactKeys(value, expected, label) {
+  assert(value && typeof value === "object" && !Array.isArray(value), `${label} must be an object`);
+  assert.deepEqual(Object.keys(value).sort(), [...expected].sort(), `${label} has an unexpected or missing field`);
+}
+
+const legacyStatusCheckKeys = Object.freeze(["toolName", "state", "bookingExists", "confirmationNumber", "attemptCount", "bookingCount", "effectStartCount"]);
+const legacyFinalStatusKeys = Object.freeze(["state", "attemptCount", "bookingCount", "effectStartCount", "confirmationNumber", "sameConfirmation"]);
+
+function assertLegacyReconciliation(reconciliation, label) {
+  assertExactKeys(reconciliation.statusCheck, legacyStatusCheckKeys, `${label}.statusCheck`);
+  assertExactKeys(reconciliation.finalStatus, legacyFinalStatusKeys, `${label}.finalStatus`);
+}
+
+function assertManagedRunBinding(nativeEvidence) {
+  const { identity, deployment, discovery, reconciliation, recording } = nativeEvidence;
+  const binding = discovery.runBinding;
+  assert.equal(binding.rootObservationUuidV7, identity.observationUuidV7, "managed run binding root observation differs");
+  assert.equal(binding.completedAt, discovery.observedAt, "managed run binding completion differs from discovery");
+  assert.equal(binding.completedAt, identity.observedAt, "managed run binding completion differs from root identity");
+  assert.equal(binding.completedAt, reconciliation.observedAt, "managed run binding completion differs from reconciliation");
+  assert.equal(binding.publicSourceCommit, deployment.sourceCommit, "managed run binding source commit differs");
+  assert.equal(binding.deploymentId, deployment.deploymentId, "managed run binding deployment differs");
+  assert.equal(binding.publicUrl, deployment.publicUrl, "managed run binding URL differs");
+  assert.equal(binding.recordingSha256, recording.sha256, "managed run binding recording differs");
+}
+
+function assertManagedReconciliationBinding(nativeEvidence) {
+  // information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca
+  // event_uuid_v7=01a054ba-6716-75c6-95a6-a74f26b67944 occurred_at=2026-08-30T22:11:37.366Z
+  // state_transition=MANAGED_COUNTS_BOUND -> MANAGED_PHASE_STATES_BOUND
+  // machine-contract: before retry is COMMITTED; only the later retry is RETRY_RECOGNIZED.
+  const { discovery, reconciliation } = nativeEvidence;
+  const [checkCall, prepareCall, beforeCall, afterCall] = discovery.toolCalls;
+  const initial = checkCall.resultObservation;
+  const prepare = prepareCall.resultObservation;
+  const before = beforeCall.resultObservation;
+  const after = afterCall.resultObservation;
+  assert.equal(reconciliation.statusCheck.state, "COMMITTED", "managed reconciliation statusCheck.state must be COMMITTED");
+  assert.equal(reconciliation.finalStatus.state, "RETRY_RECOGNIZED", "managed reconciliation finalStatus.state must be RETRY_RECOGNIZED");
+
+  assertExactArray(reconciliation.calledToolNames, [checkCall.toolName, prepareCall.toolName, beforeCall.toolName], "managed reconciliation called tools");
+  assert.equal(initial.fingerprint, prepare.intentId, "managed preparation is not bound to the initial fingerprint");
+  assert.equal(prepare.intentId, before.intentId, "managed status-before is not bound to the preparation intent");
+  assert.equal(prepare.intentId, after.intentId, "managed status-after is not bound to the preparation intent");
+  assert.equal(prepare.fingerprint, before.fingerprint, "managed status-before fingerprint differs from preparation");
+  assert.equal(prepare.fingerprint, after.fingerprint, "managed status-after fingerprint differs from preparation");
+
+  const assertStatusBinding = (status, observation, label) => {
+    for (const field of [
+      "state",
+      "intentId",
+      "fingerprint",
+      "bookingId",
+      "confirmationNumber",
+      "attemptCount",
+      "effectStartCount",
+      "eventCount",
+      "eventChainHead",
+    ]) {
+      assert.equal(status[field], observation[field], `managed reconciliation ${label}.${field} differs from the native result`);
+    }
+    if (Object.hasOwn(status, "bookingExists")) {
+      assert.equal(status.bookingExists, observation.bookingExists, `managed reconciliation ${label}.bookingExists differs from the native result`);
+    }
+    assert.equal(status.bookingCount, observation.bookingExists ? 1 : 0, `managed reconciliation ${label}.bookingCount differs from the native result`);
+  };
+  assertStatusBinding(reconciliation.statusCheck, before, "statusCheck");
+  assertStatusBinding(reconciliation.finalStatus, after, "finalStatus");
+  assert.equal(reconciliation.sameConfirmation, before.confirmationNumber === after.confirmationNumber, "managed reconciliation confirmation binding differs");
+  assert.equal(reconciliation.finalStatus.sameConfirmation, reconciliation.sameConfirmation, "managed final confirmation binding differs");
+}
+
+export function validateNativeDiscovery(nativeEvidence) {
+  assert.equal(nativeEvidence.status, "PASS");
+  const { discovery, reconciliation } = nativeEvidence;
+  assert.equal(discovery.status, "PASS");
+  assertExactArray(discovery.visibleToolNames, expectedTools, "native visible tools");
+  assertExactArray(discovery.forbiddenToolNames, forbiddenTools, "native forbidden tools");
+  if (discovery.profile === managedEvidenceProfile) {
+    validateManagedBrowserDiscovery(discovery);
+    assertManagedRunBinding(nativeEvidence);
+    assertManagedReconciliationBinding(nativeEvidence);
+  } else {
+    assertExactArray(discovery.requiredChromeFlags, requiredChromeFlags, "native browser flags");
+    assert.equal(discovery.documentModelContext, "CONFIRMED_PRESENT");
+    assert.equal(discovery.secureContext, true);
+    assert.equal(discovery.discoveryEffectCounts.bookingCount, 0);
+    assert.equal(discovery.discoveryEffectCounts.effectStartCount, 0);
+    assertLegacyReconciliation(reconciliation, "legacy native reconciliation");
+  }
+  assert.equal(reconciliation.status, "PASS");
+  assert.equal(reconciliation.sameConfirmation, true);
+  assert.equal(reconciliation.finalStatus.attemptCount, 2);
+  assert.equal(reconciliation.finalStatus.bookingCount, 1);
+  assert.equal(reconciliation.finalStatus.effectStartCount, 1);
+  assert.equal(reconciliation.finalStatus.sameConfirmation, true);
+  assertExactArray(
+    reconciliation.calledToolNames,
+    ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"],
+    "native called tools",
+  );
+}
+
+function browserReconciliationFrom(reconciliation) {
+  return {
+    status: reconciliation.status,
+    flow: reconciliation.flow,
+    statusCheck: reconciliation.statusCheck,
+    finalStatus: reconciliation.finalStatus,
+    sameConfirmation: reconciliation.sameConfirmation,
+    humanConfirmationBoundary: reconciliation.humanConfirmationBoundary,
+    driverAction: reconciliation.driverAction,
+    agentExplanation: reconciliation.agentExplanation,
+  };
+}
+
+export function browserObservationFrom(nativeEvidence, sourceCommit) {
+  validateNativeDiscovery(nativeEvidence);
   const discovery = nativeEvidence.discovery;
   const reconciliation = nativeEvidence.reconciliation;
   const deployment = nativeEvidence.deployment;
   const origin = new URL(deployment.publicUrl).origin;
-  return {
+  const common = {
     url: deployment.publicUrl,
     origin,
     observedAt: reconciliation.observedAt,
-    browser: discovery.browser,
-    secureContext: discovery.secureContext,
     pageSourceCommit: deployment.sourceCommit,
     candidateSourceCommit: sourceCommit,
+    visibleToolNames: discovery.visibleToolNames,
+    forbiddenToolNames: discovery.forbiddenToolNames,
+    reconciliation: browserReconciliationFrom(reconciliation),
+    recording: nativeEvidence.recording,
+    status: "PASS",
+  };
+  if (discovery.profile === managedEvidenceProfile) {
+    return { ...common, profile: discovery.profile, managedDiscovery: discovery };
+  }
+  return {
+    ...common,
+    browser: discovery.browser,
+    secureContext: discovery.secureContext,
     documentModelContext: discovery.documentModelContext,
     requiredChromeFlags: discovery.requiredChromeFlags,
     configurationState: "VERIFIED",
     launchArguments: discovery.configuration.launchArguments,
     devtoolsWebmcpCategory: discovery.configuration.devtoolsWebmcpCategory,
     originTrialMetadataCount: discovery.originTrialMetadataCount,
-    visibleToolNames: discovery.visibleToolNames,
-    forbiddenToolNames: discovery.forbiddenToolNames,
     calledToolNames: reconciliation.calledToolNames,
     discoveryEffectCounts: discovery.discoveryEffectCounts,
-    reconciliation: {
-      status: reconciliation.status,
-      flow: reconciliation.flow,
-      statusCheck: reconciliation.statusCheck,
-      finalStatus: reconciliation.finalStatus,
-      sameConfirmation: reconciliation.sameConfirmation,
-      humanConfirmationBoundary: reconciliation.humanConfirmationBoundary,
-      driverAction: reconciliation.driverAction,
-      agentExplanation: reconciliation.agentExplanation,
-    },
-    recording: nativeEvidence.recording,
-    status: "PASS",
   };
 }
 
@@ -121,6 +236,7 @@ async function buildCandidate() {
   const sourceCommit = publicReadback.release.sourceCommit;
   const baseCommit = publicReadback.release.baseCommit;
   const branch = publicReadback.release.branch;
+  const managedDiscovery = nativeEvidence.discovery.profile === managedEvidenceProfile;
   validateReleaseContext({
     repositoryRoot,
     baseCommit,
@@ -144,29 +260,10 @@ async function buildCandidate() {
   );
   assertExactArray(publicEvaluations.forbiddenTools, forbiddenTools, "public forbidden tool contract");
 
-  assert.equal(nativeEvidence.status, "PASS");
+  validateNativeDiscovery(nativeEvidence);
   assert.equal(nativeEvidence.deployment.sourceCommit, sourceCommit, "native evidence source commit differs from release");
   assert.equal(nativeEvidence.deployment.publicUrl, publicReadback.deployment.publicUrl, "native evidence URL differs from public readback");
   assert.equal(nativeEvidence.deployment.deploymentId, publicReadback.deployment.deploymentId, "native evidence deployment differs from public readback");
-  assert.equal(nativeEvidence.discovery.status, "PASS");
-  assert.equal(nativeEvidence.reconciliation.status, "PASS");
-  assert.equal(nativeEvidence.reconciliation.sameConfirmation, true);
-  assertExactArray(nativeEvidence.discovery.requiredChromeFlags, requiredChromeFlags, "native browser flags");
-  assertExactArray(nativeEvidence.discovery.visibleToolNames, expectedTools, "native visible tools");
-  assertExactArray(nativeEvidence.discovery.forbiddenToolNames, forbiddenTools, "native forbidden tools");
-  assert.equal(nativeEvidence.discovery.documentModelContext, "CONFIRMED_PRESENT");
-  assert.equal(nativeEvidence.discovery.secureContext, true);
-  assert.equal(nativeEvidence.discovery.discoveryEffectCounts.bookingCount, 0);
-  assert.equal(nativeEvidence.discovery.discoveryEffectCounts.effectStartCount, 0);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.attemptCount, 2);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.bookingCount, 1);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.effectStartCount, 1);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.sameConfirmation, true);
-  assertExactArray(
-    nativeEvidence.reconciliation.calledToolNames,
-    ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"],
-    "native called tools",
-  );
   assert(nativeEvidence.recording.path.startsWith("/"), "recording path must be absolute");
   // machine-contract: the native recording is a local artifact excluded from
   // the repository; verify its bytes when this checkout has them, otherwise
@@ -244,8 +341,9 @@ async function buildCandidate() {
       {
         issue: 191,
         status: "PASS",
-        reason:
-          "A fresh HTTPS browser session exposed document.modelContext and exactly the four intended tools; discovery reported zero booking and effect starts.",
+        reason: managedDiscovery
+          ? "The managed IAB native capability returned exactly the four intended tools and the required calls; browser configuration and external effects remain explicitly unmeasured."
+          : "A fresh HTTPS browser session exposed document.modelContext and exactly the four intended tools; discovery reported zero booking and effect starts.",
       },
       {
         issue: 192,
@@ -269,11 +367,17 @@ async function buildCandidate() {
   return candidate;
 }
 
-function compareStable(actual, expected) {
+// machine-contract: expected is built from separately loaded and validated native
+// evidence; schema validation alone cannot establish equality of duplicated values.
+export function compareStable(actual, expected) {
+  assert.equal(actual.observedAt, expected.observedAt, "candidate observation time differs from native evidence");
   assert.deepEqual(actual.testRun, expected.testRun, "candidate test summary is stale");
   assert.deepEqual(actual.localLiveness, expected.localLiveness, "candidate liveness evidence drifted");
   assert.deepEqual(actual.artifacts, expected.artifacts, "candidate artifact digest is stale");
   assert.deepEqual(actual.publicClaims, expected.publicClaims, "candidate public-claim record is stale");
+  if (actual.browserObservation.profile !== managedEvidenceProfile) {
+    assertLegacyReconciliation(actual.browserObservation.reconciliation, "legacy browser observation reconciliation");
+  }
   assert.deepEqual(actual.browserObservation, expected.browserObservation, "native browser observation record drifted");
   assert.deepEqual(actual.issueReadiness, expected.issueReadiness, "issue readiness record drifted");
   assert.deepEqual(actual.finalGate, expected.finalGate, "final gate record drifted");
@@ -284,34 +388,35 @@ function compareStable(actual, expected) {
     deterministicUuid7(actual.observedAt, `${informationUuidV5}\0${actual.source.commit}\0${actual.testRun.total}`),
     "candidate observation identity is not reproducible from its recorded inputs",
   );
-  assert.match(actual.observedAt, /^2026-08-30T/u, "candidate observation must belong to the current run date");
 }
 
-const mode = process.argv[2] ?? "--check";
-assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
-const candidate = await buildCandidate();
-if (mode === "--write") {
-  await writeFile(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
-  console.log(
-    JSON.stringify({
-      receipt: "HOTEL_RELEASE_CANDIDATE_WRITTEN",
-      path: "metadata/hotel-release-candidate.json",
-      sourceCommit: candidate.source.commit,
-      testCount: candidate.testRun.total,
-      deploymentId: candidate.publicClaims.deploymentId,
-      finalGate: candidate.finalGate.status,
-    }),
-  );
-} else {
-  const actual = await readJson("metadata/hotel-release-candidate.json");
-  compareStable(actual, candidate);
-  console.log(
-    JSON.stringify({
-      receipt: "HOTEL_RELEASE_CANDIDATE_VALIDATION_PASS",
-      sourceCommit: actual.source.commit,
-      testCount: actual.testRun.total,
-      publicClaimStatus: actual.publicClaims.status,
-      finalGate: actual.finalGate.status,
-    }),
-  );
+if (import.meta.main) {
+  const mode = process.argv[2] ?? "--check";
+  assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
+  const candidate = await buildCandidate();
+  if (mode === "--write") {
+    await writeFile(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
+    console.log(
+      JSON.stringify({
+        receipt: "HOTEL_RELEASE_CANDIDATE_WRITTEN",
+        path: "metadata/hotel-release-candidate.json",
+        sourceCommit: candidate.source.commit,
+        testCount: candidate.testRun.total,
+        deploymentId: candidate.publicClaims.deploymentId,
+        finalGate: candidate.finalGate.status,
+      }),
+    );
+  } else {
+    const actual = await readJson("metadata/hotel-release-candidate.json");
+    compareStable(actual, candidate);
+    console.log(
+      JSON.stringify({
+        receipt: "HOTEL_RELEASE_CANDIDATE_VALIDATION_PASS",
+        sourceCommit: actual.source.commit,
+        testCount: actual.testRun.total,
+        publicClaimStatus: actual.publicClaims.status,
+        finalGate: actual.finalGate.status,
+      }),
+    );
+  }
 }

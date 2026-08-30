@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-native-webmcp-reconciliation.schema.json",
   "$comment": "information_uuid_v5=1d4b92e2-85a9-5d03-a7b3-62c3d9ca4f83 event_uuid_v7=01a052e3-0000-7000-8000-000000000192 state_transition=NATIVE_TOOL_DISCOVERY_ZERO_EFFECT -> AGENT_RECONCILIATION_PROVED machine-contract=Native discovery and the later fictional lost-response read-before-retry run stay in separate records with one deployment and source commit.",
+  "description": "This schema checks structure. Accepting PASS additionally requires node scripts/validate_hotel_release_candidate.mjs --check, which validates native call bindings and compares the stored candidate with separately loaded native evidence. Schema-only validation is not semantic acceptance.",
   "title": "Hotel native WebMCP reconciliation evidence",
   "type": "object",
   "additionalProperties": false,
@@ -11,7 +12,9 @@
     "identity": { "$ref": "#/$defs/identity" },
     "status": { "const": "PASS" },
     "deployment": { "$ref": "#/$defs/deployment" },
-    "discovery": { "$ref": "#/$defs/discovery" },
+    "discovery": {
+      "oneOf": [{ "$ref": "#/$defs/discovery" }, { "$ref": "#/$defs/managedDiscovery" }]
+    },
     "reconciliation": { "$ref": "#/$defs/reconciliation" },
     "recording": {
       "type": "object",
@@ -25,6 +28,45 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "discovery": {
+            "type": "object",
+            "required": ["profile"],
+            "properties": { "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reconciliation": { "$ref": "#/$defs/managedReconciliation" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "discovery": {
+            "type": "object",
+            "required": ["profile"],
+            "properties": { "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reconciliation": {
+            "properties": {
+              "statusCheck": { "$ref": "#/$defs/legacyStatusResult" },
+              "finalStatus": { "$ref": "#/$defs/legacyFinalStatus" }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
     "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
@@ -126,6 +168,309 @@
         "discoveryEffectCounts": { "$ref": "#/$defs/effectCounts" }
       }
     },
+    "managedDiscovery": {
+      "type": "object",
+      "$comment": "information_uuid_v5=a0fbdc59-0d0e-5134-89b8-1d30db405e5a event_uuid_v7=01a05439-6770-7ee3-a4cf-7ac7d7ea90ef state_transition=MANAGED_NATIVE_CAPABILITY_UNTESTED -> MANAGED_NATIVE_CAPABILITY_VALIDATED occurred_at=2026-08-30T19:50:43.312Z machine-contract=Managed capability calls are separate from Chrome configuration; unavailable external-effect and configuration observations remain unmeasured.",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "status",
+        "observedAt",
+        "surface",
+        "runBinding",
+        "fetchToolsCall",
+        "visibleToolNames",
+        "forbiddenToolNames",
+        "toolCalls",
+        "interactionSequence",
+        "effectObservation",
+        "configurationObservation"
+      ],
+      "properties": {
+        "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" },
+        "status": { "const": "PASS" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "surface": { "const": "MANAGED_IAB_NATIVE_CAPABILITY" },
+        "runBinding": { "$ref": "#/$defs/managedRunBinding" },
+        "fetchToolsCall": { "$ref": "#/$defs/fetchToolsCall" },
+        "visibleToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "toolCalls": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                { "properties": { "sequence": { "const": 1 }, "phase": { "const": "check" }, "toolName": { "const": "check_existing_hotel_booking" } } }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                { "properties": { "sequence": { "const": 2 }, "phase": { "const": "prepare" }, "toolName": { "const": "prepare_hotel_booking" } } }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                {
+                  "properties": {
+                    "sequence": { "const": 3 },
+                    "phase": { "const": "status_before_retry" },
+                    "toolName": { "const": "get_hotel_booking_status" },
+                    "resultObservation": { "$ref": "#/$defs/statusBeforeRetryObservation" }
+                  },
+                  "required": ["resultObservation"]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                {
+                  "properties": {
+                    "sequence": { "const": 4 },
+                    "phase": { "const": "status_after_retry" },
+                    "toolName": { "const": "get_hotel_booking_status" },
+                    "resultObservation": { "$ref": "#/$defs/statusAfterRetryObservation" }
+                  },
+                  "required": ["resultObservation"]
+                }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "interactionSequence": {
+          "const": [
+            "check_existing_hotel_booking",
+            "prepare_hotel_booking",
+            "visible_human_confirmation",
+            "get_hotel_booking_status:before_retry",
+            "visible_retry",
+            "get_hotel_booking_status:after_retry"
+          ]
+        },
+        "effectObservation": { "$ref": "#/$defs/limitedEffectObservation" },
+        "configurationObservation": { "$ref": "#/$defs/unmeasuredConfigurationObservation" }
+      }
+    },
+    "resultEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "basis", "canonicalSummary", "scope", "description"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "basis": { "const": "EXPLICIT_SUMMARY_HASH" },
+        "canonicalSummary": { "type": "string", "minLength": 2 },
+        "scope": { "const": "EXPLICIT_SUMMARY_ONLY_NOT_RAW_ATTESTATION" },
+        "description": { "type": "string", "minLength": 20 }
+      }
+    },
+    "managedRunBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rootObservationUuidV7", "completedAt", "publicSourceCommit", "deploymentId", "publicUrl", "recordingSha256"],
+      "properties": {
+        "rootObservationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "completedAt": { "$ref": "#/$defs/observedAt" },
+        "publicSourceCommit": { "$ref": "#/$defs/commit" },
+        "deploymentId": { "type": "string", "pattern": "^dpl_[A-Za-z0-9]+$" },
+        "publicUrl": { "type": "string", "format": "uri", "pattern": "^https://[^\\s]+$" },
+        "recordingSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "fetchToolsCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "method", "status", "resultStatus", "returnedToolNames", "forbiddenToolNames", "resultEvidence"],
+      "properties": {
+        "sequence": { "const": 1 },
+        "method": { "const": "webmcp.capability.fetchTools().call" },
+        "status": { "const": "EXECUTED" },
+        "resultStatus": { "const": "SUCCESS" },
+        "returnedToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "resultEvidence": { "$ref": "#/$defs/resultEvidence" }
+      }
+    },
+    "managedToolCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "phase", "method", "toolName", "status", "resultStatus", "resultEvidence"],
+      "properties": {
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "phase": { "enum": ["check", "prepare", "status_before_retry", "status_after_retry"] },
+        "method": { "const": "webmcp.capability.tool.call" },
+        "toolName": { "enum": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"] },
+        "status": { "const": "EXECUTED" },
+        "resultStatus": { "const": "SUCCESS" },
+        "resultEvidence": { "$ref": "#/$defs/resultEvidence" },
+        "resultObservation": {
+          "oneOf": [{ "$ref": "#/$defs/initialCheckObservation" }, { "$ref": "#/$defs/prepareObservation" }, { "$ref": "#/$defs/capabilityResultObservation" }]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "phase": { "const": "check" } } },
+          "then": {
+            "properties": {
+              "sequence": { "const": 1 },
+              "toolName": { "const": "check_existing_hotel_booking" },
+              "resultObservation": { "$ref": "#/$defs/initialCheckObservation" }
+            },
+            "required": ["resultObservation"]
+          }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "prepare" } } },
+          "then": {
+            "properties": {
+              "sequence": { "const": 2 },
+              "toolName": { "const": "prepare_hotel_booking" },
+              "resultObservation": { "$ref": "#/$defs/prepareObservation" }
+            },
+            "required": ["resultObservation"]
+          }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "status_before_retry" } } },
+          "then": {
+            "required": ["resultObservation"],
+            "properties": {
+              "sequence": { "const": 3 },
+              "toolName": { "const": "get_hotel_booking_status" },
+              "resultObservation": { "$ref": "#/$defs/statusBeforeRetryObservation" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "status_after_retry" } } },
+          "then": {
+            "required": ["resultObservation"],
+            "properties": {
+              "sequence": { "const": 4 },
+              "toolName": { "const": "get_hotel_booking_status" },
+              "resultObservation": { "$ref": "#/$defs/statusAfterRetryObservation" }
+            }
+          }
+        }
+      ]
+    },
+    "initialCheckObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attemptCount", "bookingExists", "effectStartCount", "eventCount", "fingerprint"],
+      "properties": {
+        "attemptCount": { "const": 0 },
+        "bookingExists": { "const": false },
+        "effectStartCount": { "const": 0 },
+        "eventCount": { "const": 0 },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" }
+      }
+    },
+    "prepareObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead", "intentId", "fingerprint"],
+      "properties": {
+        "state": { "const": "PREPARED" },
+        "attemptCount": { "const": 1 },
+        "bookingExists": { "const": false },
+        "effectStartCount": { "const": 0 },
+        "eventCount": { "const": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" }
+      }
+    },
+    "capabilityResultObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "attemptCount",
+        "bookingExists",
+        "effectStartCount",
+        "eventCount",
+        "eventChainHead",
+        "intentId",
+        "fingerprint",
+        "bookingId",
+        "confirmationNumber"
+      ],
+      "properties": {
+        "state": { "enum": ["COMMITTED", "RETRY_RECOGNIZED"] },
+        "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "bookingExists": { "const": true },
+        "effectStartCount": { "const": 1 },
+        "eventCount": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" }
+      }
+    },
+    "statusBeforeRetryObservation": {
+      "allOf": [
+        { "$ref": "#/$defs/capabilityResultObservation" },
+        {
+          "properties": {
+            "state": { "const": "COMMITTED" },
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "statusAfterRetryObservation": {
+      "allOf": [
+        { "$ref": "#/$defs/capabilityResultObservation" },
+        {
+          "properties": {
+            "state": { "const": "RETRY_RECOGNIZED" },
+            "attemptCount": { "const": 2 },
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
+    },
+    "limitedEffectObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "scope", "observedFields", "unmeasuredFields", "reasonCode"],
+      "properties": {
+        "status": { "const": "LIMITED" },
+        "scope": { "const": "NATIVE_CAPABILITY_RESULT_FIELDS_ONLY" },
+        "observedFields": { "const": ["attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead"] },
+        "unmeasuredFields": { "const": ["externalRequests", "permissionRequests", "notifications"] },
+        "reasonCode": { "const": "CDP_NETWORK_EVENTS_NOT_CAPTURED" }
+      }
+    },
+    "unmeasuredConfigurationObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["browserVersion", "launchArguments", "documentModelContext", "requiredChromeFlags", "devtoolsWebmcpCategory"],
+      "properties": {
+        "browserVersion": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "launchArguments": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "documentModelContext": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "requiredChromeFlags": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "devtoolsWebmcpCategory": { "$ref": "#/$defs/unmeasuredConfigurationValue" }
+      }
+    },
+    "unmeasuredConfigurationValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reasonCode"],
+      "properties": {
+        "status": { "const": "UNMEASURED" },
+        "reasonCode": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" }
+      }
+    },
     "statusResult": {
       "type": "object",
       "additionalProperties": false,
@@ -137,8 +482,29 @@
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingCount": { "const": 1 },
-        "effectStartCount": { "const": 1 }
+        "effectStartCount": { "const": 1 },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "legacyStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
     },
     "finalStatus": {
       "type": "object",
@@ -150,7 +516,60 @@
         "bookingCount": { "const": 1 },
         "effectStartCount": { "const": 1 },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
-        "sameConfirmation": { "const": true }
+        "sameConfirmation": { "const": true },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "legacyFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
+    },
+    "managedReconciliationStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "state": { "const": "COMMITTED" },
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "managedReconciliationFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
+    },
+    "managedReconciliation": {
+      "type": "object",
+      "required": ["statusCheck", "finalStatus"],
+      "properties": {
+        "statusCheck": { "$ref": "#/$defs/managedReconciliationStatusResult" },
+        "finalStatus": { "$ref": "#/$defs/managedReconciliationFinalStatus" }
       }
     },
     "reconciliation": {

@@ -99,6 +99,8 @@ SUBTITLE_TIMESTAMP_FIELDS = {
 }
 ANONYMOUS_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED"
 ANONYMOUS_SUBTITLE_MISMATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+OWNER_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED"
+OWNER_SUBTITLE_FAILURE_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
 
 
 def is_ignored(path: Path):
@@ -167,9 +169,13 @@ def subtitle_capture_timing_errors(
     return findings
 
 
-def subtitle_observation_errors(collections: dict[str, Any], root_updated_ms: int | None = None) -> list[str]:
+def subtitle_observation_errors(
+    collections: dict[str, Any],
+    root_updated_ms: int | None = None,
+    reserved_events: dict[str, str] | None = None,
+) -> list[str]:
     findings: list[str] = []
-    seen_events: dict[str, str] = {}
+    seen_events: dict[str, str] = dict(reserved_events or {})
     for collection_name, records in collections.items():
         if not isinstance(records, list):
             findings.append(f"{collection_name} must be an array")
@@ -261,6 +267,15 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     findings.extend(subtitle_record_errors(future_record, "recordedAt", "future subtitleAnonymousReadbacks entry"))
     future_records = future_publication["subtitleAnonymousReadbacks"]
     findings.extend(document_history_errors(future_video))
+    for reserved_label, reserved_id in (
+        ("current document root", future_video["identity"]["observationUuidV7"]),
+        ("previous document observation", future_video["previousDocumentObservation"]["observationUuidV7"]),
+    ):
+        reserved_video = json.loads(json.dumps(future_video))
+        reserved_video["publication"]["subtitleAnonymousReadbacks"][-1]["observationUuidV7"] = reserved_id
+        reserved_findings = document_history_errors(reserved_video)
+        if not any(f"reuses observationUuidV7 from {reserved_label}" in finding for finding in reserved_findings):
+            findings.append(f"future subtitle fixture accepted an observation UUID reused from {reserved_label}")
 
     duplicate_records = json.loads(json.dumps(future_records))
     duplicate_records[-1]["observationUuidV7"] = duplicate_records[0]["observationUuidV7"]
@@ -492,6 +507,10 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     "subtitleAnonymousReadbacks": publication.get("subtitleAnonymousReadbacks"),
                 },
                 document_updated_ms,
+                {
+                    document_identity["observationUuidV7"]: "current document root",
+                    previous_observation["observationUuidV7"]: "previous document observation",
+                },
             )
         )
     return findings
@@ -1717,6 +1736,48 @@ def main():
     owner_future_findings = document_history_errors(owner_future)
     if not any("subtitleUpdates entry 1 observedAt exceeds document root updatedAt" in finding for finding in owner_future_findings):
         errors.append("owner subtitle update beyond the document root was accepted")
+    owner_failure = json.loads(json.dumps(video_production))
+    owner_failure_observed_ms = rfc3339_ms(owner_failure["updatedAt"]) + 1
+    owner_failure_root_ms = owner_failure_observed_ms + 1
+    owner_failure_record = json.loads(json.dumps(owner_failure["publication"]["subtitleUpdates"][0]))
+    owner_failure_record.update({
+        "observationUuidV7": uuid7_for_ms(owner_failure_observed_ms, 0x678, 0x6789ABCDEF01234),
+        "observedAt": rfc3339_from_ms(owner_failure_observed_ms),
+        "stateTransition": OWNER_SUBTITLE_FAILURE_STATE,
+        "ownerReadback": {
+            "surfaces": ["YOUTUBE_STUDIO_SUBTITLE_TABLE"],
+            "status": "FAIL",
+            "scope": "OBSERVED_TRACK_STATUS_ONLY",
+            "studioTable": {
+                "surface": "YOUTUBE_STUDIO_SUBTITLE_TABLE",
+                "tracks": [{"language": "English", "trackType": "VIDEO_LANGUAGE", "status": "DELETED"}],
+            },
+        },
+    })
+    owner_failure["publication"]["subtitleUpdates"].append(owner_failure_record)
+    owner_failure["identity"]["observationUuidV7"] = uuid7_for_ms(owner_failure_root_ms, 0x789, 0x789ABCDEF012345)
+    owner_failure["updatedAt"] = rfc3339_from_ms(owner_failure_root_ms)
+    owner_failure["stateTransition"] = f"{owner_failure['stateTransition']} -> OWNER_TRACK_STATUS_READBACK_FAILED"
+    if list(video_production_validator.iter_errors(owner_failure)):
+        errors.append("video production schema rejected a later owner subtitle failure readback")
+    owner_failure_identity_findings = subtitle_record_errors(
+        owner_failure_record, "observedAt", "future failed subtitleUpdates entry"
+    )
+    if owner_failure_identity_findings:
+        errors.append("future owner subtitle failure readback failed its UUIDv7/time binding")
+    owner_failure_history_findings = document_history_errors(owner_failure)
+    if owner_failure_history_findings:
+        errors.append("future owner subtitle failure readback failed document history checks")
+    inconsistent_owner_success = json.loads(json.dumps(owner_failure))
+    inconsistent_owner_success["publication"]["subtitleUpdates"][-1]["stateTransition"] = OWNER_SUBTITLE_MATCH_STATE
+    if not list(video_production_validator.iter_errors(inconsistent_owner_success)):
+        errors.append("schema accepted an owner failure readback under the success state")
+    inconsistent_owner_failure = json.loads(json.dumps(owner_failure))
+    inconsistent_owner_failure["publication"]["subtitleUpdates"][-1]["ownerReadback"] = json.loads(
+        json.dumps(video_production["publication"]["subtitleUpdates"][0]["ownerReadback"])
+    )
+    if not list(video_production_validator.iter_errors(inconsistent_owner_failure)):
+        errors.append("schema accepted an owner success readback under the failure state")
     errors.extend(subtitle_comparison_schema_errors(video_production, video_production_validator))
     errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))

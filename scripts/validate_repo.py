@@ -1777,6 +1777,30 @@ def main():
     owner_failure_history_findings = document_history_errors(owner_failure)
     if owner_failure_history_findings:
         errors.append("future owner subtitle failure readback failed document history checks")
+    duplicate_owner_failure_tracks = json.loads(json.dumps(owner_failure))
+    duplicate_owner_failure_tracks["publication"]["subtitleUpdates"][-1]["ownerReadback"]["studioTable"]["tracks"] = [
+        {"language": "English", "trackType": "VIDEO_LANGUAGE", "status": "DELETED"},
+        {"language": "English", "trackType": "VIDEO_LANGUAGE", "status": "UNAVAILABLE"},
+    ]
+    if not list(video_production_validator.iter_errors(duplicate_owner_failure_tracks)):
+        errors.append("schema accepted duplicate English VIDEO_LANGUAGE tracks in one owner failure readback")
+    invalid_owner_failure_track_pair = json.loads(json.dumps(owner_failure))
+    invalid_owner_failure_track_pair["publication"]["subtitleUpdates"][-1]["ownerReadback"]["studioTable"]["tracks"] = [
+        {"language": "English", "trackType": "AUTHORED", "status": "DELETED"},
+    ]
+    if not list(video_production_validator.iter_errors(invalid_owner_failure_track_pair)):
+        errors.append("schema accepted an English AUTHORED track pair in an owner failure readback")
+    for valid_language, valid_track_type in (
+        ("English", "VIDEO_LANGUAGE"),
+        ("English", "AUTOMATIC"),
+        ("Japanese", "AUTHORED"),
+    ):
+        valid_owner_failure_track = json.loads(json.dumps(owner_failure))
+        valid_owner_failure_track["publication"]["subtitleUpdates"][-1]["ownerReadback"]["studioTable"]["tracks"] = [
+            {"language": valid_language, "trackType": valid_track_type, "status": "UNAVAILABLE"},
+        ]
+        if list(video_production_validator.iter_errors(valid_owner_failure_track)):
+            errors.append(f"schema rejected valid {valid_language} {valid_track_type} owner failure track pair")
     inconsistent_owner_success = json.loads(json.dumps(owner_failure))
     inconsistent_owner_success["publication"]["subtitleUpdates"][-1]["stateTransition"] = OWNER_SUBTITLE_MATCH_STATE
     if not list(video_production_validator.iter_errors(inconsistent_owner_success)):

@@ -525,7 +525,30 @@
         "language": { "enum": ["English", "Japanese"] },
         "trackType": { "enum": ["VIDEO_LANGUAGE", "AUTOMATIC", "AUTHORED"] },
         "status": { "enum": ["DELETED", "UNAVAILABLE"] }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "VIDEO_LANGUAGE" } }
+          },
+          "then": { "properties": { "language": { "const": "English" } } }
+        },
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "AUTOMATIC" } }
+          },
+          "then": { "properties": { "language": { "const": "English" } } }
+        },
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "AUTHORED" } }
+          },
+          "then": { "properties": { "language": { "const": "Japanese" } } }
+        }
+      ]
     },
     "subtitleStudioFailureReadback": {
       "type": "object",
@@ -538,7 +561,45 @@
           "minItems": 1,
           "maxItems": 3,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/subtitleTrackFailure" }
+          "items": { "$ref": "#/$defs/subtitleTrackFailure" },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "English" },
+                  "trackType": { "const": "VIDEO_LANGUAGE" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "English" },
+                  "trackType": { "const": "AUTOMATIC" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "Japanese" },
+                  "trackType": { "const": "AUTHORED" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          ]
         }
       }
     },

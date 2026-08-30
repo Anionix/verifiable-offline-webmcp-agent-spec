@@ -65,10 +65,6 @@
       "type": "string",
       "pattern": "^[0-9a-f]{40}$"
     },
-    "providerSourceCommit": {
-      "type": "string",
-      "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE|OFF_HISTORY)$"
-    },
     "projectId": {
       "type": "string",
       "pattern": "^prj_[A-Za-z0-9]+$"
@@ -155,7 +151,7 @@
         "projectName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
         "deploymentId": { "$ref": "#/$defs/deploymentId" },
         "sourceState": { "const": "PROVIDER_COMMIT_REACHABLE" },
-        "providerGitCommit": { "$ref": "#/$defs/providerSourceCommit" },
+        "providerGitCommit": { "$ref": "#/$defs/sourceCommit" },
         "providerGitCommitObservation": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "providerGitDirty": { "const": false },
         "uniqueUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },

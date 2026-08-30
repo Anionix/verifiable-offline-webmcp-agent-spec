@@ -4957,8 +4957,8 @@
     },
     {
       "path": "schemas/vercel-hotel-deployment.schema.json",
-      "sha256": "17c60a9dc64154ca5214ccb53ff4a278339fa0d4b1409729efa108989bae2264",
-      "bytes": 15441,
+      "sha256": "bbc221ef8df571a437b93770f47d955f7fabfe0fa04f51bf00baf49cb780d830",
+      "bytes": 15308,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5318,8 +5318,8 @@
     },
     {
       "path": "scripts/validate_service_integrations.mjs",
-      "sha256": "d5f56329ea862ad0771ae81e4f4da1f59403e4acbac7bb10ad04d8455113c9a3",
-      "bytes": 49266,
+      "sha256": "c419deb59c66d9f810a951483c744458604012e86241586a7e0272fd86c96ba1",
+      "bytes": 49339,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -6116,8 +6116,8 @@
     },
     {
       "path": "src/typescript/sync/synchronizer.ts",
-      "sha256": "3e4a246e2bbb84886a4b3cf84eb0567b30c21a41d52f36cb4830d433571a33dc",
-      "bytes": 63632,
+      "sha256": "8222609dd97a6aa6c8c1ee95ff435c7df28374807f58dbeea6337607bec54eaf",
+      "bytes": 63983,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {
@@ -6363,8 +6363,8 @@
     },
     {
       "path": "src/typescript/test/offline-sync.test.ts",
-      "sha256": "86b47584cfc2376d6262649cf88d13108e825bd6255cbf6b84f94a93558556c1",
-      "bytes": 64716,
+      "sha256": "c0f2ffb1877e0b72e34707f5e3a69834df09115a927733fb293b71887f3f289e",
+      "bytes": 67832,
       "mediaType": "text/typescript",
       "category": "src",
       "identity": {

@@ -106,6 +106,7 @@ interface TrustedKeyAnchorLockOwner {
 interface TrustedKeyAnchorLockOwnerRead {
   owner: TrustedKeyAnchorLockOwner | null;
   present: boolean;
+  malformed: boolean;
 }
 
 interface TrustedKeyAnchorLockObservation {
@@ -135,6 +136,7 @@ const TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS = 1_000;
 const TRUST_ANCHOR_LOCK_OWNER_FILE = "owner.json";
 const TRUST_ANCHOR_LOCK_OWNER_FIELDS = ["schemaVersion", "ownerProcessId", "ownerProcessStartTimeEpochMs", "acquiredAtEpochMs", "ownerEventId"] as const;
 const TRUST_ANCHOR_PROCESS_START_TOLERANCE_MS = 1_000;
+const TRUST_ANCHOR_PROCESS_START_EPOCH_MS = Math.max(0, Math.floor(Date.now() - process.uptime() * 1_000));
 const TRUST_ANCHOR_LOCK_WAIT = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
 
 function hasExactFields(value: unknown, fields: readonly string[]): value is Record<string, unknown> {
@@ -165,7 +167,7 @@ function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOw
     if (!fstatSync(descriptor).isFile()) throw new Error("trusted device key anchor lock owner must be a regular file");
     ownerText = readFileSync(descriptor, "utf8");
   } catch (error) {
-    if (filesystemErrorCode(error) === "ENOENT") return { owner: null, present: false };
+    if (filesystemErrorCode(error) === "ENOENT") return { owner: null, present: false, malformed: false };
     if (filesystemErrorCode(error) === "ELOOP") {
       throw new Error("trusted device key anchor lock owner must be a regular file", { cause: error });
     }
@@ -177,7 +179,7 @@ function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOw
   try {
     value = JSON.parse(ownerText);
   } catch {
-    return { owner: null, present: true };
+    return { owner: null, present: true, malformed: true };
   }
   if (
     !hasExactFields(value, TRUST_ANCHOR_LOCK_OWNER_FIELDS) ||
@@ -191,16 +193,16 @@ function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOw
     typeof value.ownerEventId !== "string" ||
     !isUuidVersion(value.ownerEventId, 7)
   )
-    return { owner: null, present: true };
-  return { owner: value as unknown as TrustedKeyAnchorLockOwner, present: true };
+    return { owner: null, present: true, malformed: true };
+  return { owner: value as unknown as TrustedKeyAnchorLockOwner, present: true, malformed: false };
 }
 
 // information_uuid_v5=2ea93f2d-0e22-5253-80b4-bf94474a994e
 // event_uuid_v7=01a05066-0020-7c7d-8b7f-d9a5c7f64f4b
-// state_transition=OWNER_PID_OBSERVED -> START_ID_COMPARED -> RECOVERY_ALLOWED_OR_BLOCKED occurred_at=2026-08-30T02:00:00.000Z
-// machine-contract: a live PID with an unknown process instance is never treated as dead; only ESRCH or a mismatched self start identity permits recovery.
+// state_transition=OWNER_PID_OBSERVED -> STABLE_START_ID_COMPARED -> RECOVERY_ALLOWED_OR_BLOCKED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a live PID with an unknown process instance is never treated as dead; only ESRCH or a mismatched self start identity permits recovery, and the current process start identity is sampled once.
 function currentProcessStartTimeEpochMs(): number {
-  return Math.max(0, Math.floor(Date.now() - process.uptime() * 1_000));
+  return TRUST_ANCHOR_PROCESS_START_EPOCH_MS;
 }
 
 function processIsDefinitelyDead(owner: TrustedKeyAnchorLockOwner): boolean {
@@ -254,9 +256,11 @@ function observeTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number): Trus
     directoryIdentity,
     fingerprint: `${directoryIdentity}-${owner?.ownerEventId ?? "uninitialized"}`,
     owner,
-    recoverable: ownerRead.present
-      ? owner !== null && processIsDefinitelyDead(owner)
-      : nowEpochMs - lockStats.mtimeMs >= TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS,
+    recoverable: ownerRead.malformed
+      ? nowEpochMs - lockStats.mtimeMs >= TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS
+      : ownerRead.present
+        ? owner !== null && processIsDefinitelyDead(owner)
+        : nowEpochMs - lockStats.mtimeMs >= TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS,
   };
 }
 

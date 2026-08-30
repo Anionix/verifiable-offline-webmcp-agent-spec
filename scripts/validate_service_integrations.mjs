@@ -561,6 +561,7 @@ if (vercelDeployment && vercelDeploymentSchema) {
     ["artifact source", ["artifact", "sourceCommit"]],
     ["browser-flow source", ["browserFlow", "appliesToFunctionalSourceCommit"]],
     ["restored-deployment source", ["restoredNotificationDeployment", "sourceCommit"]],
+    ["provider deployment source", ["deployment", "providerGitCommit"]],
   ]) {
     for (const sentinel of ["CHECKOUT_TREE", "OFF_HISTORY"]) {
       const candidate = structuredClone(vercelDeployment);

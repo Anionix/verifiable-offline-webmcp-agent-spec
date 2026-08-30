@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-release-candidate.schema.json",
-  "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052ac-2ad0-7a33-a496-f0f93b6a383f state_transition=HOTEL_LIVENESS_FIXED -> RELEASE_EVIDENCE_BOUND occurred_at=2026-08-30T12:36:50.000Z machine-contract=local test output, built digests, public claims, and bounded browser observations remain separate until every hard gate has evidence",
+  "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8 state_transition=LOCAL_LIVENESS_PROVED -> PUBLIC_WEBMCP_RELEASE_READY occurred_at=2026-08-30T13:28:07.383Z machine-contract=The five hard gates are pass only when local behavior, exact public count, native tool discovery, agent read-before-retry, and the committed production deployment share one source boundary.",
   "title": "Hotel release candidate evidence",
   "type": "object",
   "additionalProperties": false,
@@ -21,16 +21,100 @@
   "properties": {
     "$schema": { "const": "../schemas/hotel-release-candidate.schema.json" },
     "identity": { "$ref": "#/$defs/identity" },
-    "observedAt": { "type": "string", "format": "date-time" },
+    "observedAt": { "$ref": "#/$defs/observedAt" },
     "source": {
       "type": "object",
       "additionalProperties": false,
       "required": ["commit", "state", "branch", "baseCommit"],
       "properties": {
-        "commit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
-        "state": { "enum": ["WORKTREE_CANDIDATE", "COMMITTED_CANDIDATE"] },
+        "commit": { "$ref": "#/$defs/commit" },
+        "state": { "const": "COMMITTED_CANDIDATE" },
         "branch": { "type": "string", "minLength": 1 },
-        "baseCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+        "baseCommit": { "$ref": "#/$defs/commit" }
+      }
+    },
+    "testRun": { "$ref": "#/$defs/testRun" },
+    "localLiveness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "stateSequence", "sameIntent", "physicalBookingRows", "effectStartCount", "approvalDigestRenewed"],
+      "properties": {
+        "status": { "const": "PASS" },
+        "stateSequence": { "const": ["PREPARED", "EXPIRED", "PREPARED", "HUMAN_APPROVED", "COMMITTED"] },
+        "sameIntent": { "const": true },
+        "physicalBookingRows": { "const": 1 },
+        "effectStartCount": { "const": 1 },
+        "approvalDigestRenewed": { "const": true }
+      }
+    },
+    "artifacts": { "$ref": "#/$defs/artifacts" },
+    "publicClaims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateTestCount", "publicReadbackTestCount", "status", "source", "releaseCommit", "deploymentId", "publicUrl"],
+      "properties": {
+        "candidateTestCount": { "type": "integer", "minimum": 1 },
+        "publicReadbackTestCount": { "type": "integer", "minimum": 1 },
+        "status": { "const": "MATCH" },
+        "source": { "const": "metadata/hotel-public-release-readback.json" },
+        "releaseCommit": { "$ref": "#/$defs/commit" },
+        "deploymentId": { "$ref": "#/$defs/deploymentId" },
+        "publicUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" }
+      }
+    },
+    "browserObservation": { "$ref": "#/$defs/browserObservation" },
+    "issueReadiness": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["issue", "status", "reason"],
+        "properties": {
+          "issue": { "enum": [189, 190, 191, 192, 193] },
+          "status": { "const": "PASS" },
+          "reason": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "finalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "status", "ready", "components"],
+      "properties": {
+        "formula": { "const": "S AND L AND F_exact AND W AND E" },
+        "status": { "const": "PASS" },
+        "ready": { "const": true },
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["S", "L", "F_exact", "W", "E"],
+          "properties": {
+            "S": { "const": "PASS" },
+            "L": { "const": "PASS" },
+            "F_exact": { "const": "PASS" },
+            "W": { "const": "PASS" },
+            "E": { "const": "PASS" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "deploymentId": { "type": "string", "pattern": "^dpl_[A-Za-z0-9]+$" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" }
       }
     },
     "testRun": {
@@ -40,26 +124,11 @@
       "properties": {
         "command": { "const": "npm test" },
         "directory": { "const": "src/typescript" },
-        "passed": { "type": "integer", "minimum": 0 },
-        "failed": { "type": "integer", "minimum": 0 },
-        "skipped": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 1 },
+        "failed": { "const": 0 },
+        "skipped": { "const": 0 },
         "total": { "type": "integer", "minimum": 1 },
         "derivedFrom": { "const": "node-test-summary" }
-      }
-    },
-    "localLiveness": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "stateSequence", "sameIntent", "physicalBookingRows", "effectStartCount", "approvalDigestRenewed"],
-      "properties": {
-        "status": { "const": "PASS" },
-        "stateSequence": {
-          "const": ["PREPARED", "EXPIRED", "PREPARED", "HUMAN_APPROVED", "COMMITTED"]
-        },
-        "sameIntent": { "const": true },
-        "physicalBookingRows": { "const": 1 },
-        "effectStartCount": { "const": 1 },
-        "approvalDigestRenewed": { "const": true }
       }
     },
     "artifacts": {
@@ -96,15 +165,54 @@
         }
       }
     },
-    "publicClaims": {
+    "effectCounts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["candidateTestCount", "publicReadbackTestCount", "status", "source"],
+      "required": ["bookingCount", "effectStartCount", "externalRequests", "permissionRequests", "notifications"],
       "properties": {
-        "candidateTestCount": { "type": "integer", "minimum": 1 },
-        "publicReadbackTestCount": { "type": "integer", "minimum": 1 },
-        "status": { "enum": ["MATCH", "MISMATCH_OBSERVED"] },
-        "source": { "const": "metadata/devpost-public-readback.json" }
+        "bookingCount": { "const": 0 },
+        "effectStartCount": { "const": 0 },
+        "externalRequests": { "const": 0 },
+        "permissionRequests": { "const": 0 },
+        "notifications": { "const": 0 }
+      }
+    },
+    "statusResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["toolName", "state", "bookingExists", "confirmationNumber", "attemptCount", "bookingCount", "effectStartCount"],
+      "properties": {
+        "toolName": { "const": "get_hotel_booking_status" },
+        "state": { "enum": ["COMMITTED", "RETRY_RECOGNIZED"] },
+        "bookingExists": { "const": true },
+        "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
+        "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "bookingCount": { "const": 1 },
+        "effectStartCount": { "const": 1 }
+      }
+    },
+    "finalStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "attemptCount", "bookingCount", "effectStartCount", "confirmationNumber", "sameConfirmation"],
+      "properties": {
+        "state": { "const": "RETRY_RECOGNIZED" },
+        "attemptCount": { "const": 2 },
+        "bookingCount": { "const": 1 },
+        "effectStartCount": { "const": 1 },
+        "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
+        "sameConfirmation": { "const": true }
+      }
+    },
+    "recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "path", "sha256", "durationSeconds"],
+      "properties": {
+        "status": { "const": "LOCAL_ARTIFACT" },
+        "path": { "type": "string", "pattern": "^/[^\\n]+$" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "durationSeconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 180 }
       }
     },
     "browserObservation": {
@@ -121,98 +229,52 @@
         "documentModelContext",
         "requiredChromeFlags",
         "configurationState",
+        "launchArguments",
+        "devtoolsWebmcpCategory",
         "originTrialMetadataCount",
         "visibleToolNames",
         "forbiddenToolNames",
         "calledToolNames",
-        "effectCounts",
+        "discoveryEffectCounts",
+        "reconciliation",
+        "recording",
         "status"
       ],
       "properties": {
-        "url": { "type": "string", "format": "uri" },
-        "origin": { "type": "string", "format": "uri" },
-        "observedAt": { "type": "string", "format": "date-time" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" },
+        "origin": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
         "browser": { "type": "string", "minLength": 1 },
         "secureContext": { "const": true },
-        "pageSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
-        "candidateSourceCommit": { "const": "NOT_PROVEN" },
-        "documentModelContext": { "const": "CONFIRMED_ABSENT" },
-        "requiredChromeFlags": {
-          "const": ["#devtools-webmcp-support", "#enable-webmcp-testing"]
-        },
-        "configurationState": { "const": "NOT_VERIFIED" },
+        "pageSourceCommit": { "$ref": "#/$defs/commit" },
+        "candidateSourceCommit": { "$ref": "#/$defs/commit" },
+        "documentModelContext": { "const": "CONFIRMED_PRESENT" },
+        "requiredChromeFlags": { "const": ["#devtools-webmcp-support", "#enable-webmcp-testing"] },
+        "configurationState": { "const": "VERIFIED" },
+        "launchArguments": { "const": ["--enable-features=WebMCP"] },
+        "devtoolsWebmcpCategory": { "const": true },
         "originTrialMetadataCount": { "const": 0 },
-        "visibleToolNames": {
-          "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"]
-        },
-        "forbiddenToolNames": {
-          "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]
-        },
-        "calledToolNames": { "const": [] },
-        "effectCounts": {
+        "visibleToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "calledToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"] },
+        "discoveryEffectCounts": { "$ref": "#/$defs/effectCounts" },
+        "reconciliation": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["intentRows", "attemptRows", "effectRows", "auditEvents", "externalRequests", "permissionRequests", "notifications"],
+          "required": ["status", "flow", "statusCheck", "finalStatus", "sameConfirmation", "humanConfirmationBoundary", "driverAction", "agentExplanation"],
           "properties": {
-            "intentRows": { "const": 0 },
-            "attemptRows": { "const": 0 },
-            "effectRows": { "const": 0 },
-            "auditEvents": { "const": 0 },
-            "externalRequests": { "const": 0 },
-            "permissionRequests": { "const": 0 },
-            "notifications": { "const": 0 }
+            "status": { "const": "PASS" },
+            "flow": { "const": ["AMBIGUOUS_OUTCOME", "AGENT_WEBMCP_STATUS_CHECK", "EXISTING_RESULT_FOUND", "NO_DUPLICATE_EFFECT"] },
+            "statusCheck": { "$ref": "#/$defs/statusResult" },
+            "finalStatus": { "$ref": "#/$defs/finalStatus" },
+            "sameConfirmation": { "const": true },
+            "humanConfirmationBoundary": { "const": "visible_button_only" },
+            "driverAction": { "const": "visible_button_exercised_by_browser_driver" },
+            "agentExplanation": { "type": "string", "minLength": 50 }
           }
         },
-        "status": { "const": "INCONCLUSIVE" }
-      }
-    },
-    "issueReadiness": {
-      "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["issue", "status", "reason"],
-        "properties": {
-          "issue": { "enum": [189, 190, 191, 192, 193] },
-          "status": { "enum": ["PASS", "INCONCLUSIVE"] },
-          "reason": { "type": "string", "minLength": 3 }
-        }
-      }
-    },
-    "finalGate": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["formula", "status", "ready", "components"],
-      "properties": {
-        "formula": { "const": "S AND L AND F_exact AND W AND E" },
-        "status": { "const": "INCONCLUSIVE" },
-        "ready": { "type": ["boolean", "null"] },
-        "components": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["S", "L", "F_exact", "W", "E"],
-          "properties": {
-            "S": { "const": "INCONCLUSIVE" },
-            "L": { "const": "PASS" },
-            "F_exact": { "const": "INCONCLUSIVE" },
-            "W": { "const": "INCONCLUSIVE" },
-            "E": { "const": "INCONCLUSIVE" }
-          }
-        }
-      }
-    }
-  },
-  "$defs": {
-    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-    "identity": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["informationUuidV5", "observationUuidV7"],
-      "properties": {
-        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
-        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+        "recording": { "$ref": "#/$defs/recording" },
+        "status": { "const": "PASS" }
       }
     }
   }

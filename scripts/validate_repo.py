@@ -566,6 +566,18 @@ def main():
     )
     for e in hotel_candidate_validator.iter_errors(hotel_candidate_evidence):
         errors.append(f"schema metadata/hotel-release-candidate.json: {e.message}")
+    hotel_public_release = load_json(ROOT / "metadata/hotel-public-release-readback.json")
+    hotel_public_release_validator = Draft202012Validator(
+        schemas["hotel-public-release-readback"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in hotel_public_release_validator.iter_errors(hotel_public_release):
+        errors.append(f"schema metadata/hotel-public-release-readback.json: {e.message}")
+    hotel_native_reconciliation = load_json(ROOT / "metadata/hotel-native-webmcp-reconciliation.json")
+    hotel_native_reconciliation_validator = Draft202012Validator(
+        schemas["hotel-native-webmcp-reconciliation"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in hotel_native_reconciliation_validator.iter_errors(hotel_native_reconciliation):
+        errors.append(f"schema metadata/hotel-native-webmcp-reconciliation.json: {e.message}")
     if hotel_evidence["sourceCommit"] == "WORKTREE" and hotel_evidence["sourceState"] != "WORKTREE_CANDIDATE":
         errors.append("hotel WORKTREE source must remain a worktree candidate")
     if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":

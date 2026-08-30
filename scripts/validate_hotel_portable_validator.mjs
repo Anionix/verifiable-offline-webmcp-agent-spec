@@ -4,10 +4,10 @@
 // state_transition=COMBINED_HOST_VALIDATION -> PORTABLE_CLIENT_RECEIPT occurred_at=2026-08-29T02:03:31.000Z
 // machine-contract: this validator proves only the complete portable client allowlist, bounded UI and tools, offline shell, local host configuration syntax, and its two scoped digests.
 // information_uuid_v5=35895cab-fd9e-5106-8047-9be7177bbe27
-// event_uuid_v7=01a052d0-0000-7000-8000-000000000191
-// state_transition=WEBMCP_RECIPE_DECLARED -> NATIVE_WEBMCP_RUN_PENDING occurred_at=2026-08-30T21:00:00.000+09:00
-// machine-contract: the native WebMCP recording recipe is executable data, but
-// UNRUN never becomes runtime evidence until a public HTTPS browser observation exists.
+// event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8
+// state_transition=NATIVE_WEBMCP_RECIPE_DECLARED -> PUBLIC_RUNTIME_PROOF_RECORDED occurred_at=2026-08-30T13:28:07.383Z
+// machine-contract: the public WebMCP file separates zero-effect native discovery,
+// the executable test count, and the later fictional human-confirmation retry.
 
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
@@ -43,10 +43,10 @@ const forbiddenTools = Object.freeze(["confirm_hotel_booking", "pay_for_hotel_bo
 
 const expectedRecordingRecipe = Object.freeze({
   recipeId: "35895cab-fd9e-5106-8047-9be7177bbe27",
-  status: "UNRUN",
-  purpose: "Record native WebMCP discovery on the public HTTPS page without invoking a state-changing tool.",
+  status: "READY",
+  purpose: "Reproduce native WebMCP discovery and the fictional lost-response reconciliation on the public HTTPS page.",
   target: {
-    url: "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
+    url: "https://kyoto-booking-retry-proof.vercel.app/",
     requiresSecureContext: true,
     requiredChromeFlags: ["#devtools-webmcp-support", "#enable-webmcp-testing"],
   },
@@ -62,17 +62,57 @@ const expectedRecordingRecipe = Object.freeze({
     {
       stepId: "assert-zero-effects",
       action: "read",
-      expectEffectCounts: {
-        intentRows: 0,
-        attemptRows: 0,
-        effectRows: 0,
-        auditEvents: 0,
-        externalRequests: 0,
-        permissionRequests: 0,
-        notifications: 0,
-      },
+      expect: "discovery creates no booking, effect, external request, permission request, or notification",
+    },
+    {
+      stepId: "prepare-and-human-confirm",
+      action: "visible-human-button",
+      expect: "COMMITTED with the success response hidden",
+    },
+    {
+      stepId: "reconcile-before-retry",
+      action: "execute-native-tool",
+      toolName: "get_hotel_booking_status",
+      expect: "existing result found before retry",
+    },
+    {
+      stepId: "retry-same-intent",
+      action: "visible-retry-button",
+      expect: "RETRY_RECOGNIZED, attempts=2, bookings=1, effectStartCount=1",
     },
   ],
+});
+
+const expectedReleaseEvidence = Object.freeze({
+  status: "PASS",
+  testCommand: "npm test",
+  testDirectory: "src/typescript",
+  testCount: 192,
+  countSource: "node-test-summary",
+});
+
+const expectedNativeRuntimeContract = Object.freeze({
+  status: "REPRODUCIBLE_PATH",
+  targetUrl: "https://kyoto-booking-retry-proof.vercel.app/",
+  requiresSecureContext: true,
+  requiredChromeFlags: ["#devtools-webmcp-support", "#enable-webmcp-testing"],
+  requiredSurface: "document.modelContext.getTools",
+  expectedToolNames: expectedTools,
+  forbiddenToolNames: forbiddenTools,
+  discoveryMustHaveZeroEffects: true,
+});
+
+const expectedAgentReconciliationContract = Object.freeze({
+  status: "REPRODUCIBLE_PATH",
+  flow: ["AMBIGUOUS_OUTCOME", "AGENT_WEBMCP_STATUS_CHECK", "EXISTING_RESULT_FOUND", "NO_DUPLICATE_EFFECT"],
+  requiredReadTool: "get_hotel_booking_status",
+  humanConfirmationBoundary: "visible_button_only",
+  resultInvariant: {
+    attemptCount: 2,
+    bookingCount: 1,
+    effectStartCount: 1,
+    sameConfirmation: true,
+  },
 });
 
 const requiredSecurityHeaders = Object.freeze([
@@ -148,12 +188,15 @@ for (const asset of ["/", "/assets/app.js", "/assets/index.css", "/favicon.svg",
 assert.doesNotMatch(serviceWorker, /addEventListener\(["'](?:sync|periodicsync)["']/i);
 assert.doesNotMatch(serviceWorker, /humanApproveAndCommit|requestPayment|cancelBooking/);
 
-assert.equal(evaluations.measurementStatus, "UNMEASURED");
+assert.equal(evaluations.measurementStatus, "CONTRACT_READY");
 assert.deepEqual(
   evaluations.applicationState.map((entry) => entry.name),
   expectedTools,
 );
 assert.deepEqual(evaluations.forbiddenTools, forbiddenTools);
+assert.deepEqual(evaluations.releaseEvidence, expectedReleaseEvidence);
+assert.deepEqual(evaluations.nativeRuntimeContract, expectedNativeRuntimeContract);
+assert.deepEqual(evaluations.agentReconciliationContract, expectedAgentReconciliationContract);
 assert.deepEqual(evaluations.recordingRecipe, expectedRecordingRecipe);
 assert.deepEqual(builtRegistry, sourceRegistry, "portable service registry must exactly match its repository source");
 assert.deepEqual(assetsIgnore.trim().split(/\r?\n/u), ["wrangler.json", ".dev.vars"]);

@@ -18,6 +18,7 @@ import {
   managedEvidenceProfile,
   validateManagedBrowserDiscovery,
 } from "./hotel-managed-browser-release-proof.mjs";
+import { browserObservationFrom, validateNativeDiscovery } from "./validate_hotel_release_candidate.mjs";
 
 const observedAt = "2026-08-30T19:50:43.312Z";
 const confirmationNumber = "FKR-SYNTHETIC214";
@@ -96,6 +97,17 @@ const managedFixture = {
   },
 };
 
+function productionShapedManagedFixture() {
+  const record = structuredClone(managedFixture);
+  record.status = "PASS";
+  const evidences = [record.fetchToolsCall.resultEvidence, ...record.toolCalls.map((call) => call.resultEvidence)];
+  for (const evidence of evidences) {
+    evidence.basis = "EXPLICIT_SUMMARY_HASH";
+    evidence.description = "Explicit test summary hash used only for candidate wiring coverage.";
+  }
+  return record;
+}
+
 test("accepts the test-only managed capability discovery shape", () => {
   const result = validateManagedBrowserDiscovery(managedFixture, { allowTestFixture: true });
   assert.deepEqual(result, {
@@ -125,6 +137,39 @@ test("uses the existing native evidence root for the managed discovery branch", 
   assert.deepEqual(managedRoot.deployment, oldChromeProof.deployment);
   assert.deepEqual(managedRoot.reconciliation, oldChromeProof.reconciliation);
   assert.deepEqual(managedRoot.recording, oldChromeProof.recording);
+});
+
+test("candidate build accepts managed discovery without requiring Chrome configuration", async () => {
+  const oldChromeProof = JSON.parse(await readFile(new URL("../metadata/hotel-native-webmcp-reconciliation.json", import.meta.url), "utf8"));
+  const managedRoot = structuredClone(oldChromeProof);
+  managedRoot.discovery = productionShapedManagedFixture();
+  validateNativeDiscovery(managedRoot);
+  const browserObservation = browserObservationFrom(managedRoot, oldChromeProof.deployment.sourceCommit);
+  assert.equal(browserObservation.profile, managedEvidenceProfile);
+  assert.deepEqual(browserObservation.managedDiscovery, managedRoot.discovery);
+  assert.equal(Object.hasOwn(browserObservation, "requiredChromeFlags"), false);
+  assert.deepEqual(browserObservation.visibleToolNames, expectedTools);
+  assert.deepEqual(browserObservation.forbiddenToolNames, forbiddenTools);
+});
+
+test("candidate managed branch rejects a declaration-only discovery", async () => {
+  const oldChromeProof = JSON.parse(await readFile(new URL("../metadata/hotel-native-webmcp-reconciliation.json", import.meta.url), "utf8"));
+  const managedRoot = structuredClone(oldChromeProof);
+  managedRoot.discovery = productionShapedManagedFixture();
+  delete managedRoot.discovery.toolCalls;
+  assert.throws(() => validateNativeDiscovery(managedRoot), /toolCalls|missing/u);
+});
+
+test("candidate old branch keeps the strict Chrome configuration gate", async () => {
+  const oldChromeProof = JSON.parse(await readFile(new URL("../metadata/hotel-native-webmcp-reconciliation.json", import.meta.url), "utf8"));
+  oldChromeProof.discovery.requiredChromeFlags = ["#unmeasured-managed-profile"];
+  assert.throws(() => validateNativeDiscovery(oldChromeProof), /browser flags/u);
+});
+
+test("candidate old browser observation remains unchanged", async () => {
+  const oldChromeProof = JSON.parse(await readFile(new URL("../metadata/hotel-native-webmcp-reconciliation.json", import.meta.url), "utf8"));
+  const candidate = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
+  assert.deepEqual(browserObservationFrom(oldChromeProof, candidate.source.commit), candidate.browserObservation);
 });
 
 const rejectingCases = [

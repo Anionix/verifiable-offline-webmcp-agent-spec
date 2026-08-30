@@ -21,6 +21,7 @@ import {
   fullSitesPackageDigestScope,
   sitesPackageRoot,
 } from "./hotel-validator-common.mjs";
+import { managedEvidenceProfile, validateManagedBrowserDiscovery } from "./hotel-managed-browser-release-proof.mjs";
 import { validateReleaseContext } from "./release-validation-context.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -75,41 +76,80 @@ function assertExactArray(actual, expected, label) {
   assert.deepEqual(actual, expected, `${label} changed`);
 }
 
-function browserObservationFrom(nativeEvidence, sourceCommit) {
+export function validateNativeDiscovery(nativeEvidence) {
+  assert.equal(nativeEvidence.status, "PASS");
+  const { discovery, reconciliation } = nativeEvidence;
+  assert.equal(discovery.status, "PASS");
+  assertExactArray(discovery.visibleToolNames, expectedTools, "native visible tools");
+  assertExactArray(discovery.forbiddenToolNames, forbiddenTools, "native forbidden tools");
+  if (discovery.profile === managedEvidenceProfile) {
+    validateManagedBrowserDiscovery(discovery);
+  } else {
+    assertExactArray(discovery.requiredChromeFlags, requiredChromeFlags, "native browser flags");
+    assert.equal(discovery.documentModelContext, "CONFIRMED_PRESENT");
+    assert.equal(discovery.secureContext, true);
+    assert.equal(discovery.discoveryEffectCounts.bookingCount, 0);
+    assert.equal(discovery.discoveryEffectCounts.effectStartCount, 0);
+  }
+  assert.equal(reconciliation.status, "PASS");
+  assert.equal(reconciliation.sameConfirmation, true);
+  assert.equal(reconciliation.finalStatus.attemptCount, 2);
+  assert.equal(reconciliation.finalStatus.bookingCount, 1);
+  assert.equal(reconciliation.finalStatus.effectStartCount, 1);
+  assert.equal(reconciliation.finalStatus.sameConfirmation, true);
+  assertExactArray(
+    reconciliation.calledToolNames,
+    ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"],
+    "native called tools",
+  );
+}
+
+function browserReconciliationFrom(reconciliation) {
+  return {
+    status: reconciliation.status,
+    flow: reconciliation.flow,
+    statusCheck: reconciliation.statusCheck,
+    finalStatus: reconciliation.finalStatus,
+    sameConfirmation: reconciliation.sameConfirmation,
+    humanConfirmationBoundary: reconciliation.humanConfirmationBoundary,
+    driverAction: reconciliation.driverAction,
+    agentExplanation: reconciliation.agentExplanation,
+  };
+}
+
+export function browserObservationFrom(nativeEvidence, sourceCommit) {
   const discovery = nativeEvidence.discovery;
   const reconciliation = nativeEvidence.reconciliation;
   const deployment = nativeEvidence.deployment;
   const origin = new URL(deployment.publicUrl).origin;
-  return {
+  const common = {
     url: deployment.publicUrl,
     origin,
     observedAt: reconciliation.observedAt,
-    browser: discovery.browser,
-    secureContext: discovery.secureContext,
     pageSourceCommit: deployment.sourceCommit,
     candidateSourceCommit: sourceCommit,
+    visibleToolNames: discovery.visibleToolNames,
+    forbiddenToolNames: discovery.forbiddenToolNames,
+    reconciliation: browserReconciliationFrom(reconciliation),
+    recording: nativeEvidence.recording,
+    status: "PASS",
+  };
+  if (discovery.profile === managedEvidenceProfile) {
+    validateManagedBrowserDiscovery(discovery);
+    return { ...common, profile: discovery.profile, managedDiscovery: discovery };
+  }
+  return {
+    ...common,
+    browser: discovery.browser,
+    secureContext: discovery.secureContext,
     documentModelContext: discovery.documentModelContext,
     requiredChromeFlags: discovery.requiredChromeFlags,
     configurationState: "VERIFIED",
     launchArguments: discovery.configuration.launchArguments,
     devtoolsWebmcpCategory: discovery.configuration.devtoolsWebmcpCategory,
     originTrialMetadataCount: discovery.originTrialMetadataCount,
-    visibleToolNames: discovery.visibleToolNames,
-    forbiddenToolNames: discovery.forbiddenToolNames,
     calledToolNames: reconciliation.calledToolNames,
     discoveryEffectCounts: discovery.discoveryEffectCounts,
-    reconciliation: {
-      status: reconciliation.status,
-      flow: reconciliation.flow,
-      statusCheck: reconciliation.statusCheck,
-      finalStatus: reconciliation.finalStatus,
-      sameConfirmation: reconciliation.sameConfirmation,
-      humanConfirmationBoundary: reconciliation.humanConfirmationBoundary,
-      driverAction: reconciliation.driverAction,
-      agentExplanation: reconciliation.agentExplanation,
-    },
-    recording: nativeEvidence.recording,
-    status: "PASS",
   };
 }
 
@@ -121,6 +161,7 @@ async function buildCandidate() {
   const sourceCommit = publicReadback.release.sourceCommit;
   const baseCommit = publicReadback.release.baseCommit;
   const branch = publicReadback.release.branch;
+  const managedDiscovery = nativeEvidence.discovery.profile === managedEvidenceProfile;
   validateReleaseContext({
     repositoryRoot,
     baseCommit,
@@ -144,29 +185,10 @@ async function buildCandidate() {
   );
   assertExactArray(publicEvaluations.forbiddenTools, forbiddenTools, "public forbidden tool contract");
 
-  assert.equal(nativeEvidence.status, "PASS");
+  validateNativeDiscovery(nativeEvidence);
   assert.equal(nativeEvidence.deployment.sourceCommit, sourceCommit, "native evidence source commit differs from release");
   assert.equal(nativeEvidence.deployment.publicUrl, publicReadback.deployment.publicUrl, "native evidence URL differs from public readback");
   assert.equal(nativeEvidence.deployment.deploymentId, publicReadback.deployment.deploymentId, "native evidence deployment differs from public readback");
-  assert.equal(nativeEvidence.discovery.status, "PASS");
-  assert.equal(nativeEvidence.reconciliation.status, "PASS");
-  assert.equal(nativeEvidence.reconciliation.sameConfirmation, true);
-  assertExactArray(nativeEvidence.discovery.requiredChromeFlags, requiredChromeFlags, "native browser flags");
-  assertExactArray(nativeEvidence.discovery.visibleToolNames, expectedTools, "native visible tools");
-  assertExactArray(nativeEvidence.discovery.forbiddenToolNames, forbiddenTools, "native forbidden tools");
-  assert.equal(nativeEvidence.discovery.documentModelContext, "CONFIRMED_PRESENT");
-  assert.equal(nativeEvidence.discovery.secureContext, true);
-  assert.equal(nativeEvidence.discovery.discoveryEffectCounts.bookingCount, 0);
-  assert.equal(nativeEvidence.discovery.discoveryEffectCounts.effectStartCount, 0);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.attemptCount, 2);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.bookingCount, 1);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.effectStartCount, 1);
-  assert.equal(nativeEvidence.reconciliation.finalStatus.sameConfirmation, true);
-  assertExactArray(
-    nativeEvidence.reconciliation.calledToolNames,
-    ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"],
-    "native called tools",
-  );
   assert(nativeEvidence.recording.path.startsWith("/"), "recording path must be absolute");
   // machine-contract: the native recording is a local artifact excluded from
   // the repository; verify its bytes when this checkout has them, otherwise
@@ -244,8 +266,9 @@ async function buildCandidate() {
       {
         issue: 191,
         status: "PASS",
-        reason:
-          "A fresh HTTPS browser session exposed document.modelContext and exactly the four intended tools; discovery reported zero booking and effect starts.",
+        reason: managedDiscovery
+          ? "The managed IAB native capability returned exactly the four intended tools and the required calls; browser configuration and external effects remain explicitly unmeasured."
+          : "A fresh HTTPS browser session exposed document.modelContext and exactly the four intended tools; discovery reported zero booking and effect starts.",
       },
       {
         issue: 192,
@@ -287,31 +310,33 @@ function compareStable(actual, expected) {
   assert.match(actual.observedAt, /^2026-08-30T/u, "candidate observation must belong to the current run date");
 }
 
-const mode = process.argv[2] ?? "--check";
-assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
-const candidate = await buildCandidate();
-if (mode === "--write") {
-  await writeFile(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
-  console.log(
-    JSON.stringify({
-      receipt: "HOTEL_RELEASE_CANDIDATE_WRITTEN",
-      path: "metadata/hotel-release-candidate.json",
-      sourceCommit: candidate.source.commit,
-      testCount: candidate.testRun.total,
-      deploymentId: candidate.publicClaims.deploymentId,
-      finalGate: candidate.finalGate.status,
-    }),
-  );
-} else {
-  const actual = await readJson("metadata/hotel-release-candidate.json");
-  compareStable(actual, candidate);
-  console.log(
-    JSON.stringify({
-      receipt: "HOTEL_RELEASE_CANDIDATE_VALIDATION_PASS",
-      sourceCommit: actual.source.commit,
-      testCount: actual.testRun.total,
-      publicClaimStatus: actual.publicClaims.status,
-      finalGate: actual.finalGate.status,
-    }),
-  );
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const mode = process.argv[2] ?? "--check";
+  assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
+  const candidate = await buildCandidate();
+  if (mode === "--write") {
+    await writeFile(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
+    console.log(
+      JSON.stringify({
+        receipt: "HOTEL_RELEASE_CANDIDATE_WRITTEN",
+        path: "metadata/hotel-release-candidate.json",
+        sourceCommit: candidate.source.commit,
+        testCount: candidate.testRun.total,
+        deploymentId: candidate.publicClaims.deploymentId,
+        finalGate: candidate.finalGate.status,
+      }),
+    );
+  } else {
+    const actual = await readJson("metadata/hotel-release-candidate.json");
+    compareStable(actual, candidate);
+    console.log(
+      JSON.stringify({
+        receipt: "HOTEL_RELEASE_CANDIDATE_VALIDATION_PASS",
+        sourceCommit: actual.source.commit,
+        testCount: actual.testRun.total,
+        publicClaimStatus: actual.publicClaims.status,
+        finalGate: actual.finalGate.status,
+      }),
+    );
+  }
 }

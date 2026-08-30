@@ -3379,7 +3379,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "f312cf066476e6b65d71cf8a3e236e2e2f62b986a54447b3a8c8c64a882aa697",
+      "sha256": "dfa67a7597a446b5c7201e68efe62d59a0bd7883168088f480c46532ee1b808e",
       "bytes": 11925,
       "mediaType": "text/html",
       "category": "root",
@@ -5470,8 +5470,8 @@
     },
     {
       "path": "scripts/validate_hotel_portable_validator.mjs",
-      "sha256": "86df37bba1cee4b0ed98e1c6fe6970027afce71d40a9ded1746d46f3336f4384",
-      "bytes": 11759,
+      "sha256": "2775306a25f35d67faa2f29234c7b28eb0668cb39f4f58dca0e120dc618e9eed",
+      "bytes": 12280,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

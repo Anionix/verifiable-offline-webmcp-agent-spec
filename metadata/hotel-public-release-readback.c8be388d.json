@@ -1,0 +1,57 @@
+{
+  "$schema": "../schemas/hotel-public-release-readback.schema.json",
+  "identity": {
+    "informationUuidV5": "5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39",
+    "observationUuidV7": "01a052f5-03b6-70df-8d85-ef68ea37e2ad",
+    "observedAt": "2026-08-30T13:56:24.118Z"
+  },
+  "release": {
+    "status": "COMMITTED_RELEASE",
+    "sourceCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "branch": "codex/issue-189-liveness",
+    "baseCommit": "37f9029e91ac2bef4c17b89ea12bcf3cdc2d60c3",
+    "testRun": {
+      "command": "npm test",
+      "directory": "src/typescript",
+      "passed": 192,
+      "failed": 0,
+      "skipped": 0,
+      "testCount": 192,
+      "countSource": "node-test-summary"
+    },
+    "artifacts": {
+      "functionalClientSha256": "ffb3d62c73b069aeb4bad71b4ad675a4b015ad6ce49448227199d1d9a265a6c9",
+      "fullClientSha256": "73b4c7d9a7b982723f052aef4203ced20961a75d73d1b45bda778226c1a1d0fb",
+      "fullSitesPackageSha256": "0165b414fd2e005771cd0cb20fa6cfb2d01d8f7466d41cf2fa94f5144c48c7ca"
+    }
+  },
+  "deployment": {
+    "provider": "Vercel",
+    "teamId": "team_npJWoj9cpy54Q7B3fpGdBCCX",
+    "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+    "projectName": "kyoto-booking-retry-proof",
+    "deploymentId": "dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK",
+    "target": "production",
+    "state": "READY",
+    "sourceCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
+    "uniqueUrl": "https://kyoto-booking-retry-proof-jnkzuh7r0-aniotajp-1978s-projects.vercel.app",
+    "readyAt": "2026-08-30T13:47:14.754Z",
+    "observedAt": "2026-08-30T13:56:24.118Z"
+  },
+  "anonymousReadback": {
+    "url": "https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json",
+    "statusCode": 200,
+    "authentication": "ANONYMOUS",
+    "observedAt": "2026-08-30T13:56:24.118Z",
+    "contentSha256": "0b4cd2df913983936734f53ab6b5c35384cbcffcfa887e965d2d1f08b180d023",
+    "localBuiltFileSha256": "0b4cd2df913983936734f53ab6b5c35384cbcffcfa887e965d2d1f08b180d023",
+    "releaseEvidence": {
+      "status": "PASS",
+      "testCommand": "npm test",
+      "testDirectory": "src/typescript",
+      "testCount": 192,
+      "countSource": "node-test-summary"
+    }
+  }
+}

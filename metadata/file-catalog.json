@@ -2182,8 +2182,8 @@
     },
     {
       "path": "docs/assets/hotel-retry-explained.png",
-      "sha256": "e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c",
-      "bytes": 1481908,
+      "sha256": "a8960459316bd8fa1853b3dc42d7ba4583198eff98ced31a375c420dbaebb141",
+      "bytes": 1511679,
       "mediaType": "application/octet-stream",
       "category": "docs",
       "identity": {
@@ -2448,8 +2448,8 @@
     },
     {
       "path": "examples/hotel-booking-demo/README.md",
-      "sha256": "9159e7702502993783f393c1beb80e46bfcb328bba26d06793573c46aa823f89",
-      "bytes": 8187,
+      "sha256": "35c2790affe477f56fc74ed47145700f258380f7988da34a945110300e8c46dd",
+      "bytes": 8951,
       "mediaType": "text/markdown",
       "category": "examples",
       "identity": {
@@ -4026,8 +4026,8 @@
     },
     {
       "path": "metadata/hotel-retry-diagram.json",
-      "sha256": "2b8e3f82437abe5a00c7af499011cad451913600aff1e0cd9c4471074e0980ba",
-      "bytes": 2220,
+      "sha256": "42ff18ee38599c473282839e0f8ffafe7b897ba4c082c365e52b2fccac2d94a2",
+      "bytes": 2764,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {

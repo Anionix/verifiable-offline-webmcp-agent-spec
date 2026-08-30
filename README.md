@@ -49,7 +49,7 @@ status: "design-specification"
 
 **60-second test:** **1. Check and prepare** → **2. Confirm booking — human action only** → **Retry the same booking** → verify `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the same confirmation number.
 
-**Open:** [Public ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site) · [2-minute-30-second video](https://youtu.be/tdSvJw4ghX8) · [Devpost](https://devpost.com/software/project-y79pb23hj1mz) · [Vercel backup](https://kyoto-booking-retry-proof.vercel.app) · [Release instructions](docs/24-hotel-release-package.ja.md)
+**Open:** [Public ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site) · [2-minute-30-second video](https://youtu.be/tdSvJw4ghX8) · [Devpost](https://devpost.com/software/project-y79pb23hj1mz) · [Vercel backup](https://kyoto-booking-retry-proof.vercel.app) · [Release README](examples/hotel-booking-demo/README.md) · [Visual guide](docs/25-devpost-visual-guide.en.md) · [Release instructions](docs/24-hotel-release-package.ja.md)
 
 [![Kyoto Booking Retry Proof showing RETRY_RECOGNIZED, two attempts, one booking, and one effect start](docs/assets/devpost-hotel-thumbnail.png)](https://kyoto-booking-retry-proof.anionix.chatgpt.site)
 
@@ -102,6 +102,9 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 17. [`docs/21-review-thread-reconciliation.ja.md`](docs/21-review-thread-reconciliation.ja.md) — 32 review findings bound to fixes and regression evidence / 32件のレビューを修正と回帰証拠へ結合
 18. [`docs/22-service-integrations.ja.md`](docs/22-service-integrations.ja.md) — eight service boundaries and the everyday value of preventing duplicate sends / 8サービスの境界と二重送信防止の生活価値
 19. [`docs/23-hotel-booking-demo.ja.md`](docs/23-hotel-booking-demo.ja.md) — fictional Kyoto hotel retry demo, four-tool boundary, and local verification / 架空の京都宿再送デモ、四機能境界、ローカル検証
+20. [`examples/hotel-booking-demo/README.md`](examples/hotel-booking-demo/README.md) — judge-ready release README with the 60-second path / 審査向け配布READMEと60秒導線
+21. [`docs/24-hotel-release-package.en.md`](docs/24-hotel-release-package.en.md) and [`ja`](docs/24-hotel-release-package.ja.md) — reproducible release commands / 再現可能な配布手順
+22. [`docs/25-devpost-visual-guide.en.md`](docs/25-devpost-visual-guide.en.md) and [`ja`](docs/25-devpost-visual-guide.ja.md) — screenshot, page, and video route / 画面・ページ・動画の視覚導線
 
 ## Machine-readable assets / 機械可読asset
 
@@ -218,6 +221,8 @@ A lost response must not turn one human intention into two real-world effects. T
 This English-first, Japanese-supported demo answers one ordinary travel problem: the booking reached the device, but the success response disappeared. Dates, adults, rooms, the fictional hotel, and its fixed plan form one UUIDv5 identity; presentation language is excluded. A visible human button alone can commit the simulated booking. A retry then recovers the same confirmation number and displays `2 attempts → 1 simulated booking → 1 confirmation number`.
 
 英語を主表示、日本語を補助表示にした架空予約デモです。料金は一室一泊12,000円、1〜14泊、大人1〜4人、部屋1〜2室、一室最大2人です。無料取消期限と想定料金は表示だけで、予約状態を変えません。個人情報、決済、実ホテル、メール、外部予約、実際の取消は扱いません。
+
+**Judge path / 審査導線:** 迷ったらまず[`examples/hotel-booking-demo/README.md`](examples/hotel-booking-demo/README.md)の60秒手順を実行し、次に[`docs/25-devpost-visual-guide.en.md`](docs/25-devpost-visual-guide.en.md)の6パネル順で画面を見てください。英語の主説明に短い日本語要約を添え、実際の画面・生成映像・未計測の境界を混ぜない構成です。
 
 ```bash
 npm ci

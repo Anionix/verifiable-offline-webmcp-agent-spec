@@ -93,6 +93,10 @@ SRT_TIMING = re.compile(
 # fixture event_uuid_v7=DERIVED_FROM_PRODUCTION_TIMELINE state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=MAX_ROOT_OR_READBACK_TIME_PLUS_ONE_MILLISECOND
 # machine-contract: future anonymous subtitle evidence must bind UUIDv7 to recordedAt, reject event reuse, keep recordedAt after measuredAt, and advance the document root time.
 FUTURE_SUBTITLE_STATE_SUFFIX = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED"
+SUBTITLE_TIMESTAMP_FIELDS = {
+    "subtitleUpdates": "observedAt",
+    "subtitleAnonymousReadbacks": "recordedAt",
+}
 
 
 def is_ignored(path: Path):
@@ -129,7 +133,7 @@ def subtitle_record_errors(record: dict[str, Any], timestamp_field: str, label: 
 
 
 def subtitle_capture_timing_errors(
-    record: dict[str, Any], label: str, root_updated_ms: int | None = None
+    record: dict[str, Any], label: str
 ) -> list[str]:
     catalog = record.get("availableSubtitleCatalog")
     capture_timing = catalog.get("captureTiming") if isinstance(catalog, dict) else None
@@ -156,8 +160,6 @@ def subtitle_capture_timing_errors(
         findings.append(f"{label} captureTiming upperBound precedes lowerBound")
     if recorded_ms < upper_ms:
         findings.append(f"{label} captureTiming upperBound exceeds recordedAt")
-    if root_updated_ms is not None and root_updated_ms < recorded_ms:
-        findings.append(f"{label} recordedAt exceeds document root updatedAt")
     return findings
 
 
@@ -187,10 +189,16 @@ def subtitle_observation_errors(collections: dict[str, Any], root_updated_ms: in
                     continue
                 if recorded_ms < measured_ms:
                     findings.append(f"{entry_label} recordedAt precedes measuredAt")
-                if root_updated_ms is not None and root_updated_ms < recorded_ms:
-                    findings.append(f"{entry_label} recordedAt exceeds document root updatedAt")
+            timestamp_field = SUBTITLE_TIMESTAMP_FIELDS.get(collection_name)
+            if root_updated_ms is not None and timestamp_field and timestamp_field in record:
+                try:
+                    record_time_ms = rfc3339_ms(record[timestamp_field])
+                except Exception:
+                    record_time_ms = None
+                if record_time_ms is not None and root_updated_ms < record_time_ms:
+                    findings.append(f"{entry_label} {timestamp_field} exceeds document root updatedAt")
             if "availableSubtitleCatalog" in record:
-                findings.extend(subtitle_capture_timing_errors(record, entry_label, root_updated_ms))
+                findings.extend(subtitle_capture_timing_errors(record, entry_label))
     return findings
 
 
@@ -1634,6 +1642,14 @@ def main():
         errors.append("video production previous root timestamp binding was not tested")
     if not any("not earlier than the current root" in finding for finding in invalid_previous_findings):
         errors.append("video production accepted an equal previous and current root timestamp")
+    owner_future = json.loads(json.dumps(video_production))
+    owner_future_ms = rfc3339_ms(owner_future["updatedAt"]) + 1
+    owner_future_record = owner_future["publication"]["subtitleUpdates"][0]
+    owner_future_record["observedAt"] = rfc3339_from_ms(owner_future_ms)
+    owner_future_record["observationUuidV7"] = uuid7_for_ms(owner_future_ms, 0x567, 0x56789ABCDEF0123)
+    owner_future_findings = document_history_errors(owner_future)
+    if not any("subtitleUpdates entry 1 observedAt exceeds document root updatedAt" in finding for finding in owner_future_findings):
+        errors.append("owner subtitle update beyond the document root was accepted")
     errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
@@ -1772,10 +1788,7 @@ def main():
                 errors.append(f"video production file digest mismatch: {record['path']}")
         plan = video_production["productionPlan"]
         publication = video_production["publication"]
-        for collection_name, timestamp_field in (
-            ("subtitleUpdates", "observedAt"),
-            ("subtitleAnonymousReadbacks", "recordedAt"),
-        ):
+        for collection_name, timestamp_field in SUBTITLE_TIMESTAMP_FIELDS.items():
             records = publication.get(collection_name, [])
             if not isinstance(records, list):
                 errors.append(f"{collection_name} must be an array")

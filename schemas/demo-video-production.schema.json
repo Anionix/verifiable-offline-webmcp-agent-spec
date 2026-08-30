@@ -129,7 +129,12 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/subtitleAnonymousReadback" }
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/subtitleAnonymousReadback" },
+              { "$ref": "#/$defs/subtitleAnonymousTrackUnavailableReadback" }
+            ]
+          }
         },
         "thumbnail": { "$ref": "#/$defs/youtubeThumbnailReadback" },
         "devpostReadback": { "$ref": "#/$defs/devpostVideoReadback" }
@@ -510,6 +515,65 @@
           }
         }
       ]
+    },
+    "subtitleAnonymousTrackUnavailableReadback": {
+      "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE machine-contract=an unavailable authored English track records only the observed anonymous catalog and failure; it does not claim a download, comparison, or retained VTT",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "measuredAt",
+        "recordedAt",
+        "stateTransition",
+        "videoId",
+        "watchUrl",
+        "track",
+        "availableSubtitleCatalog",
+        "failure"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "measuredAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "recordedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "track": { "const": "ENGLISH_AUTHORED_TRACK" },
+        "availableSubtitleCatalog": { "$ref": "#/$defs/subtitleAnonymousUnavailableCatalog" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["result", "reason"],
+          "properties": {
+            "result": { "const": "FAIL" },
+            "reason": { "const": "AUTHORED_ENGLISH_TRACK_UNAVAILABLE" }
+          }
+        }
+      }
+    },
+    "subtitleAnonymousUnavailableCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "command", "authentication", "capturedAfterComparison", "captureTiming", "languages", "trackClass", "automaticCaptionsSeparate", "authoredEnglishConfirmed"],
+      "properties": {
+        "source": { "const": "ANONYMOUS_YOUTUBE_PLAYER_METADATA" },
+        "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
+        "authentication": { "const": "NONE" },
+        "capturedAfterComparison": { "const": false },
+        "captureTiming": { "$ref": "#/$defs/captureTiming" },
+        "languages": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": { "const": "ja" }
+        },
+        "trackClass": { "const": "MANUAL_SUBTITLES" },
+        "automaticCaptionsSeparate": { "const": true },
+        "authoredEnglishConfirmed": { "const": false }
+      }
     },
     "subtitleTrack": {
       "type": "object",

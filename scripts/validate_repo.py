@@ -99,6 +99,8 @@ SUBTITLE_TIMESTAMP_FIELDS = {
 }
 ANONYMOUS_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED"
 ANONYMOUS_SUBTITLE_MISMATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE"
+ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE"
 OWNER_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED"
 OWNER_SUBTITLE_FAILURE_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
 
@@ -332,6 +334,100 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
         out_of_order_findings = subtitle_observation_errors({collection_name: out_of_order_records})
         if not any("precedes previous" in finding for finding in out_of_order_findings):
             findings.append(f"{collection_name} accepted an out-of-order timestamp fixture")
+    return findings
+
+
+def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, Any], validator) -> list[str]:
+    publication = video_production.get("publication")
+    records = publication.get("subtitleAnonymousReadbacks") if isinstance(publication, dict) else None
+    if not isinstance(records, list) or not records or not isinstance(records[0], dict):
+        return ["anonymous unavailable-track fixture lacks a base readback"]
+    try:
+        timeline_ms = max(
+            rfc3339_ms(video_production["updatedAt"]),
+            *(rfc3339_ms(record["recordedAt"]) for record in records),
+        )
+    except Exception as exc:
+        return [f"anonymous unavailable-track fixture cannot derive its timeline: {exc}"]
+    measured_ms = timeline_ms + 1
+    capture_ms = measured_ms + 1
+    recorded_ms = capture_ms + 1
+    root_ms = recorded_ms + 1
+    unavailable_video = json.loads(json.dumps(video_production))
+    unavailable_publication = unavailable_video["publication"]
+    unavailable_record = {
+        "informationUuidV5": "adeb6009-db9e-51be-8555-da27f170ca95",
+        "observationUuidV7": uuid7_for_ms(recorded_ms, 0x345, 0x3456789ABCDEF01),
+        "measuredAt": rfc3339_from_ms(measured_ms),
+        "recordedAt": rfc3339_from_ms(recorded_ms),
+        "stateTransition": ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE,
+        "videoId": records[0]["videoId"],
+        "watchUrl": records[0]["watchUrl"],
+        "track": "ENGLISH_AUTHORED_TRACK",
+        "availableSubtitleCatalog": {
+            "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
+            "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+            "authentication": "NONE",
+            "capturedAfterComparison": False,
+            "captureTiming": {
+                "precision": "EXACT",
+                "lowerBound": rfc3339_from_ms(capture_ms),
+                "upperBound": rfc3339_from_ms(capture_ms),
+                "description": "future validation fixture catalog capture time",
+            },
+            "languages": ["ja"],
+            "trackClass": "MANUAL_SUBTITLES",
+            "automaticCaptionsSeparate": True,
+            "authoredEnglishConfirmed": False,
+        },
+        "failure": {
+            "result": "FAIL",
+            "reason": ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON,
+        },
+    }
+    previous_identity = unavailable_video["identity"]
+    previous_updated_at = unavailable_video["updatedAt"]
+    previous_state = unavailable_video["stateTransition"]
+    unavailable_video["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": previous_updated_at,
+        "stateTransition": previous_state,
+    }
+    unavailable_publication["subtitleAnonymousReadbacks"].append(unavailable_record)
+    unavailable_video["identity"]["observationUuidV7"] = uuid7_for_ms(root_ms, 0x456, 0x456789ABCDEF012)
+    unavailable_video["updatedAt"] = rfc3339_from_ms(root_ms)
+    unavailable_video["stateTransition"] = f"{previous_state} -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE"
+
+    findings: list[str] = []
+    if list(validator.iter_errors(unavailable_video)):
+        findings.append("schema rejected a minimal anonymous authored-track-unavailable fixture")
+    record_findings = subtitle_record_errors(
+        unavailable_record, "recordedAt", "future unavailable subtitleAnonymousReadbacks entry"
+    )
+    if record_findings:
+        findings.append("future unavailable anonymous readback failed UUIDv7/time binding")
+    observation_findings = subtitle_anonymous_readback_errors(
+        unavailable_publication["subtitleAnonymousReadbacks"]
+    )
+    if observation_findings:
+        findings.append("future unavailable anonymous readback failed common observation checks")
+    history_findings = document_history_errors(unavailable_video)
+    if history_findings:
+        findings.append("future unavailable anonymous readback failed document history checks")
+
+    non_fail = json.loads(json.dumps(unavailable_video))
+    non_fail["publication"]["subtitleAnonymousReadbacks"][-1]["failure"]["result"] = "PASS"
+    if not list(validator.iter_errors(non_fail)):
+        findings.append("schema accepted a non-FAIL unavailable-track fixture")
+
+    early_root = json.loads(json.dumps(unavailable_video))
+    early_root_ms = recorded_ms - 1
+    early_root["identity"]["observationUuidV7"] = uuid7_for_ms(early_root_ms, 0x567, 0x56789ABCDEF0123)
+    early_root["updatedAt"] = rfc3339_from_ms(early_root_ms)
+    early_findings = document_history_errors(early_root)
+    if not any("exceeds document root updatedAt" in finding for finding in early_findings):
+        findings.append("unavailable-track fixture accepted a root older than its recorded observation")
     return findings
 
 
@@ -1860,6 +1956,7 @@ def main():
         errors.append("schema accepted an owner success readback under the failure state")
     errors.extend(subtitle_comparison_schema_errors(video_production, video_production_validator))
     errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
+    errors.extend(subtitle_anonymous_unavailable_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
     future_video_devpost.update({

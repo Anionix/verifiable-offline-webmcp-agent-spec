@@ -169,6 +169,61 @@ async function createBaseInputSquashRepository() {
   return { directory, baseCommit, sourceCommit, currentCommit };
 }
 
+async function createDurableEvidenceTagFreshCloneRepository() {
+  const sourceRepository = await initializeRepository();
+  const bareRepository = await mkdtemp(join(tmpdir(), "hotel-release-context-bare-"));
+  const cloneParent = await mkdtemp(join(tmpdir(), "hotel-release-context-clones-"));
+  runGit(bareRepository, ["init", "--bare", "--quiet"]);
+
+  const commonCommit = await commitFile(sourceRepository, "common.txt", "common\n", "common");
+  runGit(sourceRepository, ["switch", "--quiet", "-c", "release-source", commonCommit]);
+  const baseCommit = await commitFile(
+    sourceRepository,
+    "src/typescript/hotel/base-input.js",
+    "base input\n",
+    "base release input",
+  );
+  const sourceCommit = await commitFile(
+    sourceRepository,
+    "src/typescript/hotel/source-input.js",
+    "source input\n",
+    "source hotel change",
+  );
+
+  runGit(sourceRepository, ["switch", "--quiet", "-c", "main", commonCommit]);
+  const currentCommit = await commitFiles(
+    sourceRepository,
+    [
+      { path: "src/typescript/hotel/base-input.js", content: "base input\n" },
+      { path: "src/typescript/hotel/source-input.js", content: "source input\n" },
+    ],
+    "squashed hotel release",
+  );
+  const evidenceTag = "evidence/synthetic-hotel-release";
+  runGit(sourceRepository, ["remote", "add", "origin", bareRepository]);
+  runGit(sourceRepository, ["push", "--quiet", "origin", "main"]);
+  runGit(sourceRepository, ["tag", "--annotate", "--message", "synthetic durable hotel release evidence", evidenceTag, sourceCommit]);
+  runGit(sourceRepository, ["push", "--quiet", "origin", `refs/tags/${evidenceTag}:refs/tags/${evidenceTag}`]);
+  runGit(bareRepository, ["symbolic-ref", "HEAD", "refs/heads/main"]);
+
+  const freshWithTag = join(cloneParent, "with-tag");
+  runGit(cloneParent, ["clone", "--quiet", "--no-local", "--single-branch", "--branch", "main", bareRepository, "with-tag"]);
+  runGit(freshWithTag, ["fetch", "--quiet", "origin", `refs/tags/${evidenceTag}:refs/tags/${evidenceTag}`]);
+  const freshWithoutTag = join(cloneParent, "without-tag");
+  runGit(cloneParent, ["clone", "--quiet", "--no-local", "--no-tags", "--single-branch", "--branch", "main", bareRepository, "without-tag"]);
+
+  return {
+    directory: sourceRepository,
+    cleanupDirectories: [bareRepository, cloneParent],
+    freshWithTag,
+    freshWithoutTag,
+    baseCommit,
+    sourceCommit,
+    currentCommit,
+    evidenceTag,
+  };
+}
+
 const checkoutOnlyBoundaryChanges = Object.freeze([
   {
     expectedPath: ".node-version",
@@ -378,7 +433,9 @@ async function withRepository(create, callback) {
   try {
     await callback(fixture);
   } finally {
-    await rm(fixture.directory, { force: true, recursive: true });
+    for (const directory of [fixture.directory, ...(fixture.cleanupDirectories ?? [])]) {
+      await rm(directory, { force: true, recursive: true });
+    }
   }
 }
 
@@ -410,6 +467,28 @@ test("rejects a squash checkout that drops an input introduced by the recorded b
       /release source file entry differs after squash: src\/typescript\/hotel\/base-input\.js/u,
     );
   });
+});
+
+test("validates tag-backed source and base hashes after a fresh clone without a release branch", async () => {
+  await withRepository(
+    createDurableEvidenceTagFreshCloneRepository,
+    ({ freshWithTag, freshWithoutTag, baseCommit, sourceCommit, evidenceTag }) => {
+      assert.match(baseCommit, /^[0-9a-f]{40}$/u);
+      assert.match(sourceCommit, /^[0-9a-f]{40}$/u);
+      assert.equal(runGit(freshWithTag, ["cat-file", "-t", `refs/tags/${evidenceTag}`]), "tag");
+      assert.equal(runGit(freshWithTag, ["cat-file", "-t", `refs/tags/${evidenceTag}^{commit}`]), "commit");
+      assert.equal(runGit(freshWithTag, ["branch", "--list", "release-source"]), "");
+
+      const taggedResult = runValidator({ directory: freshWithTag, baseCommit, sourceCommit });
+      assert.equal(taggedResult.status, 0, output(taggedResult));
+      assert.match(output(taggedResult), /mode.*SQUASH_CONTENT_MATCH/u);
+
+      assert.equal(runGit(freshWithoutTag, ["tag", "--list", evidenceTag]), "");
+      const missingTagResult = runValidator({ directory: freshWithoutTag, baseCommit, sourceCommit });
+      assert.notEqual(missingTagResult.status, 0, output(missingTagResult));
+      assert.match(output(missingTagResult), /release source commit must be an existing commit/u);
+    },
+  );
 });
 
 test("rejects checkout-only boundary changes in a squash checkout", async () => {

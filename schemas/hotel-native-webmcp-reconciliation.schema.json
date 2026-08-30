@@ -11,7 +11,9 @@
     "identity": { "$ref": "#/$defs/identity" },
     "status": { "const": "PASS" },
     "deployment": { "$ref": "#/$defs/deployment" },
-    "discovery": { "$ref": "#/$defs/discovery" },
+    "discovery": {
+      "oneOf": [{ "$ref": "#/$defs/discovery" }, { "$ref": "#/$defs/managedDiscovery" }]
+    },
     "reconciliation": { "$ref": "#/$defs/reconciliation" },
     "recording": {
       "type": "object",
@@ -124,6 +126,195 @@
         "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
         "calledToolNames": { "const": [] },
         "discoveryEffectCounts": { "$ref": "#/$defs/effectCounts" }
+      }
+    },
+    "managedDiscovery": {
+      "type": "object",
+      "$comment": "information_uuid_v5=a0fbdc59-0d0e-5134-89b8-1d30db405e5a event_uuid_v7=01a05439-6770-7ee3-a4cf-7ac7d7ea90ef state_transition=MANAGED_NATIVE_CAPABILITY_UNTESTED -> MANAGED_NATIVE_CAPABILITY_VALIDATED occurred_at=2026-08-30T19:50:43.312Z machine-contract=Managed capability calls are separate from Chrome configuration; unavailable external-effect and configuration observations remain unmeasured.",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "status",
+        "observedAt",
+        "surface",
+        "fetchToolsCall",
+        "visibleToolNames",
+        "forbiddenToolNames",
+        "toolCalls",
+        "interactionSequence",
+        "effectObservation",
+        "configurationObservation"
+      ],
+      "properties": {
+        "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" },
+        "status": { "const": "PASS" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "surface": { "const": "MANAGED_IAB_NATIVE_CAPABILITY" },
+        "fetchToolsCall": { "$ref": "#/$defs/fetchToolsCall" },
+        "visibleToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "toolCalls": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                { "properties": { "sequence": { "const": 1 }, "phase": { "const": "check" }, "toolName": { "const": "check_existing_hotel_booking" } } }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                { "properties": { "sequence": { "const": 2 }, "phase": { "const": "prepare" }, "toolName": { "const": "prepare_hotel_booking" } } }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                {
+                  "properties": {
+                    "sequence": { "const": 3 },
+                    "phase": { "const": "status_before_retry" },
+                    "toolName": { "const": "get_hotel_booking_status" }
+                  },
+                  "required": ["resultObservation"]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/managedToolCall" },
+                {
+                  "properties": { "sequence": { "const": 4 }, "phase": { "const": "status_after_retry" }, "toolName": { "const": "get_hotel_booking_status" } },
+                  "required": ["resultObservation"]
+                }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "interactionSequence": {
+          "const": [
+            "check_existing_hotel_booking",
+            "prepare_hotel_booking",
+            "get_hotel_booking_status:before_retry",
+            "visible_human_confirmation",
+            "visible_retry",
+            "get_hotel_booking_status:after_retry"
+          ]
+        },
+        "effectObservation": { "$ref": "#/$defs/limitedEffectObservation" },
+        "configurationObservation": { "$ref": "#/$defs/unmeasuredConfigurationObservation" }
+      }
+    },
+    "resultEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "basis", "description"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "basis": { "enum": ["NATIVE_FETCH_RESULT_CANONICAL_BYTES", "EXPLICIT_SUMMARY_HASH"] },
+        "description": { "type": "string", "minLength": 20 }
+      }
+    },
+    "fetchToolsCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "method", "status", "resultStatus", "returnedToolNames", "forbiddenToolNames", "resultEvidence"],
+      "properties": {
+        "sequence": { "const": 1 },
+        "method": { "const": "webmcp.capability.fetchTools().call" },
+        "status": { "const": "EXECUTED" },
+        "resultStatus": { "const": "SUCCESS" },
+        "returnedToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
+        "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
+        "resultEvidence": { "$ref": "#/$defs/resultEvidence" }
+      }
+    },
+    "managedToolCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "phase", "method", "toolName", "status", "resultStatus", "resultEvidence"],
+      "properties": {
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "phase": { "enum": ["check", "prepare", "status_before_retry", "status_after_retry"] },
+        "method": { "const": "webmcp.capability.tool.call" },
+        "toolName": { "enum": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"] },
+        "status": { "const": "EXECUTED" },
+        "resultStatus": { "const": "SUCCESS" },
+        "resultEvidence": { "$ref": "#/$defs/resultEvidence" },
+        "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "phase": { "const": "check" } } },
+          "then": {
+            "properties": { "sequence": { "const": 1 }, "toolName": { "const": "check_existing_hotel_booking" } },
+            "not": { "required": ["resultObservation"] }
+          }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "prepare" } } },
+          "then": {
+            "properties": { "sequence": { "const": 2 }, "toolName": { "const": "prepare_hotel_booking" } },
+            "not": { "required": ["resultObservation"] }
+          }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "status_before_retry" } } },
+          "then": { "required": ["resultObservation"], "properties": { "sequence": { "const": 3 }, "toolName": { "const": "get_hotel_booking_status" } } }
+        },
+        {
+          "if": { "properties": { "phase": { "const": "status_after_retry" } } },
+          "then": { "required": ["resultObservation"], "properties": { "sequence": { "const": 4 }, "toolName": { "const": "get_hotel_booking_status" } } }
+        }
+      ]
+    },
+    "capabilityResultObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attemptCount", "bookingExists", "effectStartCount", "events", "confirmationNumber"],
+      "properties": {
+        "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "bookingExists": { "const": true },
+        "effectStartCount": { "const": 1 },
+        "events": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" }
+      }
+    },
+    "limitedEffectObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "scope", "observedFields", "unmeasuredFields", "reasonCode"],
+      "properties": {
+        "status": { "const": "LIMITED" },
+        "scope": { "const": "NATIVE_CAPABILITY_RESULT_FIELDS_ONLY" },
+        "observedFields": { "const": ["attemptCount", "bookingExists", "effectStartCount", "events"] },
+        "unmeasuredFields": { "const": ["externalRequests", "permissionRequests", "notifications"] },
+        "reasonCode": { "const": "CDP_NETWORK_EVENTS_NOT_CAPTURED" }
+      }
+    },
+    "unmeasuredConfigurationObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["browserVersion", "launchArguments", "documentModelContext", "requiredChromeFlags", "devtoolsWebmcpCategory"],
+      "properties": {
+        "browserVersion": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "launchArguments": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "documentModelContext": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "requiredChromeFlags": { "$ref": "#/$defs/unmeasuredConfigurationValue" },
+        "devtoolsWebmcpCategory": { "$ref": "#/$defs/unmeasuredConfigurationValue" }
+      }
+    },
+    "unmeasuredConfigurationValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reasonCode"],
+      "properties": {
+        "status": { "const": "UNMEASURED" },
+        "reasonCode": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" }
       }
     },
     "statusResult": {

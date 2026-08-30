@@ -4710,8 +4710,8 @@
     },
     {
       "path": "schemas/hotel-native-webmcp-reconciliation.schema.json",
-      "sha256": "afaf06ecd05b0fd58422aeaf90ee9e3e60aa2161034f2067f63ca19b886d0fff",
-      "bytes": 16960,
+      "sha256": "6ec8d04b0a983a05bea330004fdde23afcbe2edba81d9dd7472d627eb644842b",
+      "bytes": 20466,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4748,8 +4748,8 @@
     },
     {
       "path": "schemas/hotel-release-candidate.schema.json",
-      "sha256": "849639eba7277a3b759c91b7db6ad19eed7bdb3ae6f5c949a1692473a396a877",
-      "bytes": 14082,
+      "sha256": "f83990435383427a9699516d04065035c1322078ccb851f1523a10e7643703e0",
+      "bytes": 14620,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5299,8 +5299,8 @@
     },
     {
       "path": "scripts/hotel-managed-browser-release-proof.mjs",
-      "sha256": "de828a4caae0fcf59365c9d0dee46ca1a8c6fb6fd9e57c534d13bd0e736af042",
-      "bytes": 9801,
+      "sha256": "a31919592b16f0493d4e6e3b4adc40c967d1ddc1adf107195eeb7ec686a098f7",
+      "bytes": 16310,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5375,8 +5375,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_managed_browser_release_proof.mjs",
-      "sha256": "32dc6b8e16d6c84a28322197cc543bd9ddcab29189dd5b4da85a8b0a19c1c65b",
-      "bytes": 10695,
+      "sha256": "a756ab1e0bc3cb28cd07e3723ab263cb3d17b643a3c82f083e3b5220c5a56f97",
+      "bytes": 24556,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5489,8 +5489,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "e9e3b129d0a8e7a30712696d61bcdd8604a57914038acb7d2770e1b44b277c76",
-      "bytes": 16914,
+      "sha256": "e22032a3a43a29f63fa6cef988f0fb035d4d85b3605b01910d6a751a31acab9f",
+      "bytes": 20322,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

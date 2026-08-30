@@ -190,7 +190,12 @@
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingCount": { "const": 1 },
-        "effectStartCount": { "const": 1 }
+        "effectStartCount": { "const": 1 },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
     "finalStatus": {
@@ -203,7 +208,12 @@
         "bookingCount": { "const": 1 },
         "effectStartCount": { "const": 1 },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
-        "sameConfirmation": { "const": true }
+        "sameConfirmation": { "const": true },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
     "recording": {

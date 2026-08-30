@@ -137,6 +137,7 @@
         "status",
         "observedAt",
         "surface",
+        "runBinding",
         "fetchToolsCall",
         "visibleToolNames",
         "forbiddenToolNames",
@@ -150,6 +151,7 @@
         "status": { "const": "PASS" },
         "observedAt": { "$ref": "#/$defs/observedAt" },
         "surface": { "const": "MANAGED_IAB_NATIVE_CAPABILITY" },
+        "runBinding": { "$ref": "#/$defs/managedRunBinding" },
         "fetchToolsCall": { "$ref": "#/$defs/fetchToolsCall" },
         "visibleToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"] },
         "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
@@ -199,8 +201,8 @@
           "const": [
             "check_existing_hotel_booking",
             "prepare_hotel_booking",
-            "get_hotel_booking_status:before_retry",
             "visible_human_confirmation",
+            "get_hotel_booking_status:before_retry",
             "visible_retry",
             "get_hotel_booking_status:after_retry"
           ]
@@ -212,11 +214,26 @@
     "resultEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["sha256", "basis", "description"],
+      "required": ["sha256", "basis", "canonicalSummary", "scope", "description"],
       "properties": {
         "sha256": { "$ref": "#/$defs/sha256" },
-        "basis": { "enum": ["NATIVE_FETCH_RESULT_CANONICAL_BYTES", "EXPLICIT_SUMMARY_HASH"] },
+        "basis": { "const": "EXPLICIT_SUMMARY_HASH" },
+        "canonicalSummary": { "type": "string", "minLength": 2 },
+        "scope": { "const": "EXPLICIT_SUMMARY_ONLY_NOT_RAW_ATTESTATION" },
         "description": { "type": "string", "minLength": 20 }
+      }
+    },
+    "managedRunBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rootObservationUuidV7", "completedAt", "publicSourceCommit", "deploymentId", "publicUrl", "recordingSha256"],
+      "properties": {
+        "rootObservationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "completedAt": { "$ref": "#/$defs/observedAt" },
+        "publicSourceCommit": { "$ref": "#/$defs/commit" },
+        "deploymentId": { "type": "string", "pattern": "^dpl_[A-Za-z0-9]+$" },
+        "publicUrl": { "type": "string", "format": "uri", "pattern": "^https://[^\\s]+$" },
+        "recordingSha256": { "$ref": "#/$defs/sha256" }
       }
     },
     "fetchToolsCall": {
@@ -245,42 +262,107 @@
         "status": { "const": "EXECUTED" },
         "resultStatus": { "const": "SUCCESS" },
         "resultEvidence": { "$ref": "#/$defs/resultEvidence" },
-        "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+        "resultObservation": {
+          "oneOf": [{ "$ref": "#/$defs/initialCheckObservation" }, { "$ref": "#/$defs/prepareObservation" }, { "$ref": "#/$defs/capabilityResultObservation" }]
+        }
       },
       "allOf": [
         {
           "if": { "properties": { "phase": { "const": "check" } } },
           "then": {
-            "properties": { "sequence": { "const": 1 }, "toolName": { "const": "check_existing_hotel_booking" } },
-            "not": { "required": ["resultObservation"] }
+            "properties": {
+              "sequence": { "const": 1 },
+              "toolName": { "const": "check_existing_hotel_booking" },
+              "resultObservation": { "$ref": "#/$defs/initialCheckObservation" }
+            },
+            "required": ["resultObservation"]
           }
         },
         {
           "if": { "properties": { "phase": { "const": "prepare" } } },
           "then": {
-            "properties": { "sequence": { "const": 2 }, "toolName": { "const": "prepare_hotel_booking" } },
-            "not": { "required": ["resultObservation"] }
+            "properties": {
+              "sequence": { "const": 2 },
+              "toolName": { "const": "prepare_hotel_booking" },
+              "resultObservation": { "$ref": "#/$defs/prepareObservation" }
+            },
+            "required": ["resultObservation"]
           }
         },
         {
           "if": { "properties": { "phase": { "const": "status_before_retry" } } },
-          "then": { "required": ["resultObservation"], "properties": { "sequence": { "const": 3 }, "toolName": { "const": "get_hotel_booking_status" } } }
+          "then": {
+            "required": ["resultObservation"],
+            "properties": {
+              "sequence": { "const": 3 },
+              "toolName": { "const": "get_hotel_booking_status" },
+              "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+            }
+          }
         },
         {
           "if": { "properties": { "phase": { "const": "status_after_retry" } } },
-          "then": { "required": ["resultObservation"], "properties": { "sequence": { "const": 4 }, "toolName": { "const": "get_hotel_booking_status" } } }
+          "then": {
+            "required": ["resultObservation"],
+            "properties": {
+              "sequence": { "const": 4 },
+              "toolName": { "const": "get_hotel_booking_status" },
+              "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+            }
+          }
         }
       ]
+    },
+    "initialCheckObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attemptCount", "bookingExists", "effectStartCount", "eventCount", "fingerprint"],
+      "properties": {
+        "attemptCount": { "const": 0 },
+        "bookingExists": { "const": false },
+        "effectStartCount": { "const": 0 },
+        "eventCount": { "const": 0 },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" }
+      }
+    },
+    "prepareObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead", "intentId", "fingerprint"],
+      "properties": {
+        "state": { "const": "PREPARED" },
+        "attemptCount": { "const": 1 },
+        "bookingExists": { "const": false },
+        "effectStartCount": { "const": 0 },
+        "eventCount": { "const": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" }
+      }
     },
     "capabilityResultObservation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["attemptCount", "bookingExists", "effectStartCount", "events", "confirmationNumber"],
+      "required": [
+        "attemptCount",
+        "bookingExists",
+        "effectStartCount",
+        "eventCount",
+        "eventChainHead",
+        "intentId",
+        "fingerprint",
+        "bookingId",
+        "confirmationNumber"
+      ],
       "properties": {
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingExists": { "const": true },
         "effectStartCount": { "const": 1 },
-        "events": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "eventCount": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" }
       }
     },
@@ -291,7 +373,7 @@
       "properties": {
         "status": { "const": "LIMITED" },
         "scope": { "const": "NATIVE_CAPABILITY_RESULT_FIELDS_ONLY" },
-        "observedFields": { "const": ["attemptCount", "bookingExists", "effectStartCount", "events"] },
+        "observedFields": { "const": ["attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead"] },
         "unmeasuredFields": { "const": ["externalRequests", "permissionRequests", "notifications"] },
         "reasonCode": { "const": "CDP_NETWORK_EVENTS_NOT_CAPTURED" }
       }
@@ -328,7 +410,12 @@
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingCount": { "const": 1 },
-        "effectStartCount": { "const": 1 }
+        "effectStartCount": { "const": 1 },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
     "finalStatus": {
@@ -341,7 +428,12 @@
         "bookingCount": { "const": 1 },
         "effectStartCount": { "const": 1 },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" },
-        "sameConfirmation": { "const": true }
+        "sameConfirmation": { "const": true },
+        "intentId": { "$ref": "#/$defs/uuidV5" },
+        "fingerprint": { "$ref": "#/$defs/uuidV5" },
+        "bookingId": { "$ref": "#/$defs/uuidV5" },
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
     "reconciliation": {

@@ -76,6 +76,49 @@ function assertExactArray(actual, expected, label) {
   assert.deepEqual(actual, expected, `${label} changed`);
 }
 
+function assertManagedRunBinding(nativeEvidence) {
+  const { identity, deployment, discovery, reconciliation, recording } = nativeEvidence;
+  const binding = discovery.runBinding;
+  assert.equal(binding.rootObservationUuidV7, identity.observationUuidV7, "managed run binding root observation differs");
+  assert.equal(binding.completedAt, discovery.observedAt, "managed run binding completion differs from discovery");
+  assert.equal(binding.completedAt, identity.observedAt, "managed run binding completion differs from root identity");
+  assert.equal(binding.completedAt, reconciliation.observedAt, "managed run binding completion differs from reconciliation");
+  assert.equal(binding.publicSourceCommit, deployment.sourceCommit, "managed run binding source commit differs");
+  assert.equal(binding.deploymentId, deployment.deploymentId, "managed run binding deployment differs");
+  assert.equal(binding.publicUrl, deployment.publicUrl, "managed run binding URL differs");
+  assert.equal(binding.recordingSha256, recording.sha256, "managed run binding recording differs");
+}
+
+function assertManagedReconciliationBinding(nativeEvidence) {
+  const { discovery, reconciliation } = nativeEvidence;
+  const [checkCall, prepareCall, beforeCall, afterCall] = discovery.toolCalls;
+  const initial = checkCall.resultObservation;
+  const prepare = prepareCall.resultObservation;
+  const before = beforeCall.resultObservation;
+  const after = afterCall.resultObservation;
+
+  assertExactArray(reconciliation.calledToolNames, [checkCall.toolName, prepareCall.toolName, beforeCall.toolName], "managed reconciliation called tools");
+  assert.equal(initial.fingerprint, prepare.intentId, "managed preparation is not bound to the initial fingerprint");
+  assert.equal(prepare.intentId, before.intentId, "managed status-before is not bound to the preparation intent");
+  assert.equal(prepare.intentId, after.intentId, "managed status-after is not bound to the preparation intent");
+  assert.equal(prepare.fingerprint, before.fingerprint, "managed status-before fingerprint differs from preparation");
+  assert.equal(prepare.fingerprint, after.fingerprint, "managed status-after fingerprint differs from preparation");
+
+  const assertStatusBinding = (status, observation, label) => {
+    for (const field of ["intentId", "fingerprint", "bookingId", "confirmationNumber", "attemptCount", "effectStartCount", "eventCount", "eventChainHead"]) {
+      assert.equal(status[field], observation[field], `managed reconciliation ${label}.${field} differs from the native result`);
+    }
+    if (Object.hasOwn(status, "bookingExists")) {
+      assert.equal(status.bookingExists, observation.bookingExists, `managed reconciliation ${label}.bookingExists differs from the native result`);
+    }
+    assert.equal(status.bookingCount, observation.bookingExists ? 1 : 0, `managed reconciliation ${label}.bookingCount differs from the native result`);
+  };
+  assertStatusBinding(reconciliation.statusCheck, before, "statusCheck");
+  assertStatusBinding(reconciliation.finalStatus, after, "finalStatus");
+  assert.equal(reconciliation.sameConfirmation, before.confirmationNumber === after.confirmationNumber, "managed reconciliation confirmation binding differs");
+  assert.equal(reconciliation.finalStatus.sameConfirmation, reconciliation.sameConfirmation, "managed final confirmation binding differs");
+}
+
 export function validateNativeDiscovery(nativeEvidence) {
   assert.equal(nativeEvidence.status, "PASS");
   const { discovery, reconciliation } = nativeEvidence;
@@ -84,6 +127,8 @@ export function validateNativeDiscovery(nativeEvidence) {
   assertExactArray(discovery.forbiddenToolNames, forbiddenTools, "native forbidden tools");
   if (discovery.profile === managedEvidenceProfile) {
     validateManagedBrowserDiscovery(discovery);
+    assertManagedRunBinding(nativeEvidence);
+    assertManagedReconciliationBinding(nativeEvidence);
   } else {
     assertExactArray(discovery.requiredChromeFlags, requiredChromeFlags, "native browser flags");
     assert.equal(discovery.documentModelContext, "CONFIRMED_PRESENT");
@@ -118,6 +163,7 @@ function browserReconciliationFrom(reconciliation) {
 }
 
 export function browserObservationFrom(nativeEvidence, sourceCommit) {
+  validateNativeDiscovery(nativeEvidence);
   const discovery = nativeEvidence.discovery;
   const reconciliation = nativeEvidence.reconciliation;
   const deployment = nativeEvidence.deployment;
@@ -135,7 +181,6 @@ export function browserObservationFrom(nativeEvidence, sourceCommit) {
     status: "PASS",
   };
   if (discovery.profile === managedEvidenceProfile) {
-    validateManagedBrowserDiscovery(discovery);
     return { ...common, profile: discovery.profile, managedDiscovery: discovery };
   }
   return {
@@ -310,7 +355,7 @@ function compareStable(actual, expected) {
   assert.match(actual.observedAt, /^2026-08-30T/u, "candidate observation must belong to the current run date");
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (import.meta.main) {
   const mode = process.argv[2] ?? "--check";
   assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
   const candidate = await buildCandidate();

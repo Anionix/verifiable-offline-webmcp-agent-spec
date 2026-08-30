@@ -5,10 +5,12 @@
 // event_uuid_v7=01a053b4-8051-7707-9492-e22d539ff62d state_transition=PATH_SNAPSHOT_UNBOUND -> DESCRIPTOR_IDENTITY_BOUND_READ occurred_at=2026-08-30T17:25:33.393Z
 // event_uuid_v7=01a0545f-a323-7754-9efb-891d12216f19 state_transition=RELEASE_FILE_SET_READBACK_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T20:32:28.963Z
 // event_uuid_v7=01a05466-11dc-7121-b1fd-4a8017c96aa5 state_transition=CLI_PATH_GUARD_UNRESOLVED -> CLI_MAIN_ENTRYPOINT_VERIFIED occurred_at=2026-08-30T20:39:30.524Z
+// event_uuid_v7=01a05471-12e1-7902-81e5-896ed0c6aff4 state_transition=WINDOWS_RELEASE_VALIDATION_UNSUPPORTED -> WINDOWS_RELEASE_VALIDATION_FAIL_CLOSED occurred_at=2026-08-30T20:51:31.681Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
 // machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
 // machine-contract: the Node 24.15 CLI entrypoint check must not depend on the spelling or realpath of a filesystem symlink.
+// machine-contract: Windows fails before any release file operation because this validator cannot guarantee a safe non-following open there; no override flag exists.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -20,6 +22,7 @@ import { fileURLToPath } from "node:url";
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const defaultReleaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
 const safeFileOpenFlags = constants.O_RDONLY | constants.O_NONBLOCK | (process.platform === "win32" ? 0 : constants.O_NOFOLLOW);
+const unsupportedPlatformError = "hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed";
 
 function releaseRootFromArguments() {
   const optionIndex = process.argv.indexOf("--release-root");
@@ -163,6 +166,7 @@ function assertSameSnapshot(initialSnapshots, finalSnapshots) {
 }
 
 export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot } = {}) {
+  if (process.platform === "win32") throw new Error(unsupportedPlatformError);
   const resolvedReleaseRoot = resolve(releaseRoot);
   const snapshots = await regularFiles(resolvedReleaseRoot);
   const snapshotByPath = new Map(snapshots.map((snapshot) => [snapshot.relativePath, snapshot]));

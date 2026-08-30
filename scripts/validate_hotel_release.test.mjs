@@ -126,6 +126,17 @@ test("accepts a checksum-complete release package without extra files", async ()
 });
 
 test(
+  "fails closed before file operations on Windows",
+  { skip: process.platform === "win32" ? false : "Windows-only platform guard" },
+  async () => {
+    await assert.rejects(
+      () => validateRelease("/definitely/missing"),
+      /hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed/u,
+    );
+  },
+);
+
+test(
   "does not skip validation when the CLI is invoked through a symbolic link",
   { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
   async () => {

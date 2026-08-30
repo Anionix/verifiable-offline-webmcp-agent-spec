@@ -28,6 +28,8 @@ This package makes the fictional Kyoto hotel demo easy to run, inspect, and show
 
 Video binaries, credentials, environment files, personal information, and real booking data are excluded.
 
+The release-package validator is unavailable on Windows because safe non-following file opens cannot be guaranteed; this is separate from the browser demo itself.
+
 ## Reproduce the package
 
 Run from one clean, committed source checkout. The builder stops if the working tree is dirty, if the source commit changes, if a required public-evidence digest differs, or if Gitleaks is unavailable.

@@ -90,14 +90,8 @@ SRT_TIMING = re.compile(
     r"(?P<end_h>\d{2}):(?P<end_m>\d{2}):(?P<end_s>\d{2}),(?P<end_ms>\d{3})"
 )
 # fixture information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
-# fixture event_uuid_v7=01a05441-e600-7234-8234-56789abcdef0 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=2026-08-30T20:00:00.000Z
-# fixture event_uuid_v7=01a05441-e9e8-7456-8345-6789abcdef01 state_transition=ROOT_UPDATED_WITH_SUBTITLE_FOLLOW_UP occurred_at=2026-08-30T20:00:01.000Z
+# fixture event_uuid_v7=DERIVED_FROM_PRODUCTION_TIMELINE state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=MAX_ROOT_OR_READBACK_TIME_PLUS_ONE_MILLISECOND
 # machine-contract: future anonymous subtitle evidence must bind UUIDv7 to recordedAt, reject event reuse, keep recordedAt after measuredAt, and advance the document root time.
-FUTURE_SUBTITLE_ANONYMOUS_EVENT_UUID = "01a05441-e600-7234-8234-56789abcdef0"
-FUTURE_SUBTITLE_MEASURED_AT = "2026-08-30T19:59:59.500Z"
-FUTURE_SUBTITLE_RECORDED_AT = "2026-08-30T20:00:00.000Z"
-FUTURE_DOCUMENT_EVENT_UUID = "01a05441-e9e8-7456-8345-6789abcdef01"
-FUTURE_DOCUMENT_UPDATED_AT = "2026-08-30T20:00:01.000Z"
 
 
 def is_ignored(path: Path):
@@ -162,20 +156,30 @@ def subtitle_anonymous_readback_errors(records: Any, label: str = "subtitleAnony
 def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], validator) -> list[str]:
     publication = video_production.get("publication")
     records = publication.get("subtitleAnonymousReadbacks") if isinstance(publication, dict) else None
-    if not isinstance(records, list) or not records or not isinstance(records[0], dict):
+    if not isinstance(records, list) or not records or any(not isinstance(record, dict) for record in records):
         return ["future subtitle readback fixture lacks a base anonymous readback"]
+    try:
+        timeline_ms = max(
+            rfc3339_ms(video_production["updatedAt"]),
+            *(rfc3339_ms(record["recordedAt"]) for record in records),
+        )
+    except Exception as exc:
+        return [f"future subtitle readback fixture cannot derive its timeline: {exc}"]
+    future_recorded_ms = timeline_ms + 1
+    future_measured_ms = future_recorded_ms - 1
+    future_root_ms = future_recorded_ms + 1
 
     future_video = json.loads(json.dumps(video_production))
     future_publication = future_video["publication"]
     future_record = json.loads(json.dumps(records[0]))
     future_record.update({
-        "observationUuidV7": FUTURE_SUBTITLE_ANONYMOUS_EVENT_UUID,
-        "measuredAt": FUTURE_SUBTITLE_MEASURED_AT,
-        "recordedAt": FUTURE_SUBTITLE_RECORDED_AT,
+        "observationUuidV7": uuid7_for_ms(future_recorded_ms, 0x234, 0x23456789ABCDEF0),
+        "measuredAt": rfc3339_from_ms(future_measured_ms),
+        "recordedAt": rfc3339_from_ms(future_recorded_ms),
     })
     future_publication["subtitleAnonymousReadbacks"].append(future_record)
-    future_video["identity"]["observationUuidV7"] = FUTURE_DOCUMENT_EVENT_UUID
-    future_video["updatedAt"] = FUTURE_DOCUMENT_UPDATED_AT
+    future_video["identity"]["observationUuidV7"] = uuid7_for_ms(future_root_ms, 0x456, 0x3456789ABCDEF01)
+    future_video["updatedAt"] = rfc3339_from_ms(future_root_ms)
 
     findings: list[str] = []
     if list(validator.iter_errors(future_video)):
@@ -204,8 +208,8 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     before_measured_records = json.loads(json.dumps(future_records))
     before_measured_record = before_measured_records[-1]
     before_measured_record.update({
-        "observationUuidV7": "01a05441-e40b-7345-8456-789abcdef012",
-        "recordedAt": "2026-08-30T19:59:59.499Z",
+        "observationUuidV7": uuid7_for_ms(future_measured_ms - 1, 0x345, 0x456789ABCDEF012),
+        "recordedAt": rfc3339_from_ms(future_measured_ms - 1),
     })
     before_measured_findings = subtitle_anonymous_readback_errors(
         before_measured_records,
@@ -296,6 +300,22 @@ def rfc3339_ms(value: str):
     if parsed.tzinfo is None:
         raise ValueError("timestamp lacks an offset")
     return int(parsed.timestamp() * 1000)
+
+
+def rfc3339_from_ms(epoch_ms: int):
+    seconds, milliseconds = divmod(epoch_ms, 1000)
+    return datetime.fromtimestamp(seconds, timezone.utc).replace(microsecond=milliseconds * 1000).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def uuid7_for_ms(epoch_ms: int, random_a: int, random_b: int):
+    value = (
+        ((epoch_ms & ((1 << 48) - 1)) << 80)
+        | (7 << 76)
+        | ((random_a & 0xFFF) << 64)
+        | (2 << 62)
+        | (random_b & ((1 << 62) - 1))
+    )
+    return str(uuid.UUID(int=value))
 
 
 def merkle_leaf(d: str): return hashlib.sha256(b"\x00" + bytes.fromhex(d)).digest()
@@ -1650,9 +1670,9 @@ def main():
                 errors.append(f"video production file digest mismatch: {record['path']}")
         plan = video_production["productionPlan"]
         publication = video_production["publication"]
-        for collection_name, timestamp_field, invalid_timestamp in (
-            ("subtitleUpdates", "observedAt", "2026-08-30T17:09:54.092Z"),
-            ("subtitleAnonymousReadbacks", "recordedAt", "2026-08-30T17:55:48.504Z"),
+        for collection_name, timestamp_field in (
+            ("subtitleUpdates", "observedAt"),
+            ("subtitleAnonymousReadbacks", "recordedAt"),
         ):
             records = publication.get(collection_name, [])
             if not isinstance(records, list):
@@ -1668,7 +1688,13 @@ def main():
                 errors.extend(subtitle_anonymous_readback_errors(records))
             if records:
                 invalid_timestamp_record = json.loads(json.dumps(records[0]))
-                invalid_timestamp_record[timestamp_field] = invalid_timestamp
+                try:
+                    invalid_timestamp_record[timestamp_field] = rfc3339_from_ms(
+                        rfc3339_ms(records[0][timestamp_field]) + 1
+                    )
+                except Exception as exc:
+                    errors.append(f"{collection_name} timestamp mutation fixture could not derive from the actual timestamp: {exc}")
+                    continue
                 mutation_label = f"{collection_name} entry 1 timestamp mutation"
                 if not subtitle_record_errors(invalid_timestamp_record, timestamp_field, mutation_label):
                     errors.append(f"{collection_name} timestamp mutation was accepted")

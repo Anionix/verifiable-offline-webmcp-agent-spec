@@ -2,6 +2,7 @@
 // information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
 // event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
+// machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -95,8 +96,7 @@ export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publ
   };
 }
 
-const invokedPath = process.argv[1] ? resolve(process.argv[1]) : null;
-if (invokedPath === fileURLToPath(import.meta.url)) {
+if (import.meta.main) {
   const comparison = await compareSubtitleFiles();
   console.log(
     JSON.stringify({

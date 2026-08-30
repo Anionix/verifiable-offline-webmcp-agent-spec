@@ -26,8 +26,9 @@ Show the title **Kyoto Booking Retry Proof**, the question **Did my hotel bookin
 
 1. Select **1. Check and prepare**.
 2. Confirm `PREPARED`, then select **2. Confirm booking — human action only**.
-3. Select **Retry the same booking** with unchanged dates, guests, and rooms.
-4. Point to `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the unchanged confirmation number.
+3. Use native `get_hotel_booking_status` before retrying; it finds the existing result after the success response is hidden.
+4. Select **Retry the same booking** with unchanged dates, guests, and rooms.
+5. Point to `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the unchanged confirmation number.
 
 The short [release README](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md) is the canonical copy of these steps.
 
@@ -41,13 +42,15 @@ The short [release README](https://github.com/Anionix/verifiable-offline-webmcp-
 | 0:36–0:47 | Dates, guests, rooms, price, and cancellation preview. | Inputs and terms are checked before preparation. |
 | 0:47–1:00 | Four safe tools and `PREPARED` with its 120-second window. | The assistant can check and prepare, not confirm. |
 | 1:00–1:12 | Human-only confirmation button. | The traveler remains the final approver. |
-| 1:12–1:30 | `COMMITTED`, hidden success response, then status recovery and retry. | The same booking is recognized after uncertainty. |
+| 1:12–1:30 | `COMMITTED`, hidden success response, native status recovery before the visible retry. | The same booking is recognized after uncertainty. |
 | 1:30–1:51 | Stable UUIDv5 identity and repeated-click/two-tab result. | Same normalized intent means one simulated booking. |
 | 1:51–2:01 | UUIDv7 event, SHA-256 chain, and counters. | The visible proof is time ordered and tamper evident. |
 | 2:01–2:22 | Service-state table and honest Sites/Vercel publication labels. | Hosting and integration claims stay separate. |
 | 2:22–2:30 | Public Site retry-result capture and end card. | Leave the judge with the one-booking result and limits. |
 
 The [storyboard](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/media/demo-video/storyboard.md) is the detailed timing source. The [public video](https://youtu.be/tdSvJw4ghX8) is under three minutes, includes English audio and captions, and keeps actual public Site recording above seventy percent.
+
+The fresh native WebMCP browser run is a separate local recording and evidence record. The published video is not retroactively described as containing that native run.
 
 ## Six capture panels
 
@@ -85,7 +88,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - Display **AI-generated dramatization / Fictional booking** on both generated opening scenes.
 - Do not show real hotels, real people, addresses, passports, payment details, reservation emails, credentials, or private browser data.
 - Do not imply that the generated scene is a real booking screen.
-- Say `INCONCLUSIVE` for the standard native Chrome WebMCP surface because it was not exposed in the observed Chrome page scope.
+- Report the tested native Chrome WebMCP configuration as `PASS`: HTTPS, `document.modelContext`, the exact four intended tools, zero discovery effects, and status recovery before retry. Do not generalize this bounded result to every Chrome release.
 - Keep the Site, Vercel, Devpost, and YouTube links as separate publication facts; one URL does not prove another.
 - Add Japanese subtitles as a separate subtitle file; English remains the primary spoken and burned-in language.
 
@@ -94,7 +97,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 | Official area | Evidence to point at |
 |---|---|
 | **WebMCP Leverage** | Panels 02, 05, and 06: four narrow tools recover state while confirmation stays human-only. |
-| **Execution** | Public Site, Vercel backup, reproducible release, the submitted artifact's 153 Node tests, and the 150-second narrated recording. The current 192-test candidate remains local until separately published. |
+| **Execution** | Public Site, current Vercel production release, reproducible release, the matching 192 Node tests, native WebMCP reconciliation, and the 150-second narrated recording. |
 | **Potential Impact** | The everyday failure mode: a traveler avoids a second reservation and a confusing cancellation hunt. |
 | **Creativity & Ambition** | Local-first recovery, stable identity, unique storage, visible event proof, and explicit authority limits in one small demo. |
 
@@ -107,6 +110,8 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - [Public source repository](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec)
 - [Release README](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md)
 - [Release package guide](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md)
+- [Public release readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json)
+- [Native WebMCP reconciliation record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json)
 - [Video publication copy](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/media/demo-video/publication-copy.md)
 
 ## Short Japanese summary / 日本語要約
@@ -115,4 +120,4 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - 60秒では「確認と準備 → 人間だけが確定 → 同じ予約を再送 → 一件へ収束」の順です。
 - 画面は`EMPTY`、`PREPARED`、人間確認、`COMMITTED`、`RETRY_RECOGNIZED`、四機能とサービス境界の6枚です。
 - 生成映像には「AI-generated dramatization / Fictional booking」を表示し、実画面録画を証拠にします。
-- 実ホテル、決済、個人情報、実際の取消は扱わず、Chrome標準WebMCPの広い適合は`INCONCLUSIVE`のままです。
+- 実ホテル、決済、個人情報、実際の取消は扱わず、確認したChrome設定の範囲を超える広い適合は主張しません。

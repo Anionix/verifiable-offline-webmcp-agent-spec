@@ -14,6 +14,8 @@ status: "release-guide"
 
 Visible proof: `2 attempts → 1 simulated booking → 1 confirmation number`.
 
+Current public proof: the Vercel production deployment `dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK` serves release source `c8be388d8047472ef7d6ad69656255adb5903e37`. Anonymous retrieval of [`webmcp-evals.json`](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json) reports the same 192-test release evidence.
+
 ## Short Japanese summary / 日本語要約
 
 通信が切れて成功表示だけ消えたとき、同じ京都旅館の予約を再送しても一件に戻る架空デモです。WebMCPは確認・準備・状態取得・取消条件の表示だけを行い、確定は画面上の人間だけが押せます。個人情報、決済、実ホテル、メール、外部予約、実際の取消はありません。
@@ -29,10 +31,11 @@ Visible proof: `2 attempts → 1 simulated booking → 1 confirmation number`.
 
 ## 60-second judge path
 
-1. Select **1. Check and prepare** with the fictional `Fictional Kyoto Ryokan` and `Standard Flexible` plan.
-2. Confirm `PREPARED`, then select **2. Confirm booking — human action only**. The simulated booking is saved while the success response is intentionally hidden.
-3. Select **Retry the same booking** with the same dates, guests, and rooms.
-4. Verify `RETRY_RECOGNIZED`, `attempts 2`, `bookings 1`, `effect starts 1`, and the same confirmation number.
+1. Open the public Vercel page in a supported HTTPS Chrome WebMCP configuration and discover the four named tools.
+2. Use `check_existing_hotel_booking`, then `prepare_hotel_booking` for the fictional `Fictional Kyoto Ryokan` and `Standard Flexible` plan.
+3. Confirm `PREPARED`, then select **2. Confirm booking — human action only**. The simulated booking is saved while the success response is intentionally hidden.
+4. Use native `get_hotel_booking_status` before retrying. It finds the existing result and its confirmation number.
+5. Select **Retry the same booking** and verify `RETRY_RECOGNIZED`, `attempts 2`, `bookings 1`, `effect starts 1`, and the same confirmation number.
 
 The result is local to this browser and this publication target. ChatGPT Sites and Vercel do not share browser storage.
 
@@ -47,7 +50,7 @@ The result is local to this browser and this publication target. ChatGPT Sites a
 
 The site never exposes an agent-facing confirmation, payment, or cancellation mutation. Only the visible human button can commit the fictional booking.
 
-The current candidate's machine-readable native WebMCP recording recipe is [`public/webmcp-evals.json`](public/webmcp-evals.json). Its `recordingRecipe.status` is intentionally `UNRUN` until a public HTTPS browser exposes `document.modelContext`; the recipe itself is not runtime evidence.
+The machine-readable native WebMCP contract and recording recipe are [`public/webmcp-evals.json`](public/webmcp-evals.json). Its public status is `READY`; the separate [native reconciliation record](../../metadata/hotel-native-webmcp-reconciliation.json) contains the fresh browser observation, exact four-tool discovery, zero-effect discovery check, visible human boundary, and read-before-retry result.
 
 ## What to look for
 
@@ -75,6 +78,6 @@ The shared build creates `dist/client/**` for static hosts, `dist/server/index.j
 
 ## Evidence and limits
 
-The source repository keeps the detailed [hotel verification record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-booking-verification.json), [current release candidate](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-release-candidate.json), [video production record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/demo-video-production.json), [public readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/devpost-public-readback.json), and [release instructions](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md). The connected Chrome page did not expose the standard native WebMCP surface, so broad Chrome-native discovery remains `INCONCLUSIVE`; the bounded in-app result is the evidence shown in the video. Physical keyboard and screen-reader runs remain `INCONCLUSIVE`, and the local video file to public YouTube identity remains `UNMEASURED`.
+The source repository keeps the detailed [hotel verification record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-booking-verification.json), [public release readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json), [native WebMCP reconciliation record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json), [current release candidate](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-release-candidate.json), [video production record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/demo-video-production.json), [historical public readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/devpost-public-readback.json), and [release instructions](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md). A fresh supported Chrome run on the public Vercel deployment exposed the exact native surface recorded above. This proves the tested configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader runs remain `INCONCLUSIVE`, and the local video file to public YouTube identity remains `UNMEASURED`.
 
 This is an educational, fictional, device-local proof of safe retry behavior. It does not contact a hotel, airline, payment service, mail service, or booking provider.

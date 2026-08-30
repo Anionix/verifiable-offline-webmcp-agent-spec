@@ -7,6 +7,10 @@
 // event_uuid_v7=01a052e1-7d4d-7c16-8b72-4d6e0d5c0189
 // state_transition=PUBLIC_RECEIPT_RETAINED -> WORKTREE_CANDIDATE_SEPARATED occurred_at=2026-08-30T12:50:00.000Z
 // machine-contract: a worktree candidate may differ from the historical public artifact; retain the public receipt and report the boundary instead of comparing unrelated bytes.
+// information_uuid_v5=5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39
+// event_uuid_v7=01a052f5-03b6-70df-8d85-ef68ea37e2ad
+// state_transition=HISTORICAL_VERCEL_RECEIPT -> STANDALONE_PUBLIC_RELEASE_BOUND occurred_at=2026-08-30T13:56:24.118Z
+// machine-contract: the retained historical Vercel receipt is not compared with a newer release when the standalone public readback binds the candidate source and digests.
 // event_uuid_v7=01a04b38-0e40-7595-81ae-fd2db303c4ae
 // state_transition=FOUR_AXIS_RECORDED -> APPROVAL_GATES_ENFORCED occurred_at=2026-08-29T01:52:40.000Z
 // machine-contract: external writes are allowed only when the exact service/action gate records plan or user authority.
@@ -44,6 +48,7 @@ const REGISTRY_PATH = resolve(ROOT, "metadata/service-integration-registry.json"
 const SCHEMA_PATH = resolve(ROOT, "schemas/service-integration-registry.schema.json");
 const HOTEL_VERIFICATION_PATH = resolve(ROOT, "metadata/hotel-booking-verification.json");
 const HOTEL_RELEASE_CANDIDATE_PATH = resolve(ROOT, "metadata/hotel-release-candidate.json");
+const HOTEL_PUBLIC_RELEASE_PATH = resolve(ROOT, "metadata/hotel-public-release-readback.json");
 const VERCEL_DEPLOYMENT_PATH = resolve(ROOT, "metadata/vercel-hotel-deployment.json");
 const VERCEL_DEPLOYMENT_SCHEMA_PATH = resolve(ROOT, "schemas/vercel-hotel-deployment.schema.json");
 const UUID_NAMESPACE = "47f3e535-0e27-559a-9556-aa79a84f95eb";
@@ -539,8 +544,10 @@ const registry = readJson(REGISTRY_PATH);
 const schema = readJson(SCHEMA_PATH);
 const hotelVerification = readJson(HOTEL_VERIFICATION_PATH);
 const hotelReleaseCandidate = readJson(HOTEL_RELEASE_CANDIDATE_PATH);
+const hotelPublicRelease = readJson(HOTEL_PUBLIC_RELEASE_PATH);
 const vercelDeployment = readJson(VERCEL_DEPLOYMENT_PATH);
 const vercelDeploymentSchema = readJson(VERCEL_DEPLOYMENT_SCHEMA_PATH);
+let candidateMatchesStandalonePublicRelease = false;
 
 record(
   schemaPatternContractErrors({ pattern: "^(a+)+$", patternProperties: { "^(.+)+$": {} } }).length === 2,
@@ -625,15 +632,25 @@ if (vercelDeployment && vercelDeploymentSchema) {
     hotelReleaseCandidate?.source?.state === "WORKTREE_CANDIDATE" &&
     typeof candidateFunctionalDigest === "string" &&
     candidateFunctionalDigest !== publicFunctionalDigest;
+  candidateMatchesStandalonePublicRelease =
+    hotelPublicRelease?.release?.status === "COMMITTED_RELEASE" &&
+    hotelPublicRelease?.release?.sourceCommit === hotelReleaseCandidate?.source?.commit &&
+    hotelPublicRelease?.release?.artifacts?.functionalClientSha256 === candidateFunctionalDigest &&
+    hotelPublicRelease?.release?.artifacts?.fullClientSha256 === hotelReleaseCandidate?.artifacts?.fullClientSha256 &&
+    hotelPublicRelease?.release?.artifacts?.fullSitesPackageSha256 === hotelReleaseCandidate?.artifacts?.fullSitesPackageSha256 &&
+    hotelPublicRelease?.deployment?.sourceCommit === hotelReleaseCandidate?.source?.commit &&
+    hotelPublicRelease?.deployment?.state === "READY" &&
+    hotelPublicRelease?.deployment?.target === "production" &&
+    hotelPublicRelease?.deployment?.deploymentId !== vercelDeployment?.deployment?.deploymentId;
   record(
-    candidateIsExplicitlyUnpublished || candidateFunctionalDigest === publicFunctionalDigest,
-    "the candidate must either match the public Vercel digest or explicitly remain an unpublished worktree candidate",
+    candidateIsExplicitlyUnpublished || candidateMatchesStandalonePublicRelease || candidateFunctionalDigest === publicFunctionalDigest,
+    "the candidate must match the historical Vercel digest, remain an unpublished worktree candidate, or match the standalone public release readback",
   );
   for (const remoteArtifact of remoteArtifactRows) {
     record(remoteArtifact.statusCode === 200, `Vercel remote artifact ${remoteArtifact.requestPath} is not HTTP 200`);
     const localPath = safeArtifactPath(remoteArtifact.localPath);
     record(existsSync(localPath), `Vercel remote artifact local file does not exist: ${remoteArtifact.localPath}`);
-    if (existsSync(localPath) && !candidateIsExplicitlyUnpublished) {
+    if (existsSync(localPath) && !candidateIsExplicitlyUnpublished && !candidateMatchesStandalonePublicRelease) {
       const localSha256 = createHash("sha256").update(readFileSync(localPath)).digest("hex");
       record(remoteArtifact.sha256 === localSha256, `Vercel remote artifact hash differs from ${remoteArtifact.localPath}`);
     } else if (candidateIsExplicitlyUnpublished) {
@@ -980,8 +997,9 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   const copyState = existsSync(resolve(ROOT, "dist/client/service-integrations.json")) ? "client copy matched" : "client copy not built";
-  const candidateState =
-    hotelReleaseCandidate?.source?.state === "WORKTREE_CANDIDATE"
+  const candidateState = candidateMatchesStandalonePublicRelease
+    ? "historical Vercel receipt retained; standalone public release readback matched"
+    : hotelReleaseCandidate?.source?.state === "WORKTREE_CANDIDATE"
       ? "historical public Vercel receipt retained; worktree candidate not published"
       : "candidate and public Vercel artifact boundary matched";
   console.log(

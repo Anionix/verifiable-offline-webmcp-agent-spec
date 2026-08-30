@@ -2,12 +2,12 @@
   "$schema": "../schemas/hotel-release-candidate.schema.json",
   "identity": {
     "informationUuidV5": "f2da6444-7447-5120-a39d-446adda200ca",
-    "observationUuidV7": "01a052c4-35af-7bb3-9fa1-6797b280910e"
+    "observationUuidV7": "01a052f2-77e0-72b2-89ec-663bebbb9c8b"
   },
-  "observedAt": "2026-08-30T13:03:05.647Z",
+  "observedAt": "2026-08-30T13:53:37.248Z",
   "source": {
-    "commit": "WORKTREE",
-    "state": "WORKTREE_CANDIDATE",
+    "commit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "state": "COMMITTED_CANDIDATE",
     "branch": "codex/issue-189-liveness",
     "baseCommit": "37f9029e91ac2bef4c17b89ea12bcf3cdc2d60c3"
   },
@@ -35,7 +35,7 @@
     "approvalDigestRenewed": true
   },
   "artifacts": {
-    "functionalClientSha256": "d8306b5b01d36303dd705fcd36e22a5aa812efe11cae1da3c17fe7497aa96c8c",
+    "functionalClientSha256": "ffb3d62c73b069aeb4bad71b4ad675a4b015ad6ce49448227199d1d9a265a6c9",
     "functionalClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
@@ -45,14 +45,14 @@
         "service-integrations.json"
       ]
     },
-    "fullClientSha256": "12ce3e12fea5209a2e8fb06d56e986f085615beb912b79abbb9ca65cdf464faf",
+    "fullClientSha256": "73b4c7d9a7b982723f052aef4203ced20961a75d73d1b45bda778226c1a1d0fb",
     "fullClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
       "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
       "excludedPaths": []
     },
-    "fullSitesPackageSha256": "ccf17568ff63252f3061687b91a51e59fab3b0116ebf205ef6008c3d29d83802",
+    "fullSitesPackageSha256": "0165b414fd2e005771cd0cb20fa6cfb2d01d8f7466d41cf2fa94f5144c48c7ca",
     "fullSitesScope": {
       "algorithm": "SHA-256",
       "root": "dist",
@@ -62,24 +62,31 @@
   },
   "publicClaims": {
     "candidateTestCount": 192,
-    "publicReadbackTestCount": 153,
-    "status": "MISMATCH_OBSERVED",
-    "source": "metadata/devpost-public-readback.json"
+    "publicReadbackTestCount": 192,
+    "status": "MATCH",
+    "source": "metadata/hotel-public-release-readback.json",
+    "releaseCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "deploymentId": "dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK",
+    "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/"
   },
   "browserObservation": {
-    "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
-    "origin": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
-    "observedAt": "2026-08-30T12:32:54.095Z",
+    "url": "https://kyoto-booking-retry-proof.vercel.app/",
+    "origin": "https://kyoto-booking-retry-proof.vercel.app",
+    "observedAt": "2026-08-30T13:53:37.248Z",
     "browser": "HeadlessChrome/152.0.0.0",
     "secureContext": true,
-    "pageSourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
-    "candidateSourceCommit": "NOT_PROVEN",
-    "documentModelContext": "CONFIRMED_ABSENT",
+    "pageSourceCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "candidateSourceCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "documentModelContext": "CONFIRMED_PRESENT",
     "requiredChromeFlags": [
       "#devtools-webmcp-support",
       "#enable-webmcp-testing"
     ],
-    "configurationState": "NOT_VERIFIED",
+    "configurationState": "VERIFIED",
+    "launchArguments": [
+      "--enable-features=WebMCP"
+    ],
+    "devtoolsWebmcpCategory": true,
     "originTrialMetadataCount": 0,
     "visibleToolNames": [
       "check_existing_hotel_booking",
@@ -92,55 +99,93 @@
       "pay_for_hotel_booking",
       "cancel_hotel_booking"
     ],
-    "calledToolNames": [],
-    "effectCounts": {
-      "intentRows": 0,
-      "attemptRows": 0,
-      "effectRows": 0,
-      "auditEvents": 0,
+    "calledToolNames": [
+      "check_existing_hotel_booking",
+      "prepare_hotel_booking",
+      "get_hotel_booking_status"
+    ],
+    "discoveryEffectCounts": {
+      "bookingCount": 0,
+      "effectStartCount": 0,
       "externalRequests": 0,
       "permissionRequests": 0,
       "notifications": 0
     },
-    "status": "INCONCLUSIVE"
+    "reconciliation": {
+      "status": "PASS",
+      "flow": [
+        "AMBIGUOUS_OUTCOME",
+        "AGENT_WEBMCP_STATUS_CHECK",
+        "EXISTING_RESULT_FOUND",
+        "NO_DUPLICATE_EFFECT"
+      ],
+      "statusCheck": {
+        "toolName": "get_hotel_booking_status",
+        "state": "COMMITTED",
+        "bookingExists": true,
+        "confirmationNumber": "FKR-08DFFA4C4F",
+        "attemptCount": 1,
+        "bookingCount": 1,
+        "effectStartCount": 1
+      },
+      "finalStatus": {
+        "state": "RETRY_RECOGNIZED",
+        "attemptCount": 2,
+        "bookingCount": 1,
+        "effectStartCount": 1,
+        "confirmationNumber": "FKR-08DFFA4C4F",
+        "sameConfirmation": true
+      },
+      "sameConfirmation": true,
+      "humanConfirmationBoundary": "visible_button_only",
+      "driverAction": "visible_button_exercised_by_browser_driver",
+      "agentExplanation": "The native status check found the existing booking with confirmation FKR-08DFFA4C4F, so the retry recognized it and did not start a second effect."
+    },
+    "recording": {
+      "status": "LOCAL_ARTIFACT",
+      "path": "/private/tmp/webmcp-issue-189/.local/native-webmcp-reconciliation-c8be388d.mp4",
+      "sha256": "d06ad515923154837747ae990b3178979e9e55b749aba3f8b2766b82039bd42b",
+      "durationSeconds": 157.866667
+    },
+    "status": "PASS"
   },
   "issueReadiness": [
     {
       "issue": 189,
       "status": "PASS",
-      "reason": "Local expiry recovery tests prove EXPIRED -> PREPARED, one semantic intent, one physical booking row, and one effect start after fresh human approval."
+      "reason": "The focused hotel tests prove EXPIRED -> PREPARED with the same semantic booking, a fresh approval window, one physical booking row, one effect start, and a valid event chain."
     },
     {
       "issue": 190,
-      "status": "INCONCLUSIVE",
-      "reason": "The candidate count is 192, while the separately read public Devpost record still claims 153; exact public agreement is not established."
+      "status": "PASS",
+      "reason": "The executable npm test summary and the anonymous public WebMCP release record both report 192 passed tests for release commit c8be388d8047472ef7d6ad69656255adb5903e37."
     },
     {
       "issue": 191,
-      "status": "INCONCLUSIVE",
-      "reason": "The public HTTPS page shows exactly four safe names, but document.modelContext is absent and WebMCP testing or origin-trial configuration was not verified."
+      "status": "PASS",
+      "reason": "A fresh HTTPS browser session exposed document.modelContext and exactly the four intended tools; discovery reported zero booking and effect starts."
     },
     {
       "issue": 192,
-      "status": "INCONCLUSIVE",
-      "reason": "No native WebMCP agent invocation was observed, so the lost-response recovery cannot be promoted from a local test to an agent-first public proof."
+      "status": "PASS",
+      "reason": "The native get_hotel_booking_status result found confirmation FKR-08DFFA4C4F; retry ended with attempts 2, bookings 1, effect starts 1, and the same confirmation without a second effect."
     },
     {
       "issue": 193,
-      "status": "INCONCLUSIVE",
-      "reason": "S AND L AND F_exact AND W AND E cannot be true while source freeze, exact public evidence, native WebMCP, and agent-first execution remain unknown."
+      "status": "PASS",
+      "reason": "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result."
     }
   ],
   "finalGate": {
     "formula": "S AND L AND F_exact AND W AND E",
-    "status": "INCONCLUSIVE",
-    "ready": null,
+    "status": "PASS",
+    "ready": true,
     "components": {
-      "S": "INCONCLUSIVE",
+      "S": "PASS",
       "L": "PASS",
-      "F_exact": "INCONCLUSIVE",
-      "W": "INCONCLUSIVE",
-      "E": "INCONCLUSIVE"
+      "F_exact": "PASS",
+      "W": "PASS",
+      "E": "PASS"
     }
   }
 }

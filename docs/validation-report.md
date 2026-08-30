@@ -86,6 +86,16 @@ status: "validation-report"
 - TypeScript language-server-equivalent checking passed with `tsc --noEmit`.
 - Sources: [`src/typescript/test/evaluator.test.ts`](../src/typescript/test/evaluator.test.ts), [`src/typescript/test/notification.test.ts`](../src/typescript/test/notification.test.ts), [`src/typescript/test/offline-sync.test.ts`](../src/typescript/test/offline-sync.test.ts), [`src/typescript/test/online-planner.test.ts`](../src/typescript/test/online-planner.test.ts), and the three browser-state tests in [`src/typescript/test`](../src/typescript/test/).
 
+### Current hotel release hard gates
+
+<!-- information_uuid_v5=5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39 event_uuid_v7=01a052f5-03b6-70df-8d85-ef68ea37e2ad state_transition=PUBLIC_RELEASE_DEPLOYED -> FINAL_GATE_RECORDED machine-contract=All five gates use the same committed source and production deployment. -->
+
+- Source commit `c8be388d8047472ef7d6ad69656255adb5903e37` passes 192 Node tests with zero failures and zero skips. The Vercel production deployment is `dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK`, and anonymous retrieval of the public evaluation file matches the local bytes. Evidence: [`metadata/hotel-public-release-readback.json`](../metadata/hotel-public-release-readback.json).
+- The focused liveness check proves `PREPARED → EXPIRED → PREPARED` with the same booking identity, a new approval window and digest, one physical booking row, one effect start, and a valid event chain.
+- The fresh supported Chrome run exposed `document.modelContext` and exactly four intended WebMCP tools. Discovery created zero bookings, effect starts, external requests, permission requests, or notifications.
+- After the visible human confirmation button and intentionally hidden success response, native `get_hotel_booking_status` found the existing result before the visible retry. The final result was `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the same confirmation number. Evidence: [`metadata/hotel-native-webmcp-reconciliation.json`](../metadata/hotel-native-webmcp-reconciliation.json).
+- The current candidate record evaluates `S AND L AND F_exact AND W AND E` as `PASS`. The older [`metadata/devpost-public-readback.json`](../metadata/devpost-public-readback.json) is a historical 153-test snapshot and is not used as the current public claim.
+
 ### Optional online planner candidate
 
 - Thirteen deterministic scripted paths covered disabled, offline, required-private-field, secret-looking public value, unknown cost, over-budget cost, healthy candidate, unknown tool, invalid arguments, timeout, response loss, incomplete response, and multiple calls.

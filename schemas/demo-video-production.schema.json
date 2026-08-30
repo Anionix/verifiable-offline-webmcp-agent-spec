@@ -204,6 +204,26 @@
       }
     },
     "subtitleUpdate": {
+      "oneOf": [
+        { "$ref": "#/$defs/ownerSubtitleSuccessUpdate" },
+        { "$ref": "#/$defs/ownerSubtitleFailureUpdate" }
+      ]
+    },
+    "ownerSubtitleFailureUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "observedAt", "stateTransition", "videoId", "watchUrl", "ownerReadback"],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "type": "string", "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "ownerReadback": { "$ref": "#/$defs/ownerSubtitleFailureReadback" }
+      }
+    },
+    "ownerSubtitleSuccessUpdate": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -224,12 +244,7 @@
         "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
-        "stateTransition": {
-          "enum": [
-            "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED",
-            "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
-          ]
-        },
+        "stateTransition": { "type": "string", "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED" },
         "videoId": { "const": "tdSvJw4ghX8" },
         "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
         "authorization": {
@@ -259,12 +274,7 @@
             "lastCueEndSeconds": { "const": 147.76 }
           }
         },
-        "ownerReadback": {
-          "oneOf": [
-            { "$ref": "#/$defs/ownerSubtitleSuccessReadback" },
-            { "$ref": "#/$defs/ownerSubtitleFailureReadback" }
-          ]
-        },
+        "ownerReadback": { "$ref": "#/$defs/ownerSubtitleSuccessReadback" },
         "videoReview": {
           "type": "object",
           "additionalProperties": false,
@@ -296,39 +306,7 @@
           "uniqueItems": true,
           "items": { "enum": ["TITLE", "VIDEO", "AUDIO", "THUMBNAIL", "DESCRIPTION", "DEVPOST", "JAPANESE_SUBTITLES"] }
         }
-      },
-      "allOf": [
-        {
-          "if": {
-            "required": ["stateTransition"],
-            "properties": {
-              "stateTransition": {
-                "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "ownerReadback": { "$ref": "#/$defs/ownerSubtitleSuccessReadback" }
-            }
-          }
-        },
-        {
-          "if": {
-            "required": ["stateTransition"],
-            "properties": {
-              "stateTransition": {
-                "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "ownerReadback": { "$ref": "#/$defs/ownerSubtitleFailureReadback" }
-            }
-          }
-        }
-      ]
+      }
     },
     "subtitleAnonymousReadback": {
       "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED measured_at=2026-08-30T17:48:28.216Z recorded_at=2026-08-30T17:55:48.503Z machine-contract=anonymous VTT download proves only the retrieved English subtitle bytes and cue comparison; each readback retains repository-relative input and public files for digest and comparison revalidation; future readbacks use structural UUIDv7 and date-time fields, while validation binds event time, rejects event reuse, and requires recorded_at >= measured_at; the player metadata list is a later approximate follow-up without an exact timestamp and does not prove video file identity or browser UI track selection",

@@ -1739,11 +1739,14 @@ def main():
     owner_failure = json.loads(json.dumps(video_production))
     owner_failure_observed_ms = rfc3339_ms(owner_failure["updatedAt"]) + 1
     owner_failure_root_ms = owner_failure_observed_ms + 1
-    owner_failure_record = json.loads(json.dumps(owner_failure["publication"]["subtitleUpdates"][0]))
-    owner_failure_record.update({
+    owner_failure_source = owner_failure["publication"]["subtitleUpdates"][0]
+    owner_failure_record = {
+        "informationUuidV5": owner_failure_source["informationUuidV5"],
         "observationUuidV7": uuid7_for_ms(owner_failure_observed_ms, 0x678, 0x6789ABCDEF01234),
         "observedAt": rfc3339_from_ms(owner_failure_observed_ms),
         "stateTransition": OWNER_SUBTITLE_FAILURE_STATE,
+        "videoId": owner_failure_source["videoId"],
+        "watchUrl": owner_failure_source["watchUrl"],
         "ownerReadback": {
             "surfaces": ["YOUTUBE_STUDIO_SUBTITLE_TABLE"],
             "status": "FAIL",
@@ -1753,7 +1756,13 @@ def main():
                 "tracks": [{"language": "English", "trackType": "VIDEO_LANGUAGE", "status": "DELETED"}],
             },
         },
-    })
+    }
+    owner_failure["previousDocumentObservation"] = {
+        "informationUuidV5": owner_failure["identity"]["informationUuidV5"],
+        "observationUuidV7": owner_failure["identity"]["observationUuidV7"],
+        "updatedAt": owner_failure["updatedAt"],
+        "stateTransition": owner_failure["stateTransition"],
+    }
     owner_failure["publication"]["subtitleUpdates"].append(owner_failure_record)
     owner_failure["identity"]["observationUuidV7"] = uuid7_for_ms(owner_failure_root_ms, 0x789, 0x789ABCDEF012345)
     owner_failure["updatedAt"] = rfc3339_from_ms(owner_failure_root_ms)

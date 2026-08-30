@@ -4,7 +4,7 @@
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
 // machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
 // machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file, with positive ordered non-overlapping cues, before binding bytes to a state.
-// machine-contract: every non-empty block is a cue or an explicit WebVTT header, NOTE, STYLE, or REGION block; unknown blocks fail closed.
+// machine-contract: every non-empty block is a cue or an explicit WebVTT header/NOTE block; unsupported STYLE/REGION and unknown blocks fail closed.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
@@ -78,9 +78,24 @@ function parseWebVttCueBlock(block, index) {
   };
 }
 
-function isAllowedWebVttNonCueBlock(block) {
+function webVttNonCueBlockKind(block) {
   const firstLine = block.split("\n", 1)[0] ?? "";
-  return /^(?:NOTE(?:[ \t].*)?|STYLE|REGION)$/u.test(firstLine);
+  if (/^NOTE(?:[ \t].*)?$/u.test(firstLine)) return "NOTE";
+  if (/^STYLE$/u.test(firstLine)) return "STYLE";
+  if (/^REGION$/u.test(firstLine)) return "REGION";
+  return null;
+}
+
+function isAllowedWebVttNonCueBlock(block) {
+  const kind = webVttNonCueBlockKind(block);
+  if (kind === "NOTE") {
+    assert.doesNotMatch(block, /-->/u, "WebVTT NOTE block cannot contain -->");
+    return true;
+  }
+  if (kind === "STYLE" || kind === "REGION") {
+    assert.fail(`unsupported WebVTT ${kind} block`);
+  }
+  return false;
 }
 
 function parseWebVttHeader(block) {

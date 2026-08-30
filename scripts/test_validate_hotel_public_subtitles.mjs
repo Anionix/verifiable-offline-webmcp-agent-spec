@@ -86,6 +86,20 @@ test("accepts an explicitly allowed WebVTT NOTE block", () => {
   assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
 });
 
+test("rejects a WebVTT NOTE block containing a cue separator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nNOTE\nmalformed --> note\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /NOTE block cannot contain/u);
+});
+
+for (const blockType of ["STYLE", "REGION"]) {
+  test("rejects an unsupported WebVTT " + blockType + " block", () => {
+    const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+    const publicText = "WEBVTT\n\n" + blockType + "\nunsupported payload\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), new RegExp("unsupported WebVTT " + blockType + " block", "u"));
+  });
+}
+
 test("rejects an unrecognized WebVTT noncue block", () => {
   const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
   const publicText = "WEBVTT\n\nUNDECLARED metadata\n\n00:00:00.000 --> 00:00:01.000\nHello\n";

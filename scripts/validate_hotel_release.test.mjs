@@ -125,6 +125,25 @@ test("accepts a checksum-complete release package without extra files", async ()
   });
 });
 
+test(
+  "does not skip validation when the CLI is invoked through a symbolic link",
+  { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
+  async () => {
+    const aliasDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-cli-"));
+    try {
+      const validatorLink = resolve(aliasDirectory, "validate_hotel_release.mjs");
+      await symlink(validatorPath, validatorLink);
+      const result = spawnSync(process.execPath, [validatorLink, "--release-root", "/definitely/missing"], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+      });
+      assert.notEqual(result.status, 0, "the symlink-invoked validator silently skipped the release check");
+    } finally {
+      await rm(aliasDirectory, { recursive: true, force: true });
+    }
+  },
+);
+
 test("rejects an unrecorded root file", async () => {
   await withFixture({ "unexpected.txt": "harmless unrecorded file\n" }, (releaseRoot) => {
     const result = runValidator(releaseRoot);

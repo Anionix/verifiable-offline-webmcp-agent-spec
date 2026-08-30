@@ -4,6 +4,7 @@
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
 // machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
 // machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file before binding bytes to a state.
+// machine-contract: every non-empty block is a cue or an explicit WebVTT header, NOTE, STYLE, or REGION block; unknown blocks fail closed.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
@@ -37,31 +38,75 @@ function timestampToMilliseconds(timestamp) {
   return Number(match.groups.hours) * 3_600_000 + minutes * 60_000 + seconds * 1_000 + Number(match.groups.milliseconds);
 }
 
-export function parseSubtitleCues(text) {
-  const blocks = text
-    .replace(/\r\n/gu, "\n")
-    .trim()
-    .split(/\n\s*\n/u)
-    .filter(Boolean);
-  return blocks.flatMap((block) => {
-    const lines = block.split("\n");
-    const timingIndex = lines.findIndex((line) => line.includes(" --> "));
-    if (timingIndex === -1) return [];
-    const match = /^(?<start>\d{2}:\d{2}:\d{2}[.,]\d{3}) --> (?<end>\d{2}:\d{2}:\d{2}[.,]\d{3})(?: .*)?$/u.exec(lines[timingIndex]);
-    assert.ok(match?.groups, `unexpected cue timing syntax: ${lines[timingIndex]}`);
-    return [
-      {
-        startMs: timestampToMilliseconds(match.groups.start),
-        endMs: timestampToMilliseconds(match.groups.end),
-        text: normalizeText(lines.slice(timingIndex + 1).join("\n")),
-      },
-    ];
+const SUBRIP_TIMING_PATTERN = /^(?<start>\d{2}:\d{2}:\d{2},\d{3}) --> (?<end>\d{2}:\d{2}:\d{2},\d{3})$/u;
+const WEBVTT_HEADER_PATTERN = /^\uFEFF?WEBVTT(?:[ \t].*)?$/u;
+const WEBVTT_TIMING_PATTERN = /^(?<start>\d{2}:\d{2}:\d{2}\.\d{3}) --> (?<end>\d{2}:\d{2}:\d{2}\.\d{3})(?:[ \t].*)?$/u;
+
+function subtitleBlocks(text) {
+  const normalized = text.replace(/\r\n?/gu, "\n").trim();
+  return normalized === "" ? [] : normalized.split(/\n\s*\n/u).filter((block) => block.trim() !== "");
+}
+
+function parseSubRipCueBlock(block, index) {
+  const lines = block.split("\n");
+  const timingMatch = SUBRIP_TIMING_PATTERN.exec(lines[1] ?? "");
+  const cueText = normalizeText(lines.slice(2).join("\n"));
+  assert.ok(
+    /^\uFEFF?\d+$/u.test(lines[0] ?? "") && timingMatch?.groups && cueText !== "" && !lines.slice(2).some((line) => SUBRIP_TIMING_PATTERN.test(line)),
+    "SubRip block " + (index + 1) + " is an unparsed SubRip cue block",
+  );
+  return {
+    startMs: timestampToMilliseconds(timingMatch.groups.start),
+    endMs: timestampToMilliseconds(timingMatch.groups.end),
+    text: cueText,
+  };
+}
+
+function parseWebVttCueBlock(block, index) {
+  const lines = block.split("\n");
+  const directTimingMatch = WEBVTT_TIMING_PATTERN.exec(lines[0] ?? "");
+  const identifiedTimingMatch = directTimingMatch ? null : WEBVTT_TIMING_PATTERN.exec(lines[1] ?? "");
+  const timingMatch = directTimingMatch ?? identifiedTimingMatch;
+  const timingIndex = directTimingMatch ? 0 : identifiedTimingMatch ? 1 : -1;
+  const cueText = normalizeText(lines.slice(timingIndex + 1).join("\n"));
+  assert.ok(timingMatch?.groups && cueText !== "", "WebVTT block " + (index + 1) + " is an unrecognized WebVTT block");
+  return {
+    startMs: timestampToMilliseconds(timingMatch.groups.start),
+    endMs: timestampToMilliseconds(timingMatch.groups.end),
+    text: cueText,
+  };
+}
+
+function isAllowedWebVttNonCueBlock(block) {
+  const firstLine = block.split("\n", 1)[0] ?? "";
+  return /^(?:NOTE(?:[ \t].*)?|STYLE|REGION)$/u.test(firstLine);
+}
+
+function parseWebVttHeader(block) {
+  const lines = block.split("\n");
+  assert.ok(WEBVTT_HEADER_PATTERN.test(lines[0] ?? ""), "WebVTT header is missing");
+  assert.ok(
+    lines.slice(1).every((line) => /^(?:Kind|Language):[ \t].*$/u.test(line)),
+    "WebVTT header contains an unrecognized line",
+  );
+}
+
+export function parseSubtitleCues(text, format) {
+  const resolvedFormat = format ?? (/^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/u.test(text) ? "vtt" : "srt");
+  assert.ok(resolvedFormat === "srt" || resolvedFormat === "vtt", "subtitle format must be srt or vtt");
+  const blocks = subtitleBlocks(text);
+  if (resolvedFormat === "srt") return blocks.map(parseSubRipCueBlock);
+  assert.ok(blocks.length > 0, "WebVTT header is missing");
+  parseWebVttHeader(blocks[0]);
+  return blocks.slice(1).flatMap((block, index) => {
+    if (isAllowedWebVttNonCueBlock(block)) return [];
+    return [parseWebVttCueBlock(block, index)];
   });
 }
 
 export function compareSubtitleHistoryTexts(sourceText, publicText) {
-  const sourceCues = parseSubtitleCues(sourceText);
-  const publicCues = parseSubtitleCues(publicText);
+  const sourceCues = parseSubtitleCues(sourceText, "srt");
+  const publicCues = parseSubtitleCues(publicText, "vtt");
   const comparable = sourceCues.length > 0 && sourceCues.length === publicCues.length;
   const textMatches = comparable && sourceCues.every((cue, index) => cue.text === publicCues[index].text);
   const timingMatches = comparable && sourceCues.every((cue, index) => cue.startMs === publicCues[index].startMs && cue.endMs === publicCues[index].endMs);

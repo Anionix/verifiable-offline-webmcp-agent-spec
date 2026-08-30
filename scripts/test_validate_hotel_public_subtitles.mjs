@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   compareSubtitleFiles,
+  compareSubtitleHistoryTexts,
   compareSubtitleTexts,
   productionMetadataPath,
   publicSubtitlePath,
@@ -38,6 +39,57 @@ test("accepts the retained public VTT when all authored cues match", async () =>
     publicVttSha256: "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
   });
   assert.deepEqual(await validateSubtitleHistory(), { readbackCount: 1, validationResult: "PASS" });
+});
+
+test("rejects a later readback when a malformed SRT cue and its VTT cue are both absent", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-missing-cue-"));
+  try {
+    const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+    await mkdir(mediaDirectory, { recursive: true });
+    await copyFile(sourceSubtitlePath, resolve(mediaDirectory, "subtitles.en.srt"));
+    await copyFile(publicSubtitlePath, resolve(mediaDirectory, "youtube-public-201.en.vtt"));
+    const [sourceText, publicText] = await Promise.all([readFile(sourceSubtitlePath, "utf8"), readFile(publicSubtitlePath, "utf8")]);
+    const brokenSourceText = sourceText.replace("2\n00:00:00,700 --> 00:00:01,620\nsubmits a", "2\nBROKEN SRT CUE\nsubmits a");
+    const missingPublicText = publicText.replace("\n00:00:00.700 --> 00:00:01.620\nsubmits a\n", "\n");
+    assert.notEqual(brokenSourceText, sourceText);
+    assert.notEqual(missingPublicText, publicText);
+    await writeFile(resolve(mediaDirectory, "broken.en.srt"), brokenSourceText, "utf8");
+    await writeFile(resolve(mediaDirectory, "missing-cue.en.vtt"), missingPublicText, "utf8");
+
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const originalReadback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+    const readback = structuredClone(originalReadback);
+    readback.inputSubtitle.path = "media/demo-video/broken.en.srt";
+    readback.inputSubtitle.sha256 = createHash("sha256").update(brokenSourceText).digest("hex");
+    readback.inputSubtitle.cueCount = 183;
+    readback.publicVtt.path = "media/demo-video/missing-cue.en.vtt";
+    readback.publicVtt.fileName = "missing-cue.en.vtt";
+    readback.publicVtt.sha256 = createHash("sha256").update(missingPublicText).digest("hex");
+    readback.publicVtt.cueCount = 183;
+    readback.download.fileName = "missing-cue.en.vtt";
+    readback.comparison.scope = "FULL_183_CUE_COMPARISON";
+    readback.comparison.inputCueCount = 183;
+    readback.comparison.publicCueCount = 183;
+    metadata.publication.subtitleAnonymousReadbacks = [originalReadback, readback];
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /unparsed SubRip cue block/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("accepts an explicitly allowed WebVTT NOTE block", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nNOTE\ntranscriber note\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
+});
+
+test("rejects an unrecognized WebVTT noncue block", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nUNDECLARED metadata\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /unrecognized WebVTT block/u);
 });
 
 test("rejects a public VTT when one cue timestamp changes", async () => {

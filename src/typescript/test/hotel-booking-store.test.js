@@ -1,6 +1,10 @@
 // information_uuid_v5=bf8ac35a-00a1-5b9b-aed3-d00c5a0e228d
 // event_uuid_v7=0199651b-6955-7000-8000-000000000001
 // machine-contract: simultaneous tabs and repeated human clicks converge to one booking and one effect start.
+// information_uuid_v5=4d5c7c5c-98a2-5a34-8d40-d4a8f8d77f0e
+// event_uuid_v7=01a050d2-0000-7000-8000-000000000189
+// state_transition=REVIEW -> DRY_RUN occurred_at=2026-08-30T20:00:00.000+09:00
+// machine-contract: expiry recovery keeps one semantic booking, renews only the approval window, and preserves the audit chain.
 import assert from "node:assert/strict";
 import test from "node:test";
 import { indexedDB } from "fake-indexeddb";
@@ -185,12 +189,87 @@ test("approval at 120 seconds expires without a booking effect", async () => {
     ...options,
     now: "2026-08-29T01:02:01.000Z",
   });
-  assert.equal(repeatedPreparation.state, "EXPIRED");
-  assert.equal(repeatedPreparation.created, false);
-  assert.equal(repeatedPreparation.eventCount, 2);
+  assert.equal(repeatedPreparation.state, "PREPARED");
+  assert.equal(repeatedPreparation.created, true);
+  assert.equal(repeatedPreparation.intentId, prepared.intentId);
+  assert.equal(repeatedPreparation.fingerprint, prepared.fingerprint);
+  assert.equal(repeatedPreparation.bookingExists, false);
+  assert.equal(repeatedPreparation.effectStartCount, 0);
+  assert.ok(Date.parse(repeatedPreparation.preparedAt) > Date.parse(prepared.preparedAt));
+  assert.ok(Date.parse(repeatedPreparation.approvalExpiresAt) > Date.parse(prepared.approvalExpiresAt));
+  assert.notEqual(repeatedPreparation.approvalPayloadDigest, prepared.approvalPayloadDigest);
+  await assert.rejects(
+    humanApproveAndCommit(BASE, {
+      ...options,
+      now: "2026-08-29T01:02:02.000Z",
+      expectedIntentId: repeatedPreparation.intentId,
+      expectedFingerprint: repeatedPreparation.fingerprint,
+      expectedApprovalPayloadDigest: prepared.approvalPayloadDigest,
+    }),
+    /visible booking details or price no longer match/u,
+  );
+  const committedAfterRecovery = await humanApproveAndCommit(BASE, {
+    ...options,
+    now: "2026-08-29T01:02:02.000Z",
+    expectedIntentId: repeatedPreparation.intentId,
+    expectedFingerprint: repeatedPreparation.fingerprint,
+    expectedApprovalPayloadDigest: repeatedPreparation.approvalPayloadDigest,
+  });
+  assert.equal(committedAfterRecovery.state, "COMMITTED");
+  assert.equal(committedAfterRecovery.bookingExists, true);
+  assert.equal(committedAfterRecovery.effectStartCount, 1);
+  assert.ok(committedAfterRecovery.confirmationNumber);
+  const countDatabase = await openHotelBookingDatabase(options);
+  try {
+    const transaction = countDatabase.transaction("bookings", "readonly");
+    const completion = transactionCompletion(transaction);
+    assert.equal(await requestResult(transaction.objectStore("bookings").count()), 1);
+    await completion;
+  } finally {
+    countDatabase.close();
+  }
   const history = await listHotelBookingEvents(BASE, options);
   assert.equal(history.chainValid, true);
-  assert.deepEqual(history.events.map((event) => event.toState), ["PREPARED", "EXPIRED"]);
+  assert.deepEqual(history.events.map((event) => event.toState), [
+    "PREPARED",
+    "EXPIRED",
+    "PREPARED",
+    "HUMAN_APPROVED",
+    "COMMITTED",
+  ]);
+  await resetHotelBookingDatabase(options);
+});
+
+test("concurrent re-preparation after expiry records one renewal event", async () => {
+  const options = databaseOptions("expiry-race");
+  await resetHotelBookingDatabase(options);
+  await prepareHotelBooking(BASE, options);
+  await expireHotelBookingPreparation(BASE, {
+    ...options,
+    now: "2026-08-29T01:02:00.000Z",
+  });
+  const [databaseA, databaseB] = await Promise.all([
+    openHotelBookingDatabase(options),
+    openHotelBookingDatabase(options),
+  ]);
+  let preparations;
+  try {
+    preparations = await Promise.all([
+      prepareHotelBooking(BASE, { ...options, database: databaseA, now: "2026-08-29T01:02:01.000Z" }),
+      prepareHotelBooking({ ...BASE, preferredLanguage: "ja" }, { ...options, database: databaseB, now: "2026-08-29T01:02:01.000Z" }),
+    ]);
+  } finally {
+    databaseA.close();
+    databaseB.close();
+  }
+  assert.equal(new Set(preparations.map((result) => result.intentId)).size, 1);
+  assert.equal(preparations.filter((result) => result.created).length, 1);
+  assert.ok(preparations.every((result) => result.state === "PREPARED"));
+  assert.ok(preparations.every((result) => result.bookingExists === false));
+  assert.ok(preparations.every((result) => result.effectStartCount === 0));
+  const history = await listHotelBookingEvents(BASE, options);
+  assert.equal(history.chainValid, true);
+  assert.deepEqual(history.events.map((event) => event.toState), ["PREPARED", "EXPIRED", "PREPARED"]);
   await resetHotelBookingDatabase(options);
 });
 
@@ -240,6 +319,8 @@ test("human approval rejects a stored price and digest that differ from the curr
       rooms: prepared.normalizedInput.rooms,
     },
     quote: forgedQuote,
+    preparedAt: prepared.preparedAt,
+    approvalExpiresAt: prepared.approvalExpiresAt,
   });
   const database = await openHotelBookingDatabase(options);
   try {

@@ -3,11 +3,17 @@
 // event_uuid_v7=0199651b-6952-7000-8000-000000000001
 // state_transition=EMPTY -> PREPARED -> HUMAN_APPROVED -> COMMITTED -> RETRY_RECOGNIZED
 // state_transition=PREPARED -> EXPIRED
+// state_transition=EXPIRED -> PREPARED
 // machine-contract: booking fingerprint, confirmation number, and event sequence
 // are protected by IndexedDB unique constraints. A human approval must repeat
 // the visible intent, fingerprint, and approval digest; HUMAN_APPROVED and
 // COMMITTED then persist in one transaction, so a retry can observe but cannot
 // repeat the simulated booking effect.
+// information_uuid_v5=4d5c7c5c-98a2-5a34-8d40-d4a8f8d77f0e
+// event_uuid_v7=01a050d2-0000-7000-8000-000000000189
+// state_transition=REVIEW -> EXECUTING occurred_at=2026-08-30T20:00:00.000+09:00
+// machine-contract: re-preparation preserves the semantic booking identity, records
+// EXPIRED before PREPARED, and binds a fresh approval digest to the new time window.
 
 import {
   APPROVAL_WINDOW_MILLISECONDS,
@@ -189,6 +195,32 @@ function presentIntent(intent, now) {
 }
 
 /**
+ * The approval digest binds the visible terms to one preparation window. This
+ * makes an expired preparation's digest unusable after a fresh preparation,
+ * even though the semantic booking fingerprint remains stable.
+ *
+ * @param {Record<string, any>} input
+ * @param {Record<string, any>} quote
+ * @param {string} preparedAt
+ * @param {string} approvalExpiresAt
+ */
+function approvalPayload(input, quote, preparedAt, approvalExpiresAt) {
+  return {
+    booking: {
+      adults: input.adults,
+      checkInDate: input.checkInDate,
+      checkOutDate: input.checkOutDate,
+      hotelId: input.hotelId,
+      roomPlanId: input.roomPlanId,
+      rooms: input.rooms,
+    },
+    quote,
+    preparedAt,
+    approvalExpiresAt,
+  };
+}
+
+/**
  * Persist the time-driven PREPARED -> EXPIRED transition without starting a
  * booking effect. This browser housekeeping function is intentionally absent
  * from the WebMCP adapter.
@@ -328,73 +360,125 @@ export async function prepareHotelBooking(value, options = {}) {
   const preparedAt = new Date(now).toISOString();
   const approvalExpiresAt = new Date(now + APPROVAL_WINDOW_MILLISECONDS).toISOString();
   const quote = calculateBookingQuote(normalizedInput);
-  const approvalPayloadDigest = await digestCanonicalPayload({
-    booking: {
-      adults: normalizedInput.adults,
-      checkInDate: normalizedInput.checkInDate,
-      checkOutDate: normalizedInput.checkOutDate,
-      hotelId: normalizedInput.hotelId,
-      roomPlanId: normalizedInput.roomPlanId,
-      rooms: normalizedInput.rooms,
-    },
-    quote,
-  });
-  const event = await buildEvent({
-    eventId: nextEventId(options, now),
-    intentId,
-    sequence: 1,
-    occurredAt: preparedAt,
-    fromState: "EMPTY",
-    toState: "PREPARED",
-    previousEventHash: ZERO_HASH,
-    payload: { approvalExpiresAt, approvalPayloadDigest, fingerprint },
-  });
-  const proposed = {
-    intentId,
-    fingerprint,
-    normalizedInput,
-    state: "PREPARED",
-    preparedAt,
-    approvalExpiresAt,
-    approvalPayloadDigest,
-    attemptCount: 1,
-    effectStartCount: 0,
-    bookingId: null,
-    confirmationNumber: null,
-    quote,
-    eventCount: 1,
-    headHash: event.eventHash,
-    version: 1,
-  };
+  const approvalPayloadDigest = await digestCanonicalPayload(
+    approvalPayload(normalizedInput, quote, preparedAt, approvalExpiresAt),
+  );
 
   const lease = await acquireDatabase(options);
   try {
-    const transaction = lease.database.transaction([INTENTS, EVENTS], "readwrite");
-    const completion = transactionCompletion(transaction);
-    const intents = transaction.objectStore(INTENTS);
-    const existing = /** @type {Record<string, any> | undefined} */ (
-      await requestResult(intents.index("byFingerprint").get(fingerprint))
-    );
-    if (existing) {
-      await completion;
-      if (existing.state === "PREPARED" && now >= Date.parse(existing.approvalExpiresAt)) {
-        const expired = await expireHotelBookingPreparation(existing.intentId, { ...options, database: lease.database });
-        return { ...expired, created: false };
+    for (let attempt = 0; attempt < MAX_OPTIMISTIC_RETRIES; attempt += 1) {
+      const readTransaction = lease.database.transaction(INTENTS, "readonly");
+      const readCompletion = transactionCompletion(readTransaction);
+      const existing = /** @type {Record<string, any> | undefined} */ (
+        await requestResult(readTransaction.objectStore(INTENTS).index("byFingerprint").get(fingerprint))
+      );
+      await readCompletion;
+
+      if (existing) {
+        if (existing.state === "PREPARED" && now >= Date.parse(existing.approvalExpiresAt)) {
+          await expireHotelBookingPreparation(existing.intentId, { ...options, database: lease.database });
+          continue;
+        }
+        if (existing.state !== "EXPIRED") return { ...presentIntent(existing, now), created: false };
+
+        const event = await buildEvent({
+          eventId: nextEventId(options, now),
+          intentId: existing.intentId,
+          sequence: existing.eventCount + 1,
+          occurredAt: preparedAt,
+          fromState: "EXPIRED",
+          toState: "PREPARED",
+          previousEventHash: existing.headHash,
+          payload: {
+            approvalExpiresAt,
+            approvalPayloadDigest,
+            fingerprint,
+            preparedAt,
+          },
+        });
+        const proposed = {
+          ...existing,
+          state: "PREPARED",
+          preparedAt,
+          approvalExpiresAt,
+          approvalPayloadDigest,
+          quote,
+          eventCount: existing.eventCount + 1,
+          headHash: event.eventHash,
+          version: existing.version + 1,
+          expiredAt: null,
+        };
+        const transaction = lease.database.transaction([INTENTS, EVENTS], "readwrite");
+        const completion = transactionCompletion(transaction);
+        const intents = transaction.objectStore(INTENTS);
+        const current = /** @type {Record<string, any> | undefined} */ (
+          await readIntentFromStore(intents, { kind: "fingerprint", value: fingerprint })
+        );
+        if (
+          !current
+          || current.version !== existing.version
+          || current.headHash !== existing.headHash
+          || current.state !== "EXPIRED"
+        ) {
+          transaction.abort();
+          await completion.catch(() => undefined);
+          continue;
+        }
+        try {
+          await requestResult(intents.put(proposed));
+          await requestResult(transaction.objectStore(EVENTS).add(event));
+          await completion;
+          return { ...presentIntent(proposed, now), created: true };
+        } catch (error) {
+          await completion.catch(() => undefined);
+          if (!isConstraintError(error)) throw error;
+          continue;
+        }
       }
-      return { ...presentIntent(existing, now), created: false };
+
+      const event = await buildEvent({
+        eventId: nextEventId(options, now),
+        intentId,
+        sequence: 1,
+        occurredAt: preparedAt,
+        fromState: "EMPTY",
+        toState: "PREPARED",
+        previousEventHash: ZERO_HASH,
+        payload: { approvalExpiresAt, approvalPayloadDigest, fingerprint, preparedAt },
+      });
+      const proposed = {
+        intentId,
+        fingerprint,
+        normalizedInput,
+        state: "PREPARED",
+        preparedAt,
+        approvalExpiresAt,
+        approvalPayloadDigest,
+        attemptCount: 1,
+        effectStartCount: 0,
+        bookingId: null,
+        confirmationNumber: null,
+        quote,
+        eventCount: 1,
+        headHash: event.eventHash,
+        version: 1,
+      };
+      const transaction = lease.database.transaction([INTENTS, EVENTS], "readwrite");
+      const completion = transactionCompletion(transaction);
+      const intents = transaction.objectStore(INTENTS);
+      try {
+        await requestResult(intents.add(proposed));
+        await requestResult(transaction.objectStore(EVENTS).add(event));
+        await completion;
+        return { ...presentIntent(proposed, now), created: true };
+      } catch (error) {
+        await completion.catch(() => undefined);
+        if (!isConstraintError(error)) throw error;
+      }
     }
-    try {
-      await requestResult(intents.add(proposed));
-      await requestResult(transaction.objectStore(EVENTS).add(event));
-      await completion;
-      return { ...presentIntent(proposed, now), created: true };
-    } catch (error) {
-      await completion.catch(() => undefined);
-      if (!isConstraintError(error)) throw error;
-      const winner = await readIntent(lease.database, { kind: "fingerprint", value: fingerprint });
-      if (!winner) throw error;
-      return { ...presentIntent(winner, now), created: false };
-    }
+    const converged = await readIntent(lease.database, { kind: "fingerprint", value: fingerprint });
+    if (converged) return { ...presentIntent(converged, now), created: false };
+    throw new Error("hotel booking preparation did not converge after concurrent updates");
   } finally {
     releaseDatabase(lease);
   }
@@ -428,17 +512,9 @@ export async function checkExistingHotelBooking(value, options = {}) {
 /** @param {Record<string, any>} snapshot */
 async function currentApproval(snapshot) {
   const quote = calculateBookingQuote(snapshot.normalizedInput);
-  const approvalPayloadDigest = await digestCanonicalPayload({
-    booking: {
-      adults: snapshot.normalizedInput.adults,
-      checkInDate: snapshot.normalizedInput.checkInDate,
-      checkOutDate: snapshot.normalizedInput.checkOutDate,
-      hotelId: snapshot.normalizedInput.hotelId,
-      roomPlanId: snapshot.normalizedInput.roomPlanId,
-      rooms: snapshot.normalizedInput.rooms,
-    },
-    quote,
-  });
+  const approvalPayloadDigest = await digestCanonicalPayload(
+    approvalPayload(snapshot.normalizedInput, quote, snapshot.preparedAt, snapshot.approvalExpiresAt),
+  );
   return { approvalPayloadDigest, quote };
 }
 

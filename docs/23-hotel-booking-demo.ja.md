@@ -16,6 +16,9 @@ status: "sites-version-12-current-vercel-clean-current-carried-forward-browser-p
 <!-- information_uuid_v5=6ecef8ee-286c-5cf0-a6df-b67de6b774bc -->
 <!-- event_uuid_v7=01a04bd0-b895-7093-97cf-ad532592a07f state_transition=EMPTY -> PREPARED -> HUMAN_APPROVED -> COMMITTED -> RETRY_RECOGNIZED occurred_at=2026-08-29T01:25:00Z -->
 <!-- machine-contract=Only the visible human button can commit. WebMCP can check, prepare, read status, and preview cancellation terms; it cannot confirm, pay, or cancel. -->
+<!-- information_uuid_v5=4d5c7c5c-98a2-5a34-8d40-d4a8f8d77f0e -->
+<!-- event_uuid_v7=01a050d2-0000-7000-8000-000000000189 state_transition=PREPARED -> EXPIRED -> PREPARED occurred_at=2026-08-30T20:00:00.000+09:00 -->
+<!-- machine-contract=期限切れ後の再準備は同じ予約識別子を保ち、新しい準備時間と承認要約値を発行し、予約処理を増やさない。 -->
 
 ## 画面で起こること
 
@@ -48,7 +51,7 @@ status: "sites-version-12-current-vercel-clean-current-carried-forward-browser-p
 - 各状態変化へUUIDv7を付け、直前のSHA-256要約値を含む前方連鎖にします。
 - 二回目以降の再送は`RETRY_RECOGNIZED`を読み取り、処理開始数を増やしません。
 - 最後に扱った予約識別子を端末内へ残し、再読込時はその識別子から日付、人数、部屋数、表示言語を復元します。
-- 期限到達は画面の時計、再読込、再準備のいずれでも`PREPARED → EXPIRED`として一度だけ記録され、予約処理は始まりません。
+- 期限到達は画面の時計、再読込、再準備のいずれでも`PREPARED → EXPIRED`として一度だけ記録され、予約処理は始まりません。期限切れ後の再準備は同じUUIDv5の予約識別子を保ったまま`EXPIRED → PREPARED`を記録し、準備時刻、失効時刻、承認要約値だけを更新します。
 
 ## 画面に出る検証証拠
 
@@ -66,7 +69,7 @@ status: "sites-version-12-current-vercel-clean-current-carried-forward-browser-p
 | 二つのタブ、連打、再読込、複数再送 | 成功 | 競合試験と任意条件のChrome実画面 |
 | 2試行、予約ストア物理1行、1確認番号、処理開始1 | 成功 | Node試験とアプリ内ブラウザー |
 | WebMCP四機能の発見と実行 | 成功 | 一般公開の安全版依存を使う版10で四機能を発見し、`get_hotel_booking_status`を実行。版11は同じ機能要約値を保持 |
-| 120秒の準備失効 | 成功 | 読み取りは期限切れを即時表示し、画面処理が`EXPIRED`イベントを一度だけ永続化 |
+| 120秒の準備失効と再準備 | 成功 | 読み取りは期限切れを即時表示し、再準備が`PREPARED → EXPIRED → PREPARED`を一度ずつ永続化。新しい承認後も予約ストア物理1行、処理開始1回 |
 | 本番構築物の通信断後復元 | 成功 | 現行構築物を強制通信断中に再読込し、2試行、1予約、処理開始1を復元 |
 | 320、375、390、768ピクセル | 成功 | 横はみ出しなし、操作部品44ピクセル以上 |
 | キーボード移動 | 判断不能 | 操作基盤がTab移動を再現できず、物理キーボード確認が必要 |

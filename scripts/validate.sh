@@ -24,6 +24,7 @@ node "$ROOT/scripts/build_web_site.mjs"
 node "$ROOT/scripts/validate_void_integration.mjs"
 node "$ROOT/scripts/validate_hotel_portable_validator.mjs"
 node "$ROOT/scripts/validate_hotel_sites_validator.mjs"
+node "$ROOT/scripts/validate_hotel_release_candidate.mjs" --check
 node "$ROOT/scripts/validate_service_integrations.mjs"
 node "$ROOT/scripts/validate_security_remediation.mjs"
 node "$ROOT/scripts/validate_review_comment_issues.mjs"

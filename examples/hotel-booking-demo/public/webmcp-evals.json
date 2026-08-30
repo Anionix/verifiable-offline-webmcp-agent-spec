@@ -10,6 +10,48 @@
     { "name": "preview_hotel_cancellation", "readOnly": true }
   ],
   "forbiddenTools": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"],
+  "recordingRecipe": {
+    "recipeId": "35895cab-fd9e-5106-8047-9be7177bbe27",
+    "status": "UNRUN",
+    "purpose": "Record native WebMCP discovery on the public HTTPS page without invoking a state-changing tool.",
+    "target": {
+      "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
+      "requiresSecureContext": true,
+      "requiredChromeFlags": ["#devtools-webmcp-support", "#enable-webmcp-testing"]
+    },
+    "steps": [
+      {
+        "stepId": "open-public-https",
+        "action": "navigate",
+        "expect": "secureContext=true"
+      },
+      {
+        "stepId": "discover-model-context",
+        "action": "read",
+        "surface": "document.modelContext.getTools",
+        "expect": "present"
+      },
+      {
+        "stepId": "assert-tool-boundary",
+        "action": "read",
+        "expectedToolNames": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"],
+        "forbiddenToolNames": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]
+      },
+      {
+        "stepId": "assert-zero-effects",
+        "action": "read",
+        "expectEffectCounts": {
+          "intentRows": 0,
+          "attemptRows": 0,
+          "effectRows": 0,
+          "auditEvents": 0,
+          "externalRequests": 0,
+          "permissionRequests": 0,
+          "notifications": 0
+        }
+      }
+    ]
+  },
   "deterministicContractCases": [
     {
       "caseId": "a894f7b3-b190-590d-bd7f-0062f8270f94",

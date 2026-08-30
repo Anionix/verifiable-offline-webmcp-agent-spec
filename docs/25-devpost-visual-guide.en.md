@@ -94,7 +94,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 | Official area | Evidence to point at |
 |---|---|
 | **WebMCP Leverage** | Panels 02, 05, and 06: four narrow tools recover state while confirmation stays human-only. |
-| **Execution** | Public Site, Vercel backup, reproducible release, 153 Node tests, and the 150-second narrated recording. |
+| **Execution** | Public Site, Vercel backup, reproducible release, the submitted artifact's 153 Node tests, and the 150-second narrated recording. The current 192-test candidate remains local until separately published. |
 | **Potential Impact** | The everyday failure mode: a traveler avoids a second reservation and a confusing cancellation hunt. |
 | **Creativity & Ambition** | Local-first recovery, stable identity, unique storage, visible event proof, and explicit authority limits in one small demo. |
 

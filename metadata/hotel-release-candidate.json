@@ -1,0 +1,146 @@
+{
+  "$schema": "../schemas/hotel-release-candidate.schema.json",
+  "identity": {
+    "informationUuidV5": "f2da6444-7447-5120-a39d-446adda200ca",
+    "observationUuidV7": "01a052c4-35af-7bb3-9fa1-6797b280910e"
+  },
+  "observedAt": "2026-08-30T13:03:05.647Z",
+  "source": {
+    "commit": "WORKTREE",
+    "state": "WORKTREE_CANDIDATE",
+    "branch": "codex/issue-189-liveness",
+    "baseCommit": "37f9029e91ac2bef4c17b89ea12bcf3cdc2d60c3"
+  },
+  "testRun": {
+    "command": "npm test",
+    "directory": "src/typescript",
+    "passed": 192,
+    "failed": 0,
+    "skipped": 0,
+    "total": 192,
+    "derivedFrom": "node-test-summary"
+  },
+  "localLiveness": {
+    "status": "PASS",
+    "stateSequence": [
+      "PREPARED",
+      "EXPIRED",
+      "PREPARED",
+      "HUMAN_APPROVED",
+      "COMMITTED"
+    ],
+    "sameIntent": true,
+    "physicalBookingRows": 1,
+    "effectStartCount": 1,
+    "approvalDigestRenewed": true
+  },
+  "artifacts": {
+    "functionalClientSha256": "d8306b5b01d36303dd705fcd36e22a5aa812efe11cae1da3c17fe7497aa96c8c",
+    "functionalClientScope": {
+      "algorithm": "SHA-256",
+      "root": "dist/client",
+      "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+      "excludedPaths": [
+        ".assetsignore",
+        "service-integrations.json"
+      ]
+    },
+    "fullClientSha256": "12ce3e12fea5209a2e8fb06d56e986f085615beb912b79abbb9ca65cdf464faf",
+    "fullClientScope": {
+      "algorithm": "SHA-256",
+      "root": "dist/client",
+      "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+      "excludedPaths": []
+    },
+    "fullSitesPackageSha256": "ccf17568ff63252f3061687b91a51e59fab3b0116ebf205ef6008c3d29d83802",
+    "fullSitesScope": {
+      "algorithm": "SHA-256",
+      "root": "dist",
+      "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+      "excludedPaths": []
+    }
+  },
+  "publicClaims": {
+    "candidateTestCount": 192,
+    "publicReadbackTestCount": 153,
+    "status": "MISMATCH_OBSERVED",
+    "source": "metadata/devpost-public-readback.json"
+  },
+  "browserObservation": {
+    "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
+    "origin": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
+    "observedAt": "2026-08-30T12:32:54.095Z",
+    "browser": "HeadlessChrome/152.0.0.0",
+    "secureContext": true,
+    "pageSourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
+    "candidateSourceCommit": "NOT_PROVEN",
+    "documentModelContext": "CONFIRMED_ABSENT",
+    "requiredChromeFlags": [
+      "#devtools-webmcp-support",
+      "#enable-webmcp-testing"
+    ],
+    "configurationState": "NOT_VERIFIED",
+    "originTrialMetadataCount": 0,
+    "visibleToolNames": [
+      "check_existing_hotel_booking",
+      "prepare_hotel_booking",
+      "get_hotel_booking_status",
+      "preview_hotel_cancellation"
+    ],
+    "forbiddenToolNames": [
+      "confirm_hotel_booking",
+      "pay_for_hotel_booking",
+      "cancel_hotel_booking"
+    ],
+    "calledToolNames": [],
+    "effectCounts": {
+      "intentRows": 0,
+      "attemptRows": 0,
+      "effectRows": 0,
+      "auditEvents": 0,
+      "externalRequests": 0,
+      "permissionRequests": 0,
+      "notifications": 0
+    },
+    "status": "INCONCLUSIVE"
+  },
+  "issueReadiness": [
+    {
+      "issue": 189,
+      "status": "PASS",
+      "reason": "Local expiry recovery tests prove EXPIRED -> PREPARED, one semantic intent, one physical booking row, and one effect start after fresh human approval."
+    },
+    {
+      "issue": 190,
+      "status": "INCONCLUSIVE",
+      "reason": "The candidate count is 192, while the separately read public Devpost record still claims 153; exact public agreement is not established."
+    },
+    {
+      "issue": 191,
+      "status": "INCONCLUSIVE",
+      "reason": "The public HTTPS page shows exactly four safe names, but document.modelContext is absent and WebMCP testing or origin-trial configuration was not verified."
+    },
+    {
+      "issue": 192,
+      "status": "INCONCLUSIVE",
+      "reason": "No native WebMCP agent invocation was observed, so the lost-response recovery cannot be promoted from a local test to an agent-first public proof."
+    },
+    {
+      "issue": 193,
+      "status": "INCONCLUSIVE",
+      "reason": "S AND L AND F_exact AND W AND E cannot be true while source freeze, exact public evidence, native WebMCP, and agent-first execution remain unknown."
+    }
+  ],
+  "finalGate": {
+    "formula": "S AND L AND F_exact AND W AND E",
+    "status": "INCONCLUSIVE",
+    "ready": null,
+    "components": {
+      "S": "INCONCLUSIVE",
+      "L": "PASS",
+      "F_exact": "INCONCLUSIVE",
+      "W": "INCONCLUSIVE",
+      "E": "INCONCLUSIVE"
+    }
+  }
+}

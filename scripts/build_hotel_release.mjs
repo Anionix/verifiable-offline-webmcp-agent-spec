@@ -121,8 +121,9 @@ command(process.execPath, ["scripts/build_web_site.mjs"]);
 command(process.execPath, ["scripts/validate_hotel_portable_validator.mjs"]);
 command(process.execPath, ["scripts/validate_hotel_sites_validator.mjs"]);
 
-const [verification, vercel, video, devpost] = await Promise.all([
+const [verification, candidate, vercel, video, devpost] = await Promise.all([
   json("metadata/hotel-booking-verification.json"),
+  json("metadata/hotel-release-candidate.json"),
   json("metadata/vercel-hotel-deployment.json"),
   json("metadata/demo-video-production.json"),
   json("metadata/devpost-public-readback.json"),
@@ -130,9 +131,9 @@ const [verification, vercel, video, devpost] = await Promise.all([
 const functionalDigest = await digestTree(clientRoot, functionalDigestScope.excludedPaths);
 const fullClientDigest = await digestTree(clientRoot, fullClientDigestScope.excludedPaths);
 const fullSitesDigest = await digestTree(sitesPackageRoot, fullSitesPackageDigestScope.excludedPaths);
-assert.equal(verification.artifactDigest, functionalDigest);
-assert.equal(verification.fullClientArtifactDigest, fullClientDigest);
-assert.equal(verification.fullSitesPackageDigest, fullSitesDigest);
+assert.equal(candidate.artifacts.functionalClientSha256, functionalDigest);
+assert.equal(candidate.artifacts.fullClientSha256, fullClientDigest);
+assert.equal(candidate.artifacts.fullSitesPackageSha256, fullSitesDigest);
 
 await rm(releaseRoot, { recursive: true, force: true });
 await mkdir(resolve(releaseRoot, "dist"), { recursive: true });

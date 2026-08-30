@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-release-candidate.schema.json",
+  "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052ac-2ad0-7a33-a496-f0f93b6a383f state_transition=HOTEL_LIVENESS_FIXED -> RELEASE_EVIDENCE_BOUND occurred_at=2026-08-30T12:36:50.000Z machine-contract=local test output, built digests, public claims, and bounded browser observations remain separate until every hard gate has evidence",
+  "title": "Hotel release candidate evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "identity",
+    "observedAt",
+    "source",
+    "testRun",
+    "localLiveness",
+    "artifacts",
+    "publicClaims",
+    "browserObservation",
+    "issueReadiness",
+    "finalGate"
+  ],
+  "properties": {
+    "$schema": { "const": "../schemas/hotel-release-candidate.schema.json" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "state", "branch", "baseCommit"],
+      "properties": {
+        "commit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|WORKTREE)$" },
+        "state": { "enum": ["WORKTREE_CANDIDATE", "COMMITTED_CANDIDATE"] },
+        "branch": { "type": "string", "minLength": 1 },
+        "baseCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "testRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "directory", "passed", "failed", "skipped", "total", "derivedFrom"],
+      "properties": {
+        "command": { "const": "npm test" },
+        "directory": { "const": "src/typescript" },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 1 },
+        "derivedFrom": { "const": "node-test-summary" }
+      }
+    },
+    "localLiveness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "stateSequence", "sameIntent", "physicalBookingRows", "effectStartCount", "approvalDigestRenewed"],
+      "properties": {
+        "status": { "const": "PASS" },
+        "stateSequence": {
+          "const": ["PREPARED", "EXPIRED", "PREPARED", "HUMAN_APPROVED", "COMMITTED"]
+        },
+        "sameIntent": { "const": true },
+        "physicalBookingRows": { "const": 1 },
+        "effectStartCount": { "const": 1 },
+        "approvalDigestRenewed": { "const": true }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionalClientSha256", "functionalClientScope", "fullClientSha256", "fullClientScope", "fullSitesPackageSha256", "fullSitesScope"],
+      "properties": {
+        "functionalClientSha256": { "$ref": "#/$defs/sha256" },
+        "functionalClientScope": {
+          "const": {
+            "algorithm": "SHA-256",
+            "root": "dist/client",
+            "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+            "excludedPaths": [".assetsignore", "service-integrations.json"]
+          }
+        },
+        "fullClientSha256": { "$ref": "#/$defs/sha256" },
+        "fullClientScope": {
+          "const": {
+            "algorithm": "SHA-256",
+            "root": "dist/client",
+            "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+            "excludedPaths": []
+          }
+        },
+        "fullSitesPackageSha256": { "$ref": "#/$defs/sha256" },
+        "fullSitesScope": {
+          "const": {
+            "algorithm": "SHA-256",
+            "root": "dist",
+            "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
+            "excludedPaths": []
+          }
+        }
+      }
+    },
+    "publicClaims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateTestCount", "publicReadbackTestCount", "status", "source"],
+      "properties": {
+        "candidateTestCount": { "type": "integer", "minimum": 1 },
+        "publicReadbackTestCount": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["MATCH", "MISMATCH_OBSERVED"] },
+        "source": { "const": "metadata/devpost-public-readback.json" }
+      }
+    },
+    "browserObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "origin",
+        "observedAt",
+        "browser",
+        "secureContext",
+        "pageSourceCommit",
+        "candidateSourceCommit",
+        "documentModelContext",
+        "requiredChromeFlags",
+        "configurationState",
+        "originTrialMetadataCount",
+        "visibleToolNames",
+        "forbiddenToolNames",
+        "calledToolNames",
+        "effectCounts",
+        "status"
+      ],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "origin": { "type": "string", "format": "uri" },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "browser": { "type": "string", "minLength": 1 },
+        "secureContext": { "const": true },
+        "pageSourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "candidateSourceCommit": { "const": "NOT_PROVEN" },
+        "documentModelContext": { "const": "CONFIRMED_ABSENT" },
+        "requiredChromeFlags": {
+          "const": ["#devtools-webmcp-support", "#enable-webmcp-testing"]
+        },
+        "configurationState": { "const": "NOT_VERIFIED" },
+        "originTrialMetadataCount": { "const": 0 },
+        "visibleToolNames": {
+          "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"]
+        },
+        "forbiddenToolNames": {
+          "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]
+        },
+        "calledToolNames": { "const": [] },
+        "effectCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["intentRows", "attemptRows", "effectRows", "auditEvents", "externalRequests", "permissionRequests", "notifications"],
+          "properties": {
+            "intentRows": { "const": 0 },
+            "attemptRows": { "const": 0 },
+            "effectRows": { "const": 0 },
+            "auditEvents": { "const": 0 },
+            "externalRequests": { "const": 0 },
+            "permissionRequests": { "const": 0 },
+            "notifications": { "const": 0 }
+          }
+        },
+        "status": { "const": "INCONCLUSIVE" }
+      }
+    },
+    "issueReadiness": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["issue", "status", "reason"],
+        "properties": {
+          "issue": { "enum": [189, 190, 191, 192, 193] },
+          "status": { "enum": ["PASS", "INCONCLUSIVE"] },
+          "reason": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "finalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "status", "ready", "components"],
+      "properties": {
+        "formula": { "const": "S AND L AND F_exact AND W AND E" },
+        "status": { "const": "INCONCLUSIVE" },
+        "ready": { "type": ["boolean", "null"] },
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["S", "L", "F_exact", "W", "E"],
+          "properties": {
+            "S": { "const": "INCONCLUSIVE" },
+            "L": { "const": "PASS" },
+            "F_exact": { "const": "INCONCLUSIVE" },
+            "W": { "const": "INCONCLUSIVE" },
+            "E": { "const": "INCONCLUSIVE" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    }
+  }
+}

@@ -3,6 +3,11 @@
 // event_uuid_v7=01a04b41-fd38-7f10-973a-b6ecdd1b71b4
 // state_transition=COMBINED_HOST_VALIDATION -> PORTABLE_CLIENT_RECEIPT occurred_at=2026-08-29T02:03:31.000Z
 // machine-contract: this validator proves only the complete portable client allowlist, bounded UI and tools, offline shell, local host configuration syntax, and its two scoped digests.
+// information_uuid_v5=35895cab-fd9e-5106-8047-9be7177bbe27
+// event_uuid_v7=01a052d0-0000-7000-8000-000000000191
+// state_transition=WEBMCP_RECIPE_DECLARED -> NATIVE_WEBMCP_RUN_PENDING occurred_at=2026-08-30T21:00:00.000+09:00
+// machine-contract: the native WebMCP recording recipe is executable data, but
+// UNRUN never becomes runtime evidence until a public HTTPS browser observation exists.
 
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
@@ -32,18 +37,43 @@ const expectedClientFiles = Object.freeze([
   "webmcp-evals.json",
 ]);
 
-const expectedTools = Object.freeze([
-  "check_existing_hotel_booking",
-  "prepare_hotel_booking",
-  "get_hotel_booking_status",
-  "preview_hotel_cancellation",
-]);
+const expectedTools = Object.freeze(["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"]);
 
-const forbiddenTools = Object.freeze([
-  "confirm_hotel_booking",
-  "pay_for_hotel_booking",
-  "cancel_hotel_booking",
-]);
+const forbiddenTools = Object.freeze(["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]);
+
+const expectedRecordingRecipe = Object.freeze({
+  recipeId: "35895cab-fd9e-5106-8047-9be7177bbe27",
+  status: "UNRUN",
+  purpose: "Record native WebMCP discovery on the public HTTPS page without invoking a state-changing tool.",
+  target: {
+    url: "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
+    requiresSecureContext: true,
+    requiredChromeFlags: ["#devtools-webmcp-support", "#enable-webmcp-testing"],
+  },
+  steps: [
+    { stepId: "open-public-https", action: "navigate", expect: "secureContext=true" },
+    { stepId: "discover-model-context", action: "read", surface: "document.modelContext.getTools", expect: "present" },
+    {
+      stepId: "assert-tool-boundary",
+      action: "read",
+      expectedToolNames: expectedTools,
+      forbiddenToolNames: forbiddenTools,
+    },
+    {
+      stepId: "assert-zero-effects",
+      action: "read",
+      expectEffectCounts: {
+        intentRows: 0,
+        attemptRows: 0,
+        effectRows: 0,
+        auditEvents: 0,
+        externalRequests: 0,
+        permissionRequests: 0,
+        notifications: 0,
+      },
+    },
+  ],
+});
 
 const requiredSecurityHeaders = Object.freeze([
   "Content-Security-Policy",
@@ -85,7 +115,7 @@ const [
   readJson(resolve(repositoryRoot, "vercel.json")),
   readText(resolve(repositoryRoot, "netlify.toml")),
   readText(resolve(repositoryRoot, "render.yaml")),
-  readJson(resolve(repositoryRoot, "metadata/hotel-booking-verification.json")),
+  readJson(resolve(repositoryRoot, "metadata/hotel-release-candidate.json")),
 ]);
 
 assert.match(html, /Did my hotel booking go through\?/);
@@ -119,8 +149,12 @@ assert.doesNotMatch(serviceWorker, /addEventListener\(["'](?:sync|periodicsync)[
 assert.doesNotMatch(serviceWorker, /humanApproveAndCommit|requestPayment|cancelBooking/);
 
 assert.equal(evaluations.measurementStatus, "UNMEASURED");
-assert.deepEqual(evaluations.applicationState.map((entry) => entry.name), expectedTools);
+assert.deepEqual(
+  evaluations.applicationState.map((entry) => entry.name),
+  expectedTools,
+);
 assert.deepEqual(evaluations.forbiddenTools, forbiddenTools);
+assert.deepEqual(evaluations.recordingRecipe, expectedRecordingRecipe);
 assert.deepEqual(builtRegistry, sourceRegistry, "portable service registry must exactly match its repository source");
 assert.deepEqual(assetsIgnore.trim().split(/\r?\n/u), ["wrangler.json", ".dev.vars"]);
 
@@ -136,9 +170,7 @@ assert.equal(vercel.cleanUrls, true);
 assert.equal(vercel.trailingSlash, false);
 assert.equal(Object.hasOwn(vercel, "rewrites"), false, "Vercel must not hide missing paths behind rewrites");
 assert.equal(Object.hasOwn(vercel, "redirects"), false, "Vercel must not add an unreviewed redirect lane");
-const vercelGlobalHeaders = new Map(
-  vercel.headers.find((entry) => entry.source === "/(.*)")?.headers.map((header) => [header.key, header.value]) ?? [],
-);
+const vercelGlobalHeaders = new Map(vercel.headers.find((entry) => entry.source === "/(.*)")?.headers.map((header) => [header.key, header.value]) ?? []);
 for (const header of requiredSecurityHeaders) {
   assert(vercelGlobalHeaders.has(header), `Vercel configuration must include ${header}`);
 }
@@ -166,18 +198,20 @@ for (const header of requiredSecurityHeaders) {
   assert.match(renderText, new RegExp(`^\\s*name:\\s*${header}\\s*$`, "m"));
 }
 
-assertDigestScope(verification.artifactDigestScope, functionalDigestScope, "functional client");
-assertDigestScope(verification.fullClientArtifactDigestScope, fullClientDigestScope, "full client");
+assertDigestScope(verification.artifacts.functionalClientScope, functionalDigestScope, "functional client");
+assertDigestScope(verification.artifacts.fullClientScope, fullClientDigestScope, "full client");
 const functionalDigest = await digestTree(clientRoot, functionalDigestScope.excludedPaths);
 const fullClientDigest = await digestTree(clientRoot, fullClientDigestScope.excludedPaths);
-assert.equal(verification.artifactDigest, functionalDigest, "functional client digest differs from its scoped receipt");
-assert.equal(verification.fullClientArtifactDigest, fullClientDigest, "full client digest differs from its scoped receipt");
+assert.equal(verification.artifacts.functionalClientSha256, functionalDigest, "functional client digest differs from its scoped receipt");
+assert.equal(verification.artifacts.fullClientSha256, fullClientDigest, "full client digest differs from its scoped receipt");
 
-console.log(JSON.stringify({
-  receipt: "HOTEL_PORTABLE_CLIENT_VALIDATION_PASS",
-  functionalArtifactSha256: functionalDigest,
-  fullClientArtifactSha256: fullClientDigest,
-  vercelConfiguration: "LOCAL_CONFIGURATION_PASS",
-  netlifyConfiguration: "REPOSITORY_SYNTAX_ONLY_PASS",
-  renderConfiguration: "REPOSITORY_SYNTAX_ONLY_PASS",
-}));
+console.log(
+  JSON.stringify({
+    receipt: "HOTEL_PORTABLE_CLIENT_VALIDATION_PASS",
+    functionalArtifactSha256: functionalDigest,
+    fullClientArtifactSha256: fullClientDigest,
+    vercelConfiguration: "LOCAL_CONFIGURATION_PASS",
+    netlifyConfiguration: "REPOSITORY_SYNTAX_ONLY_PASS",
+    renderConfiguration: "REPOSITORY_SYNTAX_ONLY_PASS",
+  }),
+);

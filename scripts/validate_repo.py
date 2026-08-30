@@ -560,6 +560,12 @@ def main():
     )
     for e in hotel_evidence_validator.iter_errors(hotel_evidence):
         errors.append(f"schema metadata/hotel-booking-verification.json: {e.message}")
+    hotel_candidate_evidence = load_json(ROOT / "metadata/hotel-release-candidate.json")
+    hotel_candidate_validator = Draft202012Validator(
+        schemas["hotel-release-candidate"], registry=schema_registry, format_checker=format_checker
+    )
+    for e in hotel_candidate_validator.iter_errors(hotel_candidate_evidence):
+        errors.append(f"schema metadata/hotel-release-candidate.json: {e.message}")
     if hotel_evidence["sourceCommit"] == "WORKTREE" and hotel_evidence["sourceState"] != "WORKTREE_CANDIDATE":
         errors.append("hotel WORKTREE source must remain a worktree candidate")
     if hotel_evidence["sourceState"] == "DEPLOYED_CURRENT":

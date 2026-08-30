@@ -12,7 +12,9 @@
       "event_uuid_v7": "01a0539e-63c4-7a72-a39b-276bbe0b7d37",
       "state_transition": "IMAGE_GENERATED_ONCE -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED",
       "occurred_at": "2026-08-30T17:01:24.292Z",
-      "source_sha256": "e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c"
+      "source_sha256": "e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c",
+      "generated_image_file": "exec-f6a5c731-8fa6-4993-8965-ef13e477ad86.png",
+      "short_prompt": "16:9 bilingual middle-school flat diagram: five numbered phone-and-record steps show human confirmation, one saved fictional booking, lost reply, read-only status-first check, and the same booking found; ivory/navy/vermilion/green; no real booking or payment."
     }
   ],
   "occurred_at": "2026-08-30T23:42:26.123Z",

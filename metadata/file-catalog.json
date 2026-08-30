@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "b3f8e1c41b336519196dd58a08c8dc8ea83a865c87762a5d5063b47f904b2b56",
-      "bytes": 44503,
+      "sha256": "91d10b5737a8c1bbd6149dbbfcfdb05e8d10403fb989cc6d5ead4db9ae5977bd",
+      "bytes": 45267,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -4026,8 +4026,8 @@
     },
     {
       "path": "metadata/hotel-retry-diagram.json",
-      "sha256": "42ff18ee38599c473282839e0f8ffafe7b897ba4c082c365e52b2fccac2d94a2",
-      "bytes": 2764,
+      "sha256": "f4a966a574d5de0d472ff553d53bf79d810a8ec54c5a980bf1d7d2a6c12d6c31",
+      "bytes": 3128,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {

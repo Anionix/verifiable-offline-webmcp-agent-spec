@@ -56,9 +56,11 @@ status: "design-specification"
 <!-- information_uuid_v5=17898066-d1e0-50f3-96c7-e30c23316f5a -->
 <!-- event_uuid_v7=01a0539e-63c4-7a72-a39b-276bbe0b7d37 state_transition=IMAGE_GENERATED_ONCE -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED occurred_at=2026-08-30T17:01:24.292Z -->
 <!-- machine-contract=This explanatory diagram is not measured-screen or real-booking evidence; image_gen_invocations=1; source_sha256=e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c; provenance_record=metadata/hotel-retry-diagram.json; historical_events=UNCHANGED. -->
-![Fictional booking retry diagram: two attempts lead to one booking after checking status first / 架空予約の再送の仕組み図：状態を先に確認し、2回の試行でも予約1件](docs/assets/hotel-retry-explained.png)
+<!-- event_uuid_v7=01a0550d-8b4b-77be-a8a3-4d8c5b478e87 state_transition=IMAGE_EDITED_FOR_RETRY_ACTION -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED occurred_at=2026-08-30T23:42:26.123Z -->
+<!-- machine-contract=This explanatory diagram remains fictional and non-measured; image_gen_invocations=2 (initial generation plus targeted edit); source_sha256=a8960459316bd8fa1853b3dc42d7ba4583198eff98ced31a375c420dbaebb141; previous_source_sha256=e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c; provenance_record=metadata/hotel-retry-diagram.json; historical_events=RETAINED. -->
+![Fictional booking retry diagram: two attempts lead to one booking after checking status, pressing Retry the same booking, and finding the same booking / 架空予約の再送の仕組み図：状態を確認し、「同じ予約を再試行」を押して同じ予約を見つける](docs/assets/hotel-retry-explained.png)
 
-This explanatory diagram shows the fictional retry path: check the device state first, then return the same booking. / この説明図は、再送前に端末の状態を確認し、同じ予約を返す架空デモの流れを示します。
+This explanatory diagram shows the fictional retry path: check the device state first, press Retry the same booking, then return the same booking. / この説明図は、再送前に端末の状態を確認し、「同じ予約を再試行」を押してから同じ予約を返す架空デモの流れを示します。
 It is not a measured screen or evidence of an additional real booking. / 実測画面や追加の実予約の証拠ではありません。
 Only a person makes the final confirmation; there is no real booking or payment. / 最終確定は人だけが行い、実在の予約・支払いはありません。
 

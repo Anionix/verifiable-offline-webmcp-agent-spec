@@ -347,6 +347,36 @@ const directReleaseConfigurationDrifts = Object.freeze([
     current: '{"scripts":{"test":"node --test current-suite.test.js"}}\n',
   },
   {
+    path: "vercel.json",
+    source: "{\"headers\":[{\"source\":\"/(.*)\",\"headers\":[{\"key\":\"Content-Security-Policy\",\"value\":\"default-src 'self'\"}]}]}\n",
+    current: "{\"headers\":[{\"source\":\"/(.*)\",\"headers\":[{\"key\":\"Content-Security-Policy\",\"value\":\"default-src *\"}]}]}\n",
+  },
+  {
+    path: "netlify.toml",
+    source: "[build]\ncommand = \"npm run build:web\"\n\nContent-Security-Policy = \"default-src 'self'\"\n",
+    current: "[build]\ncommand = \"npm run build:web\"\n\nContent-Security-Policy = \"default-src *\"\n",
+  },
+  {
+    path: "render.yaml",
+    source: "services:\n  - type: web\n    env: static\n    headers:\n      - name: Content-Security-Policy\n        value: \"default-src 'self'\"\n",
+    current: "services:\n  - type: web\n    env: static\n    headers:\n      - name: Content-Security-Policy\n        value: \"default-src *\"\n",
+  },
+  {
+    path: ".openai/hosting.json",
+    source: '{"project_id":"source-project"}\n',
+    current: '{"project_id":"current-project"}\n',
+  },
+  {
+    path: ".vercelignore",
+    source: "dist\n.env*\n",
+    current: "dist\npublic\n",
+  },
+  {
+    path: "drizzle/0001_hotel.sql",
+    source: "create table hotel_source (id integer);\n",
+    current: "create table hotel_current (id integer);\n",
+  },
+  {
     path: "schemas/hotel-booking-tool-input.schema.json",
     source: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"source"}\n',
     current: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"current"}\n',

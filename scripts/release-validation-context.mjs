@@ -8,17 +8,21 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// machine-contract: executable TypeScript, demo source, and data remain prefix-scoped; runtime schemas are explicit exact paths. Unlisted documentation, metadata, evidence schemas, and validation control remain under their own checks.
+// machine-contract: executable TypeScript, demo source, data, and Sites copy inputs remain prefix-scoped; runtime schemas and deployment configuration are explicit exact paths. Unlisted documentation, metadata, evidence schemas, and validation control remain under their own checks.
 const squashValidationInputPrefixes = Object.freeze([
   "src/typescript/",
   "examples/",
   "data/",
+  "drizzle/",
 ]);
 const squashValidationInputPaths = Object.freeze([
   ".node-version",
+  ".openai/hosting.json",
+  ".vercelignore",
   "index.html",
   "package.json",
   "package-lock.json",
+  "netlify.toml",
   "schemas/hotel-booking-tool-input.schema.json",
   "schemas/notification-tool-input.schema.json",
   "schemas/input-provenance.schema.json",
@@ -28,7 +32,9 @@ const squashValidationInputPaths = Object.freeze([
   "metadata/slo-gate-verification.json",
   "scripts/build_web_site.mjs",
   "vite.config.js",
+  "vercel.json",
   "wrangler.jsonc",
+  "render.yaml",
 ]);
 // machine-contract: adding a runtime schema dependency requires a matching src/typescript/ change and an explicit exact-path allowlist update; dependency discovery is not inferred automatically.
 const squashValidationDocumentationPaths = Object.freeze([

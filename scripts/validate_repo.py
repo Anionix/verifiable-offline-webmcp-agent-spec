@@ -99,6 +99,31 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def schema_has_required_error(validation_errors, field: str) -> bool:
+    pending = list(validation_errors)
+    while pending:
+        error = pending.pop()
+        if error.validator == "required" and field in error.message:
+            return True
+        pending.extend(error.context)
+    return False
+
+
+def subtitle_record_errors(record: dict[str, Any], timestamp_field: str, label: str) -> list[str]:
+    findings: list[str] = []
+    if record.get("informationUuidV5") != "adeb6009-db9e-51be-8555-da27f170ca95":
+        findings.append(f"{label} information identifier differs from the subtitle collection")
+    try:
+        record_event = uuid.UUID(record["observationUuidV7"])
+        record_time_ms = rfc3339_ms(record[timestamp_field])
+    except Exception as exc:
+        findings.append(f"{label} identity or {timestamp_field} is invalid: {exc}")
+    else:
+        if record_event.version != 7 or uuid7_ms(str(record_event)) != record_time_ms:
+            findings.append(f"{label} UUIDv7 does not match {timestamp_field}")
+    return findings
+
+
 def load_ed25519_public_key(path: Path) -> Ed25519PublicKey:
     """Load a public key and fail closed if an evidence fixture changes algorithms."""
     key = serialization.load_pem_public_key(path.read_bytes())
@@ -1329,6 +1354,43 @@ def main():
     )
     for e in video_production_validator.iter_errors(video_production):
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    for required_field in ("subtitleUpdates", "subtitleAnonymousReadbacks"):
+        missing_field = json.loads(json.dumps(video_production))
+        missing_field["publication"].pop(required_field, None)
+        if not schema_has_required_error(video_production_validator.iter_errors(missing_field), required_field):
+            errors.append(f"video production schema accepted publication without {required_field}")
+    mismatched_subtitle_identity = json.loads(json.dumps(video_production))
+    mismatched_subtitle_identity["publication"]["subtitleUpdates"][0]["informationUuidV5"] = (
+        "8bb1420d-3305-5c00-81a0-e24c5c68d99a"
+    )
+    if not list(video_production_validator.iter_errors(mismatched_subtitle_identity)):
+        errors.append("video production schema accepted a mismatched subtitle information identifier")
+    document_identity = video_production.get("identity", {})
+    previous_document_observation = video_production.get("previousDocumentObservation", {})
+    try:
+        document_event = uuid.UUID(document_identity["observationUuidV7"])
+        document_updated_ms = rfc3339_ms(video_production["updatedAt"])
+        previous_event = uuid.UUID(previous_document_observation["observationUuidV7"])
+        previous_updated_ms = rfc3339_ms(previous_document_observation["updatedAt"])
+    except Exception as exc:
+        errors.append(f"video production document identity or previous observation is invalid: {exc}")
+    else:
+        if document_identity.get("informationUuidV5") != "8bb1420d-3305-5c00-81a0-e24c5c68d99a":
+            errors.append("video production document information identifier changed")
+        if document_event.version != 7 or uuid7_ms(str(document_event)) != document_updated_ms:
+            errors.append("video production root UUIDv7 does not match updatedAt")
+        if previous_document_observation != {
+            "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
+            "observationUuidV7": "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42",
+            "updatedAt": "2026-08-29T12:24:33.000Z",
+        }:
+            errors.append("video production previous document observation does not preserve the prior root")
+        if previous_event.version != 7 or uuid7_ms(str(previous_event)) != previous_updated_ms:
+            errors.append("video production previous root UUIDv7 does not match its updatedAt")
+        if not video_production.get("stateTransition", "").endswith(
+            " -> PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
+        ):
+            errors.append("video production root state transition does not append the latest subtitle observation")
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
     future_video_devpost.update({
@@ -1466,6 +1528,19 @@ def main():
                 errors.append(f"video production file digest mismatch: {record['path']}")
         plan = video_production["productionPlan"]
         publication = video_production["publication"]
+        for collection_name, timestamp_field, invalid_timestamp in (
+            ("subtitleUpdates", "observedAt", "2026-08-30T17:09:54.092Z"),
+            ("subtitleAnonymousReadbacks", "recordedAt", "2026-08-30T17:55:48.504Z"),
+        ):
+            for index, record in enumerate(publication.get(collection_name, []), start=1):
+                label = f"{collection_name} entry {index}"
+                errors.extend(subtitle_record_errors(record, timestamp_field, label))
+            if publication.get(collection_name):
+                invalid_timestamp_record = json.loads(json.dumps(publication[collection_name][0]))
+                invalid_timestamp_record[timestamp_field] = invalid_timestamp
+                mutation_label = f"{collection_name} entry 1 timestamp mutation"
+                if not subtitle_record_errors(invalid_timestamp_record, timestamp_field, mutation_label):
+                    errors.append(f"{collection_name} timestamp mutation was accepted")
         if publication.get("status") == "NOT_STARTED":
             if publication != {
                 "youtubeUrl": None,

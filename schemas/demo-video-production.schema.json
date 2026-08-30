@@ -1,15 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing",
+  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a0543c-357b-7440-a307-0ff75b03a874 document_updated_at=2026-08-30T19:53:47.131Z document_state_transition_suffix=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED previous_document_observation_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "identity", "updatedAt", "stateTransition", "billingBoundary", "mediaCapabilities", "assets", "productionFiles", "productionPlan", "publication"],
+  "required": ["$schema", "identity", "updatedAt", "previousDocumentObservation", "stateTransition", "billingBoundary", "mediaCapabilities", "assets", "productionFiles", "productionPlan", "publication"],
   "properties": {
     "$schema": { "const": "../schemas/demo-video-production.schema.json" },
     "identity": { "$ref": "#/$defs/identity" },
     "updatedAt": { "type": "string", "format": "date-time" },
+    "previousDocumentObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "updatedAt"],
+      "properties": {
+        "informationUuidV5": { "const": "8bb1420d-3305-5c00-81a0-e24c5c68d99a" },
+        "observationUuidV7": { "const": "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42" },
+        "updatedAt": { "const": "2026-08-29T12:24:33.000Z" }
+      }
+    },
     "stateTransition": { "type": "string", "minLength": 3 },
     "billingBoundary": {
       "type": "object",
@@ -88,6 +98,8 @@
         "artifactToVideoIdentity",
         "anonymousReadback",
         "subtitles",
+        "subtitleUpdates",
+        "subtitleAnonymousReadbacks",
         "thumbnail",
         "devpostReadback"
       ],
@@ -208,7 +220,7 @@
         "unchangedSurfaces"
       ],
       "properties": {
-        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
         "stateTransition": { "type": "string", "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED" },

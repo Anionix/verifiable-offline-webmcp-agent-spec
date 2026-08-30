@@ -398,7 +398,7 @@
             "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
             "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
             "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-            "cueCount": { "type": "integer", "minimum": 1 },
+            "cueCount": { "type": "integer", "minimum": 0 },
             "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
           }
         },
@@ -464,6 +464,50 @@
               }
             }
           ]
+        },
+        {
+          "if": {
+            "required": ["comparison"],
+            "properties": {
+              "comparison": {
+                "required": ["result"],
+                "properties": { "result": { "const": "PASS" } }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "publicVtt": {
+                "required": ["cueCount", "lastCueEndMilliseconds"],
+                "properties": {
+                  "cueCount": { "minimum": 1 },
+                  "lastCueEndMilliseconds": { "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["comparison"],
+            "properties": {
+              "comparison": {
+                "required": ["result"],
+                "properties": { "result": { "const": "FAIL" } }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "publicVtt": {
+                "required": ["cueCount", "lastCueEndMilliseconds"],
+                "properties": {
+                  "cueCount": { "minimum": 0 },
+                  "lastCueEndMilliseconds": { "minimum": 0 }
+                }
+              }
+            }
+          }
         }
       ]
     },

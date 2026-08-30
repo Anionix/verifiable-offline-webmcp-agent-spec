@@ -108,6 +108,44 @@ test("accepts a correctly encoded U+FFFD subtitle character", async () => {
   }
 });
 
+test("rejects a WebVTT header containing the cue separator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\nKind: subtitles --> invalid\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /header cannot contain -->/u);
+});
+
+test("rejects WebVTT cue settings as unsupported by this comparator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:01.000 align:start\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /unrecognized WebVTT block/u);
+});
+
+test("accepts an arbitrary WebVTT cue identifier without the forbidden separator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nany identifier 日本語\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
+});
+
+test("rejects a WebVTT cue identifier containing the cue separator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nbad --> identifier\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /cue identifier cannot contain -->/u);
+});
+
+test("rejects a WebVTT cue payload containing the cue separator", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello --> world\n";
+  const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nHello --> world\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /cue payload cannot contain -->/u);
+});
+
+for (const location of ["SRT", "VTT"]) {
+  test("rejects a NUL in the " + location + " cue payload", () => {
+    const sourceText = location === "SRT" ? "1\n00:00:00,000 --> 00:00:01,000\nHello\u0000\n" : "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+    const publicText = location === "VTT" ? "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nHello\u0000\n" : "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /NUL/u);
+  });
+}
+
 test("rejects a later readback when a malformed SRT cue and its VTT cue are both absent", async () => {
   const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-missing-cue-"));
   try {

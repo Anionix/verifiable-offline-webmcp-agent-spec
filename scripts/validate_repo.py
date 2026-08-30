@@ -364,6 +364,32 @@ def subtitle_comparison_schema_errors(video_production: dict[str, Any], validato
     valid_record["stateTransition"] = ANONYMOUS_SUBTITLE_MISMATCH_STATE
     if list(validator.iter_errors(valid_fail)):
         findings.append("video production schema rejected a fact-consistent subtitle mismatch fixture")
+
+    header_only_failure = json.loads(json.dumps(video_production))
+    header_only_record = header_only_failure["publication"]["subtitleAnonymousReadbacks"][0]
+    header_only_record["publicVtt"]["cueCount"] = 0
+    header_only_record["publicVtt"]["lastCueEndMilliseconds"] = 0
+    header_only_record["comparison"].update({
+        "publicCueCount": 0,
+        "text": "MISMATCH",
+        "timing": "MISMATCH",
+        "lastCueEndMilliseconds": 0,
+        "result": "FAIL",
+    })
+    header_only_record["stateTransition"] = ANONYMOUS_SUBTITLE_MISMATCH_STATE
+    if list(validator.iter_errors(header_only_failure)):
+        findings.append("video production schema rejected a header-only anonymous subtitle failure fixture")
+
+    header_only_pass = json.loads(json.dumps(header_only_failure))
+    header_only_pass_record = header_only_pass["publication"]["subtitleAnonymousReadbacks"][0]
+    header_only_pass_record["comparison"].update({
+        "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION",
+        "timing": "MATCH_EXACT_INTEGER_MILLISECONDS",
+        "result": "PASS",
+    })
+    header_only_pass_record["stateTransition"] = ANONYMOUS_SUBTITLE_MATCH_STATE
+    if not list(validator.iter_errors(header_only_pass)):
+        findings.append("video production schema accepted a header-only anonymous subtitle PASS fixture")
     return findings
 
 

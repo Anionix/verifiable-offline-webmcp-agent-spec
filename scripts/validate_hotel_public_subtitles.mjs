@@ -5,6 +5,7 @@
 // machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
 // machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file, with positive ordered non-overlapping cues, before binding bytes to a state.
 // machine-contract: every non-empty block is a cue or an explicit WebVTT header/NOTE block; unsupported STYLE/REGION and unknown blocks fail closed.
+// machine-contract: cue settings, NUL characters, and the WebVTT cue separator in headers, identifiers, or payloads are unsupported and fail closed.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
@@ -46,7 +47,7 @@ function timestampToMilliseconds(timestamp) {
 
 const SUBRIP_TIMING_PATTERN = /^(?<start>\d{2}:\d{2}:\d{2},\d{3}) --> (?<end>\d{2}:\d{2}:\d{2},\d{3})$/u;
 const WEBVTT_HEADER_PATTERN = /^\uFEFF?WEBVTT(?:[ \t].*)?$/u;
-const WEBVTT_TIMING_PATTERN = /^(?<start>\d{2}:\d{2}:\d{2}\.\d{3}) --> (?<end>\d{2}:\d{2}:\d{2}\.\d{3})(?:[ \t].*)?$/u;
+const WEBVTT_TIMING_PATTERN = /^(?<start>\d{2}:\d{2}:\d{2}\.\d{3}) --> (?<end>\d{2}:\d{2}:\d{2}\.\d{3})$/u;
 
 function subtitleBlocks(text) {
   const normalized = text.replace(/\r\n?/gu, "\n").trim();
@@ -75,8 +76,14 @@ function parseWebVttCueBlock(block, index) {
   const identifiedTimingMatch = directTimingMatch ? null : WEBVTT_TIMING_PATTERN.exec(lines[1] ?? "");
   const timingMatch = directTimingMatch ?? identifiedTimingMatch;
   const timingIndex = directTimingMatch ? 0 : identifiedTimingMatch ? 1 : -1;
-  const cueText = normalizeText(lines.slice(timingIndex + 1).join("\n"));
-  assert.ok(timingMatch?.groups && cueText !== "", "WebVTT block " + (index + 1) + " is an unrecognized WebVTT block");
+  assert.ok(timingMatch?.groups, "WebVTT block " + (index + 1) + " is an unrecognized WebVTT block");
+  if (!directTimingMatch) {
+    assert.ok(!lines[0].includes("-->"), "WebVTT cue identifier cannot contain -->");
+  }
+  const payload = lines.slice(timingIndex + 1).join("\n");
+  assert.ok(!payload.includes("-->"), "WebVTT cue payload cannot contain -->");
+  const cueText = normalizeText(payload);
+  assert.ok(cueText !== "", "WebVTT block " + (index + 1) + " is an unrecognized WebVTT block");
   return {
     startMs: timestampToMilliseconds(timingMatch.groups.start),
     endMs: timestampToMilliseconds(timingMatch.groups.end),
@@ -106,6 +113,7 @@ function isAllowedWebVttNonCueBlock(block) {
 
 function parseWebVttHeader(block) {
   const lines = block.split("\n");
+  assert.ok(!block.includes("-->"), "WebVTT header cannot contain -->");
   assert.ok(WEBVTT_HEADER_PATTERN.test(lines[0] ?? ""), "WebVTT header is missing");
   assert.ok(
     lines.slice(1).every((line) => /^(?:Kind|Language):[ \t].*$/u.test(line)),
@@ -126,6 +134,7 @@ function validateCueTimeline(cues, format) {
 export function parseSubtitleCues(text, format) {
   const resolvedFormat = format ?? (/^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/u.test(text) ? "vtt" : "srt");
   assert.ok(resolvedFormat === "srt" || resolvedFormat === "vtt", "subtitle format must be srt or vtt");
+  assert.ok(!text.includes("\u0000"), `${resolvedFormat} subtitle contains NUL`);
   const blocks = subtitleBlocks(text);
   if (resolvedFormat === "srt") {
     const cues = blocks.map(parseSubRipCueBlock);

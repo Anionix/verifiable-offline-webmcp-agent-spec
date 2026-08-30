@@ -412,6 +412,58 @@
       "publicWidth": 1280,
       "publicHeight": 720
     },
+    "thumbnailUpdates": [
+      {
+        "informationUuidV5": "f9fb8705-c71e-5c65-95ed-3da200a4bf34",
+        "eventUuidV7": "01a05396-770e-7df5-94a3-fb592384c275",
+        "observedAt": "2026-08-30T16:52:44.942Z",
+        "stateTransition": "THUMBNAIL_UPLOAD_APPROVED -> PUBLIC_THUMBNAIL_READBACK_VERIFIED",
+        "status": "PUBLIC_THUMBNAIL_READBACK_VERIFIED",
+        "videoId": "tdSvJw4ghX8",
+        "recordedBy": "PARENT",
+        "ownerApproval": {
+          "actor": "USER",
+          "scope": "THUMBNAIL_ONLY",
+          "state": "GRANTED"
+        },
+        "sourceArtifact": {
+          "path": "docs/assets/devpost-hotel-thumbnail.png",
+          "sourceCommit": "5583cdbeddbbeae2c6f16fd481fc809069a15296",
+          "bytes": 1240818,
+          "width": 1672,
+          "height": 941,
+          "sha256": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10"
+        },
+        "ownerReadback": {
+          "screenState": "UPLOADED_THUMBNAIL_SAVE_DISABLED_PUBLIC",
+          "uploadedThumbnail": true,
+          "saveEnabled": false,
+          "visibility": "PUBLIC"
+        },
+        "anonymousReadback": {
+          "url": "https://i.ytimg.com/vi/tdSvJw4ghX8/maxresdefault.jpg",
+          "httpStatus": 200,
+          "contentType": "image/jpeg",
+          "width": 1280,
+          "height": 720,
+          "sha256": "3ad391ba3efc35f61566299848dd1a3deeff05efc1e263a8dbfd73af293c8792"
+        },
+        "visualReadback": {
+          "matchesRecordedObservation": true,
+          "warningTextPresent": false,
+          "blackBandPresent": false
+        },
+        "operationScope": {
+          "titleChanged": false,
+          "bodyChanged": false,
+          "videoChanged": false,
+          "captionsChanged": false,
+          "devpostChanged": false
+        },
+        "sourceToPublicByteIdentity": "NOT_ASSERTED",
+        "sourceToPublicByteIdentityReason": "The public JPEG was recompressed; source and public bytes are not claimed identical."
+      }
+    ],
     "devpostReadback": {
       "informationUuidV5": "31436b48-0f88-5f9c-8525-184b8d33d32b",
       "observationUuidV7": "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42",

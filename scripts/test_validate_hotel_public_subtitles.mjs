@@ -130,6 +130,64 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
   }
 });
 
+test("rejects a readback that retains the authored SRT as its public VTT", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-self-compare-"));
+  try {
+    const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+    await mkdir(mediaDirectory, { recursive: true });
+    const retainedSourcePath = resolve(mediaDirectory, "subtitles.en.srt");
+    await copyFile(sourceSubtitlePath, retainedSourcePath);
+    await copyFile(publicSubtitlePath, resolve(mediaDirectory, "youtube-public-201.en.vtt"));
+
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const originalReadback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+    const readback = structuredClone(originalReadback);
+    readback.publicVtt.path = "media/demo-video/subtitles.en.srt";
+    readback.publicVtt.fileName = "subtitles.en.srt";
+    readback.download.fileName = "subtitles.en.srt";
+    readback.publicVtt.sha256 = createHash("sha256")
+      .update(await readFile(retainedSourcePath))
+      .digest("hex");
+    metadata.publication.subtitleAnonymousReadbacks = [originalReadback, readback];
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /input and public retained paths must differ/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("rejects a retained VTT without a WEBVTT header", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-header-"));
+  try {
+    const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+    await mkdir(mediaDirectory, { recursive: true });
+    await copyFile(sourceSubtitlePath, resolve(mediaDirectory, "subtitles.en.srt"));
+    await copyFile(publicSubtitlePath, resolve(mediaDirectory, "youtube-public-201.en.vtt"));
+    const publicText = await readFile(publicSubtitlePath, "utf8");
+    const headerlessPublicText = publicText.replace(/^WEBVTT\r?\n/u, "");
+    assert.notEqual(headerlessPublicText, publicText);
+    const retainedPublicPath = resolve(mediaDirectory, "headerless.en.vtt");
+    await writeFile(retainedPublicPath, headerlessPublicText, "utf8");
+
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const originalReadback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+    const readback = structuredClone(originalReadback);
+    readback.publicVtt.path = "media/demo-video/headerless.en.vtt";
+    readback.publicVtt.fileName = "headerless.en.vtt";
+    readback.download.fileName = "headerless.en.vtt";
+    readback.publicVtt.sha256 = createHash("sha256").update(headerlessPublicText).digest("hex");
+    metadata.publication.subtitleAnonymousReadbacks = [originalReadback, readback];
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /WEBVTT header is missing/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
 test("runs and propagates failures when invoked through a symlink", async () => {
   const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitles-cli-"));
   const symlinkPath = resolve(temporaryDirectory, "run-public-subtitles.mjs");

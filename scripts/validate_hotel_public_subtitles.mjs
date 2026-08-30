@@ -3,6 +3,7 @@
 // event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
 // machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
+// machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file before binding bytes to a state.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
@@ -103,10 +104,29 @@ function retainedSubtitlePath(value, label, root = repositoryRoot) {
   return resolve(root, value);
 }
 
+function assertSubtitlePathExtension(value, label, extension) {
+  assert.match(value, extension === "srt" ? /\.srt$/u : /\.vtt$/u, `${label} must use .${extension}`);
+}
+
+function assertSubRipText(text, label) {
+  assert.doesNotMatch(text, /^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/u, `${label} must be SubRip, not WebVTT`);
+  assert.match(text, /(?:^|\r?\n)\s*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}(?:\r?\n|$)/u, `${label} is not a SubRip file`);
+}
+
+function assertWebVttText(text, label) {
+  assert.match(text, /^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/u, `${label} WEBVTT header is missing`);
+  assert.doesNotMatch(text, /(?:^|\r?\n)\d{2}:\d{2}:\d{2},\d{3} --> /u, `${label} must use WebVTT timestamps`);
+}
+
 export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publicPath = publicSubtitlePath, metadataPath = productionMetadataPath) {
+  assert.notEqual(resolve(sourcePath), resolve(publicPath), "input and public retained paths must differ");
+  assertSubtitlePathExtension(sourcePath, "input subtitle path", "srt");
+  assertSubtitlePathExtension(publicPath, "public VTT path", "vtt");
   const [sourceBytes, publicBytes, metadataText] = await Promise.all([readFile(sourcePath), readFile(publicPath), readFile(metadataPath, "utf8")]);
   const sourceText = sourceBytes.toString("utf8");
   const publicText = publicBytes.toString("utf8");
+  assertSubRipText(sourceText, "input subtitle");
+  assertWebVttText(publicText, "public VTT");
   const sourceSha256 = digest(sourceBytes);
   const publicVttSha256 = digest(publicBytes);
   const metadata = JSON.parse(metadataText);
@@ -132,11 +152,16 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
     const label = `subtitle readback ${index + 1}`;
     const inputPath = retainedSubtitlePath(record?.inputSubtitle?.path, `${label} inputSubtitle.path`, root);
     const publicPath = retainedSubtitlePath(record?.publicVtt?.path, `${label} publicVtt.path`, root);
+    assert.notEqual(inputPath, publicPath, `${label} input and public retained paths must differ`);
+    assertSubtitlePathExtension(record.inputSubtitle.path, `${label} inputSubtitle.path`, "srt");
+    assertSubtitlePathExtension(record.publicVtt.path, `${label} publicVtt.path`, "vtt");
     assert.equal(record?.publicVtt?.fileName, basename(publicPath), `${label} publicVtt.fileName differs from its retained path`);
     assert.equal(record?.download?.fileName, basename(publicPath), `${label} download.fileName differs from its retained path`);
     const [sourceBytes, publicBytes] = await Promise.all([readFile(inputPath), readFile(publicPath)]);
     const sourceText = sourceBytes.toString("utf8");
     const publicText = publicBytes.toString("utf8");
+    assertSubRipText(sourceText, `${label} input subtitle`);
+    assertWebVttText(publicText, `${label} public VTT`);
     const sourceSha256 = digest(sourceBytes);
     const publicVttSha256 = digest(publicBytes);
     assert.equal(record?.inputSubtitle?.sha256, sourceSha256, `${label} input subtitle SHA-256 differs from its retained file`);

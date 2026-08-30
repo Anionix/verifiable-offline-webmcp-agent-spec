@@ -342,7 +342,7 @@
             "requestedLanguage": { "const": "en" },
             "format": { "const": "vtt" },
             "automaticSubtitles": { "const": "EXCLUDED" },
-            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*$" }
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" }
           }
         },
         "availableSubtitleCatalog": {
@@ -373,7 +373,7 @@
           "additionalProperties": false,
           "required": ["path", "sha256", "cueCount", "lastCueEndMilliseconds"],
           "properties": {
-            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
             "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
             "cueCount": { "type": "integer", "minimum": 1 },
             "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
@@ -384,8 +384,8 @@
           "additionalProperties": false,
           "required": ["path", "fileName", "sha256", "cueCount", "lastCueEndMilliseconds"],
           "properties": {
-            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
-            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
             "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
             "cueCount": { "type": "integer", "minimum": 1 },
             "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }

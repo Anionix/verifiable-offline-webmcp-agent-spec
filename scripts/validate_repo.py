@@ -154,6 +154,8 @@ def subtitle_capture_timing_errors(
         return [f"{label} capture timing or readback time is invalid: {exc}"]
     if precision == "EXACT" and lower_ms != upper_ms:
         findings.append(f"{label} exact captureTiming bounds differ")
+    if precision == "EXACT" and lower_ms <= measured_ms:
+        findings.append(f"{label} exact captureTiming must be after measuredAt")
     if recorded_ms < measured_ms:
         findings.append(f"{label} recordedAt precedes measuredAt")
     if lower_ms < measured_ms:
@@ -220,8 +222,9 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
         )
     except Exception as exc:
         return [f"future subtitle readback fixture cannot derive its timeline: {exc}"]
-    future_recorded_ms = timeline_ms + 1
-    future_measured_ms = future_recorded_ms - 1
+    future_measured_ms = timeline_ms + 1
+    future_capture_ms = future_measured_ms + 1
+    future_recorded_ms = future_capture_ms + 1
     future_root_ms = future_recorded_ms + 1
 
     future_video = json.loads(json.dumps(video_production))
@@ -234,8 +237,8 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     })
     future_record["availableSubtitleCatalog"]["captureTiming"] = {
         "precision": "EXACT",
-        "lowerBound": rfc3339_from_ms(future_measured_ms),
-        "upperBound": rfc3339_from_ms(future_measured_ms),
+        "lowerBound": rfc3339_from_ms(future_capture_ms),
+        "upperBound": rfc3339_from_ms(future_capture_ms),
         "description": "future validation fixture capture time",
     }
     previous_identity = future_video["identity"]
@@ -277,6 +280,15 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     )
     if not any("recordedAt precedes measuredAt" in finding for finding in before_measured_findings):
         findings.append("recordedAt-before-measuredAt fixture was accepted")
+    equal_capture_records = json.loads(json.dumps(future_records))
+    equal_capture_timing = equal_capture_records[-1]["availableSubtitleCatalog"]["captureTiming"]
+    equal_capture_timing["lowerBound"] = rfc3339_from_ms(future_measured_ms)
+    equal_capture_timing["upperBound"] = rfc3339_from_ms(future_measured_ms)
+    equal_capture_findings = subtitle_observation_errors(
+        {"equal capture timing subtitleAnonymousReadbacks": equal_capture_records}, future_root_ms
+    )
+    if not any("exact captureTiming must be after measuredAt" in finding for finding in equal_capture_findings):
+        findings.append("exact capture-at-measured fixture was accepted")
     invalid_capture_records = json.loads(json.dumps(future_records))
     invalid_capture_records[-1]["availableSubtitleCatalog"]["captureTiming"]["upperBound"] = rfc3339_from_ms(future_root_ms)
     invalid_capture_findings = subtitle_observation_errors(

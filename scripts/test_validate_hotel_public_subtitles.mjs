@@ -17,6 +17,13 @@ import {
 } from "./validate_hotel_public_subtitles.mjs";
 
 const publicSubtitleValidatorPath = fileURLToPath(new URL("./validate_hotel_public_subtitles.mjs", import.meta.url));
+const mismatchedSubtitleStateTransition =
+  "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED";
+
+function uuidV7ForMilliseconds(epochMilliseconds) {
+  const timestamp = BigInt(epochMilliseconds).toString(16).padStart(12, "0");
+  return `${timestamp.slice(0, 8)}-${timestamp.slice(8)}-7abc-8def-0123456789ab`;
+}
 
 test("accepts the retained public VTT when all authored cues match", async () => {
   const result = await compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath);
@@ -59,6 +66,7 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
     const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
     await mkdir(mediaDirectory, { recursive: true });
     await copyFile(sourceSubtitlePath, resolve(mediaDirectory, "subtitles.en.srt"));
+    await copyFile(publicSubtitlePath, resolve(mediaDirectory, "youtube-public-201.en.vtt"));
     const publicText = await readFile(publicSubtitlePath, "utf8");
     const changedPublicText = publicText.replace("00:00:00.000 --> 00:00:00.700", "00:00:00.001 --> 00:00:00.700");
     assert.notEqual(changedPublicText, publicText);
@@ -66,18 +74,49 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
     await writeFile(changedPublicPath, changedPublicText, "utf8");
 
     const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
-    const readback = metadata.publication.subtitleAnonymousReadbacks[0];
+    const originalReadback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+    const readback = structuredClone(originalReadback);
+    const previousRootUpdatedAt = metadata.updatedAt;
+    const futureMeasuredMilliseconds = Date.parse(previousRootUpdatedAt);
+    const futureRecordedMilliseconds = futureMeasuredMilliseconds + 1;
+    const futureRootMilliseconds = futureMeasuredMilliseconds + 2;
+    readback.observationUuidV7 = uuidV7ForMilliseconds(futureRecordedMilliseconds);
+    readback.measuredAt = new Date(futureMeasuredMilliseconds).toISOString();
+    readback.recordedAt = new Date(futureRecordedMilliseconds).toISOString();
+    readback.stateTransition = mismatchedSubtitleStateTransition;
+    readback.availableSubtitleCatalog.captureTiming = {
+      precision: "EXACT",
+      lowerBound: readback.measuredAt,
+      upperBound: readback.measuredAt,
+      description: "synthetic mismatch history fixture capture time",
+    };
     readback.publicVtt.path = "media/demo-video/changed.en.vtt";
     readback.publicVtt.fileName = "changed.en.vtt";
     readback.download.fileName = "changed.en.vtt";
     readback.publicVtt.sha256 = createHash("sha256").update(changedPublicText).digest("hex");
     readback.comparison.timing = "MISMATCH";
     readback.comparison.result = "FAIL";
+    metadata.publication.subtitleAnonymousReadbacks = [originalReadback, readback];
+    metadata.previousDocumentObservation = {
+      informationUuidV5: metadata.identity.informationUuidV5,
+      observationUuidV7: metadata.identity.observationUuidV7,
+      updatedAt: previousRootUpdatedAt,
+      stateTransition: metadata.stateTransition,
+    };
+    metadata.identity.observationUuidV7 = uuidV7ForMilliseconds(futureRootMilliseconds);
+    metadata.updatedAt = new Date(futureRootMilliseconds).toISOString();
+    metadata.stateTransition = `${metadata.stateTransition} -> PUBLIC_SUBTITLE_ANONYMOUS_VTT_COMPARISON_MISMATCH_RECORDED_UI_TRACK_SELECTION_UNMEASURED`;
     const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
     await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
 
-    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), { readbackCount: 1, validationResult: "PASS" });
+    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), { readbackCount: 2, validationResult: "PASS" });
+    assert.equal((await compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath, metadataFixturePath)).result, "PASS");
 
+    readback.stateTransition = originalReadback.stateTransition;
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /state transition differs/u);
+
+    readback.stateTransition = mismatchedSubtitleStateTransition;
     readback.comparison.timing = "MATCH_EXACT_INTEGER_MILLISECONDS";
     readback.comparison.result = "PASS";
     await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");

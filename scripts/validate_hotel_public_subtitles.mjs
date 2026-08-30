@@ -2,6 +2,7 @@
 // information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
 // event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
+// machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
 import assert from "node:assert/strict";
@@ -14,6 +15,10 @@ export const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.ur
 export const sourceSubtitlePath = resolve(repositoryRoot, "media/demo-video/subtitles.en.srt");
 export const publicSubtitlePath = resolve(repositoryRoot, "media/demo-video/youtube-public-201.en.vtt");
 export const productionMetadataPath = resolve(repositoryRoot, "metadata/demo-video-production.json");
+export const MATCHED_SUBTITLE_STATE_TRANSITION =
+  "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED";
+export const MISMATCHED_SUBTITLE_STATE_TRANSITION =
+  "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED";
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
@@ -67,6 +72,7 @@ export function compareSubtitleHistoryTexts(sourceText, publicText) {
     text: textMatches ? "MATCH_AFTER_WHITESPACE_NORMALIZATION" : "MISMATCH",
     timing: timingMatches ? "MATCH_EXACT_INTEGER_MILLISECONDS" : "MISMATCH",
     result: textMatches && timingMatches ? "PASS" : "FAIL",
+    stateTransition: textMatches && timingMatches ? MATCHED_SUBTITLE_STATE_TRANSITION : MISMATCHED_SUBTITLE_STATE_TRANSITION,
   };
 }
 
@@ -136,6 +142,7 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
     assert.equal(record?.inputSubtitle?.sha256, sourceSha256, `${label} input subtitle SHA-256 differs from its retained file`);
     assert.equal(record?.publicVtt?.sha256, publicVttSha256, `${label} public VTT SHA-256 differs from its retained file`);
     const comparison = compareSubtitleHistoryTexts(sourceText, publicText);
+    assert.equal(record?.stateTransition, comparison.stateTransition, `${label} state transition differs from its byte comparison`);
     assert.equal(record?.inputSubtitle?.cueCount, comparison.inputCueCount, `${label} input cue count differs from its retained file`);
     assert.equal(
       record?.inputSubtitle?.lastCueEndMilliseconds,

@@ -97,6 +97,8 @@ SUBTITLE_TIMESTAMP_FIELDS = {
     "subtitleUpdates": "observedAt",
     "subtitleAnonymousReadbacks": "recordedAt",
 }
+ANONYMOUS_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED"
+ANONYMOUS_SUBTITLE_MISMATCH_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
 
 
 def is_ignored(path: Path):
@@ -282,6 +284,59 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     )
     if not any("captureTiming upperBound exceeds recordedAt" in finding for finding in invalid_capture_findings):
         findings.append("capture-timing upper-bound fixture was accepted")
+    return findings
+
+
+def subtitle_comparison_schema_errors(video_production: dict[str, Any], validator) -> list[str]:
+    """Keep the schema from accepting an impossible comparison/state combination."""
+    publication = video_production.get("publication")
+    records = publication.get("subtitleAnonymousReadbacks") if isinstance(publication, dict) else None
+    if not isinstance(records, list) or not records or not isinstance(records[0], dict):
+        return ["subtitle comparison schema fixture lacks an anonymous readback"]
+
+    invalid_cases = [
+        (
+            "PASS with timing mismatch",
+            {"result": "PASS", "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION", "timing": "MISMATCH", "stateTransition": ANONYMOUS_SUBTITLE_MATCH_STATE},
+        ),
+        (
+            "FAIL with matching comparison",
+            {
+                "result": "FAIL",
+                "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION",
+                "timing": "MATCH_EXACT_INTEGER_MILLISECONDS",
+                "stateTransition": ANONYMOUS_SUBTITLE_MISMATCH_STATE,
+            },
+        ),
+        (
+            "FAIL with matched state",
+            {"result": "FAIL", "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION", "timing": "MISMATCH", "stateTransition": ANONYMOUS_SUBTITLE_MATCH_STATE},
+        ),
+        (
+            "PASS with mismatched state",
+            {
+                "result": "PASS",
+                "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION",
+                "timing": "MATCH_EXACT_INTEGER_MILLISECONDS",
+                "stateTransition": ANONYMOUS_SUBTITLE_MISMATCH_STATE,
+            },
+        ),
+    ]
+    findings: list[str] = []
+    for label, changes in invalid_cases:
+        fixture = json.loads(json.dumps(video_production))
+        record = fixture["publication"]["subtitleAnonymousReadbacks"][0]
+        record["comparison"].update({key: value for key, value in changes.items() if key != "stateTransition"})
+        record["stateTransition"] = changes["stateTransition"]
+        if not list(validator.iter_errors(fixture)):
+            findings.append(f"video production schema accepted {label} fixture")
+
+    valid_fail = json.loads(json.dumps(video_production))
+    valid_record = valid_fail["publication"]["subtitleAnonymousReadbacks"][0]
+    valid_record["comparison"].update({"text": "MATCH_AFTER_WHITESPACE_NORMALIZATION", "timing": "MISMATCH", "result": "FAIL"})
+    valid_record["stateTransition"] = ANONYMOUS_SUBTITLE_MISMATCH_STATE
+    if list(validator.iter_errors(valid_fail)):
+        findings.append("video production schema rejected a fact-consistent subtitle mismatch fixture")
     return findings
 
 
@@ -1650,6 +1705,7 @@ def main():
     owner_future_findings = document_history_errors(owner_future)
     if not any("subtitleUpdates entry 1 observedAt exceeds document root updatedAt" in finding for finding in owner_future_findings):
         errors.append("owner subtitle update beyond the document root was accepted")
+    errors.extend(subtitle_comparison_schema_errors(video_production, video_production_validator))
     errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]

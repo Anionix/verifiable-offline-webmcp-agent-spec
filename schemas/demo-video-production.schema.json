@@ -322,7 +322,12 @@
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "measuredAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
         "recordedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
-        "stateTransition": { "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED" },
+        "stateTransition": {
+          "enum": [
+            "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED",
+            "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+          ]
+        },
         "videoId": { "const": "tdSvJw4ghX8" },
         "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
         "track": { "const": "ENGLISH_AUTHORED_TRACK" },
@@ -411,7 +416,45 @@
             "downloadDoesNotEstablishVideoFileIdentity": { "const": true }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "required": ["stateTransition", "comparison"],
+              "properties": {
+                "stateTransition": {
+                  "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED"
+                },
+                "comparison": {
+                  "required": ["result", "text", "timing"],
+                  "properties": {
+                    "result": { "const": "PASS" },
+                    "text": { "const": "MATCH_AFTER_WHITESPACE_NORMALIZATION" },
+                    "timing": { "const": "MATCH_EXACT_INTEGER_MILLISECONDS" }
+                  }
+                }
+              }
+            },
+            {
+              "required": ["stateTransition", "comparison"],
+              "properties": {
+                "stateTransition": {
+                  "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+                },
+                "comparison": {
+                  "required": ["result", "text", "timing"],
+                  "properties": { "result": { "const": "FAIL" } },
+                  "anyOf": [
+                    { "properties": { "text": { "const": "MISMATCH" } } },
+                    { "properties": { "timing": { "const": "MISMATCH" } } }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
     },
     "subtitleTrack": {
       "type": "object",

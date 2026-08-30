@@ -26,6 +26,38 @@ function uuidV7ForMilliseconds(epochMilliseconds) {
   return `${timestamp.slice(0, 8)}-${timestamp.slice(8)}-7abc-8def-0123456789ab`;
 }
 
+function replaceFirstUtf8Sequence(bytes, needle, replacementBytes) {
+  const needleBytes = Buffer.from(needle, "utf8");
+  const offset = bytes.indexOf(needleBytes);
+  assert.notEqual(offset, -1, `fixture text is missing: ${needle}`);
+  return Buffer.concat([bytes.subarray(0, offset), Buffer.from(replacementBytes), bytes.subarray(offset + needleBytes.length)]);
+}
+
+async function createSubtitleHistoryFixture(sourceBytes, publicBytes, prefix) {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), prefix));
+  const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+  await mkdir(mediaDirectory, { recursive: true });
+  await writeFile(resolve(mediaDirectory, "subtitles.en.srt"), sourceBytes);
+  await writeFile(resolve(mediaDirectory, "youtube-public-201.en.vtt"), publicBytes);
+  const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+  const readback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+  readback.inputSubtitle.sha256 = createHash("sha256").update(sourceBytes).digest("hex");
+  readback.publicVtt.sha256 = createHash("sha256").update(publicBytes).digest("hex");
+  metadata.publication.subtitleAnonymousReadbacks = [readback];
+  const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+  await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+  return { temporaryDirectory, metadataFixturePath };
+}
+
+async function assertRejectsInvalidUtf8(sourceBytes, publicBytes, prefix) {
+  const fixture = await createSubtitleHistoryFixture(sourceBytes, publicBytes, prefix);
+  try {
+    await assert.rejects(() => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory), TypeError);
+  } finally {
+    await rm(fixture.temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
 test("accepts the retained public VTT when all authored cues match", async () => {
   const result = await compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath);
   assert.deepEqual(result, {
@@ -39,6 +71,41 @@ test("accepts the retained public VTT when all authored cues match", async () =>
     publicVttSha256: "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
   });
   assert.deepEqual(await validateSubtitleHistory(), { readbackCount: 1, validationResult: "PASS" });
+});
+
+test("rejects different invalid UTF-8 bytes in the SRT and VTT", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const brokenSourceBytes = replaceFirstUtf8Sequence(sourceBytes, "submits a", [0xff]);
+  const brokenPublicBytes = replaceFirstUtf8Sequence(publicBytes, "submits a", [0xfe]);
+  await assertRejectsInvalidUtf8(brokenSourceBytes, brokenPublicBytes, "hotel-public-subtitles-invalid-both-");
+});
+
+test("rejects invalid UTF-8 in the SRT only", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const brokenSourceBytes = replaceFirstUtf8Sequence(sourceBytes, "submits a", [0xff]);
+  await assertRejectsInvalidUtf8(brokenSourceBytes, publicBytes, "hotel-public-subtitles-invalid-srt-");
+});
+
+test("rejects invalid UTF-8 in the VTT only", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const brokenPublicBytes = replaceFirstUtf8Sequence(publicBytes, "submits a", [0xfe]);
+  await assertRejectsInvalidUtf8(sourceBytes, brokenPublicBytes, "hotel-public-subtitles-invalid-vtt-");
+});
+
+test("accepts a correctly encoded U+FFFD subtitle character", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const replacementCharacter = Buffer.from("\uFFFD", "utf8");
+  const validSourceBytes = replaceFirstUtf8Sequence(sourceBytes, "submits a", replacementCharacter);
+  const validPublicBytes = replaceFirstUtf8Sequence(publicBytes, "submits a", replacementCharacter);
+  const fixture = await createSubtitleHistoryFixture(validSourceBytes, validPublicBytes, "hotel-public-subtitles-valid-replacement-");
+  try {
+    assert.deepEqual(await validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory), {
+      readbackCount: 1,
+      validationResult: "PASS",
+    });
+  } finally {
+    await rm(fixture.temporaryDirectory, { recursive: true, force: true });
+  }
 });
 
 test("rejects a later readback when a malformed SRT cue and its VTT cue are both absent", async () => {

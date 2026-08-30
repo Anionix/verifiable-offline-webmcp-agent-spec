@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
+import { TextDecoder } from "node:util";
 import { fileURLToPath } from "node:url";
 
 export const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -24,6 +25,11 @@ export const MISMATCHED_SUBTITLE_STATE_TRANSITION =
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
+const UTF8_DECODER = new TextDecoder("utf-8", { fatal: true });
+
+function decodeUtf8(bytes) {
+  return UTF8_DECODER.decode(bytes);
+}
 
 function normalizeText(text) {
   return text.replace(/\s+/gu, " ").trim();
@@ -200,8 +206,8 @@ export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publ
   assertSubtitlePathExtension(sourcePath, "input subtitle path", "srt");
   assertSubtitlePathExtension(publicPath, "public VTT path", "vtt");
   const [sourceBytes, publicBytes, metadataText] = await Promise.all([readFile(sourcePath), readFile(publicPath), readFile(metadataPath, "utf8")]);
-  const sourceText = sourceBytes.toString("utf8");
-  const publicText = publicBytes.toString("utf8");
+  const sourceText = decodeUtf8(sourceBytes);
+  const publicText = decodeUtf8(publicBytes);
   assertSubRipText(sourceText, "input subtitle");
   assertWebVttText(publicText, "public VTT");
   const sourceSha256 = digest(sourceBytes);
@@ -235,8 +241,8 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
     assert.equal(record?.publicVtt?.fileName, basename(publicPath), `${label} publicVtt.fileName differs from its retained path`);
     assert.equal(record?.download?.fileName, basename(publicPath), `${label} download.fileName differs from its retained path`);
     const [sourceBytes, publicBytes] = await Promise.all([readFile(inputPath), readFile(publicPath)]);
-    const sourceText = sourceBytes.toString("utf8");
-    const publicText = publicBytes.toString("utf8");
+    const sourceText = decodeUtf8(sourceBytes);
+    const publicText = decodeUtf8(publicBytes);
     assertSubRipText(sourceText, `${label} input subtitle`);
     assertWebVttText(publicText, `${label} public VTT`);
     const sourceSha256 = digest(sourceBytes);

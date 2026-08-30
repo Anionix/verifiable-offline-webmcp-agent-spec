@@ -1354,17 +1354,25 @@ def main():
     )
     for e in video_production_validator.iter_errors(video_production):
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
+    publication_for_schema_checks = video_production.get("publication")
     for required_field in ("subtitleUpdates", "subtitleAnonymousReadbacks"):
         missing_field = json.loads(json.dumps(video_production))
-        missing_field["publication"].pop(required_field, None)
+        missing_publication = missing_field.get("publication")
+        if not isinstance(missing_publication, dict):
+            errors.append("video production schema mutation fixture lacks a publication object")
+            continue
+        missing_publication.pop(required_field, None)
         if not schema_has_required_error(video_production_validator.iter_errors(missing_field), required_field):
             errors.append(f"video production schema accepted publication without {required_field}")
     mismatched_subtitle_identity = json.loads(json.dumps(video_production))
-    mismatched_subtitle_identity["publication"]["subtitleUpdates"][0]["informationUuidV5"] = (
-        "8bb1420d-3305-5c00-81a0-e24c5c68d99a"
-    )
-    if not list(video_production_validator.iter_errors(mismatched_subtitle_identity)):
-        errors.append("video production schema accepted a mismatched subtitle information identifier")
+    mismatched_publication = mismatched_subtitle_identity.get("publication")
+    subtitle_updates_fixture = mismatched_publication.get("subtitleUpdates") if isinstance(mismatched_publication, dict) else None
+    if isinstance(subtitle_updates_fixture, list) and subtitle_updates_fixture and isinstance(subtitle_updates_fixture[0], dict):
+        subtitle_updates_fixture[0]["informationUuidV5"] = "8bb1420d-3305-5c00-81a0-e24c5c68d99a"
+        if not list(video_production_validator.iter_errors(mismatched_subtitle_identity)):
+            errors.append("video production schema accepted a mismatched subtitle information identifier")
+    elif isinstance(publication_for_schema_checks, dict):
+        errors.append("video production schema mutation fixture lacks a subtitleUpdates entry")
     document_identity = video_production.get("identity", {})
     previous_document_observation = video_production.get("previousDocumentObservation", {})
     try:
@@ -1387,10 +1395,31 @@ def main():
             errors.append("video production previous document observation does not preserve the prior root")
         if previous_event.version != 7 or uuid7_ms(str(previous_event)) != previous_updated_ms:
             errors.append("video production previous root UUIDv7 does not match its updatedAt")
-        if not video_production.get("stateTransition", "").endswith(
-            " -> PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
-        ):
-            errors.append("video production root state transition does not append the latest subtitle observation")
+        if document_updated_ms < previous_updated_ms:
+            errors.append("video production root updatedAt precedes the previous root observation")
+        latest_subtitle_state = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
+        if latest_subtitle_state not in video_production.get("stateTransition", "").split(" -> "):
+            errors.append("video production root state transition does not retain the latest subtitle observation")
+        publication_for_chronology = video_production.get("publication", {})
+        if isinstance(publication_for_chronology, dict):
+            for collection_name, timestamp_field in (
+                ("subtitleUpdates", "observedAt"),
+                ("subtitleAnonymousReadbacks", "recordedAt"),
+            ):
+                records = publication_for_chronology.get(collection_name, [])
+                if not isinstance(records, list):
+                    continue
+                for index, record in enumerate(records, start=1):
+                    if not isinstance(record, dict) or timestamp_field not in record:
+                        continue
+                    try:
+                        record_time_ms = rfc3339_ms(record[timestamp_field])
+                    except Exception:
+                        continue
+                    if document_updated_ms < record_time_ms:
+                        errors.append(
+                            f"video production root updatedAt precedes {collection_name} entry {index} {timestamp_field}"
+                        )
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
     future_video_devpost.update({
@@ -1532,11 +1561,18 @@ def main():
             ("subtitleUpdates", "observedAt", "2026-08-30T17:09:54.092Z"),
             ("subtitleAnonymousReadbacks", "recordedAt", "2026-08-30T17:55:48.504Z"),
         ):
-            for index, record in enumerate(publication.get(collection_name, []), start=1):
+            records = publication.get(collection_name, [])
+            if not isinstance(records, list):
+                errors.append(f"{collection_name} must be an array")
+                continue
+            for index, record in enumerate(records, start=1):
                 label = f"{collection_name} entry {index}"
+                if not isinstance(record, dict):
+                    errors.append(f"{label} must be an object")
+                    continue
                 errors.extend(subtitle_record_errors(record, timestamp_field, label))
-            if publication.get(collection_name):
-                invalid_timestamp_record = json.loads(json.dumps(publication[collection_name][0]))
+            if records:
+                invalid_timestamp_record = json.loads(json.dumps(records[0]))
                 invalid_timestamp_record[timestamp_field] = invalid_timestamp
                 mutation_label = f"{collection_name} entry 1 timestamp mutation"
                 if not subtitle_record_errors(invalid_timestamp_record, timestamp_field, mutation_label):

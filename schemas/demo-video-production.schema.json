@@ -298,7 +298,7 @@
       }
     },
     "subtitleAnonymousReadback": {
-      "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED measured_at=2026-08-30T17:48:28.216Z recorded_at=2026-08-30T17:55:48.503Z machine-contract=anonymous VTT download proves only the retrieved English subtitle bytes and cue comparison; future readbacks use structural UUIDv7 and date-time fields, while validation binds event time, rejects event reuse, and requires recorded_at >= measured_at; the player metadata list is a later approximate follow-up without an exact timestamp and does not prove video file identity or browser UI track selection",
+      "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED measured_at=2026-08-30T17:48:28.216Z recorded_at=2026-08-30T17:55:48.503Z machine-contract=anonymous VTT download proves only the retrieved English subtitle bytes and cue comparison; each readback retains repository-relative input and public files for digest and comparison revalidation; future readbacks use structural UUIDv7 and date-time fields, while validation binds event time, rejects event reuse, and requires recorded_at >= measured_at; the player metadata list is a later approximate follow-up without an exact timestamp and does not prove video file identity or browser UI track selection",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -337,7 +337,7 @@
             "requestedLanguage": { "const": "en" },
             "format": { "const": "vtt" },
             "automaticSubtitles": { "const": "EXCLUDED" },
-            "fileName": { "const": "youtube-public-201.en.vtt" }
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*$" }
           }
         },
         "availableSubtitleCatalog": {
@@ -368,21 +368,22 @@
           "additionalProperties": false,
           "required": ["path", "sha256", "cueCount", "lastCueEndMilliseconds"],
           "properties": {
-            "path": { "const": "media/demo-video/subtitles.en.srt" },
-            "sha256": { "const": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f" },
-            "cueCount": { "const": 184 },
-            "lastCueEndMilliseconds": { "const": 147760 }
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 1 },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
           }
         },
         "publicVtt": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fileName", "sha256", "cueCount", "lastCueEndMilliseconds"],
+          "required": ["path", "fileName", "sha256", "cueCount", "lastCueEndMilliseconds"],
           "properties": {
-            "fileName": { "const": "youtube-public-201.en.vtt" },
-            "sha256": { "const": "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac" },
-            "cueCount": { "const": 184 },
-            "lastCueEndMilliseconds": { "const": 147760 }
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 1 },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
           }
         },
         "comparison": {
@@ -390,13 +391,13 @@
           "additionalProperties": false,
           "required": ["scope", "inputCueCount", "publicCueCount", "text", "timing", "lastCueEndMilliseconds", "result"],
           "properties": {
-            "scope": { "const": "FULL_184_CUE_COMPARISON" },
-            "inputCueCount": { "const": 184 },
-            "publicCueCount": { "const": 184 },
-            "text": { "const": "MATCH_AFTER_WHITESPACE_NORMALIZATION" },
-            "timing": { "const": "MATCH_EXACT_INTEGER_MILLISECONDS" },
-            "lastCueEndMilliseconds": { "const": 147760 },
-            "result": { "const": "PASS" }
+            "scope": { "type": "string", "pattern": "^FULL_[1-9][0-9]*_CUE_COMPARISON$" },
+            "inputCueCount": { "type": "integer", "minimum": 1 },
+            "publicCueCount": { "type": "integer", "minimum": 0 },
+            "text": { "enum": ["MATCH_AFTER_WHITESPACE_NORMALIZATION", "MISMATCH"] },
+            "timing": { "enum": ["MATCH_EXACT_INTEGER_MILLISECONDS", "MISMATCH"] },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 },
+            "result": { "enum": ["PASS", "FAIL"] }
           }
         },
         "limitations": {

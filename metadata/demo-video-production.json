@@ -534,6 +534,7 @@
           "lastCueEndMilliseconds": 147760
         },
         "publicVtt": {
+          "path": "media/demo-video/youtube-public-201.en.vtt",
           "fileName": "youtube-public-201.en.vtt",
           "sha256": "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
           "cueCount": 184,

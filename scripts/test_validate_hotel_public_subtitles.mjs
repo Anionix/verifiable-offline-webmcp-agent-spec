@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -12,6 +13,7 @@ import {
   productionMetadataPath,
   publicSubtitlePath,
   sourceSubtitlePath,
+  validateSubtitleHistory,
 } from "./validate_hotel_public_subtitles.mjs";
 
 const publicSubtitleValidatorPath = fileURLToPath(new URL("./validate_hotel_public_subtitles.mjs", import.meta.url));
@@ -28,6 +30,7 @@ test("accepts the retained public VTT when all authored cues match", async () =>
     sourceSha256: "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
     publicVttSha256: "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
   });
+  assert.deepEqual(await validateSubtitleHistory(), { readbackCount: 1, validationResult: "PASS" });
 });
 
 test("rejects a public VTT when one cue timestamp changes", async () => {
@@ -45,6 +48,44 @@ test("rejects metadata when a recorded subtitle digest differs", async () => {
     const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
     await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
     await assert.rejects(() => compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath, metadataFixturePath), /metadata public VTT SHA-256 differs/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("rehashes every retained VTT and records a later mismatch instead of a false PASS", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-history-"));
+  try {
+    const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+    await mkdir(mediaDirectory, { recursive: true });
+    await copyFile(sourceSubtitlePath, resolve(mediaDirectory, "subtitles.en.srt"));
+    const publicText = await readFile(publicSubtitlePath, "utf8");
+    const changedPublicText = publicText.replace("00:00:00.000 --> 00:00:00.700", "00:00:00.001 --> 00:00:00.700");
+    assert.notEqual(changedPublicText, publicText);
+    const changedPublicPath = resolve(mediaDirectory, "changed.en.vtt");
+    await writeFile(changedPublicPath, changedPublicText, "utf8");
+
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const readback = metadata.publication.subtitleAnonymousReadbacks[0];
+    readback.publicVtt.path = "media/demo-video/changed.en.vtt";
+    readback.publicVtt.fileName = "changed.en.vtt";
+    readback.download.fileName = "changed.en.vtt";
+    readback.publicVtt.sha256 = createHash("sha256").update(changedPublicText).digest("hex");
+    readback.comparison.timing = "MISMATCH";
+    readback.comparison.result = "FAIL";
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+
+    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), { readbackCount: 1, validationResult: "PASS" });
+
+    readback.comparison.timing = "MATCH_EXACT_INTEGER_MILLISECONDS";
+    readback.comparison.result = "PASS";
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /comparison timing status differs/u);
+
+    readback.publicVtt.path = "../outside.vtt";
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /safe repository-relative path/u);
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }

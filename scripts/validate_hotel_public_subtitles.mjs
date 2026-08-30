@@ -53,19 +53,36 @@ export function parseSubtitleCues(text) {
   });
 }
 
-export function compareSubtitleTexts(sourceText, publicText) {
+export function compareSubtitleHistoryTexts(sourceText, publicText) {
   const sourceCues = parseSubtitleCues(sourceText);
   const publicCues = parseSubtitleCues(publicText);
-  assert.equal(sourceCues.length, EXPECTED_CUE_COUNT, "authored subtitle cue count changed");
-  assert.equal(publicCues.length, sourceCues.length, "public subtitle cue count differs");
-  assert.deepEqual(publicCues, sourceCues, "public subtitle text or timestamps differ");
-  assert.equal(sourceCues.at(-1)?.endMs, EXPECTED_LAST_CUE_END_MS, "authored subtitle ending changed");
+  const comparable = sourceCues.length > 0 && sourceCues.length === publicCues.length;
+  const textMatches = comparable && sourceCues.every((cue, index) => cue.text === publicCues[index].text);
+  const timingMatches = comparable && sourceCues.every((cue, index) => cue.startMs === publicCues[index].startMs && cue.endMs === publicCues[index].endMs);
   return {
     inputCueCount: sourceCues.length,
     publicCueCount: publicCues.length,
-    textComparison: "MATCH_AFTER_WHITESPACE_NORMALIZATION",
-    timingComparison: "MATCH_EXACT_INTEGER_MILLISECONDS",
-    lastCueEndMilliseconds: sourceCues.at(-1).endMs,
+    sourceLastCueEndMilliseconds: sourceCues.at(-1)?.endMs ?? 0,
+    publicLastCueEndMilliseconds: publicCues.at(-1)?.endMs ?? 0,
+    text: textMatches ? "MATCH_AFTER_WHITESPACE_NORMALIZATION" : "MISMATCH",
+    timing: timingMatches ? "MATCH_EXACT_INTEGER_MILLISECONDS" : "MISMATCH",
+    result: textMatches && timingMatches ? "PASS" : "FAIL",
+  };
+}
+
+export function compareSubtitleTexts(sourceText, publicText) {
+  const comparison = compareSubtitleHistoryTexts(sourceText, publicText);
+  assert.equal(comparison.inputCueCount, EXPECTED_CUE_COUNT, "authored subtitle cue count changed");
+  assert.equal(comparison.publicCueCount, comparison.inputCueCount, "public subtitle cue count differs");
+  assert.equal(comparison.result, "PASS", "public subtitle text or timestamps differ");
+  assert.equal(comparison.sourceLastCueEndMilliseconds, EXPECTED_LAST_CUE_END_MS, "authored subtitle ending changed");
+  assert.equal(comparison.publicLastCueEndMilliseconds, EXPECTED_LAST_CUE_END_MS, "public subtitle ending changed");
+  return {
+    inputCueCount: comparison.inputCueCount,
+    publicCueCount: comparison.publicCueCount,
+    textComparison: comparison.text,
+    timingComparison: comparison.timing,
+    lastCueEndMilliseconds: comparison.sourceLastCueEndMilliseconds,
     result: "PASS",
   };
 }
@@ -74,16 +91,21 @@ function digest(text) {
   return createHash("sha256").update(text).digest("hex");
 }
 
+function retainedSubtitlePath(value, label, root = repositoryRoot) {
+  assert.equal(typeof value, "string", `${label} must be a string`);
+  assert.match(value, /^media\/demo-video\/[A-Za-z0-9_-][A-Za-z0-9._-]*$/u, `${label} must be a safe repository-relative path`);
+  return resolve(root, value);
+}
+
 export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publicPath = publicSubtitlePath, metadataPath = productionMetadataPath) {
-  const [sourceText, publicText, metadataText] = await Promise.all([
-    readFile(sourcePath, "utf8"),
-    readFile(publicPath, "utf8"),
-    readFile(metadataPath, "utf8"),
-  ]);
-  const sourceSha256 = digest(sourceText);
-  const publicVttSha256 = digest(publicText);
+  const [sourceBytes, publicBytes, metadataText] = await Promise.all([readFile(sourcePath), readFile(publicPath), readFile(metadataPath, "utf8")]);
+  const sourceText = sourceBytes.toString("utf8");
+  const publicText = publicBytes.toString("utf8");
+  const sourceSha256 = digest(sourceBytes);
+  const publicVttSha256 = digest(publicBytes);
   const metadata = JSON.parse(metadataText);
-  const matchingReadbacks = metadata?.publication?.subtitleAnonymousReadbacks?.filter((record) => record?.publicVtt?.fileName === basename(publicPath));
+  const currentPublicPath = `media/demo-video/${basename(publicPath)}`;
+  const matchingReadbacks = metadata?.publication?.subtitleAnonymousReadbacks?.filter((record) => record?.publicVtt?.path === currentPublicPath);
   assert.ok(matchingReadbacks?.length, "metadata subtitle readback for the public VTT is missing");
   for (const [index, record] of matchingReadbacks.entries()) {
     assert.equal(record.inputSubtitle?.sha256, sourceSha256, `metadata source subtitle SHA-256 differs at readback ${index + 1}`);
@@ -96,12 +118,52 @@ export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publ
   };
 }
 
+export async function validateSubtitleHistory(metadataPath = productionMetadataPath, root = repositoryRoot) {
+  const metadata = JSON.parse(await readFile(metadataPath, "utf8"));
+  const records = metadata?.publication?.subtitleAnonymousReadbacks;
+  assert.ok(Array.isArray(records) && records.length > 0, "metadata subtitle readback history is missing");
+  for (const [index, record] of records.entries()) {
+    const label = `subtitle readback ${index + 1}`;
+    const inputPath = retainedSubtitlePath(record?.inputSubtitle?.path, `${label} inputSubtitle.path`, root);
+    const publicPath = retainedSubtitlePath(record?.publicVtt?.path, `${label} publicVtt.path`, root);
+    assert.equal(record?.publicVtt?.fileName, basename(publicPath), `${label} publicVtt.fileName differs from its retained path`);
+    assert.equal(record?.download?.fileName, basename(publicPath), `${label} download.fileName differs from its retained path`);
+    const [sourceBytes, publicBytes] = await Promise.all([readFile(inputPath), readFile(publicPath)]);
+    const sourceText = sourceBytes.toString("utf8");
+    const publicText = publicBytes.toString("utf8");
+    const sourceSha256 = digest(sourceBytes);
+    const publicVttSha256 = digest(publicBytes);
+    assert.equal(record?.inputSubtitle?.sha256, sourceSha256, `${label} input subtitle SHA-256 differs from its retained file`);
+    assert.equal(record?.publicVtt?.sha256, publicVttSha256, `${label} public VTT SHA-256 differs from its retained file`);
+    const comparison = compareSubtitleHistoryTexts(sourceText, publicText);
+    assert.equal(record?.inputSubtitle?.cueCount, comparison.inputCueCount, `${label} input cue count differs from its retained file`);
+    assert.equal(
+      record?.inputSubtitle?.lastCueEndMilliseconds,
+      comparison.sourceLastCueEndMilliseconds,
+      `${label} input ending differs from its retained file`,
+    );
+    assert.equal(record?.publicVtt?.cueCount, comparison.publicCueCount, `${label} public cue count differs from its retained file`);
+    assert.equal(record?.publicVtt?.lastCueEndMilliseconds, comparison.publicLastCueEndMilliseconds, `${label} public ending differs from its retained file`);
+    assert.equal(record?.comparison?.scope, `FULL_${comparison.inputCueCount}_CUE_COMPARISON`, `${label} comparison scope differs`);
+    assert.equal(record?.comparison?.inputCueCount, comparison.inputCueCount, `${label} comparison input count differs`);
+    assert.equal(record?.comparison?.publicCueCount, comparison.publicCueCount, `${label} comparison public count differs`);
+    assert.equal(record?.comparison?.text, comparison.text, `${label} comparison text status differs`);
+    assert.equal(record?.comparison?.timing, comparison.timing, `${label} comparison timing status differs`);
+    assert.equal(record?.comparison?.lastCueEndMilliseconds, comparison.publicLastCueEndMilliseconds, `${label} comparison ending differs`);
+    assert.equal(record?.comparison?.result, comparison.result, `${label} comparison result differs`);
+  }
+  return { readbackCount: records.length, validationResult: "PASS" };
+}
+
 if (import.meta.main) {
   const comparison = await compareSubtitleFiles();
+  const history = await validateSubtitleHistory();
   console.log(
     JSON.stringify({
       receipt: "HOTEL_PUBLIC_SUBTITLE_COMPARISON_PASS",
       ...comparison,
+      historyReadbackCount: history.readbackCount,
+      historyValidationResult: history.validationResult,
       authentication: "NO_COOKIES_OR_CREDENTIALS_SUPPLIED",
       videoFileIdentity: "UNMEASURED",
     }),

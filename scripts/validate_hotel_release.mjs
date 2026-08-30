@@ -12,6 +12,8 @@
 // event_uuid_v7=01a054a4-27a9-75a2-8762-c0fd4bcb86f0 state_transition=RELEASE_DIRECTORY_ENUMERATION_UNBOUND -> RELEASE_DIRECTORY_FD3_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:47:19.337Z
 // event_uuid_v7=01a054bb-6f17-785d-aa07-2420c4ff811e state_transition=RELEASE_ROOT_DESCRIPTOR_UNBOUND -> RELEASE_ROOT_DESCRIPTOR_HELD occurred_at=2026-08-30T22:12:44.951Z
 // event_uuid_v7=01a054d4-db72-7bfb-9cef-252977d955c6 state_transition=RELEASE_ROOT_PATH_CHECK_USE_UNVERIFIED -> RELEASE_ROOT_DESCRIPTOR_FIRST_OPEN_VERIFIED occurred_at=2026-08-30T22:40:31.090Z
+// event_uuid_v7=01a054f1-6b9b-7d84-8a31-53a43a4a52a0 state_transition=PER_OPERATION_HELPER_STARTUP -> ONE_BOUND_ROOT_HELPER_PER_VALIDATION occurred_at=2026-08-30T23:11:43.003Z
+// machine-contract: one isolated helper serves strictly sequential bounded requests; each response has one JSON header and its exact declared byte payload, and the child closes before the held root descriptor.
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: the resolved release-root entry is checked by Node, while all nested directory names, identities, and file bytes are resolved relative to one held root descriptor.
 // machine-contract: each helper request receives only root fd 3 and strict relative components; the helper opens every directory ancestor with O_NOFOLLOW|O_DIRECTORY and fstat-checks expected identities.
@@ -170,96 +172,167 @@ function expectedDirectoryChain(context, ancestors, target = null) {
   return chain.map((directory) => ({ components: directory.components, identity: wireIdentity(directory.identity) }));
 }
 
-async function runBoundRootHelper(context, request, label) {
-  const requestBytes = Buffer.from(`${JSON.stringify(request)}\n`, "utf8");
-  assert.ok(requestBytes.length <= boundRootHelperRequestMaxBytes, `${label} helper request exceeded its byte limit`);
-  const remainingMs = assertValidationTime(context, `${label} helper start`);
+function createBoundRootHelper(context) {
+  const remainingMs = assertValidationTime(context, "helper start");
   const child = spawn("python3", ["-I", boundRootHelperPath], {
     cwd: repositoryRoot,
     shell: false,
     stdio: ["pipe", "pipe", "pipe", context.rootHandle.fd],
   });
-  const stdout = [];
   const stderr = [];
-  let stdoutBytes = 0;
   let stderrBytes = 0;
+  let requestSequence = 0;
+  let pending = null;
   let termination = null;
+  let finishing = false;
+  let closed = false;
+  let closeResult;
+  let resolveClose;
+  const closePromise = new Promise((resolvePromise) => {
+    resolveClose = resolvePromise;
+  });
+  const label = () => pending?.label ?? "release";
+  const stop = (reason) => {
+    if (closed || termination) return;
+    termination = reason;
+    child.stdin.destroy();
+    child.kill("SIGKILL");
+  };
+  const lifetimeTimer = setTimeout(() => stop(new Error("helper reached the release validation deadline")), remainingMs);
+  const clearRequestTimer = () => {
+    if (pending) clearTimeout(pending.timer);
+  };
+  const streamError = (stream, error) => stop(new Error(label() + " helper " + stream + " failed", { cause: error }));
 
-  return new Promise((resolvePromise, rejectPromise) => {
-    let settled = false;
-    let spawned = false;
-    let timer;
-    const settleReject = (error) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      rejectPromise(error);
-    };
-    const settleResolve = (value) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolvePromise(value);
-    };
-    const stop = (reason) => {
-      if (settled || termination) return;
-      termination = reason;
-      child.stdin.destroy();
-      child.kill("SIGKILL");
-    };
-    const timerReason = () =>
-      new Error(remainingMs <= boundRootHelperTimeoutMs ? `${label} helper reached the release validation deadline` : `${label} helper timed out`);
-    timer = setTimeout(() => stop(timerReason()), Math.min(boundRootHelperTimeoutMs, remainingMs));
-    const collect = (chunks, stream) => (chunk) => {
-      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      if (stream === "stdout") stdoutBytes += bytes.length;
-      else stderrBytes += bytes.length;
-      const limit = stream === "stdout" ? boundRootHelperOutputMaxBytes : boundRootHelperStderrMaxBytes;
-      if ((stream === "stdout" ? stdoutBytes : stderrBytes) > limit) {
-        stop(new Error(`${label} helper ${stream} exceeded its byte limit`));
-        return;
-      }
-      chunks.push(bytes);
-    };
-    child.stdout.on("data", collect(stdout, "stdout"));
-    child.stderr.on("data", collect(stderr, "stderr"));
-    const stopForStreamError = (stream, error) => {
-      if (!settled && !termination) stop(new Error(`${label} helper ${stream} failed`, { cause: error }));
-    };
-    child.stdin.once("error", (error) => stopForStreamError("stdin", error));
-    child.stdout.once("error", (error) => stopForStreamError("stdout", error));
-    child.stderr.once("error", (error) => stopForStreamError("stderr", error));
-    child.once("spawn", () => {
-      spawned = true;
-      if (termination) child.kill("SIGKILL");
-    });
-    child.once("error", (error) => {
-      if (!spawned) {
-        settleReject(new Error(`${label} helper failed to spawn`, { cause: error }));
-      } else if (!termination) {
-        stop(new Error(`${label} helper process failed`, { cause: error }));
-      }
-    });
-    child.once("close", (status, signal) => {
-      clearTimeout(timer);
-      if (termination) {
-        settleReject(termination);
-        return;
-      }
-      if (status !== 0) {
-        const detail = Buffer.concat(stderr).toString("utf8").trim();
-        settleReject(new Error(`${label} helper failed${signal ? ` with ${signal}` : ""}${detail ? `: ${detail}` : ""}`));
-        return;
-      }
-      settleResolve(Buffer.concat(stdout));
-    });
+  child.stdin.on("error", (error) => streamError("stdin", error));
+  child.stdout.on("error", (error) => streamError("stdout", error));
+  child.stderr.on("error", (error) => streamError("stderr", error));
+  child.once("spawn", () => {
+    if (termination) child.kill("SIGKILL");
+  });
+  child.once("error", (error) => stop(new Error(label() + " helper process failed", { cause: error })));
+  child.stderr.on("data", (chunk) => {
+    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    stderrBytes += bytes.length;
+    if (stderrBytes > boundRootHelperStderrMaxBytes) {
+      stop(new Error(label() + " helper stderr exceeded its byte limit"));
+      return;
+    }
+    stderr.push(bytes);
+  });
+  child.stdout.on("data", (chunk) => {
+    if (termination) return;
+    if (!pending) {
+      stop(new Error("helper returned an unsolicited response"));
+      return;
+    }
+    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    pending.bytes += bytes.length;
+    if (pending.bytes > boundRootHelperOutputMaxBytes) {
+      stop(new Error(pending.label + " helper stdout exceeded its byte limit"));
+      return;
+    }
+    pending.chunks.push(bytes);
     try {
-      child.stdin.end(requestBytes);
+      if (pending.expectedBytes === null) {
+        const buffered = Buffer.concat(pending.chunks);
+        const separator = buffered.indexOf(10);
+        if (separator === -1) return;
+        assert.ok(separator > 0, pending.label + " helper response has no header");
+        const header = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(buffered.subarray(0, separator)));
+        assert.equal(header?.sequence, pending.sequence, pending.label + " helper returned the wrong request sequence");
+        assert.ok(
+          Number.isSafeInteger(header?.bytes) && header.bytes >= 0 && header.bytes <= boundRootHelperFileMaxBytes,
+          pending.label + " helper returned an invalid byte count",
+        );
+        pending.expectedBytes = separator + 1 + header.bytes;
+        assert.ok(pending.expectedBytes <= boundRootHelperOutputMaxBytes, pending.label + " helper response exceeded its byte limit");
+      }
+      assert.ok(pending.bytes <= pending.expectedBytes, pending.label + " helper returned trailing response bytes");
+      if (pending.bytes === pending.expectedBytes) {
+        const response = Buffer.concat(pending.chunks);
+        const completed = pending;
+        clearRequestTimer();
+        pending = null;
+        completed.resolve(response);
+      }
     } catch (error) {
-      if (spawned) stop(new Error(`${label} helper stdin failed`, { cause: error }));
-      else settleReject(new Error(`${label} helper failed to start`, { cause: error }));
+      stop(error);
     }
   });
+  child.once("close", (status, signal) => {
+    closed = true;
+    clearTimeout(lifetimeTimer);
+    clearRequestTimer();
+    const detail = Buffer.concat(stderr).toString("utf8").trim();
+    const unexpected = !finishing || pending !== null || status !== 0;
+    closeResult =
+      termination ??
+      (unexpected
+        ? new Error(label() + " helper failed" + (signal ? " with " + signal : "") + (detail ? ": " + detail : " before validation completed"))
+        : null);
+    if (pending) {
+      pending.reject(closeResult ?? new Error(pending.label + " helper closed before its response"));
+      pending = null;
+    }
+    resolveClose();
+  });
+
+  return {
+    async request(request, requestLabel) {
+      if (termination || closed) throw termination ?? closeResult ?? new Error("helper is closed");
+      assert.ok(!finishing && pending === null, "bound-root helper requests must be sequential");
+      const sequence = ++requestSequence;
+      const requestBytes = Buffer.from(JSON.stringify({ ...request, sequence }) + "\n", "utf8");
+      assert.ok(requestBytes.length <= boundRootHelperRequestMaxBytes, requestLabel + " helper request exceeded its byte limit");
+      const requestRemainingMs = assertValidationTime(context, requestLabel + " helper request");
+      return new Promise((resolvePromise, rejectPromise) => {
+        const timer = setTimeout(
+          () =>
+            stop(
+              new Error(
+                requestLabel + (requestRemainingMs <= boundRootHelperTimeoutMs ? " helper reached the release validation deadline" : " helper timed out"),
+              ),
+            ),
+          Math.min(boundRootHelperTimeoutMs, requestRemainingMs),
+        );
+        pending = { label: requestLabel, sequence, chunks: [], bytes: 0, expectedBytes: null, timer, resolve: resolvePromise, reject: rejectPromise };
+        try {
+          child.stdin.write(requestBytes, (error) => {
+            if (error) streamError("stdin", error);
+          });
+        } catch (error) {
+          streamError("stdin", error);
+        }
+      });
+    },
+    async finish() {
+      let timer;
+      if (!closed && !termination) {
+        assert.ok(pending === null, "helper cannot finish with an outstanding request");
+        finishing = true;
+        timer = setTimeout(
+          () => stop(new Error("helper did not close after its final request")),
+          Math.min(boundRootHelperTimeoutMs, assertValidationTime(context, "helper shutdown")),
+        );
+        child.stdin.end();
+      }
+      try {
+        await closePromise;
+      } finally {
+        clearTimeout(timer);
+      }
+      if (closeResult) throw closeResult;
+    },
+    async dispose() {
+      if (!closed) stop(new Error("validation stopped before helper completion"));
+      await closePromise;
+    },
+  };
+}
+
+async function runBoundRootHelper(context, request, label) {
+  return context.helper.request(request, label);
 }
 
 function decodeBoundRootResponse(bytes, operation, label) {
@@ -477,12 +550,15 @@ export async function validateRelease(
   const deadlineAt = Date.now() + releaseValidationTimeoutMs;
   const resolvedReleaseRoot = resolve(releaseRoot);
   const rootHandle = await openReleaseRoot(resolvedReleaseRoot);
+  let helper;
   try {
     const openedRoot = await rootHandle.stat({ bigint: true });
     assert.ok(openedRoot.isDirectory(), "release root must be a directory after opening");
     const rootIdentity = identity(openedRoot);
     const context = { resolvedReleaseRoot, rootHandle, rootIdentity, beforeFileRead, deadlineAt };
     await assertRootLocation(context, "before validation");
+    helper = createBoundRootHelper(context);
+    context.helper = helper;
     const snapshots = await regularFiles(context, [], null, [], afterDirectoryLstat);
     const snapshotByPath = new Map(snapshots.map((snapshot) => [snapshot.relativePath, snapshot]));
     // These callbacks are in-process test seams; the command-line validator never supplies them.
@@ -562,6 +638,7 @@ export async function validateRelease(
     await afterFinalRead?.(finalSnapshots);
     await assertRootLocation(context, "before final readback enumeration");
     assertSameSnapshot(snapshots, await regularFiles(context, [], null, [], afterDirectoryLstat));
+    await helper.finish();
 
     return {
       receipt: "HOTEL_RELEASE_READBACK_PASS",
@@ -569,7 +646,11 @@ export async function validateRelease(
       files: checksumLines.length,
     };
   } finally {
-    await rootHandle.close();
+    try {
+      await helper?.dispose();
+    } finally {
+      await rootHandle.close();
+    }
   }
 }
 

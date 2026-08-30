@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { link, lstat, mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { resolve } from "node:path";
+import { delimiter, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -11,6 +11,8 @@ import { validateRelease } from "./validate_hotel_release.mjs";
 // information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2
 // event_uuid_v7=01a05388-5ea8-7fbd-a08e-e5a8ef88376f state_transition=RELEASE_FILE_SET_UNVERIFIED -> RELEASE_FILE_SET_REJECTS_UNLISTED occurred_at=2026-08-30T16:37:21.192Z
 // event_uuid_v7=01a053b8-3877-7197-be30-8519dfe88680 state_transition=PATH_SNAPSHOT_RACE_UNTESTED -> PATH_SNAPSHOT_RACE_REJECTED occurred_at=2026-08-30T17:29:37.143Z
+// event_uuid_v7=01a054f0-4c31-78bb-a5a2-270eace3b973 state_transition=PER_REQUEST_HELPER_STARTS_UNBOUNDED -> ONE_VALIDATION_HELPER_SESSION_REQUIRED occurred_at=2026-08-30T23:10:29.425Z
+// event_uuid_v7=01a054f5-8d8a-7fe5-9182-fd87a21b76ee state_transition=LONG_LIVED_HELPER_PROTOCOL_UNCHECKED -> MALFORMED_RESPONSES_REJECTED_AND_CHILD_REAPED occurred_at=2026-08-30T23:16:13.834Z
 // machine-contract: run the real release validator against a harmless package fixture; do not inspect its source text.
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -63,6 +65,95 @@ async function addNestedChecksummedFile(releaseRoot) {
   const checksumPath = resolve(releaseRoot, "SHA256SUMS");
   const checksum = await readFile(checksumPath, "utf8");
   await writeFile(checksumPath, `${checksum}${sha256(contents)}  ${relativePath}\n`);
+}
+
+async function addDistLikeChecksummedFiles(releaseRoot) {
+  const files = [];
+  for (const [area, directory] of [
+    ["client", "assets"],
+    ["server", "routes"],
+    [".openai", "prompts"],
+  ]) {
+    for (let index = 0; index < 8; index += 1) {
+      const relativePath = `dist/${area}/${directory}/fixture-${index.toString().padStart(2, "0")}.json`;
+      const contents = `dist-like fixture ${relativePath}\n`;
+      const absolutePath = resolve(releaseRoot, relativePath);
+      await mkdir(resolve(absolutePath, ".."), { recursive: true });
+      await writeFile(absolutePath, contents);
+      files.push(`${sha256(contents)}  ${relativePath}`);
+    }
+  }
+  const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+  const checksum = await readFile(checksumPath, "utf8");
+  await writeFile(checksumPath, `${checksum}${files.sort().join("\n")}\n`);
+}
+
+function systemPythonPath() {
+  const result = spawnSync("python3", ["-c", "import sys; print(sys.executable)"], { encoding: "utf8" });
+  assert.equal(result.status, 0, `${result.stdout ?? ""}\n${result.stderr ?? ""}`);
+  const executable = result.stdout.trim();
+  assert.ok(executable.startsWith("/"), `python3 did not report an absolute executable: ${executable}`);
+  return executable;
+}
+
+async function withPythonLaunchCounter(assertion) {
+  return withPythonWrapper('/bin/sleep 0.2\nexec "$PYTHON_LAUNCH_REAL" "$@"', assertion, true);
+}
+
+async function withPythonWrapper(wrapperBody, assertion, useSystemPython = false) {
+  const realPython = useSystemPython ? systemPythonPath() : null;
+  const wrapperDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-python-wrapper-"));
+  const wrapperPath = resolve(wrapperDirectory, "python3");
+  const counterPath = resolve(wrapperDirectory, "launches.log");
+  const previousPath = process.env.PATH;
+  const previousCounter = process.env.PYTHON_LAUNCH_COUNTER;
+  const previousRealPython = process.env.PYTHON_LAUNCH_REAL;
+  await writeFile(
+    wrapperPath,
+    `#!/bin/sh
+set -eu
+/usr/bin/printf '%s\\n' "$$" >> "$PYTHON_LAUNCH_COUNTER"
+${wrapperBody}
+`,
+    { mode: 0o755 },
+  );
+  process.env.PATH = `${wrapperDirectory}${delimiter}${previousPath ?? ""}`;
+  process.env.PYTHON_LAUNCH_COUNTER = counterPath;
+  if (realPython) process.env.PYTHON_LAUNCH_REAL = realPython;
+  try {
+    return await assertion(counterPath);
+  } finally {
+    if (previousPath === undefined) delete process.env.PATH;
+    else process.env.PATH = previousPath;
+    if (previousCounter === undefined) delete process.env.PYTHON_LAUNCH_COUNTER;
+    else process.env.PYTHON_LAUNCH_COUNTER = previousCounter;
+    if (previousRealPython === undefined) delete process.env.PYTHON_LAUNCH_REAL;
+    else process.env.PYTHON_LAUNCH_REAL = previousRealPython;
+    await rm(wrapperDirectory, { recursive: true, force: true });
+  }
+}
+
+function shellQuote(value) {
+  return "'" + value.replaceAll("'", "'\"'\"'") + "'";
+}
+
+function fakeResponseScript(response) {
+  return `IFS= read -r request || true
+sequence=$(/usr/bin/printf '%s\\n' "$request" | /usr/bin/sed -n 's/.*"sequence":\\([0-9][0-9]*\\).*/\\1/p')
+/usr/bin/printf '%s' ${shellQuote(response)} | /usr/bin/sed "s/__SEQUENCE__/$sequence/g"
+exit 0`;
+}
+
+async function assertPythonWrapperExited(counterPath, label) {
+  const pids = (await readFile(counterPath, "utf8")).trim().split("\n").filter(Boolean);
+  assert.equal(pids.length, 1, `${label} must start exactly one fake helper`);
+  const pid = Number(pids[0]);
+  assert.ok(Number.isSafeInteger(pid) && pid > 0, `${label} recorded an invalid helper PID`);
+  assert.throws(
+    () => process.kill(pid, 0),
+    (error) => error?.code === "ESRCH",
+    `${label} left helper process ${pid} alive after validation rejected it`,
+  );
 }
 
 function runValidator(releaseRoot, options = {}) {
@@ -124,6 +215,68 @@ test("accepts a checksum-complete release package without extra files", async ()
     assert.equal(JSON.parse(result.stdout).directory, releaseRoot);
   });
 });
+
+test(
+  "reuses one Python helper for a dist-like nested release",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      await addDistLikeChecksummedFiles(releaseRoot);
+      await withPythonLaunchCounter(async (counterPath) => {
+        const startedAt = Date.now();
+        const result = await validateRelease(releaseRoot);
+        const elapsedMs = Date.now() - startedAt;
+        assert.equal(result.receipt, "HOTEL_RELEASE_READBACK_PASS");
+        const launches = (await readFile(counterPath, "utf8")).trim().split("\n").filter(Boolean);
+        assert.equal(launches.length, 1, `one validation must use one long-lived Python helper (elapsed ${elapsedMs} ms)`);
+        assert.ok(elapsedMs < 15_000, `single-helper validation exceeded its test budget: ${elapsedMs} ms`);
+      });
+    });
+  },
+);
+
+test(
+  "rejects malformed long-lived helper responses and reaps the child",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    const cases = [
+      { label: "invalid JSON header", wrapperBody: fakeResponseScript("not-json\n"), expectedError: /invalid JSON|not valid JSON/u },
+      {
+        label: "negative declared bytes",
+        wrapperBody: fakeResponseScript('{"operation":"list","sequence":__SEQUENCE__,"bytes":-1}\n'),
+        expectedError: /helper returned an invalid byte count/u,
+      },
+      {
+        label: "declared bytes above the 8 MiB limit",
+        wrapperBody: fakeResponseScript('{"operation":"list","sequence":__SEQUENCE__,"bytes":8388609}\n'),
+        expectedError: /helper returned an invalid byte count/u,
+      },
+      {
+        label: "payload shorter than declared bytes",
+        wrapperBody: fakeResponseScript('{"operation":"list","sequence":__SEQUENCE__,"bytes":1}\n'),
+        expectedError: /helper failed before validation completed|closed before its response/u,
+      },
+      {
+        label: "extra response bytes",
+        wrapperBody: fakeResponseScript('{"operation":"list","sequence":__SEQUENCE__,"bytes":0}\nx'),
+        expectedError: /trailing response bytes/u,
+      },
+      {
+        label: "stderr above the limit",
+        wrapperBody: "IFS= read -r request || true\n/usr/bin/awk 'BEGIN { for (i = 0; i < 65537; i += 1) printf \"x\" }' >&2\nexit 0",
+        expectedError: /stderr exceeded its byte limit/u,
+      },
+    ];
+    for (const { label, wrapperBody, expectedError } of cases) {
+      await withFixture({}, async (releaseRoot) => {
+        await withPythonWrapper(wrapperBody, async (counterPath) => {
+          await assert.rejects(() => validateRelease(releaseRoot), expectedError, `${label} was accepted`);
+          await assertPythonWrapperExited(counterPath, label);
+        });
+      });
+    }
+  },
+);
 
 test("fails closed before file operations on Windows", { skip: process.platform === "win32" ? false : "Windows-only platform guard" }, async () => {
   await assert.rejects(

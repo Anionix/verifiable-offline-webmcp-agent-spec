@@ -28,6 +28,9 @@ shasum -a 256 -c SHA256SUMS
 
 この配布物検査は、安全なリンク追従なしのファイルオープンを保証できないためWindowsでは利用できません。これはブラウザーデモ本体とは別の制限です。
 
+<!-- machine-contract information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2 event_uuid_v7=01a054f1-6b9b-7d84-8a31-53a43a4a52a0 state_transition=PER_OPERATION_HELPER_STARTUP -> ONE_BOUND_ROOT_HELPER_PER_VALIDATION occurred_at=2026-08-30T23:11:43.003Z -->
+Pythonの補助処理は、検査ごとに一度だけ起動します。三回の一覧確認でも同じ補助処理を使い、読み取りのたびに親フォルダーの識別子を照合します。要求は一件ずつ送り、通し番号と返却バイト数が一致しなければ拒否します。各要求と最後の終了待ちはそれぞれ5秒以内、検査全体は従来どおり30秒以内です。異常時は成功を返さず、補助処理の終了後に配布フォルダーの参照を閉じます。
+
 この読み取り方法の再現にはNode.js 24.15と`python3`を使います。macOSとLinuxでは、配布フォルダーを一度開き、その同じフォルダーを確認しながら配下の項目を読みます。Pythonの補助処理へ渡すのは、開いたフォルダーの識別子と検査済みの相対位置だけです。リンクはたどらず、1ファイルは8 MiBまで、1回の一覧は4,096件まで、配布物全体の一覧は4,096件まで、検査時間は30秒までです。配布フォルダーより上の親フォルダーは信頼できることが前提です。途中の差し替えを検出しますが、検査全体を一瞬の状態として固定する保証ではありません。根拠は[Node.js v24.15 fs](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html)、[Node.js child_process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio)、[Python os.listdir](https://docs.python.org/3.14/library/os.html#os.listdir)です。
 
 JSONは、元コミット、コミット時刻、UUIDv5、決定的UUIDv7、機能部分・全クライアント・全Sites包装の三つのSHA-256要約値、公開先、YouTube動画、60秒の四手順、各内容ファイルの大きさとSHA-256を記録します。`SHA256SUMS`はJSON目録自身も検査しますが、自分自身は列挙しないため、自己参照による要約値の循環はありません。

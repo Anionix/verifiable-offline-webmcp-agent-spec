@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # information_uuid_v5=c7febceb-9eba-52fe-866d-e3bf95498b60
 # event_uuid_v7=01a054bb-6f19-7b12-857a-453b7df85cb7 state_transition=BOUND_ROOT_RELATIVE_ACCESS_UNVERIFIED -> BOUND_ROOT_RELATIVE_ACCESS_VERIFIED occurred_at=2026-08-30T22:12:44.953Z
+# event_uuid_v7=01a054f1-6b9b-7d84-8a31-53a43a4a52a0 state_transition=SINGLE_REQUEST_PROCESS -> SEQUENTIAL_BOUNDED_REQUEST_PROCESS occurred_at=2026-08-30T23:11:43.003Z
+# machine-contract: each newline-delimited request is size-bounded and revalidates every directory; responses flush a JSON header and exactly its declared payload bytes, and stdin EOF ends the process.
 # machine-contract: accept no path or other argument; receive only fd 3 and a strict relative-component request on stdin.
 
 from __future__ import annotations
@@ -20,7 +22,7 @@ MAX_DIRECTORY_ENTRIES = 4_096
 MAX_FILE_BYTES = 8 * 1024 * 1024
 DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 FILE_FLAGS = os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW
-REQUEST_KEYS = {"operation", "components", "expectedAncestors", "expectedIdentity"}
+REQUEST_KEYS = {"operation", "components", "expectedAncestors", "expectedIdentity", "sequence"}
 
 
 def fail(message: str) -> NoReturn:
@@ -193,16 +195,22 @@ def read_entry(request: dict[str, Any]) -> tuple[dict[str, Any], bytes]:
         close_descriptors(descriptors)
 
 
-def parse_request() -> dict[str, Any]:
-    raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
+def parse_request() -> dict[str, Any] | None:
+    raw = sys.stdin.buffer.readline(MAX_REQUEST_BYTES + 1)
+    if not raw:
+        return None
     if len(raw) > MAX_REQUEST_BYTES:
         fail("request exceeds byte limit")
+    if not raw.endswith(b"\n"):
+        fail("request must end with a newline")
     try:
         request = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         fail(f"invalid request: {error.__class__.__name__}")
     if not isinstance(request, dict) or set(request) != REQUEST_KEYS:
         fail("request keys are invalid")
+    if type(request["sequence"]) is not int or not 1 <= request["sequence"] <= 9_007_199_254_740_991:
+        fail("request sequence is invalid")
     if request["operation"] not in {"list", "stat", "read"}:
         fail("operation is invalid")
     component_list(request["components"], "components")
@@ -225,20 +233,27 @@ def parse_request() -> dict[str, Any]:
 def emit(response: dict[str, Any], payload: bytes = b"") -> None:
     header = json.dumps(response, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
     sys.stdout.buffer.write(header + b"\n" + payload)
+    sys.stdout.buffer.flush()
 
 
 def main() -> None:
     if len(sys.argv) != 1:
         raise SystemExit("bound-root helper accepts no arguments")
-    request = parse_request()
     os.fstat(ROOT_FD)
-    if request["operation"] == "list":
-        emit(list_directory(request))
-    elif request["operation"] == "stat":
-        emit(stat_entry(request))
-    else:
-        response, payload = read_entry(request)
+    sequence = 1
+    while (request := parse_request()) is not None:
+        if request["sequence"] != sequence:
+            fail("request sequence is out of order")
+        payload = b""
+        if request["operation"] == "list":
+            response = list_directory(request)
+        elif request["operation"] == "stat":
+            response = stat_entry(request)
+        else:
+            response, payload = read_entry(request)
+        response["sequence"] = sequence
         emit(response, payload)
+        sequence += 1
 
 
 if __name__ == "__main__":

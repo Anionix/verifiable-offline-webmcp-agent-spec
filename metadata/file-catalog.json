@@ -1859,8 +1859,8 @@
     },
     {
       "path": "docs/24-hotel-release-package.en.md",
-      "sha256": "91d681ca8bb49a4d266a05490cba48ab0b51c594de38ebda39c9d84f0ac3c8ce",
-      "bytes": 5876,
+      "sha256": "be96c265c3aeb8e1c288e65591c87071148a4b263c71fcdbf57cb8546c2fd09a",
+      "bytes": 6591,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1878,8 +1878,8 @@
     },
     {
       "path": "docs/24-hotel-release-package.ja.md",
-      "sha256": "a8c50a22d7f0510c2019a0a93b5a028de76f89b2e5f88c63c86e3c3339e60825",
-      "bytes": 5084,
+      "sha256": "0233a38398300fb05d4e5857dd0609bed7ae8c502f0f9c2afcf618e75f76e209",
+      "bytes": 5871,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -5337,8 +5337,8 @@
     },
     {
       "path": "scripts/list_directory_fd.py",
-      "sha256": "b52806c3dd436c689edd2d5d3a59dec347043fde9926bb4a0da23ce209cdf76d",
-      "bytes": 10864,
+      "sha256": "db5385e5d4fc0830b9329328d2b33a25a181f331f4cb5f03dd75724d8b73ca00",
+      "bytes": 11803,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {
@@ -5489,8 +5489,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.mjs",
-      "sha256": "f0d7fadb7ceee59f7ac4361eb4624e9d9d04adcc51dce36c58847706bc7ba86e",
-      "bytes": 31545,
+      "sha256": "910316f331b1fbd53433ad492fe4be8b68b34f08be16ff69cdc84aad61d4c3f2",
+      "bytes": 35045,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5508,8 +5508,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.test.mjs",
-      "sha256": "8d254162f08ef313d6065f16f3fa5729ca638305dab90070522f8447fc75150f",
-      "bytes": 29417,
+      "sha256": "8cc08675bdf1c696991330d9aefcad9fae6ab040be3d3597df746ade86d5a390",
+      "bytes": 36374,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

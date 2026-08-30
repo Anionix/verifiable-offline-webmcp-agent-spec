@@ -74,6 +74,7 @@ test("accepts a checksum-complete release package without extra files", async ()
     const result = runValidator(releaseRoot);
     assert.equal(result.status, 0, result.output);
     assert.match(result.stdout, /HOTEL_RELEASE_READBACK_PASS/u);
+    assert.equal(JSON.parse(result.stdout).directory, releaseRoot);
   });
 });
 

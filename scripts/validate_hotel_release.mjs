@@ -106,4 +106,10 @@ for (const { sha, path: relativePath } of checksumRecords) {
 assert.ok(!checksumPaths.has("SHA256SUMS"), "checksum file must not self-reference");
 for (const relativePath of requiredFiles.filter((path) => path !== "SHA256SUMS")) assert.ok(checksumPaths.has(relativePath), `${relativePath} is not recorded`);
 
-console.log(JSON.stringify({ receipt: "HOTEL_RELEASE_READBACK_PASS", directory: "release/kyoto-booking-retry-proof", files: checksumLines.length }));
+console.log(
+  JSON.stringify({
+    receipt: "HOTEL_RELEASE_READBACK_PASS",
+    directory: releaseRoot === defaultReleaseRoot ? "release/kyoto-booking-retry-proof" : releaseRoot,
+    files: checksumLines.length,
+  }),
+);

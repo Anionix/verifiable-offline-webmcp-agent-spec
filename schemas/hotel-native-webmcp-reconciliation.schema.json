@@ -44,6 +44,27 @@
           "reconciliation": { "$ref": "#/$defs/managedReconciliation" }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "discovery": {
+            "type": "object",
+            "required": ["profile"],
+            "properties": { "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reconciliation": {
+            "properties": {
+              "statusCheck": { "$ref": "#/$defs/legacyStatusResult" },
+              "finalStatus": { "$ref": "#/$defs/legacyFinalStatus" }
+            }
+          }
+        }
+      }
     }
   ],
   "$defs": {
@@ -469,6 +490,22 @@
         "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
+    "legacyStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
+    },
     "finalStatus": {
       "type": "object",
       "additionalProperties": false,
@@ -486,6 +523,22 @@
         "eventCount": { "type": "integer", "minimum": 1 },
         "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "legacyFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
     },
     "managedReconciliationStatusResult": {
       "allOf": [

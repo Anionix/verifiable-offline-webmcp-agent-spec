@@ -76,6 +76,19 @@ function assertExactArray(actual, expected, label) {
   assert.deepEqual(actual, expected, `${label} changed`);
 }
 
+function assertExactKeys(value, expected, label) {
+  assert(value && typeof value === "object" && !Array.isArray(value), `${label} must be an object`);
+  assert.deepEqual(Object.keys(value).sort(), [...expected].sort(), `${label} has an unexpected or missing field`);
+}
+
+const legacyStatusCheckKeys = Object.freeze(["toolName", "state", "bookingExists", "confirmationNumber", "attemptCount", "bookingCount", "effectStartCount"]);
+const legacyFinalStatusKeys = Object.freeze(["state", "attemptCount", "bookingCount", "effectStartCount", "confirmationNumber", "sameConfirmation"]);
+
+function assertLegacyReconciliation(reconciliation, label) {
+  assertExactKeys(reconciliation.statusCheck, legacyStatusCheckKeys, `${label}.statusCheck`);
+  assertExactKeys(reconciliation.finalStatus, legacyFinalStatusKeys, `${label}.finalStatus`);
+}
+
 function assertManagedRunBinding(nativeEvidence) {
   const { identity, deployment, discovery, reconciliation, recording } = nativeEvidence;
   const binding = discovery.runBinding;
@@ -151,6 +164,7 @@ export function validateNativeDiscovery(nativeEvidence) {
     assert.equal(discovery.secureContext, true);
     assert.equal(discovery.discoveryEffectCounts.bookingCount, 0);
     assert.equal(discovery.discoveryEffectCounts.effectStartCount, 0);
+    assertLegacyReconciliation(reconciliation, "legacy native reconciliation");
   }
   assert.equal(reconciliation.status, "PASS");
   assert.equal(reconciliation.sameConfirmation, true);
@@ -361,6 +375,9 @@ export function compareStable(actual, expected) {
   assert.deepEqual(actual.localLiveness, expected.localLiveness, "candidate liveness evidence drifted");
   assert.deepEqual(actual.artifacts, expected.artifacts, "candidate artifact digest is stale");
   assert.deepEqual(actual.publicClaims, expected.publicClaims, "candidate public-claim record is stale");
+  if (actual.browserObservation.profile !== managedEvidenceProfile) {
+    assertLegacyReconciliation(actual.browserObservation.reconciliation, "legacy browser observation reconciliation");
+  }
   assert.deepEqual(actual.browserObservation, expected.browserObservation, "native browser observation record drifted");
   assert.deepEqual(actual.issueReadiness, expected.issueReadiness, "issue readiness record drifted");
   assert.deepEqual(actual.finalGate, expected.finalGate, "final gate record drifted");

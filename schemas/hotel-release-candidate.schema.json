@@ -199,6 +199,22 @@
         "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
     },
+    "legacyStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
+    },
     "finalStatus": {
       "type": "object",
       "additionalProperties": false,
@@ -216,6 +232,22 @@
         "eventCount": { "type": "integer", "minimum": 1 },
         "eventChainHead": { "$ref": "#/$defs/sha256" }
       }
+    },
+    "legacyFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["intentId"] },
+              { "required": ["fingerprint"] },
+              { "required": ["bookingId"] },
+              { "required": ["eventCount"] },
+              { "required": ["eventChainHead"] }
+            ]
+          }
+        }
+      ]
     },
     "recording": {
       "type": "object",
@@ -271,7 +303,17 @@
         "forbiddenToolNames": { "const": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"] },
         "calledToolNames": { "const": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status"] },
         "discoveryEffectCounts": { "$ref": "#/$defs/effectCounts" },
-        "reconciliation": { "$ref": "#/$defs/browserReconciliation" },
+        "reconciliation": {
+          "allOf": [
+            { "$ref": "#/$defs/browserReconciliation" },
+            {
+              "properties": {
+                "statusCheck": { "$ref": "#/$defs/legacyStatusResult" },
+                "finalStatus": { "$ref": "#/$defs/legacyFinalStatus" }
+              }
+            }
+          ]
+        },
         "recording": { "$ref": "#/$defs/recording" },
         "status": { "const": "PASS" }
       }

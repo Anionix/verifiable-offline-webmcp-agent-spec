@@ -43,6 +43,22 @@ const correctedInteractionSequence = Object.freeze([
   "visible_retry",
   "get_hotel_booking_status:after_retry",
 ]);
+const legacyManagedFieldsByPhase = Object.freeze({
+  statusCheck: Object.freeze({
+    intentId: fingerprint,
+    fingerprint,
+    bookingId,
+    eventCount: 3,
+    eventChainHead: beforeEventChainHead,
+  }),
+  finalStatus: Object.freeze({
+    intentId: fingerprint,
+    fingerprint,
+    bookingId,
+    eventCount: 4,
+    eventChainHead: afterEventChainHead,
+  }),
+});
 
 const DRAFT_2020_12_REGISTRY_RUNNER = String.raw`
 import json
@@ -448,12 +464,22 @@ async function validateWithDraft202012Registry(cases) {
     $id: "https://example.invalid/managed-browser-observation-test.schema.json",
     $ref: `${candidateSchema.$id}#/$defs/managedBrowserObservation`,
   };
+  const candidateLegacyObservationSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "https://example.invalid/legacy-browser-observation-test.schema.json",
+    $ref: `${candidateSchema.$id}#/$defs/browserObservation`,
+  };
   const result = spawnSync("uv", ["run", "--frozen", "python", "-c", DRAFT_2020_12_REGISTRY_RUNNER], {
     cwd: fileURLToPath(new URL("..", import.meta.url)),
     encoding: "utf8",
     env: { ...process.env, UV_CACHE_DIR: process.env.UV_CACHE_DIR ?? join(fileURLToPath(new URL("..", import.meta.url)), ".local/uv-cache") },
     input: JSON.stringify({
-      schemas: { native: nativeSchema, candidate: candidateSchema, candidateManagedObservation: candidateManagedObservationSchema },
+      schemas: {
+        native: nativeSchema,
+        candidate: candidateSchema,
+        candidateManagedObservation: candidateManagedObservationSchema,
+        candidateLegacyObservation: candidateLegacyObservationSchema,
+      },
       cases,
     }),
     maxBuffer: 1024 * 1024,
@@ -612,6 +638,32 @@ test("candidate old browser observation remains unchanged", async () => {
   assert.deepEqual(browserObservationFrom(oldChromeProof, oldChromeProof.deployment.sourceCommit), legacyCandidateBrowserObservation);
 });
 
+test("legacy Chrome rejects managed-only reconciliation fields", async () => {
+  const storedCandidate = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
+  for (const [phase, values] of Object.entries(legacyManagedFieldsByPhase)) {
+    for (const [field, value] of Object.entries(values)) {
+      const invalid = structuredClone(legacyChromeProof);
+      invalid.reconciliation[phase][field] = value;
+      assert.throws(() => validateNativeDiscovery(invalid), /legacy|unexpected|managed|reconciliation/u, `${phase}.${field}`);
+      assert.throws(
+        () => browserObservationFrom(invalid, legacyChromeProof.deployment.sourceCommit),
+        /legacy|unexpected|managed|reconciliation/u,
+        `candidate ${phase}.${field}`,
+      );
+
+      const candidateWithExtra = structuredClone(storedCandidate);
+      candidateWithExtra.browserObservation.reconciliation[phase][field] = value;
+      assert.throws(
+        () => compareStable(candidateWithExtra, candidateWithExtra),
+        /legacy|unexpected|managed|reconciliation/u,
+        `stored candidate ${phase}.${field}`,
+      );
+    }
+  }
+  assert.doesNotThrow(() => validateNativeDiscovery(legacyChromeProof));
+  assert.deepEqual(browserObservationFrom(legacyChromeProof, legacyChromeProof.deployment.sourceCommit), legacyCandidateBrowserObservation);
+});
+
 test("the CLI comparison rejects stored managed candidates with unrelated reconciliation values", async () => {
   const expected = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
   const nativeFixture = managedRootWithBoundReconciliation(legacyChromeProof);
@@ -637,6 +689,9 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   const nativePositive = managedRootWithBoundReconciliation(legacyChromeProof);
   nativePositive.$schema = "../schemas/hotel-native-webmcp-reconciliation.schema.json";
   const candidatePositive = browserObservationFrom(nativePositive, nativePositive.deployment.sourceCommit);
+  const legacyNativePositive = structuredClone(legacyChromeProof);
+  legacyNativePositive.$schema = "../schemas/hotel-native-webmcp-reconciliation.schema.json";
+  const legacyCandidatePositive = structuredClone(legacyCandidateBrowserObservation);
   const nativeMissingBinding = structuredClone(nativePositive);
   delete nativeMissingBinding.discovery.runBinding;
   const candidateMissingPrepareObservation = structuredClone(candidatePositive);
@@ -655,6 +710,17 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   ];
   const managedReconciliationFields = ["state", "intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"];
   const managedBindingCases = [];
+  const legacyFieldCases = [];
+  for (const [phase, values] of Object.entries(legacyManagedFieldsByPhase)) {
+    for (const [field, value] of Object.entries(values)) {
+      const invalidNative = structuredClone(legacyNativePositive);
+      invalidNative.reconciliation[phase][field] = value;
+      legacyFieldCases.push({ name: `legacy-native-${phase}-${field}`, schemaName: "native", instance: invalidNative });
+      const invalidCandidate = structuredClone(legacyCandidatePositive);
+      invalidCandidate.reconciliation[phase][field] = value;
+      legacyFieldCases.push({ name: `legacy-candidate-${phase}-${field}`, schemaName: "candidateLegacyObservation", instance: invalidCandidate });
+    }
+  }
   const candidateStateCases = ["statusCheck", "finalStatus"].map((location) => {
     const invalid = structuredClone(candidatePositive);
     invalid.reconciliation[location].state = location === "statusCheck" ? "RETRY_RECOGNIZED" : "COMMITTED";
@@ -684,6 +750,8 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   const results = await validateWithDraft202012Registry([
     { name: "native-positive", schemaName: "native", instance: nativePositive },
     { name: "candidate-positive", schemaName: "candidateManagedObservation", instance: candidatePositive },
+    { name: "legacy-native-positive", schemaName: "native", instance: legacyNativePositive },
+    { name: "legacy-candidate-positive", schemaName: "candidateLegacyObservation", instance: legacyCandidatePositive },
     { name: "native-missing-run-binding", schemaName: "native", instance: nativeMissingBinding },
     { name: "candidate-missing-prepare-observation", schemaName: "candidateManagedObservation", instance: candidateMissingPrepareObservation },
     ...phaseMismatchCases.map(([name, mutate]) => {
@@ -692,11 +760,14 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
       return { name, schemaName: "native", instance: invalid };
     }),
     ...managedBindingCases,
+    ...legacyFieldCases,
     ...candidateStateCases,
   ]);
   const byName = new Map(results.map((result) => [result.name, result]));
   assert.deepEqual(byName.get("native-positive")?.errors, []);
   assert.deepEqual(byName.get("candidate-positive")?.errors, []);
+  assert.deepEqual(byName.get("legacy-native-positive")?.errors, []);
+  assert.deepEqual(byName.get("legacy-candidate-positive")?.errors, []);
   assert(byName.get("native-missing-run-binding")?.errors.some((error) => schemaErrorExists(error, "required", "runBinding")));
   assert(
     byName.get("candidate-missing-prepare-observation")?.errors.some((error) => schemaErrorExists(error, "required", "resultObservation")),
@@ -712,6 +783,9 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
       byName.get(name)?.errors.some((error) => schemaErrorExists(error, "required", field)),
       `${name} unexpectedly passed the managed reconciliation schema`,
     );
+  }
+  for (const { name } of legacyFieldCases) {
+    assert(byName.get(name)?.errors.length > 0, `${name} unexpectedly passed the legacy schema`);
   }
 });
 

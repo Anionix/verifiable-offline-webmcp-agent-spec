@@ -1,0 +1,29 @@
+{
+  "$comment": "information_uuid_v5=17898066-d1e0-50f3-96c7-e30c23316f5a event_uuid_v7=01a0539e-63c4-7a72-a39b-276bbe0b7d37 occurred_at=2026-08-30T17:01:24.292Z machine-contract=This is an explanatory diagram, not measured-screen, performance, or real-booking evidence.",
+  "id": "ASSET-HOTEL-RETRY-EXPLAINED",
+  "identity": {
+    "uuid_v5": "17898066-d1e0-50f3-96c7-e30c23316f5a",
+    "uuid_v7": "01a0539e-63c4-7a72-a39b-276bbe0b7d37",
+    "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "canonical_name": "asset/hotel-retry-explained"
+  },
+  "occurred_at": "2026-08-30T17:01:24.292Z",
+  "generation": {
+    "tool": "built-in image_gen",
+    "calls": "one",
+    "short_prompt": "16:9 bilingual middle-school flat diagram: five numbered phone-and-record steps show human confirmation, one saved fictional booking, lost reply, read-only status-first check, and the same booking found; ivory/navy/vermilion/green; no real booking or payment.",
+    "generated_image_file": "exec-f6a5c731-8fa6-4993-8965-ef13e477ad86.png",
+    "source_sha256": "e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c",
+    "dimensions": "1672x941 PNG"
+  },
+  "repository_copy": {
+    "path": "docs/assets/hotel-retry-explained.png",
+    "sha256": "e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c",
+    "format": "PNG 1672x941 8-bit RGB"
+  },
+  "content_boundary": "This image is an explanatory diagram, not a measured screen, performance measurement, or evidence of an additional real booking; it describes a fictional demo that checks device state first, returns the same booking, and leaves final confirmation to a human with no real booking or payment. / この画像は説明図であり、実測画面・性能測定・追加の実予約の証拠ではなく、再送前に端末の状態を確認して同じ架空予約を返し、最終確定は人だけが行い、実在の予約・支払いを行わない架空デモを説明する。",
+  "readme_placements": [
+    { "path": "README.md", "relative_image_link": "docs/assets/hotel-retry-explained.png" },
+    { "path": "examples/hotel-booking-demo/README.md", "relative_image_link": "../../docs/assets/hotel-retry-explained.png" }
+  ]
+}

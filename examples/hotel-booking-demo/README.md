@@ -20,6 +20,15 @@ Current public proof: the Vercel production deployment `dpl_AdzeHw7CgM3sbsZBVutZ
 
 通信が切れて成功表示だけ消えたとき、同じ京都旅館の予約を再送しても一件に戻る架空デモです。WebMCPは確認・準備・状態取得・取消条件の表示だけを行い、確定は画面上の人間だけが押せます。個人情報、決済、実ホテル、メール、外部予約、実際の取消はありません。
 
+<!-- information_uuid_v5=17898066-d1e0-50f3-96c7-e30c23316f5a -->
+<!-- event_uuid_v7=01a0539e-63c4-7a72-a39b-276bbe0b7d37 state_transition=IMAGE_GENERATED_ONCE -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED occurred_at=2026-08-30T17:01:24.292Z -->
+<!-- machine-contract=This explanatory diagram is not measured-screen or real-booking evidence; image_gen_invocations=1; source_sha256=e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c; provenance_record=metadata/hotel-retry-diagram.json; historical_events=UNCHANGED. -->
+![Fictional booking retry diagram: two attempts lead to one booking after checking status first / 架空予約の再送の仕組み図：状態を先に確認し、2回の試行でも予約1件](../../docs/assets/hotel-retry-explained.png)
+
+This explanatory diagram shows the fictional retry path: check the device state first, then return the same booking. / この説明図は、再送前に端末の状態を確認し、同じ予約を返す架空デモの流れを示します。
+It is not a measured screen or evidence of an additional real booking. / 実測画面や追加の実予約の証拠ではありません。
+Only a person makes the final confirmation; there is no real booking or payment. / 最終確定は人だけが行い、実在の予約・支払いはありません。
+
 ## Open first
 
 - [Primary ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site)

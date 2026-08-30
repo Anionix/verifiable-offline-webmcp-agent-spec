@@ -3854,8 +3854,8 @@
     },
     {
       "path": "metadata/demo-video-production.json",
-      "sha256": "841409476d65bd7ce332330ded7284e3c2f0766f4ef821851fc92e33cbaedb6d",
-      "bytes": 25899,
+      "sha256": "3b91620e70ae924c2b024f9de6985e842fa558ce2334cd23df14ed25a3313ece",
+      "bytes": 26028,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4596,8 +4596,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "7aec80e5f38151d5668b83ed0d612f4fef845a6c0a5e1fdda89e23001243a385",
-      "bytes": 28763,
+      "sha256": "6eca59990f9e9e0ea8153347d1024859064772118e44860dd6482385bbe7e5a0",
+      "bytes": 29052,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {

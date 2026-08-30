@@ -11,6 +11,7 @@
 // event_uuid_v7=01a05499-4fe4-7433-9cef-be33da14a776 state_transition=RELEASE_ANCESTOR_CHAIN_UNVERIFIED -> RELEASE_ANCESTOR_CHAIN_VERIFIED occurred_at=2026-08-30T21:35:28.740Z
 // event_uuid_v7=01a054a4-27a9-75a2-8762-c0fd4bcb86f0 state_transition=RELEASE_DIRECTORY_ENUMERATION_UNBOUND -> RELEASE_DIRECTORY_FD3_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:47:19.337Z
 // event_uuid_v7=01a054bb-6f17-785d-aa07-2420c4ff811e state_transition=RELEASE_ROOT_DESCRIPTOR_UNBOUND -> RELEASE_ROOT_DESCRIPTOR_HELD occurred_at=2026-08-30T22:12:44.951Z
+// event_uuid_v7=01a054d4-db72-7bfb-9cef-252977d955c6 state_transition=RELEASE_ROOT_PATH_CHECK_USE_UNVERIFIED -> RELEASE_ROOT_DESCRIPTOR_FIRST_OPEN_VERIFIED occurred_at=2026-08-30T22:40:31.090Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: the resolved release-root entry is checked by Node, while all nested directory names, identities, and file bytes are resolved relative to one held root descriptor.
 // machine-contract: each helper request receives only root fd 3 and strict relative components; the helper opens every directory ancestor with O_NOFOLLOW|O_DIRECTORY and fstat-checks expected identities.
@@ -446,6 +447,24 @@ async function assertSameSnapshotBytes(context, snapshots, initialDigests) {
   }
 }
 
+async function openReleaseRoot(resolvedReleaseRoot) {
+  try {
+    return await open(resolvedReleaseRoot, safeDirectoryOpenFlags);
+  } catch (error) {
+    if (error?.code !== "ELOOP" && error?.code !== "ENOTDIR") throw error;
+    // This lstat only explains an already-failed open; it never authorizes a file operation.
+    let current;
+    try {
+      current = await lstat(resolvedReleaseRoot, { bigint: true });
+    } catch {
+      throw error;
+    }
+    if (current.isSymbolicLink()) assert.fail("release root must not be a symbolic link before opening");
+    if (!current.isDirectory()) assert.fail("release root must be a directory before opening");
+    throw error;
+  }
+}
+
 export async function validateRelease(
   releaseRoot = defaultReleaseRoot,
   { afterSnapshot, afterInitialRead, afterFinalRead, afterDirectoryLstat, beforeFileRead } = {},
@@ -457,15 +476,11 @@ export async function validateRelease(
   );
   const deadlineAt = Date.now() + releaseValidationTimeoutMs;
   const resolvedReleaseRoot = resolve(releaseRoot);
-  const initialRoot = await lstat(resolvedReleaseRoot, { bigint: true });
-  if (initialRoot.isSymbolicLink()) assert.fail("release root must not be a symbolic link before opening");
-  assert.ok(initialRoot.isDirectory(), "release root must be a directory before opening");
-  const rootHandle = await open(resolvedReleaseRoot, safeDirectoryOpenFlags);
+  const rootHandle = await openReleaseRoot(resolvedReleaseRoot);
   try {
     const openedRoot = await rootHandle.stat({ bigint: true });
     assert.ok(openedRoot.isDirectory(), "release root must be a directory after opening");
-    const rootIdentity = identity(initialRoot);
-    assertIdentity(rootIdentity, identity(openedRoot), "release root changed before validation");
+    const rootIdentity = identity(openedRoot);
     const context = { resolvedReleaseRoot, rootHandle, rootIdentity, beforeFileRead, deadlineAt };
     await assertRootLocation(context, "before validation");
     const snapshots = await regularFiles(context, [], null, [], afterDirectoryLstat);

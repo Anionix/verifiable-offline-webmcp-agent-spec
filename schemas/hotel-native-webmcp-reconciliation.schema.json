@@ -27,6 +27,24 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "discovery": {
+            "type": "object",
+            "required": ["profile"],
+            "properties": { "profile": { "const": "MANAGED_IAB_NATIVE_CAPABILITY_V1" } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reconciliation": { "$ref": "#/$defs/managedReconciliation" }
+        }
+      }
+    }
+  ],
   "$defs": {
     "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
     "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
@@ -179,7 +197,8 @@
                   "properties": {
                     "sequence": { "const": 3 },
                     "phase": { "const": "status_before_retry" },
-                    "toolName": { "const": "get_hotel_booking_status" }
+                    "toolName": { "const": "get_hotel_booking_status" },
+                    "resultObservation": { "$ref": "#/$defs/statusBeforeRetryObservation" }
                   },
                   "required": ["resultObservation"]
                 }
@@ -189,7 +208,12 @@
               "allOf": [
                 { "$ref": "#/$defs/managedToolCall" },
                 {
-                  "properties": { "sequence": { "const": 4 }, "phase": { "const": "status_after_retry" }, "toolName": { "const": "get_hotel_booking_status" } },
+                  "properties": {
+                    "sequence": { "const": 4 },
+                    "phase": { "const": "status_after_retry" },
+                    "toolName": { "const": "get_hotel_booking_status" },
+                    "resultObservation": { "$ref": "#/$defs/statusAfterRetryObservation" }
+                  },
                   "required": ["resultObservation"]
                 }
               ]
@@ -296,7 +320,7 @@
             "properties": {
               "sequence": { "const": 3 },
               "toolName": { "const": "get_hotel_booking_status" },
-              "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+              "resultObservation": { "$ref": "#/$defs/statusBeforeRetryObservation" }
             }
           }
         },
@@ -307,7 +331,7 @@
             "properties": {
               "sequence": { "const": 4 },
               "toolName": { "const": "get_hotel_booking_status" },
-              "resultObservation": { "$ref": "#/$defs/capabilityResultObservation" }
+              "resultObservation": { "$ref": "#/$defs/statusAfterRetryObservation" }
             }
           }
         }
@@ -365,6 +389,28 @@
         "bookingId": { "$ref": "#/$defs/uuidV5" },
         "confirmationNumber": { "type": "string", "pattern": "^FKR-[A-Z0-9]+$" }
       }
+    },
+    "statusBeforeRetryObservation": {
+      "allOf": [
+        { "$ref": "#/$defs/capabilityResultObservation" },
+        {
+          "properties": {
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "statusAfterRetryObservation": {
+      "allOf": [
+        { "$ref": "#/$defs/capabilityResultObservation" },
+        {
+          "properties": {
+            "attemptCount": { "const": 2 },
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
     },
     "limitedEffectObservation": {
       "type": "object",
@@ -434,6 +480,37 @@
         "bookingId": { "$ref": "#/$defs/uuidV5" },
         "eventCount": { "type": "integer", "minimum": 1 },
         "eventChainHead": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "managedReconciliationStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "managedReconciliationFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
+    },
+    "managedReconciliation": {
+      "type": "object",
+      "required": ["statusCheck", "finalStatus"],
+      "properties": {
+        "statusCheck": { "$ref": "#/$defs/managedReconciliationStatusResult" },
+        "finalStatus": { "$ref": "#/$defs/managedReconciliationFinalStatus" }
       }
     },
     "reconciliation": {

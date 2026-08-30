@@ -290,6 +290,41 @@
         "agentExplanation": { "type": "string", "minLength": 50 }
       }
     },
+    "managedBrowserReconciliationStatusResult": {
+      "allOf": [
+        { "$ref": "#/$defs/statusResult" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "attemptCount": { "const": 1 },
+            "eventCount": { "const": 3 }
+          }
+        }
+      ]
+    },
+    "managedBrowserReconciliationFinalStatus": {
+      "allOf": [
+        { "$ref": "#/$defs/finalStatus" },
+        {
+          "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
+          "properties": {
+            "eventCount": { "const": 4 }
+          }
+        }
+      ]
+    },
+    "managedBrowserReconciliation": {
+      "allOf": [
+        { "$ref": "#/$defs/browserReconciliation" },
+        {
+          "required": ["statusCheck", "finalStatus"],
+          "properties": {
+            "statusCheck": { "$ref": "#/$defs/managedBrowserReconciliationStatusResult" },
+            "finalStatus": { "$ref": "#/$defs/managedBrowserReconciliationFinalStatus" }
+          }
+        }
+      ]
+    },
     "managedBrowserObservation": {
       "type": "object",
       "additionalProperties": false,
@@ -320,7 +355,7 @@
         "managedDiscovery": {
           "$ref": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-native-webmcp-reconciliation.schema.json#/$defs/managedDiscovery"
         },
-        "reconciliation": { "$ref": "#/$defs/browserReconciliation" },
+        "reconciliation": { "$ref": "#/$defs/managedBrowserReconciliation" },
         "recording": { "$ref": "#/$defs/recording" },
         "status": { "const": "PASS" }
       }

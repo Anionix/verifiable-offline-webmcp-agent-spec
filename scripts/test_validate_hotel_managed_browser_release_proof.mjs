@@ -568,12 +568,46 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   delete nativeMissingBinding.discovery.runBinding;
   const candidateMissingPrepareObservation = structuredClone(candidatePositive);
   delete candidateMissingPrepareObservation.managedDiscovery.toolCalls[1].resultObservation;
+  const phaseMismatchCases = [
+    ["native-status-before-attempt-two", (record) => { record.discovery.toolCalls[2].resultObservation.attemptCount = 2; }],
+    ["native-status-before-event-four", (record) => { record.discovery.toolCalls[2].resultObservation.eventCount = 4; }],
+    ["native-status-after-attempt-one", (record) => { record.discovery.toolCalls[3].resultObservation.attemptCount = 1; }],
+    ["native-status-after-event-one", (record) => { record.discovery.toolCalls[3].resultObservation.eventCount = 1; }],
+  ];
+  const managedReconciliationFields = ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"];
+  const managedBindingCases = [];
+  for (const location of ["statusCheck", "finalStatus"]) {
+    for (const field of managedReconciliationFields) {
+      const nativeMissingField = structuredClone(nativePositive);
+      delete nativeMissingField.reconciliation[location][field];
+      managedBindingCases.push({
+        name: `native-managed-${location}-missing-${field}`,
+        schemaName: "native",
+        instance: nativeMissingField,
+        field,
+      });
+      const candidateMissingField = structuredClone(candidatePositive);
+      delete candidateMissingField.reconciliation[location][field];
+      managedBindingCases.push({
+        name: `candidate-managed-${location}-missing-${field}`,
+        schemaName: "candidateManagedObservation",
+        instance: candidateMissingField,
+        field,
+      });
+    }
+  }
 
   const results = await validateWithDraft202012Registry([
     { name: "native-positive", schemaName: "native", instance: nativePositive },
     { name: "candidate-positive", schemaName: "candidateManagedObservation", instance: candidatePositive },
     { name: "native-missing-run-binding", schemaName: "native", instance: nativeMissingBinding },
     { name: "candidate-missing-prepare-observation", schemaName: "candidateManagedObservation", instance: candidateMissingPrepareObservation },
+    ...phaseMismatchCases.map(([name, mutate]) => {
+      const invalid = structuredClone(nativePositive);
+      mutate(invalid);
+      return { name, schemaName: "native", instance: invalid };
+    }),
+    ...managedBindingCases,
   ]);
   const byName = new Map(results.map((result) => [result.name, result]));
   assert.deepEqual(byName.get("native-positive")?.errors, []);
@@ -582,6 +616,15 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   assert(
     byName.get("candidate-missing-prepare-observation")?.errors.some((error) => schemaErrorExists(error, "required", "resultObservation")),
   );
+  for (const [name] of phaseMismatchCases) {
+    assert(byName.get(name)?.errors.length > 0, `${name} unexpectedly passed the native schema`);
+  }
+  for (const { name, field } of managedBindingCases) {
+    assert(
+      byName.get(name)?.errors.some((error) => schemaErrorExists(error, "required", field)),
+      `${name} unexpectedly passed the managed reconciliation schema`,
+    );
+  }
 });
 
 const rejectingCases = [

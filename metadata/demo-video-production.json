@@ -402,6 +402,90 @@
       "englishAutomatic": "PUBLISHED",
       "japaneseAuthored": "PUBLISHED"
     },
+    "subtitleUpdates": [
+      {
+        "informationUuidV5": "adeb6009-db9e-51be-8555-da27f170ca95",
+        "observationUuidV7": "01a053a6-2b2b-7b5f-8fde-9e34653ec0f9",
+        "observedAt": "2026-08-30T17:09:54.091Z",
+        "stateTransition": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED",
+        "videoId": "tdSvJw4ghX8",
+        "watchUrl": "https://www.youtube.com/watch?v=tdSvJw4ghX8",
+        "authorization": {
+          "publicationScope": "ENGLISH_AUTHORED_TRACK",
+          "additionalCreditsAuthorized": 25,
+          "preservedExistingTracks": ["JAPANESE_AUTHORED"]
+        },
+        "inputSubtitle": {
+          "path": "media/demo-video/subtitles.en.srt",
+          "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+          "cueCount": 184,
+          "lastCueEndSeconds": 147.76
+        },
+        "ownerReadback": {
+          "surfaces": [
+            "YOUTUBE_STUDIO_SUBTITLE_TABLE",
+            "AUTHENTICATED_YOUTUBE_WATCH_PAGE"
+          ],
+          "studioTable": {
+            "surface": "YOUTUBE_STUDIO_SUBTITLE_TABLE",
+            "tracks": [
+              {
+                "language": "English",
+                "trackType": "VIDEO_LANGUAGE",
+                "status": "PUBLISHED",
+                "publishedDate": "2026-08-31"
+              },
+              {
+                "language": "English",
+                "trackType": "AUTOMATIC",
+                "status": "PUBLISHED",
+                "publishedDate": "2026-08-29"
+              },
+              {
+                "language": "Japanese",
+                "trackType": "AUTHORED",
+                "status": "PUBLISHED",
+                "publishedDate": "2026-08-29"
+              }
+            ]
+          },
+          "watchPage": {
+            "surface": "AUTHENTICATED_YOUTUBE_WATCH_PAGE",
+            "trackSelectionAvailable": true,
+            "transcript": {
+              "scope": "FULL_TRANSCRIPT",
+              "sourcePath": "media/demo-video/subtitles.en.srt",
+              "groupCount": 26,
+              "normalizedTextCharacterCount": 2146,
+              "comparison": "MATCH_AFTER_WHITESPACE_NORMALIZATION"
+            }
+          }
+        },
+        "videoReview": {
+          "tool": "vidIQvideo_watch",
+          "jobId": "job_23d70365-ebab-49b0-bb95-78d59ff9704d",
+          "scope": "FULL_150_SECOND_AUDIO_AND_SCREEN_ALIGNMENT",
+          "reportedState": "MATCH",
+          "coverageSeconds": 150,
+          "unconfirmedIntervals": 0
+        },
+        "limitations": {
+          "videoFileIdentity": "UNMEASURED",
+          "exactCueTimestampComparison": "UNMEASURED",
+          "anonymousSubtitleReadback": "UNMEASURED",
+          "audioVisualReportGranularity": "NOT_WORD_OR_MILLISECOND_EXACT"
+        },
+        "unchangedSurfaces": [
+          "TITLE",
+          "VIDEO",
+          "AUDIO",
+          "THUMBNAIL",
+          "DESCRIPTION",
+          "DEVPOST",
+          "JAPANESE_SUBTITLES"
+        ]
+      }
+    ],
     "thumbnail": {
       "canvaAssetSha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
       "customApplicationState": "NOT_APPLIED_TOOL_TIMEOUT",

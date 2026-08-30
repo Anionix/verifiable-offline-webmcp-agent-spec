@@ -5413,8 +5413,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "2a798bac7d93739e415853f0f5e4f987f7ff54628c051b7b39b6368a986b27b0",
-      "bytes": 16670,
+      "sha256": "49d51897814ea5ed253274cf762767c3f9aa6c566390466ccad2f24648fc3613",
+      "bytes": 16901,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

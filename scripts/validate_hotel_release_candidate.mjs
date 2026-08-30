@@ -138,7 +138,10 @@ async function buildCandidate() {
   assertCommit(baseCommit, "release base commit");
   assert.equal(command("git", ["merge-base", "HEAD", candidateBaseRef]), baseCommit, "release base changed");
   assertDescendant(sourceCommit, "HEAD");
-  assert.equal(command("git", ["branch", "--show-current"]), branch, "release branch changed");
+  // machine-contract: pull-request checkouts are detached; GitHub exposes the
+  // source branch through GITHUB_HEAD_REF, while local release checks use Git.
+  const checkoutBranch = process.env.GITHUB_HEAD_REF || command("git", ["branch", "--show-current"]);
+  assert.equal(checkoutBranch, branch, "release branch changed");
 
   assert.equal(publicReadback.release.status, "COMMITTED_RELEASE");
   assert.equal(publicReadback.release.testRun.testCount, testRun.total, "public release test count differs from npm test");

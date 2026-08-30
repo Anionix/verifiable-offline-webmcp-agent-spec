@@ -5,7 +5,9 @@ stable_uuid_v5: "996e5fcf-8ad6-55db-874d-48ea873e5cf8"
 event_uuid_v7: "01a04291-b473-7b9f-8aa2-eb9ac997adc5"
 slo_gate_event_uuid_v7: "01a049a3-edbc-7d99-96f5-6bc46cd41163"
 generated_at: "2026-08-27T09:34:00Z"
-updated_at: "2026-08-28T18:31:15.132Z"
+previous_updated_at: "2026-08-28T18:31:15.132Z"
+updated_at: "2026-08-30T20:31:15.630Z"
+hotel_evidence_event_uuid_v7: "01a0545e-84ae-7440-ba42-7637a5c23bdc"
 version: "0.1.0"
 status: "design-specification"
 ---
@@ -19,12 +21,13 @@ Each source record also exists in [`knowledge/sources.json`](../knowledge/source
 ## Kyoto Booking Retry Proof evidence map / 京都ホテル再送の証拠対応表
 
 <!-- event_uuid_v7=01a0538a-86ff-7649-893a-19400c01cee9 occurred_at=2026-08-30T16:39:42.591Z state_transition=SOURCE_MAP_BASELINE -> HOTEL_EVIDENCE_MAP_ADDED -->
+<!-- machine-contract information_uuid_v5=996e5fcf-8ad6-55db-874d-48ea873e5cf8 event_uuid_v7=01a0545e-84ae-7440-ba42-7637a5c23bdc occurred_at=2026-08-30T20:31:15.630Z state_transition=HOTEL_EVIDENCE_MAP_ADDED -> ALL_FIVE_LEDGER_PAIRS_LINKED; catalog discovery is not public browser execution. -->
 
 Start with the existing [60-second judge path / 60秒手順](../examples/hotel-booking-demo/README.md#60-second-judge-path). / 最初に既存の60秒手順を読みます。
 
 It lists the four safe tools—`check_existing_hotel_booking`, `prepare_hotel_booking`, `get_hotel_booking_status`, and `preview_hotel_cancellation`—and says only the visible human button confirms; retry ends at `RETRY_RECOGNIZED`. / 4つの安全な機能を確認し、確定は画面の人だけが行い、再試行後に`RETRY_RECOGNIZED`を見ます。
 
-The four pairs below point both ways in the ledgers. Hotel evidence is related evidence, not a replacement for the general test. / 次の4組は台帳を双方向に結びます。ホテル証拠は関連証拠であり、一般試験の代わりではありません。
+The five pairs below point both ways in the ledgers. Hotel evidence is related evidence, not a replacement for the general test. / 次の5組は台帳を双方向に結びます。ホテル証拠は関連証拠であり、一般試験の代わりではありません。
 
 Common provenance / 共通の出所: this document uses repository base `5583cdbeddbbeae2c6f16fd481fc809069a15296`. The [hotel verification record](../metadata/hotel-booking-verification.json) uses source `f832cc611ed43613035a8735ca97d4bc1a0a8efc`, observed `2026-08-29T13:52:59.000Z`, Sites version 12, and [this Sites URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The [native reconciliation record](../metadata/hotel-native-webmcp-reconciliation.json) and [public release readback](../metadata/hotel-public-release-readback.json) use source `c8be388d8047472ef7d6ad69656255adb5903e37`; observations are `2026-08-30T13:53:37.248Z` and `2026-08-30T13:56:24.118Z` at [Vercel](https://kyoto-booking-retry-proof.vercel.app/) and its [evaluation file](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json). The `c8be...` observation is not rewritten as a `5583...` execution. / この文書の基準は`5583...`です。SitesとVercelの記録は、それぞれ元の時刻とsourceを保ちます。
 
@@ -36,6 +39,7 @@ The ledgers are [`knowledge/requirements.json`](../knowledge/requirements.json) 
 | 2. Keep one effect / 効果を一回にする | `REQ-EXEC-003`<br>同じ意思の効果は高々1回 / The same intent starts an effect at most once. | `TEST-MODEL-003`<br>一般の有限状態モデル試験 / General finite-state model test. | `311a96f7-7859-5b7f-baf2-17e39b83502d`: 2 attempts → 1 booking. | `PASS` | `2026-08-29` / Sites v12 |
 | 3. Read back / 読み戻す | `REQ-TOOL-003`<br>書き込みの結果は読み戻して確かめる / Check a write result by reading it back. | `TEST-VERIFY-001`<br>一般の通知デモ向け試験 / General notification-demo test. | `6f65cf02-40eb-51c3-bdbc-4d532082fe0e`: Google Chrome page and WebMCP runtime. Native reconciliation separately records the read-before-retry flow. | Hotel verification: `INCONCLUSIVE`.<br>Native record: `PASS`. | `2026-08-29` / Sites v12; `2026-08-30` / Vercel |
 | 4. Separate claim and observation / 主張と観測を分ける | `REQ-AUDIT-010`<br>記録された主張と独立した観測を分ける / Separate a recorded claim from an independent observation. | `TEST-VERIFY-003`<br>一般の証拠分離試験 / General claim-versus-observation test. | `e72277c5-f851-57da-a456-bfffc43f9479`: ChatGPT Sites live execution. | `PASS` (related hotel evidence). | `2026-08-29` / Sites v12 |
+| 5. Find the matching files / 対応する資料を見つける | `REQ-KNOW-003`<br>配布物と目録を検索できる / Make distributions and manifests discoverable. | `TEST-KNOW-003`<br>一般の台帳整合検査 / General catalog integrity check. | [File catalog / ファイル目録](../metadata/file-catalog.json) links the hotel records above; [the validator / 検査](../scripts/validate_repo.py) checks the general ledger. | General check implemented; public execution is not asserted. / 一般検査は実装済み。公開実行の証明ではありません。 | Catalog of this checkout / この作業版の目録。The hotel observations keep the dates and sources above. / ホテル観測は上記の時刻と版を保持。 |
 
 The three hotel-verification `INCONCLUSIVE` states remain so: Chrome/WebMCP runtime, keyboard focus, and screen-reader announcement. Local-video-to-public-video identity remains `UNMEASURED` in [`metadata/demo-video-production.json`](../metadata/demo-video-production.json). / ホテル確認の3件の`INCONCLUSIVE`と、動画同一性の`UNMEASURED`はそのままです。
 

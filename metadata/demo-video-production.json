@@ -486,6 +486,65 @@
         ]
       }
     ],
+    "subtitleAnonymousReadbacks": [
+      {
+        "informationUuidV5": "adeb6009-db9e-51be-8555-da27f170ca95",
+        "observationUuidV7": "01a053d0-3297-722c-b7f8-5ff273c9b729",
+        "measuredAt": "2026-08-30T17:48:28.216Z",
+        "recordedAt": "2026-08-30T17:49:11.160Z",
+        "stateTransition": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED",
+        "videoId": "tdSvJw4ghX8",
+        "watchUrl": "https://www.youtube.com/watch?v=tdSvJw4ghX8",
+        "track": "ENGLISH_AUTHORED_TRACK",
+        "download": {
+          "method": "YTDLP_ANONYMOUS_PUBLIC_SUBTITLE_DOWNLOAD",
+          "command": "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir",
+          "authentication": "NONE",
+          "requestedLanguage": "en",
+          "format": "vtt",
+          "automaticSubtitles": "EXCLUDED",
+          "fileName": "youtube-public-201.en.vtt"
+        },
+        "availableSubtitleCatalog": {
+          "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
+          "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+          "authentication": "NONE",
+          "capturedAfterComparison": true,
+          "captureTiming": "FOLLOW_UP_READBACK_AFTER_FULL_184_CUE_COMPARISON_APPROXIMATELY_2026-08-30T17:50Z_EXACT_TIMESTAMP_NOT_RECORDED",
+          "languages": ["en", "ja"],
+          "trackClass": "MANUAL_SUBTITLES",
+          "automaticCaptionsSeparate": true,
+          "authoredEnglishConfirmed": true
+        },
+        "inputSubtitle": {
+          "path": "media/demo-video/subtitles.en.srt",
+          "sha256": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
+          "cueCount": 184,
+          "lastCueEndMilliseconds": 147760
+        },
+        "publicVtt": {
+          "fileName": "youtube-public-201.en.vtt",
+          "sha256": "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
+          "cueCount": 184,
+          "lastCueEndMilliseconds": 147760
+        },
+        "comparison": {
+          "scope": "FULL_184_CUE_COMPARISON",
+          "inputCueCount": 184,
+          "publicCueCount": 184,
+          "text": "MATCH_AFTER_WHITESPACE_NORMALIZATION",
+          "timing": "MATCH_EXACT_INTEGER_MILLISECONDS",
+          "lastCueEndMilliseconds": 147760,
+          "result": "PASS"
+        },
+        "limitations": {
+          "videoFileIdentity": "UNMEASURED",
+          "anonymousBrowserTrackSelection": "UNMEASURED",
+          "japaneseSubtitleDownload": "NOT_RETRIEVED",
+          "downloadDoesNotEstablishVideoFileIdentity": true
+        }
+      }
+    ],
     "thumbnail": {
       "canvaAssetSha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
       "customApplicationState": "NOT_APPLIED_TOOL_TIMEOUT",

@@ -5375,8 +5375,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_managed_browser_release_proof.mjs",
-      "sha256": "a756ab1e0bc3cb28cd07e3723ab263cb3d17b643a3c82f083e3b5220c5a56f97",
-      "bytes": 24556,
+      "sha256": "e06150a5b675d4e450d31c1699dee46c165b9c9f9ef864f8bbbe198f1789364e",
+      "bytes": 29459,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

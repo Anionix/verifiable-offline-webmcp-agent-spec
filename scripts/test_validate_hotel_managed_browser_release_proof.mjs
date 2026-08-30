@@ -8,7 +8,7 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, rm, symlink } from "node:fs/promises";
+import { mkdtemp, readFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -44,6 +44,41 @@ const correctedInteractionSequence = Object.freeze([
   "get_hotel_booking_status:after_retry",
 ]);
 
+const DRAFT_2020_12_REGISTRY_RUNNER = String.raw`
+import json
+import sys
+
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
+
+payload = json.load(sys.stdin)
+schemas = payload["schemas"]
+registry = Registry().with_resources(
+    (schema["$id"], Resource.from_contents(schema)) for schema in schemas.values()
+)
+results = []
+
+def serialize_error(error):
+    return {
+        "path": list(error.path),
+        "schemaPath": list(error.schema_path),
+        "validator": error.validator,
+        "message": error.message,
+        "context": [serialize_error(child) for child in error.context],
+    }
+
+for case in payload["cases"]:
+    schema = schemas[case["schemaName"]]
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema, registry=registry, format_checker=FormatChecker())
+    errors = sorted(validator.iter_errors(case["instance"]), key=lambda error: (list(error.path), list(error.schema_path)))
+    results.append({
+        "name": case["name"],
+        "errors": [serialize_error(error) for error in errors],
+    })
+json.dump(results, sys.stdout, ensure_ascii=False, separators=(",", ":"))
+`;
+
 // Fixed test-only copy of the original measured Chrome proof. The production
 // metadata may later become a managed record; this regression input must not.
 const legacyChromeProof = {
@@ -54,9 +89,17 @@ const legacyChromeProof = {
   },
   status: "PASS",
   deployment: {
-    sourceCommit: "c8be388d8047472ef7d6ad69656255adb5903e37",
+    provider: "Vercel",
+    projectId: "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+    projectName: "kyoto-booking-retry-proof",
     deploymentId: "dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK",
+    target: "production",
+    state: "READY",
+    sourceCommit: "c8be388d8047472ef7d6ad69656255adb5903e37",
     publicUrl: "https://kyoto-booking-retry-proof.vercel.app/",
+    uniqueUrl: "https://kyoto-booking-retry-proof-jnkzuh7r0-aniotajp-1978s-projects.vercel.app",
+    readyAt: "2026-08-30T13:47:14.754Z",
+    observedAt: "2026-08-30T13:56:24.118Z",
   },
   discovery: {
     status: "PASS",
@@ -386,6 +429,37 @@ function managedRootWithBoundReconciliation(oldChromeProof) {
   return managedRoot;
 }
 
+async function validateWithDraft202012Registry(cases) {
+  const nativeSchema = JSON.parse(await readFile(new URL("../schemas/hotel-native-webmcp-reconciliation.schema.json", import.meta.url), "utf8"));
+  const candidateSchema = JSON.parse(await readFile(new URL("../schemas/hotel-release-candidate.schema.json", import.meta.url), "utf8"));
+  const candidateManagedObservationSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "https://example.invalid/managed-browser-observation-test.schema.json",
+    $ref: `${candidateSchema.$id}#/$defs/managedBrowserObservation`,
+  };
+  const result = spawnSync("uv", ["run", "--frozen", "python", "-c", DRAFT_2020_12_REGISTRY_RUNNER], {
+    cwd: fileURLToPath(new URL("..", import.meta.url)),
+    encoding: "utf8",
+    env: { ...process.env, UV_CACHE_DIR: process.env.UV_CACHE_DIR ?? join(fileURLToPath(new URL("..", import.meta.url)), ".local/uv-cache") },
+    input: JSON.stringify({
+      schemas: { native: nativeSchema, candidate: candidateSchema, candidateManagedObservation: candidateManagedObservationSchema },
+      cases,
+    }),
+    maxBuffer: 1024 * 1024,
+    timeout: 30_000,
+  });
+  assert.equal(result.error, undefined, `Draft 2020-12 registry validator failed to start: ${result.error?.message ?? "unknown error"}`);
+  assert.equal(result.status, 0, `Draft 2020-12 registry validator failed:\n${result.stderr}`);
+  return JSON.parse(result.stdout);
+}
+
+function schemaErrorExists(error, validator, pathPart) {
+  return (
+    (error.validator === validator && (error.path.includes(pathPart) || error.message.includes(pathPart))) ||
+    error.context?.some((child) => schemaErrorExists(child, validator, pathPart))
+  );
+}
+
 test("accepts the test-only managed capability discovery shape", () => {
   const result = validateManagedBrowserDiscovery(managedFixture, { allowTestFixture: true });
   assert.deepEqual(result, {
@@ -484,6 +558,30 @@ test("candidate old branch keeps the strict Chrome configuration gate", async ()
 test("candidate old browser observation remains unchanged", async () => {
   const oldChromeProof = structuredClone(legacyChromeProof);
   assert.deepEqual(browserObservationFrom(oldChromeProof, oldChromeProof.deployment.sourceCommit), legacyCandidateBrowserObservation);
+});
+
+test("accepts managed native and candidate fixtures through the Draft 2020-12 registry", async () => {
+  const nativePositive = managedRootWithBoundReconciliation(legacyChromeProof);
+  nativePositive.$schema = "../schemas/hotel-native-webmcp-reconciliation.schema.json";
+  const candidatePositive = browserObservationFrom(nativePositive, nativePositive.deployment.sourceCommit);
+  const nativeMissingBinding = structuredClone(nativePositive);
+  delete nativeMissingBinding.discovery.runBinding;
+  const candidateMissingPrepareObservation = structuredClone(candidatePositive);
+  delete candidateMissingPrepareObservation.managedDiscovery.toolCalls[1].resultObservation;
+
+  const results = await validateWithDraft202012Registry([
+    { name: "native-positive", schemaName: "native", instance: nativePositive },
+    { name: "candidate-positive", schemaName: "candidateManagedObservation", instance: candidatePositive },
+    { name: "native-missing-run-binding", schemaName: "native", instance: nativeMissingBinding },
+    { name: "candidate-missing-prepare-observation", schemaName: "candidateManagedObservation", instance: candidateMissingPrepareObservation },
+  ]);
+  const byName = new Map(results.map((result) => [result.name, result]));
+  assert.deepEqual(byName.get("native-positive")?.errors, []);
+  assert.deepEqual(byName.get("candidate-positive")?.errors, []);
+  assert(byName.get("native-missing-run-binding")?.errors.some((error) => schemaErrorExists(error, "required", "runBinding")));
+  assert(
+    byName.get("candidate-missing-prepare-observation")?.errors.some((error) => schemaErrorExists(error, "required", "resultObservation")),
+  );
 });
 
 const rejectingCases = [

@@ -8,6 +8,7 @@
 // event_uuid_v7=01a05471-12e1-7902-81e5-896ed0c6aff4 state_transition=WINDOWS_RELEASE_VALIDATION_UNSUPPORTED -> WINDOWS_RELEASE_VALIDATION_FAIL_CLOSED occurred_at=2026-08-30T20:51:31.681Z
 // event_uuid_v7=01a05478-ac4b-704b-aca2-769202026762 state_transition=RELEASE_BYTES_INITIAL_HASHED -> RELEASE_BYTES_FINAL_HASH_VERIFIED occurred_at=2026-08-30T20:59:49.707Z
 // event_uuid_v7=01a05490-b710-7496-8f7c-77058578081e state_transition=RELEASE_BYTES_FINAL_HASH_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:26:05.328Z
+// event_uuid_v7=01a05499-4fe4-7433-9cef-be33da14a776 state_transition=RELEASE_ANCESTOR_CHAIN_UNVERIFIED -> RELEASE_ANCESTOR_CHAIN_VERIFIED occurred_at=2026-08-30T21:35:28.740Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
 // machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
@@ -66,6 +67,22 @@ function assertIdentity(expected, actual, subject) {
   assert.equal(actual.type, expected.type, `${subject} type changed during validation`);
   assert.equal(actual.dev, expected.dev, `${subject} device changed during validation`);
   assert.equal(actual.ino, expected.ino, `${subject} inode changed during validation`);
+}
+
+function assertSameAncestorChain(initialSnapshot, finalSnapshot) {
+  const initialAncestors = initialSnapshot.ancestorDirectories;
+  const finalAncestors = finalSnapshot.ancestorDirectories;
+  assert.equal(finalAncestors.length, initialAncestors.length, `${initialSnapshot.relativePath} ancestor chain length changed after final enumeration`);
+  for (let index = 0; index < initialAncestors.length; index += 1) {
+    const initialAncestor = initialAncestors[index];
+    const finalAncestor = finalAncestors[index];
+    assert.equal(finalAncestor.relativePath, initialAncestor.relativePath, `${initialSnapshot.relativePath} ancestor path changed after final enumeration`);
+    assertIdentity(
+      initialAncestor.identity,
+      finalAncestor.identity,
+      `${initialSnapshot.relativePath} ancestor ${directoryLabel(initialAncestor.relativePath)} changed after final enumeration`,
+    );
+  }
 }
 
 function directoryLabel(relativeDirectory) {
@@ -165,7 +182,10 @@ function assertSameSnapshot(initialSnapshots, finalSnapshots) {
     `release file set changed after snapshot: added=${addedPaths.join(", ")}; removed=${removedPaths.join(", ")}`,
   );
   for (const relativePath of initialPaths) {
-    assertIdentity(initialByPath.get(relativePath).identity, finalByPath.get(relativePath).identity, `${relativePath} changed after final enumeration`);
+    const initialSnapshot = initialByPath.get(relativePath);
+    const finalSnapshot = finalByPath.get(relativePath);
+    assertIdentity(initialSnapshot.identity, finalSnapshot.identity, `${relativePath} changed after final enumeration`);
+    assertSameAncestorChain(initialSnapshot, finalSnapshot);
   }
 }
 

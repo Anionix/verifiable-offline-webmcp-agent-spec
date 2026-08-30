@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { lstat, mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
+import { link, lstat, mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
@@ -225,6 +225,84 @@ test(
           }),
         /release file set changed after snapshot: added=.*UNLISTED_AFTER_FINAL_READ\.txt/u,
       );
+    });
+  },
+);
+
+test(
+  "rejects a release root replaced with hardlinks after the final hash read",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      const originalRoot = `${releaseRoot}.original`;
+      const replacementRoot = `${releaseRoot}.replacement`;
+      let originalRootMoved = false;
+      let replacementInstalled = false;
+      try {
+        await assert.rejects(
+          () =>
+            validateRelease(releaseRoot, {
+              afterFinalRead: async () => {
+                await mkdir(replacementRoot);
+                for (const relativePath of [...baseFiles.keys(), "SHA256SUMS"])
+                  await link(resolve(releaseRoot, relativePath), resolve(replacementRoot, relativePath));
+                await rename(releaseRoot, originalRoot);
+                originalRootMoved = true;
+                await rename(replacementRoot, releaseRoot);
+                replacementInstalled = true;
+              },
+            }),
+          /ancestor release root changed after final enumeration/u,
+        );
+      } finally {
+        if (replacementInstalled) {
+          await rm(releaseRoot, { recursive: true, force: true });
+          await rename(originalRoot, releaseRoot);
+        } else if (originalRootMoved) await rename(originalRoot, releaseRoot);
+        await rm(replacementRoot, { recursive: true, force: true });
+        await rm(originalRoot, { recursive: true, force: true });
+      }
+    });
+  },
+);
+
+test(
+  "rejects a nested ancestor replaced with hardlinks after the final hash read",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      await addNestedChecksummedFile(releaseRoot);
+      const nestedPath = resolve(releaseRoot, "nested");
+      const originalNestedPath = `${releaseRoot}.nested-original`;
+      const replacementNestedPath = resolve(releaseRoot, "nested-replacement");
+      let originalNestedMoved = false;
+      let replacementInstalled = false;
+      try {
+        await assert.rejects(
+          () =>
+            validateRelease(releaseRoot, {
+              afterFinalRead: async () => {
+                await mkdir(resolve(replacementNestedPath, "group"), { recursive: true });
+                await link(
+                  resolve(nestedPath, "group/release-note.txt"),
+                  resolve(replacementNestedPath, "group/release-note.txt"),
+                );
+                await rename(nestedPath, originalNestedPath);
+                originalNestedMoved = true;
+                await rename(replacementNestedPath, nestedPath);
+                replacementInstalled = true;
+              },
+            }),
+          /ancestor nested changed after final enumeration/u,
+        );
+      } finally {
+        if (replacementInstalled) {
+          await rm(nestedPath, { recursive: true, force: true });
+          await rename(originalNestedPath, nestedPath);
+        } else if (originalNestedMoved) await rename(originalNestedPath, nestedPath);
+        await rm(replacementNestedPath, { recursive: true, force: true });
+        await rm(originalNestedPath, { recursive: true, force: true });
+      }
     });
   },
 );

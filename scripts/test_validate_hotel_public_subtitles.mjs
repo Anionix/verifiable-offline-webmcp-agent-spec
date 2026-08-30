@@ -70,7 +70,12 @@ test("accepts the retained public VTT when all authored cues match", async () =>
     sourceSha256: "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f",
     publicVttSha256: "34150342efb88ed37d5c2d0d8b55f0041d8d49850cb6e5701ba3d31ecdbeb5ac",
   });
-  assert.deepEqual(await validateSubtitleHistory(), { readbackCount: 1, validationResult: "PASS" });
+  assert.deepEqual(await validateSubtitleHistory(), {
+    readbackCount: 1,
+    comparisonReadbackCount: 1,
+    unavailableReadbackCount: 0,
+    validationResult: "PASS",
+  });
 });
 
 test("rejects different invalid UTF-8 bytes in the SRT and VTT", async () => {
@@ -101,6 +106,8 @@ test("accepts a correctly encoded U+FFFD subtitle character", async () => {
   try {
     assert.deepEqual(await validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory), {
       readbackCount: 1,
+      comparisonReadbackCount: 1,
+      unavailableReadbackCount: 0,
       validationResult: "PASS",
     });
   } finally {
@@ -321,7 +328,12 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
     const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
     await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
 
-    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), { readbackCount: 2, validationResult: "PASS" });
+    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), {
+      readbackCount: 2,
+      comparisonReadbackCount: 2,
+      unavailableReadbackCount: 0,
+      validationResult: "PASS",
+    });
     assert.equal((await compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath, metadataFixturePath)).result, "PASS");
 
     readback.stateTransition = originalReadback.stateTransition;
@@ -337,6 +349,88 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
     readback.publicVtt.path = "../outside.vtt";
     await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
     await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /safe repository-relative path/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("accepts a schema-valid anonymous track-unavailable readback in history", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitle-unavailable-"));
+  try {
+    const mediaDirectory = resolve(temporaryDirectory, "media/demo-video");
+    await mkdir(mediaDirectory, { recursive: true });
+    await copyFile(sourceSubtitlePath, resolve(mediaDirectory, "subtitles.en.srt"));
+    await copyFile(publicSubtitlePath, resolve(mediaDirectory, "youtube-public-201.en.vtt"));
+
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const originalReadback = structuredClone(metadata.publication.subtitleAnonymousReadbacks[0]);
+    const recordedMilliseconds = Date.parse(metadata.updatedAt) + 1_000;
+    const unavailableReadback = {
+      informationUuidV5: originalReadback.informationUuidV5,
+      observationUuidV7: uuidV7ForMilliseconds(recordedMilliseconds),
+      measuredAt: new Date(recordedMilliseconds - 2).toISOString(),
+      recordedAt: new Date(recordedMilliseconds).toISOString(),
+      stateTransition: "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE",
+      videoId: originalReadback.videoId,
+      watchUrl: originalReadback.watchUrl,
+      track: "ENGLISH_AUTHORED_TRACK",
+      availableSubtitleCatalog: {
+        source: "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
+        command: "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+        authentication: "NONE",
+        capturedAfterComparison: false,
+        captureTiming: {
+          precision: "EXACT",
+          lowerBound: new Date(recordedMilliseconds - 1).toISOString(),
+          upperBound: new Date(recordedMilliseconds - 1).toISOString(),
+          description: "synthetic unavailable-track catalog capture time",
+        },
+        languages: ["ja"],
+        trackClass: "MANUAL_SUBTITLES",
+        automaticCaptionsSeparate: true,
+        authoredEnglishConfirmed: false,
+      },
+      failure: { result: "FAIL", reason: "AUTHORED_ENGLISH_TRACK_UNAVAILABLE" },
+    };
+    assert.equal("download" in unavailableReadback, false);
+    assert.equal("inputSubtitle" in unavailableReadback, false);
+    assert.equal("publicVtt" in unavailableReadback, false);
+    assert.equal("comparison" in unavailableReadback, false);
+    metadata.publication.subtitleAnonymousReadbacks = [originalReadback, unavailableReadback];
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+
+    assert.deepEqual(await validateSubtitleHistory(metadataFixturePath, temporaryDirectory), {
+      readbackCount: 2,
+      comparisonReadbackCount: 1,
+      unavailableReadbackCount: 1,
+      validationResult: "PASS",
+    });
+
+    const invalidUnavailableCases = [
+      ["non-FAIL result", (record) => (record.failure.result = "PASS"), /failure result must be FAIL/u],
+      ["wrong failure reason", (record) => (record.failure.reason = "OTHER"), /failure reason differs/u],
+      ["comparison state", (record) => (record.stateTransition = mismatchedSubtitleStateTransition), /state transition differs/u],
+      ["comparison catalog", (record) => (record.availableSubtitleCatalog.capturedAfterComparison = true), /must not claim a comparison/u],
+      ["English catalog", (record) => (record.availableSubtitleCatalog.languages = ["en"]), /must not include English/u],
+      ["confirmed English catalog", (record) => (record.availableSubtitleCatalog.authoredEnglishConfirmed = true), /must not confirm English/u],
+      ...["download", "inputSubtitle", "publicVtt", "comparison"].map((field) => [
+        `extra ${field}`,
+        (record) => (record[field] = {}),
+        /must not contain download/u,
+      ]),
+    ];
+    for (const [, mutate, expectedError] of invalidUnavailableCases) {
+      const invalidMetadata = structuredClone(metadata);
+      mutate(invalidMetadata.publication.subtitleAnonymousReadbacks[1]);
+      await writeFile(metadataFixturePath, `${JSON.stringify(invalidMetadata)}\n`, "utf8");
+      await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), expectedError);
+    }
+
+    const incompleteSuccessMetadata = structuredClone(metadata);
+    delete incompleteSuccessMetadata.publication.subtitleAnonymousReadbacks[0].publicVtt;
+    await writeFile(metadataFixturePath, `${JSON.stringify(incompleteSuccessMetadata)}\n`, "utf8");
+    await assert.rejects(() => validateSubtitleHistory(metadataFixturePath, temporaryDirectory), /publicVtt\.path must be a string/u);
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }
@@ -408,6 +502,8 @@ test("runs and propagates failures when invoked through a symlink", async () => 
     const successfulRun = spawnSync(process.execPath, [symlinkPath], { encoding: "utf8" });
     assert.equal(successfulRun.status, 0, successfulRun.stderr);
     assert.match(successfulRun.stdout, /HOTEL_PUBLIC_SUBTITLE_COMPARISON_PASS/u);
+    assert.match(successfulRun.stdout, /"historyComparisonReadbackCount":1/u);
+    assert.match(successfulRun.stdout, /"historyUnavailableReadbackCount":0/u);
 
     const failingRun = spawnSync(process.execPath, ["--preserve-symlinks-main", symlinkPath], { encoding: "utf8" });
     assert.ok(typeof failingRun.status === "number" && failingRun.status !== 0, "symlink failure must exit non-zero");

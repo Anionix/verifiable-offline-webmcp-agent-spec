@@ -23,6 +23,9 @@ export const MATCHED_SUBTITLE_STATE_TRANSITION =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED";
 export const MISMATCHED_SUBTITLE_STATE_TRANSITION =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED";
+export const UNAVAILABLE_SUBTITLE_STATE_TRANSITION =
+  "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE";
+const UNAVAILABLE_SUBTITLE_FAILURE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE";
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
@@ -210,6 +213,64 @@ function assertWebVttText(text, label) {
   assert.doesNotMatch(text, /(?:^|\r?\n)\d{2}:\d{2}:\d{2},\d{3} --> /u, `${label} must use WebVTT timestamps`);
 }
 
+function isUnavailableSubtitleReadback(record) {
+  return record?.failure !== undefined || record?.stateTransition === UNAVAILABLE_SUBTITLE_STATE_TRANSITION;
+}
+
+function validateUnavailableSubtitleReadback(record, label) {
+  assert.deepEqual(
+    Object.keys(record).sort(),
+    [
+      "availableSubtitleCatalog",
+      "failure",
+      "informationUuidV5",
+      "measuredAt",
+      "observationUuidV7",
+      "recordedAt",
+      "stateTransition",
+      "track",
+      "videoId",
+      "watchUrl",
+    ].sort(),
+    `${label} unavailable readback must not contain download, inputSubtitle, publicVtt, or comparison`,
+  );
+  assert.equal(record.informationUuidV5, "adeb6009-db9e-51be-8555-da27f170ca95", `${label} information UUID differs`);
+  assert.equal(record.stateTransition, UNAVAILABLE_SUBTITLE_STATE_TRANSITION, `${label} state transition differs`);
+  assert.equal(record.track, "ENGLISH_AUTHORED_TRACK", `${label} track differs`);
+  assert.equal(record.videoId, "tdSvJw4ghX8", `${label} video ID differs`);
+  assert.equal(record.watchUrl, "https://www.youtube.com/watch?v=tdSvJw4ghX8", `${label} watch URL differs`);
+  assert.deepEqual(Object.keys(record.failure ?? {}).sort(), ["reason", "result"], `${label} failure fields differ`);
+  assert.equal(record.failure.result, "FAIL", `${label} unavailable failure result must be FAIL`);
+  assert.equal(record.failure.reason, UNAVAILABLE_SUBTITLE_FAILURE_REASON, `${label} unavailable failure reason differs`);
+  const catalog = record.availableSubtitleCatalog;
+  assert.deepEqual(
+    Object.keys(catalog ?? {}).sort(),
+    [
+      "authentication",
+      "automaticCaptionsSeparate",
+      "authoredEnglishConfirmed",
+      "captureTiming",
+      "capturedAfterComparison",
+      "command",
+      "languages",
+      "source",
+      "trackClass",
+    ].sort(),
+    `${label} unavailable catalog fields differ`,
+  );
+  assert.equal(catalog.source, "ANONYMOUS_YOUTUBE_PLAYER_METADATA", `${label} catalog source differs`);
+  assert.equal(catalog.command, "uvx yt-dlp --skip-download --list-subs --no-cache-dir", `${label} catalog command differs`);
+  assert.equal(catalog.authentication, "NONE", `${label} catalog authentication differs`);
+  assert.equal(catalog.capturedAfterComparison, false, `${label} unavailable catalog must not claim a comparison`);
+  assert.equal(catalog.authoredEnglishConfirmed, false, `${label} unavailable catalog must not confirm English`);
+  assert.ok(Array.isArray(catalog.languages), `${label} unavailable catalog languages must be an array`);
+  assert.ok(!catalog.languages.includes("en"), `${label} unavailable catalog must not include English`);
+  assert.ok(catalog.languages.every((language) => language === "ja"), `${label} unavailable catalog has an unsupported language`);
+  assert.equal(catalog.trackClass, "MANUAL_SUBTITLES", `${label} catalog track class differs`);
+  assert.equal(catalog.automaticCaptionsSeparate, true, `${label} catalog automatic-caption separation differs`);
+  assert.ok(catalog.captureTiming && typeof catalog.captureTiming === "object", `${label} catalog capture timing is missing`);
+}
+
 export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publicPath = publicSubtitlePath, metadataPath = productionMetadataPath) {
   assert.notEqual(resolve(sourcePath), resolve(publicPath), "input and public retained paths must differ");
   assertSubtitlePathExtension(sourcePath, "input subtitle path", "srt");
@@ -240,8 +301,16 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
   const metadata = JSON.parse(await readFile(metadataPath, "utf8"));
   const records = metadata?.publication?.subtitleAnonymousReadbacks;
   assert.ok(Array.isArray(records) && records.length > 0, "metadata subtitle readback history is missing");
+  let comparisonReadbackCount = 0;
+  let unavailableReadbackCount = 0;
   for (const [index, record] of records.entries()) {
     const label = `subtitle readback ${index + 1}`;
+    if (isUnavailableSubtitleReadback(record)) {
+      validateUnavailableSubtitleReadback(record, label);
+      unavailableReadbackCount += 1;
+      continue;
+    }
+    comparisonReadbackCount += 1;
     const inputPath = retainedSubtitlePath(record?.inputSubtitle?.path, `${label} inputSubtitle.path`, root);
     const publicPath = retainedSubtitlePath(record?.publicVtt?.path, `${label} publicVtt.path`, root);
     assert.notEqual(inputPath, publicPath, `${label} input and public retained paths must differ`);
@@ -276,7 +345,7 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
     assert.equal(record?.comparison?.lastCueEndMilliseconds, comparison.publicLastCueEndMilliseconds, `${label} comparison ending differs`);
     assert.equal(record?.comparison?.result, comparison.result, `${label} comparison result differs`);
   }
-  return { readbackCount: records.length, validationResult: "PASS" };
+  return { readbackCount: records.length, comparisonReadbackCount, unavailableReadbackCount, validationResult: "PASS" };
 }
 
 if (import.meta.main) {
@@ -287,6 +356,8 @@ if (import.meta.main) {
       receipt: "HOTEL_PUBLIC_SUBTITLE_COMPARISON_PASS",
       ...comparison,
       historyReadbackCount: history.readbackCount,
+      historyComparisonReadbackCount: history.comparisonReadbackCount,
+      historyUnavailableReadbackCount: history.unavailableReadbackCount,
       historyValidationResult: history.validationResult,
       authentication: "NO_COOKIES_OR_CREDENTIALS_SUPPLIED",
       videoFileIdentity: "UNMEASURED",

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca
 // event_uuid_v7=01a0538f-f73f-753a-9f64-7e4fec9cb6fe state=LEGACY_CONTEXT_EXTRACTED->SQUASH_CONTEXT_CONTENT_BOUND occurred_at=2026-08-30T16:45:39.007Z
-// machine-contract: validate the recorded release context without changing the recorded evidence; squash comparison covers the full common-ancestor-to-source range within the hotel build-input boundary.
+// machine-contract: validate the recorded release context without changing the recorded evidence; squash comparison covers boundary-relevant paths changed from the common ancestor on either side.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -115,6 +115,7 @@ function assertSquashContent(repositoryRoot, baseCommit, sourceCommit, currentRe
     [
       ...changedPaths(repositoryRoot, commonAncestor, sourceCommit),
       ...changedPaths(repositoryRoot, baseCommit, sourceCommit),
+      ...changedPaths(repositoryRoot, commonAncestor, currentRef),
     ].filter((path) => isSquashValidationInput(path)),
   );
   assert(paths.size > 0, "release source squash has no comparable file entries");
@@ -142,6 +143,7 @@ export function validateReleaseContext({
     "release base commit must be an ancestor of the source commit",
   );
   if (isAncestor(repositoryRoot, sourceCommit, currentRef)) {
+    // machine-contract: SOURCE_ANCESTOR remains the shortcut when the current checkout already contains the complete source history; bidirectional comparison is for squashed checkouts only.
     return { mode: "SOURCE_ANCESTOR", baseCommit, sourceCommit };
   }
   assertSquashContent(repositoryRoot, baseCommit, sourceCommit, currentRef);

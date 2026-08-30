@@ -169,6 +169,56 @@ async function createBaseInputSquashRepository() {
   return { directory, baseCommit, sourceCommit, currentCommit };
 }
 
+const checkoutOnlyBoundaryChanges = Object.freeze([
+  {
+    expectedPath: ".node-version",
+    commonFiles: [{ path: ".node-version", content: "20\n" }],
+    currentFiles: [{ path: ".node-version", content: "22\n" }],
+  },
+  {
+    expectedPath: "src/typescript/hotel/current-added.js",
+    commonFiles: [],
+    currentFiles: [{ path: "src/typescript/hotel/current-added.js", content: "current-only addition\n" }],
+  },
+  {
+    expectedPath: "src/typescript/hotel/current-deleted.js",
+    commonFiles: [{ path: "src/typescript/hotel/current-deleted.js", content: "common input\n" }],
+    currentFiles: [],
+    deletePath: "src/typescript/hotel/current-deleted.js",
+  },
+]);
+
+async function createCheckoutOnlyDriftSquashRepository({ commonFiles, currentFiles, deletePath }) {
+  const directory = await initializeRepository();
+  const commonCommit = await commitFiles(
+    directory,
+    [{ path: "common.txt", content: "common\n" }, ...commonFiles],
+    "common inputs",
+  );
+  runGit(directory, ["switch", "--quiet", "-c", "release-base", commonCommit]);
+  const baseCommit = await commitFile(directory, "base.txt", "base-only\n", "base");
+  runGit(directory, ["switch", "--quiet", "-c", "release-source"]);
+  const sourceCommit = await commitFile(
+    directory,
+    "src/typescript/hotel/source-input.js",
+    "source input\n",
+    "source hotel change",
+  );
+
+  runGit(directory, ["switch", "--quiet", "-c", "current", commonCommit]);
+  if (deletePath) runGit(directory, ["rm", "--quiet", deletePath]);
+  const currentCommit = await commitFiles(
+    directory,
+    [
+      { path: "src/typescript/hotel/source-input.js", content: "source input\n" },
+      ...currentFiles,
+    ],
+    "squashed source with checkout-only drift",
+  );
+  runGit(directory, ["checkout", "--quiet", "--detach", currentCommit]);
+  return { directory, baseCommit, sourceCommit, currentCommit };
+}
+
 async function createUnrelatedSourceRepository() {
   const directory = await initializeRepository();
   const commonCommit = await commitFile(
@@ -360,6 +410,23 @@ test("rejects a squash checkout that drops an input introduced by the recorded b
       /release source file entry differs after squash: src\/typescript\/hotel\/base-input\.js/u,
     );
   });
+});
+
+test("rejects checkout-only boundary changes in a squash checkout", async () => {
+  for (const change of checkoutOnlyBoundaryChanges) {
+    await withRepository(
+      () => createCheckoutOnlyDriftSquashRepository(change),
+      ({ directory, baseCommit, sourceCommit }) => {
+        const result = runValidator({ directory, baseCommit, sourceCommit });
+
+        assert.notEqual(result.status, 0, output(result));
+        assert.match(
+          output(result),
+          new RegExp(`release source file entry differs after squash: ${change.expectedPath.replaceAll(".", "\\.")}`, "u"),
+        );
+      },
+    );
+  }
 });
 
 test("rejects a nonexistent base commit", async () => {

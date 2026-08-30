@@ -13,11 +13,12 @@
     "previousDocumentObservation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["informationUuidV5", "observationUuidV7", "updatedAt"],
+      "required": ["informationUuidV5", "observationUuidV7", "updatedAt", "stateTransition"],
       "properties": {
-        "informationUuidV5": { "const": "8bb1420d-3305-5c00-81a0-e24c5c68d99a" },
-        "observationUuidV7": { "const": "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42" },
-        "updatedAt": { "const": "2026-08-29T12:24:33.000Z" }
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "updatedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "type": "string", "minLength": 3 }
       }
     },
     "stateTransition": { "type": "string", "minLength": 3 },
@@ -348,7 +349,7 @@
             "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
             "authentication": { "const": "NONE" },
             "capturedAfterComparison": { "const": true },
-            "captureTiming": { "const": "FOLLOW_UP_READBACK_AFTER_FULL_184_CUE_COMPARISON_APPROXIMATELY_2026-08-30T17:50Z_EXACT_TIMESTAMP_NOT_RECORDED" },
+            "captureTiming": { "$ref": "#/$defs/captureTiming" },
             "languages": {
               "type": "array",
               "minItems": 2,
@@ -583,6 +584,17 @@
       "properties": {
         "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    },
+    "captureTiming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["precision", "lowerBound", "upperBound", "description"],
+      "properties": {
+        "precision": { "enum": ["EXACT", "BOUNDED_APPROXIMATE"] },
+        "lowerBound": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "upperBound": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "description": { "type": "string", "minLength": 3 }
       }
     },
     "asset": {

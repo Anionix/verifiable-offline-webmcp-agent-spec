@@ -92,6 +92,7 @@ SRT_TIMING = re.compile(
 # fixture information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
 # fixture event_uuid_v7=DERIVED_FROM_PRODUCTION_TIMELINE state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=MAX_ROOT_OR_READBACK_TIME_PLUS_ONE_MILLISECOND
 # machine-contract: future anonymous subtitle evidence must bind UUIDv7 to recordedAt, reject event reuse, keep recordedAt after measuredAt, and advance the document root time.
+FUTURE_SUBTITLE_STATE_SUFFIX = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED"
 
 
 def is_ignored(path: Path):
@@ -127,30 +128,74 @@ def subtitle_record_errors(record: dict[str, Any], timestamp_field: str, label: 
     return findings
 
 
-def subtitle_anonymous_readback_errors(records: Any, label: str = "subtitleAnonymousReadbacks") -> list[str]:
-    if not isinstance(records, list):
-        return [f"{label} must be an array"]
+def subtitle_capture_timing_errors(
+    record: dict[str, Any], label: str, root_updated_ms: int | None = None
+) -> list[str]:
+    catalog = record.get("availableSubtitleCatalog")
+    capture_timing = catalog.get("captureTiming") if isinstance(catalog, dict) else None
+    if not isinstance(capture_timing, dict):
+        return [f"{label} captureTiming must be a structured object"]
     findings: list[str] = []
-    seen_events: dict[str, int] = {}
-    for index, record in enumerate(records, start=1):
-        if not isinstance(record, dict):
-            continue
-        entry_label = f"{label} entry {index}"
-        event_id = record.get("observationUuidV7")
-        if isinstance(event_id, str):
-            previous_index = seen_events.get(event_id)
-            if previous_index is not None:
-                findings.append(f"{entry_label} reuses observationUuidV7 from entry {previous_index}")
-            else:
-                seen_events[event_id] = index
-        try:
-            measured_ms = rfc3339_ms(record["measuredAt"])
-            recorded_ms = rfc3339_ms(record["recordedAt"])
-        except Exception:
-            continue
-        if recorded_ms < measured_ms:
-            findings.append(f"{entry_label} recordedAt precedes measuredAt")
+    precision = capture_timing.get("precision")
+    if precision not in {"EXACT", "BOUNDED_APPROXIMATE"}:
+        findings.append(f"{label} captureTiming precision is invalid")
+    try:
+        measured_ms = rfc3339_ms(record["measuredAt"])
+        recorded_ms = rfc3339_ms(record["recordedAt"])
+        lower_ms = rfc3339_ms(capture_timing["lowerBound"])
+        upper_ms = rfc3339_ms(capture_timing["upperBound"])
+    except Exception as exc:
+        return [f"{label} capture timing or readback time is invalid: {exc}"]
+    if precision == "EXACT" and lower_ms != upper_ms:
+        findings.append(f"{label} exact captureTiming bounds differ")
+    if recorded_ms < measured_ms:
+        findings.append(f"{label} recordedAt precedes measuredAt")
+    if lower_ms < measured_ms:
+        findings.append(f"{label} captureTiming lowerBound precedes measuredAt")
+    if upper_ms < lower_ms:
+        findings.append(f"{label} captureTiming upperBound precedes lowerBound")
+    if recorded_ms < upper_ms:
+        findings.append(f"{label} captureTiming upperBound exceeds recordedAt")
+    if root_updated_ms is not None and root_updated_ms < recorded_ms:
+        findings.append(f"{label} recordedAt exceeds document root updatedAt")
     return findings
+
+
+def subtitle_observation_errors(collections: dict[str, Any], root_updated_ms: int | None = None) -> list[str]:
+    findings: list[str] = []
+    seen_events: dict[str, str] = {}
+    for collection_name, records in collections.items():
+        if not isinstance(records, list):
+            findings.append(f"{collection_name} must be an array")
+            continue
+        for index, record in enumerate(records, start=1):
+            if not isinstance(record, dict):
+                continue
+            entry_label = f"{collection_name} entry {index}"
+            event_id = record.get("observationUuidV7")
+            if isinstance(event_id, str):
+                previous_entry = seen_events.get(event_id)
+                if previous_entry is not None:
+                    findings.append(f"{entry_label} reuses observationUuidV7 from {previous_entry}")
+                else:
+                    seen_events[event_id] = entry_label
+            if "measuredAt" in record and "recordedAt" in record:
+                try:
+                    measured_ms = rfc3339_ms(record["measuredAt"])
+                    recorded_ms = rfc3339_ms(record["recordedAt"])
+                except Exception:
+                    continue
+                if recorded_ms < measured_ms:
+                    findings.append(f"{entry_label} recordedAt precedes measuredAt")
+                if root_updated_ms is not None and root_updated_ms < recorded_ms:
+                    findings.append(f"{entry_label} recordedAt exceeds document root updatedAt")
+            if "availableSubtitleCatalog" in record:
+                findings.extend(subtitle_capture_timing_errors(record, entry_label, root_updated_ms))
+    return findings
+
+
+def subtitle_anonymous_readback_errors(records: Any, label: str = "subtitleAnonymousReadbacks") -> list[str]:
+    return subtitle_observation_errors({label: records})
 
 
 def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], validator) -> list[str]:
@@ -177,27 +222,32 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
         "measuredAt": rfc3339_from_ms(future_measured_ms),
         "recordedAt": rfc3339_from_ms(future_recorded_ms),
     })
+    future_record["availableSubtitleCatalog"]["captureTiming"] = {
+        "precision": "EXACT",
+        "lowerBound": rfc3339_from_ms(future_measured_ms),
+        "upperBound": rfc3339_from_ms(future_measured_ms),
+        "description": "future validation fixture capture time",
+    }
+    previous_identity = future_video["identity"]
+    previous_updated_at = future_video["updatedAt"]
+    previous_state = future_video["stateTransition"]
+    future_video["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": previous_updated_at,
+        "stateTransition": previous_state,
+    }
     future_publication["subtitleAnonymousReadbacks"].append(future_record)
     future_video["identity"]["observationUuidV7"] = uuid7_for_ms(future_root_ms, 0x456, 0x3456789ABCDEF01)
     future_video["updatedAt"] = rfc3339_from_ms(future_root_ms)
+    future_video["stateTransition"] = f"{previous_state} -> {FUTURE_SUBTITLE_STATE_SUFFIX}"
 
     findings: list[str] = []
     if list(validator.iter_errors(future_video)):
         findings.append("video production schema rejected a future anonymous subtitle readback fixture")
     findings.extend(subtitle_record_errors(future_record, "recordedAt", "future subtitleAnonymousReadbacks entry"))
     future_records = future_publication["subtitleAnonymousReadbacks"]
-    findings.extend(subtitle_anonymous_readback_errors(future_records, "future subtitleAnonymousReadbacks"))
-    try:
-        future_root_event = uuid.UUID(future_video["identity"]["observationUuidV7"])
-        future_root_ms = rfc3339_ms(future_video["updatedAt"])
-        if future_root_event.version != 7 or uuid7_ms(str(future_root_event)) != future_root_ms:
-            findings.append("future subtitle fixture root UUIDv7 does not match updatedAt")
-        for record in future_records:
-            record_ms = rfc3339_ms(record["recordedAt"])
-            if future_root_ms < record_ms:
-                findings.append("future subtitle fixture root updatedAt precedes a readback")
-    except Exception as exc:
-        findings.append(f"future subtitle fixture root time is invalid: {exc}")
+    findings.extend(document_history_errors(future_video))
 
     duplicate_records = json.loads(json.dumps(future_records))
     duplicate_records[-1]["observationUuidV7"] = duplicate_records[0]["observationUuidV7"]
@@ -217,6 +267,13 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     )
     if not any("recordedAt precedes measuredAt" in finding for finding in before_measured_findings):
         findings.append("recordedAt-before-measuredAt fixture was accepted")
+    invalid_capture_records = json.loads(json.dumps(future_records))
+    invalid_capture_records[-1]["availableSubtitleCatalog"]["captureTiming"]["upperBound"] = rfc3339_from_ms(future_root_ms)
+    invalid_capture_findings = subtitle_observation_errors(
+        {"invalid capture timing subtitleAnonymousReadbacks": invalid_capture_records}, future_root_ms
+    )
+    if not any("captureTiming upperBound exceeds recordedAt" in finding for finding in invalid_capture_findings):
+        findings.append("capture-timing upper-bound fixture was accepted")
     return findings
 
 
@@ -316,6 +373,53 @@ def uuid7_for_ms(epoch_ms: int, random_a: int, random_b: int):
         | (random_b & ((1 << 62) - 1))
     )
     return str(uuid.UUID(int=value))
+
+
+def document_history_errors(video_production: dict[str, Any]) -> list[str]:
+    # machine-contract: the previous root keeps its complete chain; the current chain may append later suffixes but cannot delete or reorder that prefix.
+    findings: list[str] = []
+    document_identity = video_production.get("identity")
+    previous_observation = video_production.get("previousDocumentObservation")
+    if not isinstance(document_identity, dict) or not isinstance(previous_observation, dict):
+        return ["video production document history lacks identity or previous observation objects"]
+    current_state = video_production.get("stateTransition")
+    previous_state = previous_observation.get("stateTransition")
+    if not isinstance(current_state, str) or not isinstance(previous_state, str):
+        findings.append("video production document history requires current and previous state transitions")
+    elif not current_state.startswith(f"{previous_state} -> "):
+        findings.append("video production root state transition does not extend the previous complete chain")
+    if "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED" not in str(current_state).split(" -> "):
+        findings.append("video production root state transition does not retain the latest subtitle observation")
+    if document_identity.get("informationUuidV5") != "8bb1420d-3305-5c00-81a0-e24c5c68d99a":
+        findings.append("video production document information identifier changed")
+    if previous_observation.get("informationUuidV5") != document_identity.get("informationUuidV5"):
+        findings.append("video production previous root information identifier differs from the document")
+    try:
+        document_event = uuid.UUID(document_identity["observationUuidV7"])
+        document_updated_ms = rfc3339_ms(video_production["updatedAt"])
+        previous_event = uuid.UUID(previous_observation["observationUuidV7"])
+        previous_updated_ms = rfc3339_ms(previous_observation["updatedAt"])
+    except Exception as exc:
+        findings.append(f"video production document identity or previous observation is invalid: {exc}")
+        return findings
+    if document_event.version != 7 or uuid7_ms(str(document_event)) != document_updated_ms:
+        findings.append("video production root UUIDv7 does not match updatedAt")
+    if previous_event.version != 7 or uuid7_ms(str(previous_event)) != previous_updated_ms:
+        findings.append("video production previous root UUIDv7 does not match its updatedAt")
+    if document_updated_ms <= previous_updated_ms:
+        findings.append("video production previous root updatedAt is not earlier than the current root")
+    publication = video_production.get("publication")
+    if isinstance(publication, dict):
+        findings.extend(
+            subtitle_observation_errors(
+                {
+                    "subtitleUpdates": publication.get("subtitleUpdates"),
+                    "subtitleAnonymousReadbacks": publication.get("subtitleAnonymousReadbacks"),
+                },
+                document_updated_ms,
+            )
+        )
+    return findings
 
 
 def merkle_leaf(d: str): return hashlib.sha256(b"\x00" + bytes.fromhex(d)).digest()
@@ -1485,53 +1589,51 @@ def main():
             errors.append("video production schema accepted a mismatched subtitle information identifier")
     elif isinstance(publication_for_schema_checks, dict):
         errors.append("video production schema mutation fixture lacks a subtitleUpdates entry")
-    document_identity = video_production.get("identity", {})
-    previous_document_observation = video_production.get("previousDocumentObservation", {})
-    try:
-        document_event = uuid.UUID(document_identity["observationUuidV7"])
-        document_updated_ms = rfc3339_ms(video_production["updatedAt"])
-        previous_event = uuid.UUID(previous_document_observation["observationUuidV7"])
-        previous_updated_ms = rfc3339_ms(previous_document_observation["updatedAt"])
-    except Exception as exc:
-        errors.append(f"video production document identity or previous observation is invalid: {exc}")
-    else:
-        if document_identity.get("informationUuidV5") != "8bb1420d-3305-5c00-81a0-e24c5c68d99a":
-            errors.append("video production document information identifier changed")
-        if document_event.version != 7 or uuid7_ms(str(document_event)) != document_updated_ms:
-            errors.append("video production root UUIDv7 does not match updatedAt")
-        if previous_document_observation != {
-            "informationUuidV5": "8bb1420d-3305-5c00-81a0-e24c5c68d99a",
-            "observationUuidV7": "01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42",
-            "updatedAt": "2026-08-29T12:24:33.000Z",
-        }:
-            errors.append("video production previous document observation does not preserve the prior root")
-        if previous_event.version != 7 or uuid7_ms(str(previous_event)) != previous_updated_ms:
-            errors.append("video production previous root UUIDv7 does not match its updatedAt")
-        if document_updated_ms < previous_updated_ms:
-            errors.append("video production root updatedAt precedes the previous root observation")
-        latest_subtitle_state = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
-        if latest_subtitle_state not in video_production.get("stateTransition", "").split(" -> "):
-            errors.append("video production root state transition does not retain the latest subtitle observation")
-        publication_for_chronology = video_production.get("publication", {})
-        if isinstance(publication_for_chronology, dict):
-            for collection_name, timestamp_field in (
-                ("subtitleUpdates", "observedAt"),
-                ("subtitleAnonymousReadbacks", "recordedAt"),
-            ):
-                records = publication_for_chronology.get(collection_name, [])
-                if not isinstance(records, list):
-                    continue
-                for index, record in enumerate(records, start=1):
-                    if not isinstance(record, dict) or timestamp_field not in record:
-                        continue
-                    try:
-                        record_time_ms = rfc3339_ms(record[timestamp_field])
-                    except Exception:
-                        continue
-                    if document_updated_ms < record_time_ms:
-                        errors.append(
-                            f"video production root updatedAt precedes {collection_name} entry {index} {timestamp_field}"
-                        )
+    errors.extend(document_history_errors(video_production))
+    missing_previous_state = json.loads(json.dumps(video_production))
+    missing_previous_state.get("previousDocumentObservation", {}).pop("stateTransition", None)
+    if not schema_has_required_error(video_production_validator.iter_errors(missing_previous_state), "stateTransition"):
+        errors.append("video production schema accepted a previous observation without its state transition")
+    subtitle_uuid_reuse = json.loads(json.dumps(video_production))
+    reuse_publication = subtitle_uuid_reuse.get("publication", {})
+    if isinstance(reuse_publication, dict):
+        reuse_updates = reuse_publication.get("subtitleUpdates")
+        reuse_readbacks = reuse_publication.get("subtitleAnonymousReadbacks")
+        if (
+            isinstance(reuse_updates, list)
+            and reuse_updates
+            and isinstance(reuse_updates[0], dict)
+            and isinstance(reuse_readbacks, list)
+            and reuse_readbacks
+            and isinstance(reuse_readbacks[0], dict)
+        ):
+            reuse_updates[0]["observationUuidV7"] = reuse_readbacks[0]["observationUuidV7"]
+            reuse_findings = subtitle_observation_errors(
+                {"subtitleUpdates": reuse_updates, "subtitleAnonymousReadbacks": reuse_readbacks}
+            )
+            if not any("reuses observationUuidV7" in finding for finding in reuse_findings):
+                errors.append("subtitle observations accepted a UUIDv7 reused across collections")
+    deleted_state = json.loads(json.dumps(video_production))
+    deleted_parts = deleted_state.get("stateTransition", "").split(" -> ")
+    if len(deleted_parts) > 2:
+        deleted_parts.pop(1)
+        deleted_state["stateTransition"] = " -> ".join(deleted_parts)
+        if not any("does not extend the previous complete chain" in finding for finding in document_history_errors(deleted_state)):
+            errors.append("video production root state deletion was accepted")
+    reordered_state = json.loads(json.dumps(video_production))
+    reordered_parts = reordered_state.get("stateTransition", "").split(" -> ")
+    if len(reordered_parts) > 2:
+        reordered_parts[0], reordered_parts[1] = reordered_parts[1], reordered_parts[0]
+        reordered_state["stateTransition"] = " -> ".join(reordered_parts)
+        if not any("does not extend the previous complete chain" in finding for finding in document_history_errors(reordered_state)):
+            errors.append("video production root state reorder was accepted")
+    invalid_previous_time = json.loads(json.dumps(video_production))
+    invalid_previous_time["previousDocumentObservation"]["updatedAt"] = invalid_previous_time["updatedAt"]
+    invalid_previous_findings = document_history_errors(invalid_previous_time)
+    if not any("previous root UUIDv7 does not match" in finding for finding in invalid_previous_findings):
+        errors.append("video production previous root timestamp binding was not tested")
+    if not any("not earlier than the current root" in finding for finding in invalid_previous_findings):
+        errors.append("video production accepted an equal previous and current root timestamp")
     errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
@@ -1684,8 +1786,6 @@ def main():
                     errors.append(f"{label} must be an object")
                     continue
                 errors.extend(subtitle_record_errors(record, timestamp_field, label))
-            if collection_name == "subtitleAnonymousReadbacks":
-                errors.extend(subtitle_anonymous_readback_errors(records))
             if records:
                 invalid_timestamp_record = json.loads(json.dumps(records[0]))
                 try:

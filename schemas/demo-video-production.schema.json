@@ -203,7 +203,29 @@
           { "$ref": "#/$defs/devpostThumbnailUpdate" },
           { "$ref": "#/$defs/devpostThumbnailSocialReadback" }
         ]
-      }
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": ["state"],
+            "properties": {
+              "state": { "const": "THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE" }
+            }
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["state"],
+            "properties": {
+              "state": { "const": "PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED" }
+            }
+          },
+          "minContains": 1
+        }
+      ]
     },
     "devpostThumbnailUpdate": {
       "$comment": "issue=202 information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246 event_uuid_v7=01a053bd-aba1-7772-928c-1b5a811b7cab state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE occurred_at=2026-08-30T17:35:34.305Z machine-contract=the public PNG readback and stale social metadata remain separate; AI_RE_RENDERED is observed and pixel identity remains NOT_ASSERTED",

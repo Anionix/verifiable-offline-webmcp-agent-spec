@@ -4596,8 +4596,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "62097ba45360554a098f876e650db72edce0e4912b2e2b188d1b830d90d903b0",
-      "bytes": 32958,
+      "sha256": "ddf0bfd6b4f087b64d2c0701537c95599942089e603dcc365e15831322ffd922",
+      "bytes": 33542,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {

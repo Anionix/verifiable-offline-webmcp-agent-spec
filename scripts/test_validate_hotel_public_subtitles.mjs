@@ -86,6 +86,12 @@ test("accepts an explicitly allowed WebVTT NOTE block", () => {
   assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
 });
 
+test("accepts a WebVTT NOTE block containing --!>", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\nNOTE\nplain --!> note\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
+});
+
 test("rejects a WebVTT NOTE block containing a cue separator", () => {
   const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
   const publicText = "WEBVTT\n\nNOTE\nmalformed --> note\n\n00:00:00.000 --> 00:00:01.000\nHello\n";

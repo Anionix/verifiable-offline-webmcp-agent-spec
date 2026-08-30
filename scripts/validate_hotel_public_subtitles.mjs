@@ -89,7 +89,7 @@ function webVttNonCueBlockKind(block) {
 function isAllowedWebVttNonCueBlock(block) {
   const kind = webVttNonCueBlockKind(block);
   if (kind === "NOTE") {
-    assert.doesNotMatch(block, /-->/u, "WebVTT NOTE block cannot contain -->");
+    assert.ok(!block.includes("-->"), "WebVTT NOTE block cannot contain -->");
     return true;
   }
   if (kind === "STYLE" || kind === "REGION") {

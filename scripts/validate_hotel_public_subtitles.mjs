@@ -6,12 +6,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const sourceSubtitlePath = resolve(repositoryRoot, "media/demo-video/subtitles.en.srt");
 export const publicSubtitlePath = resolve(repositoryRoot, "media/demo-video/youtube-public-201.en.vtt");
+export const productionMetadataPath = resolve(repositoryRoot, "metadata/demo-video-production.json");
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
@@ -72,12 +73,25 @@ function digest(text) {
   return createHash("sha256").update(text).digest("hex");
 }
 
-export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publicPath = publicSubtitlePath) {
-  const [sourceText, publicText] = await Promise.all([readFile(sourcePath, "utf8"), readFile(publicPath, "utf8")]);
+export async function compareSubtitleFiles(sourcePath = sourceSubtitlePath, publicPath = publicSubtitlePath, metadataPath = productionMetadataPath) {
+  const [sourceText, publicText, metadataText] = await Promise.all([
+    readFile(sourcePath, "utf8"),
+    readFile(publicPath, "utf8"),
+    readFile(metadataPath, "utf8"),
+  ]);
+  const sourceSha256 = digest(sourceText);
+  const publicVttSha256 = digest(publicText);
+  const metadata = JSON.parse(metadataText);
+  const matchingReadbacks = metadata?.publication?.subtitleAnonymousReadbacks?.filter((record) => record?.publicVtt?.fileName === basename(publicPath));
+  assert.ok(matchingReadbacks?.length, "metadata subtitle readback for the public VTT is missing");
+  for (const [index, record] of matchingReadbacks.entries()) {
+    assert.equal(record.inputSubtitle?.sha256, sourceSha256, `metadata source subtitle SHA-256 differs at readback ${index + 1}`);
+    assert.equal(record.publicVtt?.sha256, publicVttSha256, `metadata public VTT SHA-256 differs at readback ${index + 1}`);
+  }
   return {
     ...compareSubtitleTexts(sourceText, publicText),
-    sourceSha256: digest(sourceText),
-    publicVttSha256: digest(publicText),
+    sourceSha256,
+    publicVttSha256,
   };
 }
 

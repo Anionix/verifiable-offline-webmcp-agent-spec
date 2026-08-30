@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import { test } from "node:test";
-import { compareSubtitleFiles, compareSubtitleTexts, publicSubtitlePath, sourceSubtitlePath } from "./validate_hotel_public_subtitles.mjs";
+import {
+  compareSubtitleFiles,
+  compareSubtitleTexts,
+  productionMetadataPath,
+  publicSubtitlePath,
+  sourceSubtitlePath,
+} from "./validate_hotel_public_subtitles.mjs";
 
 test("accepts the retained public VTT when all authored cues match", async () => {
   const result = await compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath);
@@ -23,4 +31,17 @@ test("rejects a public VTT when one cue timestamp changes", async () => {
   const changedPublicText = publicText.replace("00:00:00.000 --> 00:00:00.700", "00:00:00.001 --> 00:00:00.700");
   assert.notEqual(changedPublicText, publicText);
   assert.throws(() => compareSubtitleTexts(sourceText, changedPublicText), /public subtitle text or timestamps differ/u);
+});
+
+test("rejects metadata when a recorded subtitle digest differs", async () => {
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitles-"));
+  try {
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    metadata.publication.subtitleAnonymousReadbacks[0].publicVtt.sha256 = "0".repeat(64);
+    const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");
+    await writeFile(metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(() => compareSubtitleFiles(sourceSubtitlePath, publicSubtitlePath, metadataFixturePath), /metadata public VTT SHA-256 differs/u);
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
 });

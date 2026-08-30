@@ -89,6 +89,15 @@ SRT_TIMING = re.compile(
     r" --> "
     r"(?P<end_h>\d{2}):(?P<end_m>\d{2}):(?P<end_s>\d{2}),(?P<end_ms>\d{3})"
 )
+# fixture information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
+# fixture event_uuid_v7=01a05441-e600-7234-8234-56789abcdef0 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=2026-08-30T20:00:00.000Z
+# fixture event_uuid_v7=01a05441-e9e8-7456-8345-6789abcdef01 state_transition=ROOT_UPDATED_WITH_SUBTITLE_FOLLOW_UP occurred_at=2026-08-30T20:00:01.000Z
+# machine-contract: future anonymous subtitle evidence must bind UUIDv7 to recordedAt, reject event reuse, keep recordedAt after measuredAt, and advance the document root time.
+FUTURE_SUBTITLE_ANONYMOUS_EVENT_UUID = "01a05441-e600-7234-8234-56789abcdef0"
+FUTURE_SUBTITLE_MEASURED_AT = "2026-08-30T19:59:59.500Z"
+FUTURE_SUBTITLE_RECORDED_AT = "2026-08-30T20:00:00.000Z"
+FUTURE_DOCUMENT_EVENT_UUID = "01a05441-e9e8-7456-8345-6789abcdef01"
+FUTURE_DOCUMENT_UPDATED_AT = "2026-08-30T20:00:01.000Z"
 
 
 def is_ignored(path: Path):
@@ -121,6 +130,89 @@ def subtitle_record_errors(record: dict[str, Any], timestamp_field: str, label: 
     else:
         if record_event.version != 7 or uuid7_ms(str(record_event)) != record_time_ms:
             findings.append(f"{label} UUIDv7 does not match {timestamp_field}")
+    return findings
+
+
+def subtitle_anonymous_readback_errors(records: Any, label: str = "subtitleAnonymousReadbacks") -> list[str]:
+    if not isinstance(records, list):
+        return [f"{label} must be an array"]
+    findings: list[str] = []
+    seen_events: dict[str, int] = {}
+    for index, record in enumerate(records, start=1):
+        if not isinstance(record, dict):
+            continue
+        entry_label = f"{label} entry {index}"
+        event_id = record.get("observationUuidV7")
+        if isinstance(event_id, str):
+            previous_index = seen_events.get(event_id)
+            if previous_index is not None:
+                findings.append(f"{entry_label} reuses observationUuidV7 from entry {previous_index}")
+            else:
+                seen_events[event_id] = index
+        try:
+            measured_ms = rfc3339_ms(record["measuredAt"])
+            recorded_ms = rfc3339_ms(record["recordedAt"])
+        except Exception:
+            continue
+        if recorded_ms < measured_ms:
+            findings.append(f"{entry_label} recordedAt precedes measuredAt")
+    return findings
+
+
+def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], validator) -> list[str]:
+    publication = video_production.get("publication")
+    records = publication.get("subtitleAnonymousReadbacks") if isinstance(publication, dict) else None
+    if not isinstance(records, list) or not records or not isinstance(records[0], dict):
+        return ["future subtitle readback fixture lacks a base anonymous readback"]
+
+    future_video = json.loads(json.dumps(video_production))
+    future_publication = future_video["publication"]
+    future_record = json.loads(json.dumps(records[0]))
+    future_record.update({
+        "observationUuidV7": FUTURE_SUBTITLE_ANONYMOUS_EVENT_UUID,
+        "measuredAt": FUTURE_SUBTITLE_MEASURED_AT,
+        "recordedAt": FUTURE_SUBTITLE_RECORDED_AT,
+    })
+    future_publication["subtitleAnonymousReadbacks"].append(future_record)
+    future_video["identity"]["observationUuidV7"] = FUTURE_DOCUMENT_EVENT_UUID
+    future_video["updatedAt"] = FUTURE_DOCUMENT_UPDATED_AT
+
+    findings: list[str] = []
+    if list(validator.iter_errors(future_video)):
+        findings.append("video production schema rejected a future anonymous subtitle readback fixture")
+    findings.extend(subtitle_record_errors(future_record, "recordedAt", "future subtitleAnonymousReadbacks entry"))
+    future_records = future_publication["subtitleAnonymousReadbacks"]
+    findings.extend(subtitle_anonymous_readback_errors(future_records, "future subtitleAnonymousReadbacks"))
+    try:
+        future_root_event = uuid.UUID(future_video["identity"]["observationUuidV7"])
+        future_root_ms = rfc3339_ms(future_video["updatedAt"])
+        if future_root_event.version != 7 or uuid7_ms(str(future_root_event)) != future_root_ms:
+            findings.append("future subtitle fixture root UUIDv7 does not match updatedAt")
+        for record in future_records:
+            record_ms = rfc3339_ms(record["recordedAt"])
+            if future_root_ms < record_ms:
+                findings.append("future subtitle fixture root updatedAt precedes a readback")
+    except Exception as exc:
+        findings.append(f"future subtitle fixture root time is invalid: {exc}")
+
+    duplicate_records = json.loads(json.dumps(future_records))
+    duplicate_records[-1]["observationUuidV7"] = duplicate_records[0]["observationUuidV7"]
+    duplicate_findings = subtitle_anonymous_readback_errors(duplicate_records, "duplicate subtitleAnonymousReadbacks")
+    if not any("reuses observationUuidV7" in finding for finding in duplicate_findings):
+        findings.append("duplicate observationUuidV7 fixture was accepted")
+
+    before_measured_records = json.loads(json.dumps(future_records))
+    before_measured_record = before_measured_records[-1]
+    before_measured_record.update({
+        "observationUuidV7": "01a05441-e40b-7345-8456-789abcdef012",
+        "recordedAt": "2026-08-30T19:59:59.499Z",
+    })
+    before_measured_findings = subtitle_anonymous_readback_errors(
+        before_measured_records,
+        "recordedAt-before-measuredAt subtitleAnonymousReadbacks",
+    )
+    if not any("recordedAt precedes measuredAt" in finding for finding in before_measured_findings):
+        findings.append("recordedAt-before-measuredAt fixture was accepted")
     return findings
 
 
@@ -1420,6 +1512,7 @@ def main():
                         errors.append(
                             f"video production root updatedAt precedes {collection_name} entry {index} {timestamp_field}"
                         )
+    errors.extend(subtitle_anonymous_future_fixture_errors(video_production, video_production_validator))
     future_video_submission = json.loads(json.dumps(video_production))
     future_video_devpost = future_video_submission["publication"]["devpostReadback"]
     future_video_devpost.update({
@@ -1571,6 +1664,8 @@ def main():
                     errors.append(f"{label} must be an object")
                     continue
                 errors.extend(subtitle_record_errors(record, timestamp_field, label))
+            if collection_name == "subtitleAnonymousReadbacks":
+                errors.extend(subtitle_anonymous_readback_errors(records))
             if records:
                 invalid_timestamp_record = json.loads(json.dumps(records[0]))
                 invalid_timestamp_record[timestamp_field] = invalid_timestamp

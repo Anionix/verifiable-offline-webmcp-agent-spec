@@ -87,7 +87,7 @@ const expectedReleaseEvidence = Object.freeze({
   status: "PASS",
   testCommand: "npm test",
   testDirectory: "src/typescript",
-  testCount: 192,
+  testCount: 194,
   countSource: "node-test-summary",
 });
 

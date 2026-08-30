@@ -1,0 +1,74 @@
+---
+title: "Kyoto Booking Retry Proof — reproducible release package"
+language: "en"
+information_uuid_v5: "4f18aaff-864b-5bbd-a2ce-1c33f0add5f2"
+event_uuid_v7: "01a050c7-34b7-7168-8c64-9443fbe87f36"
+state_transition: "UNPACKAGED_HOTEL_ARTIFACT -> REPRODUCIBLE_RELEASE_PACKAGE"
+occurred_at: "2026-08-30T04:20:00Z"
+status: "release-guide"
+---
+
+# Reproducible hotel release package
+
+This package makes the fictional Kyoto hotel demo easy to run, inspect, and show to a judge. The short route is in [`examples/hotel-booking-demo/README.md`](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md). The screenshot and video route is in the [English visual guide](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/25-devpost-visual-guide.en.md), with a [short Japanese guide](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/25-devpost-visual-guide.ja.md).
+
+## What the command creates
+
+`npm run release:hotel` builds and validates the existing demo, then writes `release/kyoto-booking-retry-proof/`:
+
+- `dist/client/**` — the static client for Vercel, Netlify, and Render checks.
+- `dist/server/index.js` — the ChatGPT Sites server entry point.
+- `dist/.openai/hosting.json` — the Sites hosting wrapper.
+- `README.md` — the concise English-first judge route with a Japanese summary.
+- `DEVPOST_VISUAL_GUIDE.md` and `DEVPOST_VISUAL_GUIDE_JA.md` — the six-panel visual route.
+- `RELEASE_GUIDE.md` — this command and verification guide.
+- `LICENSE` — Apache License 2.0.
+- `release-manifest.json` — source commit, public links, state transition, digests, and file receipts.
+- `SHA256SUMS` — the sorted SHA-256 list for the package.
+
+Video binaries, credentials, environment files, personal information, and real booking data are excluded.
+
+## Reproduce the package
+
+Run from one clean, committed source checkout. The builder stops if the working tree is dirty, if the source commit changes, if a required public-evidence digest differs, or if Gitleaks is unavailable.
+
+```bash
+npm ci
+npm run build:web
+npm run validate:hotel
+npm run release:hotel
+npm run validate:hotel:release
+```
+
+Check every recorded package file:
+
+```bash
+cd release/kyoto-booking-retry-proof
+shasum -a 256 -c SHA256SUMS
+```
+
+To prove repeatability on the same commit:
+
+```bash
+npm run release:hotel
+cp release/kyoto-booking-retry-proof/SHA256SUMS /tmp/kyoto-booking-retry-proof.first.sha256
+npm run release:hotel
+cmp /tmp/kyoto-booking-retry-proof.first.sha256 release/kyoto-booking-retry-proof/SHA256SUMS
+```
+
+`release/` is ignored by Git. Keep the manifest and checksum output with the release record when distributing the package; do not add the video itself to the source repository.
+
+## Judge-facing boundaries
+
+The demo uses only the fictional `Fictional Kyoto Ryokan` and `Standard Flexible` plan. WebMCP exposes `check_existing_hotel_booking`, `prepare_hotel_booking`, `get_hotel_booking_status`, and `preview_hotel_cancellation`. It does not expose confirmation, payment, or cancellation mutation to an agent. A human-only visible button commits the simulated booking.
+
+The result is browser-local and publication-target-specific. `2 attempts → 1 simulated booking → 1 confirmation number` is a deterministic demonstration, not an external hotel transaction. The current Vercel production deployment `dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK` serves source commit `c8be388d8047472ef7d6ad69656255adb5903e37`. A fresh supported HTTPS Chrome run exposed `document.modelContext`, exactly the four intended tools, zero discovery effects, and a native status read before retry; the final result was `RETRY_RECOGNIZED` with two attempts, one booking, one effect start, and the same confirmation number. This proves the recorded configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader evidence, and local-video-to-YouTube file identity, remain explicitly limited in the manifest and verification records. See the [public release readback](../metadata/hotel-public-release-readback.json) and [native reconciliation record](../metadata/hotel-native-webmcp-reconciliation.json).
+
+## Related evidence
+
+- [Primary ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site)
+- [Vercel backup](https://kyoto-booking-retry-proof.vercel.app)
+- [Devpost project](https://devpost.com/software/project-y79pb23hj1mz)
+- [Public video](https://youtu.be/tdSvJw4ghX8)
+- [Source repository](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec)
+- [Japanese release guide](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.ja.md)

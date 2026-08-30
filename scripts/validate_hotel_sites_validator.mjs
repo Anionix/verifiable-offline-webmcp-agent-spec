@@ -54,7 +54,7 @@ const [
   readText(resolve(repositoryRoot, "wrangler.jsonc")),
   readText(resolve(repositoryRoot, ".openai/hosting.json")),
   readText(resolve(hostingRoot, "hosting.json")),
-  readJson(resolve(repositoryRoot, "metadata/hotel-booking-verification.json")),
+  readJson(resolve(repositoryRoot, "metadata/hotel-release-candidate.json")),
 ]);
 
 assert.match(workerBundle, /ASSETS\.fetch/);
@@ -96,10 +96,10 @@ assert.deepEqual(Object.keys(hosting), ["project_id"], "Sites hosting identity m
 assert.equal(typeof hosting.project_id, "string");
 assert(hosting.project_id.length > 0, "Sites project_id must be persisted");
 
-assertDigestScope(verification.fullSitesPackageDigestScope, fullSitesPackageDigestScope, "full Sites package");
+assertDigestScope(verification.artifacts.fullSitesScope, fullSitesPackageDigestScope, "full Sites package");
 const fullSitesPackageDigest = await digestTree(sitesPackageRoot, fullSitesPackageDigestScope.excludedPaths);
 assert.equal(
-  verification.fullSitesPackageDigest,
+  verification.artifacts.fullSitesPackageSha256,
   fullSitesPackageDigest,
   "full Sites package digest differs from its scoped receipt",
 );

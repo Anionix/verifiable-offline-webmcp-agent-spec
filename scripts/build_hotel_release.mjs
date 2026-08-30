@@ -2,6 +2,9 @@
 // information_uuid_v5=f26c8714-a704-5f83-a2af-c7231c73c28c
 // event_uuid_v7=01a04dbb-0fa0-71e1-93a4-f4100e947b72 state_transition=UNPACKAGED_HOTEL_ARTIFACT -> REPRODUCIBLE_RELEASE_CONTRACT_IMPLEMENTED occurred_at=2026-08-29T13:35:00.000Z
 // machine-contract: one clean commit produces an allowlisted release directory plus stable JSON and SHA-256 file receipts; video, environment files, and credentials are excluded.
+// information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2
+// event_uuid_v7=01a050c7-34b7-7168-8c64-9443fbe87f36 state_transition=ROOT_README_RELEASE -> JUDGE_ROUTE_DOCUMENTS_RELEASE occurred_at=2026-08-30T04:20:00.000Z
+// machine-contract: the release root uses a concise English-first README, a bilingual visual route, and a reproducible command guide instead of copying the entire repository README.
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -24,6 +27,12 @@ const releaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof")
 const namespaceUuidV5 = "47f3e535-0e27-559a-9556-aa79a84f95eb";
 const informationUuidV5 = "55e8dd64-ba47-5c26-897d-aa6893eb5ec5";
 const forbiddenExtensions = new Set([".avi", ".m4v", ".mkv", ".mov", ".mp4", ".webm"]);
+const releaseDocuments = [
+  { source: "examples/hotel-booking-demo/README.md", target: "README.md" },
+  { source: "docs/25-devpost-visual-guide.en.md", target: "DEVPOST_VISUAL_GUIDE.md" },
+  { source: "docs/25-devpost-visual-guide.ja.md", target: "DEVPOST_VISUAL_GUIDE_JA.md" },
+  { source: "docs/24-hotel-release-package.en.md", target: "RELEASE_GUIDE.md" },
+];
 
 function command(name, args) {
   return execFileSync(name, args, { cwd: repositoryRoot, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim();
@@ -112,8 +121,9 @@ command(process.execPath, ["scripts/build_web_site.mjs"]);
 command(process.execPath, ["scripts/validate_hotel_portable_validator.mjs"]);
 command(process.execPath, ["scripts/validate_hotel_sites_validator.mjs"]);
 
-const [verification, vercel, video, devpost] = await Promise.all([
+const [verification, candidate, vercel, video, devpost] = await Promise.all([
   json("metadata/hotel-booking-verification.json"),
+  json("metadata/hotel-release-candidate.json"),
   json("metadata/vercel-hotel-deployment.json"),
   json("metadata/demo-video-production.json"),
   json("metadata/devpost-public-readback.json"),
@@ -121,9 +131,9 @@ const [verification, vercel, video, devpost] = await Promise.all([
 const functionalDigest = await digestTree(clientRoot, functionalDigestScope.excludedPaths);
 const fullClientDigest = await digestTree(clientRoot, fullClientDigestScope.excludedPaths);
 const fullSitesDigest = await digestTree(sitesPackageRoot, fullSitesPackageDigestScope.excludedPaths);
-assert.equal(verification.artifactDigest, functionalDigest);
-assert.equal(verification.fullClientArtifactDigest, fullClientDigest);
-assert.equal(verification.fullSitesPackageDigest, fullSitesDigest);
+assert.equal(candidate.artifacts.functionalClientSha256, functionalDigest);
+assert.equal(candidate.artifacts.fullClientSha256, fullClientDigest);
+assert.equal(candidate.artifacts.fullSitesPackageSha256, fullSitesDigest);
 
 await rm(releaseRoot, { recursive: true, force: true });
 await mkdir(resolve(releaseRoot, "dist"), { recursive: true });
@@ -131,9 +141,22 @@ await Promise.all([
   cp(resolve(repositoryRoot, "dist/client"), resolve(releaseRoot, "dist/client"), { recursive: true }),
   cp(resolve(repositoryRoot, "dist/server"), resolve(releaseRoot, "dist/server"), { recursive: true }),
   cp(resolve(repositoryRoot, "dist/.openai"), resolve(releaseRoot, "dist/.openai"), { recursive: true }),
-  cp(resolve(repositoryRoot, "README.md"), resolve(releaseRoot, "README.md")),
   cp(resolve(repositoryRoot, "LICENSE"), resolve(releaseRoot, "LICENSE")),
+  ...releaseDocuments.map(({ source, target }) => cp(resolve(repositoryRoot, source), resolve(releaseRoot, target))),
 ]);
+
+const releaseReadme = await readFile(resolve(releaseRoot, "README.md"), "utf8");
+assert.match(releaseReadme, /Kyoto Booking Retry Proof/u, "release README must identify the hotel demo");
+assert.match(releaseReadme, /2 attempts → 1 simulated booking → 1 confirmation number/u, "release README must show the judge result");
+assert.match(releaseReadme, /check_existing_hotel_booking/u, "release README must name the WebMCP boundary");
+const visualGuide = await readFile(resolve(releaseRoot, "DEVPOST_VISUAL_GUIDE.md"), "utf8");
+assert.match(visualGuide, /01-hero-empty/u, "visual guide must include the hero panel");
+assert.match(visualGuide, /05-retry-recognized/u, "visual guide must include the retry proof panel");
+assert.match(visualGuide, /AI-generated dramatization \/ Fictional booking/u, "visual guide must preserve generated-scene disclosure");
+const visualGuideJapanese = await readFile(resolve(releaseRoot, "DEVPOST_VISUAL_GUIDE_JA.md"), "utf8");
+assert.match(visualGuideJapanese, /60秒/u, "Japanese visual guide must include the short route");
+const releaseGuide = await readFile(resolve(releaseRoot, "RELEASE_GUIDE.md"), "utf8");
+assert.match(releaseGuide, /shasum -a 256 -c SHA256SUMS/u, "release guide must include checksum verification");
 
 const payloadReceipts = await Promise.all((await filesUnder(releaseRoot)).map(fileReceipt));
 const eventUuidV7 = deterministicUuidV7(commitSeconds * 1000, `${sourceCommit}\0${functionalDigest}\0${fullSitesDigest}`);
@@ -166,6 +189,12 @@ const manifest = {
     "Select Retry the same booking.",
     "Verify RETRY_RECOGNIZED, attempts 2, bookings 1, effect starts 1, and the same confirmation number.",
   ],
+  presentation: {
+    primaryReadme: "README.md",
+    visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md",
+    visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md",
+    releaseGuide: "RELEASE_GUIDE.md",
+  },
   license: { spdx: "Apache-2.0", path: "LICENSE" },
   boundaries: {
     booking: "Fictional device-local demonstration; no real booking, payment, email, or cancellation.",

@@ -1,8 +1,9 @@
 {
-  "informationUuidV5": "6ccf2fbe-a858-5707-9470-96318a92b49c",
-  "observationUuidV7": "01a04bd0-b895-7603-8491-8d60a19b1107",
-  "measurementStatus": "UNMEASURED",
-  "reason": "These deterministic cases are checked locally; model-selection quality remains unmeasured until a recorded ChatGPT Sites run exists.",
+  "$comment": "information_uuid_v5=35895cab-fd9e-5106-8047-9be7177bbe27 event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8 state_transition=NATIVE_WEBMCP_RECIPE_DECLARED -> PUBLIC_RUNTIME_CONTRACT_READY occurred_at=2026-08-30T13:28:07.383Z machine-contract=The public file declares exact names, the executable test count, and a reproducible read-before-retry path; runtime observations remain in the release evidence record.",
+  "informationUuidV5": "35895cab-fd9e-5106-8047-9be7177bbe27",
+  "observationUuidV7": "01a052db-1fd7-7f69-a40f-540e4dc061a8",
+  "measurementStatus": "CONTRACT_READY",
+  "reason": "The public Vercel release declares the four intended WebMCP tools and the executable test count. A fresh supported browser run is recorded separately with its runtime timestamp, source commit, and result.",
   "applicationState": [
     { "name": "check_existing_hotel_booking", "readOnly": true },
     { "name": "prepare_hotel_booking", "readOnly": false },
@@ -10,6 +11,85 @@
     { "name": "preview_hotel_cancellation", "readOnly": true }
   ],
   "forbiddenTools": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"],
+  "releaseEvidence": {
+    "status": "PASS",
+    "testCommand": "npm test",
+    "testDirectory": "src/typescript",
+    "testCount": 192,
+    "countSource": "node-test-summary"
+  },
+  "nativeRuntimeContract": {
+    "status": "REPRODUCIBLE_PATH",
+    "targetUrl": "https://kyoto-booking-retry-proof.vercel.app/",
+    "requiresSecureContext": true,
+    "requiredChromeFlags": ["#devtools-webmcp-support", "#enable-webmcp-testing"],
+    "requiredSurface": "document.modelContext.getTools",
+    "expectedToolNames": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"],
+    "forbiddenToolNames": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"],
+    "discoveryMustHaveZeroEffects": true
+  },
+  "agentReconciliationContract": {
+    "status": "REPRODUCIBLE_PATH",
+    "flow": ["AMBIGUOUS_OUTCOME", "AGENT_WEBMCP_STATUS_CHECK", "EXISTING_RESULT_FOUND", "NO_DUPLICATE_EFFECT"],
+    "requiredReadTool": "get_hotel_booking_status",
+    "humanConfirmationBoundary": "visible_button_only",
+    "resultInvariant": {
+      "attemptCount": 2,
+      "bookingCount": 1,
+      "effectStartCount": 1,
+      "sameConfirmation": true
+    }
+  },
+  "recordingRecipe": {
+    "recipeId": "35895cab-fd9e-5106-8047-9be7177bbe27",
+    "status": "READY",
+    "purpose": "Reproduce native WebMCP discovery and the fictional lost-response reconciliation on the public HTTPS page.",
+    "target": {
+      "url": "https://kyoto-booking-retry-proof.vercel.app/",
+      "requiresSecureContext": true,
+      "requiredChromeFlags": ["#devtools-webmcp-support", "#enable-webmcp-testing"]
+    },
+    "steps": [
+      {
+        "stepId": "open-public-https",
+        "action": "navigate",
+        "expect": "secureContext=true"
+      },
+      {
+        "stepId": "discover-model-context",
+        "action": "read",
+        "surface": "document.modelContext.getTools",
+        "expect": "present"
+      },
+      {
+        "stepId": "assert-tool-boundary",
+        "action": "read",
+        "expectedToolNames": ["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"],
+        "forbiddenToolNames": ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]
+      },
+      {
+        "stepId": "assert-zero-effects",
+        "action": "read",
+        "expect": "discovery creates no booking, effect, external request, permission request, or notification"
+      },
+      {
+        "stepId": "prepare-and-human-confirm",
+        "action": "visible-human-button",
+        "expect": "COMMITTED with the success response hidden"
+      },
+      {
+        "stepId": "reconcile-before-retry",
+        "action": "execute-native-tool",
+        "toolName": "get_hotel_booking_status",
+        "expect": "existing result found before retry"
+      },
+      {
+        "stepId": "retry-same-intent",
+        "action": "visible-retry-button",
+        "expect": "RETRY_RECOGNIZED, attempts=2, bookings=1, effectStartCount=1"
+      }
+    ]
+  },
   "deterministicContractCases": [
     {
       "caseId": "a894f7b3-b190-590d-bd7f-0062f8270f94",

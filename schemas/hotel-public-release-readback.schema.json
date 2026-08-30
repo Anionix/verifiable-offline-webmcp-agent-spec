@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-public-release-readback.schema.json",
+  "$comment": "information_uuid_v5=5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39 event_uuid_v7=01a052e2-0000-7000-8000-000000000190 state_transition=PUBLIC_RELEASE_DEPLOYED -> ANONYMOUS_RELEASE_READBACK_RECORDED machine-contract=The public test count, release commit, production deployment, and anonymously fetched WebMCP evidence are one closed receipt.",
+  "title": "Hotel public release readback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "identity", "release", "deployment", "anonymousReadback"],
+  "properties": {
+    "$schema": { "const": "../schemas/hotel-public-release-readback.schema.json" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sourceCommit", "branch", "baseCommit", "testRun", "artifacts"],
+      "properties": {
+        "status": { "const": "COMMITTED_RELEASE" },
+        "sourceCommit": { "$ref": "#/$defs/commit" },
+        "branch": { "type": "string", "minLength": 1 },
+        "baseCommit": { "$ref": "#/$defs/commit" },
+        "testRun": { "$ref": "#/$defs/testRun" },
+        "artifacts": { "$ref": "#/$defs/artifacts" }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "teamId",
+        "projectId",
+        "projectName",
+        "deploymentId",
+        "target",
+        "state",
+        "sourceCommit",
+        "publicUrl",
+        "uniqueUrl",
+        "readyAt",
+        "observedAt"
+      ],
+      "properties": {
+        "provider": { "const": "Vercel" },
+        "teamId": { "type": "string", "pattern": "^team_[A-Za-z0-9]+$" },
+        "projectId": { "type": "string", "pattern": "^prj_[A-Za-z0-9]+$" },
+        "projectName": { "const": "kyoto-booking-retry-proof" },
+        "deploymentId": { "type": "string", "pattern": "^dpl_[A-Za-z0-9]+$" },
+        "target": { "const": "production" },
+        "state": { "const": "READY" },
+        "sourceCommit": { "$ref": "#/$defs/commit" },
+        "publicUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" },
+        "uniqueUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/?$" },
+        "readyAt": { "$ref": "#/$defs/observedAt" },
+        "observedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "anonymousReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "statusCode", "authentication", "observedAt", "contentSha256", "localBuiltFileSha256", "releaseEvidence"],
+      "properties": {
+        "url": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app/webmcp-evals\\.json$" },
+        "statusCode": { "const": 200 },
+        "authentication": { "const": "ANONYMOUS" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "contentSha256": { "$ref": "#/$defs/sha256" },
+        "localBuiltFileSha256": { "$ref": "#/$defs/sha256" },
+        "releaseEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "testCommand", "testDirectory", "testCount", "countSource"],
+          "properties": {
+            "status": { "const": "PASS" },
+            "testCommand": { "const": "npm test" },
+            "testDirectory": { "const": "src/typescript" },
+            "testCount": { "type": "integer", "minimum": 1 },
+            "countSource": { "const": "node-test-summary" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "uuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+    "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "observedAt"],
+      "properties": {
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/observedAt" }
+      }
+    },
+    "testRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "directory", "passed", "failed", "skipped", "testCount", "countSource"],
+      "properties": {
+        "command": { "const": "npm test" },
+        "directory": { "const": "src/typescript" },
+        "passed": { "type": "integer", "minimum": 1 },
+        "failed": { "const": 0 },
+        "skipped": { "const": 0 },
+        "testCount": { "type": "integer", "minimum": 1 },
+        "countSource": { "const": "node-test-summary" }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionalClientSha256", "fullClientSha256", "fullSitesPackageSha256"],
+      "properties": {
+        "functionalClientSha256": { "$ref": "#/$defs/sha256" },
+        "fullClientSha256": { "$ref": "#/$defs/sha256" },
+        "fullSitesPackageSha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

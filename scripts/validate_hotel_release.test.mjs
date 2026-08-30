@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { validateRelease } from "./validate_hotel_release.mjs";
 
 // information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2
 // event_uuid_v7=01a05388-5ea8-7fbd-a08e-e5a8ef88376f state_transition=RELEASE_FILE_SET_UNVERIFIED -> RELEASE_FILE_SET_REJECTS_UNLISTED occurred_at=2026-08-30T16:37:21.192Z
+// event_uuid_v7=01a053b8-3877-7197-be30-8519dfe88680 state_transition=PATH_SNAPSHOT_RACE_UNTESTED -> PATH_SNAPSHOT_RACE_REJECTED occurred_at=2026-08-30T17:29:37.143Z
 // machine-contract: run the real release validator against a harmless package fixture; do not inspect its source text.
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -21,7 +23,10 @@ const baseFiles = new Map([
   ["DEVPOST_VISUAL_GUIDE_JA.md", "60秒の確認\n"],
   ["RELEASE_GUIDE.md", "shasum -a 256 -c SHA256SUMS\n"],
   ["LICENSE", "MIT License\n"],
-  ["release-manifest.json", `${JSON.stringify({ presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" }, source: { commit: sourceCommit } })}\n`],
+  [
+    "release-manifest.json",
+    `${JSON.stringify({ presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" }, source: { commit: sourceCommit } })}\n`,
+  ],
   ["package-note.txt", "fixture-only package note\n"],
   ["package-provenance.txt", "fixture-only provenance\n"],
 ]);
@@ -50,6 +55,16 @@ async function writeFixture(releaseRoot, extraFiles = {}) {
   }
 }
 
+async function addNestedChecksummedFile(releaseRoot) {
+  const relativePath = "nested/group/release-note.txt";
+  const contents = "nested release fixture\n";
+  await mkdir(resolve(releaseRoot, "nested/group"), { recursive: true });
+  await writeFile(resolve(releaseRoot, relativePath), contents);
+  const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+  const checksum = await readFile(checksumPath, "utf8");
+  await writeFile(checksumPath, `${checksum}${sha256(contents)}  ${relativePath}\n`);
+}
+
 function runValidator(releaseRoot, options = {}) {
   const result = spawnSync(process.execPath, [validatorPath, "--release-root", releaseRoot], {
     cwd: repositoryRoot,
@@ -57,6 +72,38 @@ function runValidator(releaseRoot, options = {}) {
     ...options,
   });
   return { ...result, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
+}
+
+function runTestChildWithTimeout(script, timeoutMs = 2000) {
+  const child = spawn(process.execPath, ["--input-type=module", "--eval", script], {
+    cwd: repositoryRoot,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let stdout = "";
+  let stderr = "";
+  let timedOut = false;
+  child.stdout.setEncoding("utf8");
+  child.stderr.setEncoding("utf8");
+  child.stdout.on("data", (chunk) => {
+    stdout += chunk;
+  });
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk;
+  });
+  return new Promise((resolvePromise, reject) => {
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGKILL");
+    }, timeoutMs);
+    child.on("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (status, signal) => {
+      clearTimeout(timer);
+      resolvePromise({ status, signal, timedOut, stdout, stderr, output: `${stdout}\n${stderr}` });
+    });
+  });
 }
 
 async function withFixture(extraFiles, assertion) {
@@ -130,20 +177,159 @@ test("rejects a symbolic link without reading its external target", async () => 
   }
 });
 
-test("rejects a symbolic link supplied as the release root", { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false }, async () => {
-  const aliasDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-"));
-  try {
+test(
+  "rejects a README replaced with an external symlink after snapshot",
+  { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
+  async () => {
+    const outsideDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-race-"));
+    try {
+      await withFixture({}, async (releaseRoot) => {
+        const readmePath = resolve(releaseRoot, "README.md");
+        const outsidePath = resolve(outsideDirectory, "README.md");
+        await writeFile(outsidePath, await readFile(readmePath));
+        await assert.rejects(
+          () =>
+            validateRelease(releaseRoot, {
+              afterSnapshot: async () => {
+                await rm(readmePath);
+                await symlink(outsidePath, readmePath);
+              },
+            }),
+          /README\.md/u,
+          "the validator read the external symlink and accepted its matching digest",
+        );
+      });
+    } finally {
+      await rm(outsideDirectory, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "rejects a README symlink that preserves the original inode after snapshot",
+  { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
+  async () => {
+    const outsideDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-inode-race-"));
+    try {
+      await withFixture({}, async (releaseRoot) => {
+        const readmePath = resolve(releaseRoot, "README.md");
+        const originalPath = resolve(outsideDirectory, "README.md");
+        await assert.rejects(
+          () =>
+            validateRelease(releaseRoot, {
+              afterSnapshot: async () => {
+                await rename(readmePath, originalPath);
+                await symlink(originalPath, readmePath);
+              },
+            }),
+          /README\.md must not be a symbolic link/u,
+        );
+      });
+    } finally {
+      await rm(outsideDirectory, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "rejects a nested file when its grandparent becomes an inode-preserving symlink",
+  { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
+  async () => {
     await withFixture({}, async (releaseRoot) => {
-      const rootLink = resolve(aliasDirectory, "release-root");
-      await symlink(releaseRoot, rootLink);
-      const result = runValidator(rootLink);
-      assert.notEqual(result.status, 0);
-      assert.match(result.output, /release root must not be a symbolic link/u);
+      await addNestedChecksummedFile(releaseRoot);
+      const nestedPath = resolve(releaseRoot, "nested");
+      const originalNestedPath = resolve(releaseRoot, "nested-original");
+      await assert.rejects(
+        () =>
+          validateRelease(releaseRoot, {
+            afterSnapshot: async () => {
+              await rename(nestedPath, originalNestedPath);
+              await symlink(originalNestedPath, nestedPath);
+            },
+          }),
+        /nested must not be a symbolic link/u,
+      );
+    });
+  },
+);
+
+test("rejects a release root replaced after snapshot", async () => {
+  const outsideDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-race-"));
+  try {
+    await writeFixture(outsideDirectory);
+    await withFixture({}, async (releaseRoot) => {
+      const movedRoot = `${releaseRoot}.original`;
+      let replacementInstalled = false;
+      try {
+        await assert.rejects(
+          () =>
+            validateRelease(releaseRoot, {
+              afterSnapshot: async () => {
+                await rename(releaseRoot, movedRoot);
+                await rename(outsideDirectory, releaseRoot);
+                replacementInstalled = true;
+              },
+            }),
+          /release root changed/u,
+          "the validator followed a replaced release root directory",
+        );
+      } finally {
+        if (replacementInstalled) await rename(releaseRoot, outsideDirectory);
+        await rm(movedRoot, { recursive: true, force: true });
+      }
     });
   } finally {
-    await rm(aliasDirectory, { recursive: true, force: true });
+    await rm(outsideDirectory, { recursive: true, force: true });
   }
 });
+
+test(
+  "rejects a FIFO swapped in after snapshot without blocking",
+  { skip: process.platform === "win32" ? "mkfifo is not available on Windows" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const validatorUrl = pathToFileURL(validatorPath).href;
+      const childScript = `
+      import { rm } from "node:fs/promises";
+      import { spawnSync } from "node:child_process";
+      import { validateRelease } from ${JSON.stringify(validatorUrl)};
+      const releaseRoot = ${JSON.stringify(releaseRoot)};
+      const readmePath = ${JSON.stringify(readmePath)};
+      await validateRelease(releaseRoot, {
+        afterSnapshot: async () => {
+          await rm(readmePath);
+          const created = spawnSync("mkfifo", [readmePath], { encoding: "utf8" });
+          if (created.status !== 0) throw new Error("mkfifo failed: " + (created.stderr ?? ""));
+        },
+      });
+    `;
+      const result = await runTestChildWithTimeout(childScript);
+      assert.equal(result.timedOut, false, "the validator blocked while opening a replaced FIFO");
+      assert.notEqual(result.status, 0);
+      assert.match(result.output, /README\.md must be a regular file/u);
+    });
+  },
+);
+
+test(
+  "rejects a symbolic link supplied as the release root",
+  { skip: process.platform === "win32" ? "symlink fixture is not portable to Windows" : false },
+  async () => {
+    const aliasDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-"));
+    try {
+      await withFixture({}, async (releaseRoot) => {
+        const rootLink = resolve(aliasDirectory, "release-root");
+        await symlink(releaseRoot, rootLink);
+        const result = runValidator(rootLink);
+        assert.notEqual(result.status, 0);
+        assert.match(result.output, /release root must not be a symbolic link/u);
+      });
+    } finally {
+      await rm(aliasDirectory, { recursive: true, force: true });
+    }
+  },
+);
 
 test("rejects a special file without reading it", { skip: process.platform === "win32" ? "mkfifo is not available on Windows" : false }, async () => {
   await withFixture({}, (releaseRoot) => {
@@ -180,7 +366,10 @@ test("keeps rejecting a duplicate checksum path", async () => {
 
 test("keeps rejecting a checksum digest mismatch", async () => {
   await withFixture({}, async (releaseRoot) => {
-    await writeFile(resolve(releaseRoot, "README.md"), "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\ntampered after checksum generation\n");
+    await writeFile(
+      resolve(releaseRoot, "README.md"),
+      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\ntampered after checksum generation\n",
+    );
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0);
     assert.match(result.output, /README\.md digest differs from SHA256SUMS/u);

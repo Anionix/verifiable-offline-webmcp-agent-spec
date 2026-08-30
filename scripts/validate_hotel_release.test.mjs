@@ -125,16 +125,12 @@ test("accepts a checksum-complete release package without extra files", async ()
   });
 });
 
-test(
-  "fails closed before file operations on Windows",
-  { skip: process.platform === "win32" ? false : "Windows-only platform guard" },
-  async () => {
-    await assert.rejects(
-      () => validateRelease("/definitely/missing"),
-      /hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed/u,
-    );
-  },
-);
+test("fails closed before file operations on Windows", { skip: process.platform === "win32" ? false : "Windows-only platform guard" }, async () => {
+  await assert.rejects(
+    () => validateRelease("/definitely/missing"),
+    /hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed/u,
+  );
+});
 
 test(
   "does not skip validation when the CLI is invoked through a symbolic link",
@@ -163,6 +159,15 @@ test("rejects an unrecorded root file", async () => {
   });
 });
 
+test("rejects a directory listing above the bounded entry limit", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    for (let index = 0; index <= 4_096; index += 1) await writeFile(resolve(releaseRoot, `unlisted-${index}.txt`), "unlisted\n");
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator processed an unbounded directory listing");
+    assert.match(result.output, /directory entry count exceeded its limit/u);
+  });
+});
+
 test("rejects a regular file added after snapshot even when the release root inode is unchanged", async () => {
   await withFixture({}, async (releaseRoot) => {
     const initialRoot = await lstat(releaseRoot, { bigint: true });
@@ -180,38 +185,35 @@ test("rejects a regular file added after snapshot even when the release root ino
   });
 });
 
-test(
-  "rejects same-inode rewrites after all initial reads",
-  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
-  async () => {
-    await withFixture({}, async (releaseRoot) => {
-      const readmePath = resolve(releaseRoot, "README.md");
-      const checksumPath = resolve(releaseRoot, "SHA256SUMS");
-      const rewrittenReadme = "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\nrewritten after initial read\n";
-      const originalChecksums = await readFile(checksumPath, "utf8");
-      const originalReadmeLine = originalChecksums.split("\n").find((line) => line.endsWith("  README.md"));
-      assert.ok(originalReadmeLine);
-      const rewrittenChecksums = originalChecksums.replace(originalReadmeLine, `${sha256(rewrittenReadme)}  README.md`);
-      const paths = [readmePath, checksumPath];
-      const initialIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
-      await assert.rejects(
-        () =>
-          validateRelease(releaseRoot, {
-            afterInitialRead: async () => {
-              await writeFile(readmePath, rewrittenReadme);
-              await writeFile(checksumPath, rewrittenChecksums);
-              const finalIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
-              for (let index = 0; index < paths.length; index += 1) {
-                assert.equal(finalIdentities[index].dev, initialIdentities[index].dev);
-                assert.equal(finalIdentities[index].ino, initialIdentities[index].ino);
-              }
-            },
-          }),
-        /content changed after initial read/u,
-      );
-    });
-  },
-);
+test("rejects same-inode rewrites after all initial reads", { skip: process.platform === "win32" ? "Windows validator is unsupported" : false }, async () => {
+  await withFixture({}, async (releaseRoot) => {
+    const readmePath = resolve(releaseRoot, "README.md");
+    const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+    const rewrittenReadme =
+      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\nrewritten after initial read\n";
+    const originalChecksums = await readFile(checksumPath, "utf8");
+    const originalReadmeLine = originalChecksums.split("\n").find((line) => line.endsWith("  README.md"));
+    assert.ok(originalReadmeLine);
+    const rewrittenChecksums = originalChecksums.replace(originalReadmeLine, `${sha256(rewrittenReadme)}  README.md`);
+    const paths = [readmePath, checksumPath];
+    const initialIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
+    await assert.rejects(
+      () =>
+        validateRelease(releaseRoot, {
+          afterInitialRead: async () => {
+            await writeFile(readmePath, rewrittenReadme);
+            await writeFile(checksumPath, rewrittenChecksums);
+            const finalIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
+            for (let index = 0; index < paths.length; index += 1) {
+              assert.equal(finalIdentities[index].dev, initialIdentities[index].dev);
+              assert.equal(finalIdentities[index].ino, initialIdentities[index].ino);
+            }
+          },
+        }),
+      /content changed after initial read/u,
+    );
+  });
+});
 
 test(
   "rejects a regular file added after the final hash read",
@@ -250,7 +252,7 @@ test(
                   await symlink(outsideDirectory, releaseRoot);
                 },
               }),
-            /ELOOP|ENOTDIR|too many symbolic links/u,
+            /symbolic link|release root changed/u,
           );
         } finally {
           if (originalRootMoved) {
@@ -307,6 +309,84 @@ test(
 );
 
 test(
+  "rejects a root replacement before nested bound directory enumeration",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    const outsideRoot = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-bound-list-"));
+    try {
+      await writeFixture(outsideRoot);
+      await addNestedChecksummedFile(outsideRoot);
+      await withFixture({}, async (releaseRoot) => {
+        await addNestedChecksummedFile(releaseRoot);
+        const movedRoot = `${releaseRoot}.original`;
+        let replacementInstalled = false;
+        try {
+          await assert.rejects(
+            () =>
+              validateRelease(releaseRoot, {
+                afterDirectoryLstat: async (relativeDirectory) => {
+                  if (relativeDirectory !== "nested" || replacementInstalled) return;
+                  await rename(releaseRoot, movedRoot);
+                  await symlink(outsideRoot, releaseRoot);
+                  replacementInstalled = true;
+                },
+              }),
+            /release root must not be a symbolic link|release root changed/u,
+          );
+        } finally {
+          if (replacementInstalled) {
+            await rm(releaseRoot, { recursive: true, force: true });
+            await rename(movedRoot, releaseRoot);
+          }
+          await rm(movedRoot, { recursive: true, force: true });
+        }
+      });
+    } finally {
+      await rm(outsideRoot, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "rejects a root replacement before nested bound file read",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    const outsideRoot = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-bound-read-"));
+    try {
+      await writeFixture(outsideRoot);
+      await addNestedChecksummedFile(outsideRoot);
+      await withFixture({}, async (releaseRoot) => {
+        await addNestedChecksummedFile(releaseRoot);
+        const movedRoot = `${releaseRoot}.original`;
+        let replacementInstalled = false;
+        try {
+          await assert.rejects(
+            () =>
+              validateRelease(releaseRoot, {
+                beforeFileRead: async (snapshot) => {
+                  if (snapshot.relativePath !== "nested/group/release-note.txt" || replacementInstalled) return;
+                  await rename(releaseRoot, movedRoot);
+                  await symlink(outsideRoot, releaseRoot);
+                  replacementInstalled = true;
+                },
+              }),
+            /release root must not be a symbolic link|release root changed/u,
+          );
+        } finally {
+          if (replacementInstalled) {
+            await rm(releaseRoot, { recursive: true, force: true });
+            await rename(movedRoot, releaseRoot);
+          }
+          await rm(movedRoot, { recursive: true, force: true });
+        }
+      });
+    } finally {
+      await rm(outsideRoot, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
   "rejects a release root replaced with hardlinks after the final hash read",
   { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
   async () => {
@@ -329,7 +409,7 @@ test(
                 replacementInstalled = true;
               },
             }),
-          /ancestor release root changed after final enumeration/u,
+          /release root changed before final readback enumeration/u,
         );
       } finally {
         if (replacementInstalled) {
@@ -360,10 +440,7 @@ test(
             validateRelease(releaseRoot, {
               afterFinalRead: async () => {
                 await mkdir(resolve(replacementNestedPath, "group"), { recursive: true });
-                await link(
-                  resolve(nestedPath, "group/release-note.txt"),
-                  resolve(replacementNestedPath, "group/release-note.txt"),
-                );
+                await link(resolve(nestedPath, "group/release-note.txt"), resolve(replacementNestedPath, "group/release-note.txt"));
                 await rename(nestedPath, originalNestedPath);
                 originalNestedMoved = true;
                 await rename(replacementNestedPath, nestedPath);

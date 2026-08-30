@@ -6,7 +6,7 @@
 
 `npm run release:hotel`は、既存のホテル画面とChatGPT Sites用成果物を構築して検査した後、`release/kyoto-booking-retry-proof/`へ再現可能なファイル集合を作ります。審査者が最初に読む英語主表示のREADME、英日二つの視覚導線、英語の再現手順を専用ファイルとして収録します。配布物を`dist/`の外へ分けるため、ChatGPT Sites包装へ混ざりません。`release/`はGitの追跡対象外です。
 
-実行には、Git、依存関係を導入済みのNode.js、Gitleaksが必要です。Gitleaksは配布物の秘密情報検査に使います。macOSでは`brew install gitleaks`、それ以外は[Gitleaksの公式導入手順](https://github.com/gitleaks/gitleaks#installing)を使い、先に`gitleaks version`が成功することを確認してください。未導入なら、構築を始める前に具体的な導入方法を表示して停止します。
+実行には、Git、依存関係を導入済みのNode.js 24.15、`python3`、Gitleaksが必要です。Gitleaksは配布物の秘密情報検査に使います。macOSでは`brew install gitleaks`、それ以外は[Gitleaksの公式導入手順](https://github.com/gitleaks/gitleaks#installing)を使い、先に`gitleaks version`が成功することを確認してください。未導入なら、構築を始める前に具体的な導入方法を表示して停止します。
 
 - `README.md`: 60秒の審査手順と短い日本語要約
 - `DEVPOST_VISUAL_GUIDE.md`: 10秒・60秒・150秒の英語主視覚導線と6枚の画面契約
@@ -28,7 +28,7 @@ shasum -a 256 -c SHA256SUMS
 
 この配布物検査は、安全なリンク追従なしのファイルオープンを保証できないためWindowsでは利用できません。これはブラウザーデモ本体とは別の制限です。
 
-POSIXでは、ディレクトリをNodeの`O_NOFOLLOW|O_DIRECTORY`で開き、fd 3だけを分離Python helperへ渡して`os.listdir(3)`で名前を読みます。時間と出力を制限し、配布物のpathはhelperへ渡しません。根拠は[Node.js v24.15 fs](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html)、[Node.js child_process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio)、[Python os.listdir](https://docs.python.org/3.14/library/os.html#os.listdir)です。これはディレクトリ列挙の保護であり、原子的snapshotの主張ではありません。
+この読み取り方法の再現にはNode.js 24.15と`python3`を使います。macOSとLinuxでは、配布フォルダーを一度開き、その同じフォルダーを確認しながら配下の項目を読みます。Pythonの補助処理へ渡すのは、開いたフォルダーの識別子と検査済みの相対位置だけです。リンクはたどらず、1ファイルは8 MiBまで、1回の一覧は4,096件まで、配布物全体の一覧は4,096件まで、検査時間は30秒までです。配布フォルダーより上の親フォルダーは信頼できることが前提です。途中の差し替えを検出しますが、検査全体を一瞬の状態として固定する保証ではありません。根拠は[Node.js v24.15 fs](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html)、[Node.js child_process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio)、[Python os.listdir](https://docs.python.org/3.14/library/os.html#os.listdir)です。
 
 JSONは、元コミット、コミット時刻、UUIDv5、決定的UUIDv7、機能部分・全クライアント・全Sites包装の三つのSHA-256要約値、公開先、YouTube動画、60秒の四手順、各内容ファイルの大きさとSHA-256を記録します。`SHA256SUMS`はJSON目録自身も検査しますが、自分自身は列挙しないため、自己参照による要約値の循環はありません。
 

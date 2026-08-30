@@ -90,12 +90,18 @@ function assertManagedRunBinding(nativeEvidence) {
 }
 
 function assertManagedReconciliationBinding(nativeEvidence) {
+  // information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca
+  // event_uuid_v7=01a054ba-6716-75c6-95a6-a74f26b67944 occurred_at=2026-08-30T22:11:37.366Z
+  // state_transition=MANAGED_COUNTS_BOUND -> MANAGED_PHASE_STATES_BOUND
+  // machine-contract: before retry is COMMITTED; only the later retry is RETRY_RECOGNIZED.
   const { discovery, reconciliation } = nativeEvidence;
   const [checkCall, prepareCall, beforeCall, afterCall] = discovery.toolCalls;
   const initial = checkCall.resultObservation;
   const prepare = prepareCall.resultObservation;
   const before = beforeCall.resultObservation;
   const after = afterCall.resultObservation;
+  assert.equal(reconciliation.statusCheck.state, "COMMITTED", "managed reconciliation statusCheck.state must be COMMITTED");
+  assert.equal(reconciliation.finalStatus.state, "RETRY_RECOGNIZED", "managed reconciliation finalStatus.state must be RETRY_RECOGNIZED");
 
   assertExactArray(reconciliation.calledToolNames, [checkCall.toolName, prepareCall.toolName, beforeCall.toolName], "managed reconciliation called tools");
   assert.equal(initial.fingerprint, prepare.intentId, "managed preparation is not bound to the initial fingerprint");

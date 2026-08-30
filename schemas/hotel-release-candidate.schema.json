@@ -297,6 +297,7 @@
         {
           "required": ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"],
           "properties": {
+            "state": { "const": "COMMITTED" },
             "attemptCount": { "const": 1 },
             "eventCount": { "const": 3 }
           }

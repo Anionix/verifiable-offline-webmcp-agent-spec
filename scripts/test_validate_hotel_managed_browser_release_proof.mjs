@@ -526,6 +526,8 @@ test("rejects status-before-retry before visible confirmation", () => {
 test("rejects a managed reconciliation that is not bound to the native status results", async () => {
   const oldChromeProof = structuredClone(legacyChromeProof);
   const mutations = [
+    ["status-check state", (record) => { record.reconciliation.statusCheck.state = "RETRY_RECOGNIZED"; }],
+    ["final-status state", (record) => { record.reconciliation.finalStatus.state = "COMMITTED"; }],
     ["status-check attempt", (record) => { record.reconciliation.statusCheck.attemptCount = 2; }],
     ["status-check confirmation", (record) => { record.reconciliation.statusCheck.confirmationNumber = "FKR-DIFFERENT"; }],
     ["final-status attempt", (record) => { record.reconciliation.finalStatus.attemptCount = 1; }],
@@ -602,6 +604,8 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   const candidateMissingPrepareObservation = structuredClone(candidatePositive);
   delete candidateMissingPrepareObservation.managedDiscovery.toolCalls[1].resultObservation;
   const phaseMismatchCases = [
+    ["native-status-before-reconciliation-state", (record) => { record.reconciliation.statusCheck.state = "RETRY_RECOGNIZED"; }],
+    ["native-status-after-reconciliation-state", (record) => { record.reconciliation.finalStatus.state = "COMMITTED"; }],
     ["native-status-before-attempt-two", (record) => { record.discovery.toolCalls[2].resultObservation.attemptCount = 2; }],
     ["native-status-before-event-four", (record) => { record.discovery.toolCalls[2].resultObservation.eventCount = 4; }],
     ["native-status-after-attempt-one", (record) => { record.discovery.toolCalls[3].resultObservation.attemptCount = 1; }],
@@ -609,6 +613,11 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   ];
   const managedReconciliationFields = ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"];
   const managedBindingCases = [];
+  const candidateStateCases = ["statusCheck", "finalStatus"].map((location) => {
+    const invalid = structuredClone(candidatePositive);
+    invalid.reconciliation[location].state = location === "statusCheck" ? "RETRY_RECOGNIZED" : "COMMITTED";
+    return { name: `candidate-managed-${location}-wrong-state`, schemaName: "candidateManagedObservation", instance: invalid };
+  });
   for (const location of ["statusCheck", "finalStatus"]) {
     for (const field of managedReconciliationFields) {
       const nativeMissingField = structuredClone(nativePositive);
@@ -641,6 +650,7 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
       return { name, schemaName: "native", instance: invalid };
     }),
     ...managedBindingCases,
+    ...candidateStateCases,
   ]);
   const byName = new Map(results.map((result) => [result.name, result]));
   assert.deepEqual(byName.get("native-positive")?.errors, []);
@@ -651,6 +661,9 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   );
   for (const [name] of phaseMismatchCases) {
     assert(byName.get(name)?.errors.length > 0, `${name} unexpectedly passed the native schema`);
+  }
+  for (const { name } of candidateStateCases) {
+    assert(byName.get(name)?.errors.some((error) => schemaErrorExists(error, "const", "state")), `${name} unexpectedly passed the candidate schema`);
   }
   for (const { name, field } of managedBindingCases) {
     assert(

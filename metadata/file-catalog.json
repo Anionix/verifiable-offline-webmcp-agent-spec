@@ -4710,8 +4710,8 @@
     },
     {
       "path": "schemas/hotel-native-webmcp-reconciliation.schema.json",
-      "sha256": "cc3862c97b78eb98ea91f203867e99c55e8a6523c12bd038a9283b2d7028463d",
-      "bytes": 22961,
+      "sha256": "dab5c95a4e9aa61da7b501c68f23ea16eadb892d305b03a261ddaf4e64dab447",
+      "bytes": 23008,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -4748,8 +4748,8 @@
     },
     {
       "path": "schemas/hotel-release-candidate.schema.json",
-      "sha256": "94e80726109a10e61371c0943d3835dc611f1242e3d504f55dc8eea644a564db",
-      "bytes": 16071,
+      "sha256": "9315876490958515692f4d579c33efc2aa8debd9c9264ae44acae1b685eb6fef",
+      "bytes": 16118,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5375,8 +5375,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_managed_browser_release_proof.mjs",
-      "sha256": "8b0471bedad9c442d133e1a98b165e64cbb5e757e7eb852cef8a0ce1573ecf44",
-      "bytes": 33619,
+      "sha256": "dc90cf1a208a99f4aedb746754cc2746a4b66a5c34608bf1c05effbadd0c57f3",
+      "bytes": 34687,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5489,8 +5489,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "4ef2add595ae659c4cd9e28ba63e73cbd72e5d5f459c3724bf309ea3bbf8c397",
-      "bytes": 20499,
+      "sha256": "7fdb3e35323dfaccca8942c769cb52c6ed46a626373b73f689c2ab65b1868600",
+      "bytes": 21083,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

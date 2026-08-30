@@ -213,6 +213,22 @@ test(
   },
 );
 
+test(
+  "rejects a regular file added after the final hash read",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      await assert.rejects(
+        () =>
+          validateRelease(releaseRoot, {
+            afterFinalRead: async () => writeFile(resolve(releaseRoot, "UNLISTED_AFTER_FINAL_READ.txt"), "unlisted after final read\n"),
+          }),
+        /release file set changed after snapshot: added=.*UNLISTED_AFTER_FINAL_READ\.txt/u,
+      );
+    });
+  },
+);
+
 test("rejects an unrecorded nested file", async () => {
   await withFixture({ "nested/unexpected.json": "harmless nested file\n" }, (releaseRoot) => {
     const result = runValidator(releaseRoot);

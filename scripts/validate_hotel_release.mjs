@@ -7,9 +7,11 @@
 // event_uuid_v7=01a05466-11dc-7121-b1fd-4a8017c96aa5 state_transition=CLI_PATH_GUARD_UNRESOLVED -> CLI_MAIN_ENTRYPOINT_VERIFIED occurred_at=2026-08-30T20:39:30.524Z
 // event_uuid_v7=01a05471-12e1-7902-81e5-896ed0c6aff4 state_transition=WINDOWS_RELEASE_VALIDATION_UNSUPPORTED -> WINDOWS_RELEASE_VALIDATION_FAIL_CLOSED occurred_at=2026-08-30T20:51:31.681Z
 // event_uuid_v7=01a05478-ac4b-704b-aca2-769202026762 state_transition=RELEASE_BYTES_INITIAL_HASHED -> RELEASE_BYTES_FINAL_HASH_VERIFIED occurred_at=2026-08-30T20:59:49.707Z
+// event_uuid_v7=01a05490-b710-7496-8f7c-77058578081e state_transition=RELEASE_BYTES_FINAL_HASH_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:26:05.328Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
 // machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
+// machine-contract: a second final release-tree enumeration follows the final hash reads to detect path-set or identity races at that boundary; this remains a bounded race check, not an atomic snapshot.
 // machine-contract: the Node 24.15 CLI entrypoint check must not depend on the spelling or realpath of a filesystem symlink.
 // machine-contract: Windows fails before any release file operation because this validator cannot guarantee a safe non-following open there; no override flag exists.
 // machine-contract: every initial snapshot byte stream is hashed and each final non-following descriptor read must reproduce that hash; this detects same-inode rewrites but does not promise an atomic snapshot or prohibit later writes.
@@ -177,7 +179,7 @@ async function assertSameSnapshotBytes(snapshots, initialDigests) {
   }
 }
 
-export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot, afterInitialRead } = {}) {
+export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot, afterInitialRead, afterFinalRead } = {}) {
   if (process.platform === "win32") throw new Error(unsupportedPlatformError);
   const resolvedReleaseRoot = resolve(releaseRoot);
   const snapshots = await regularFiles(resolvedReleaseRoot);
@@ -256,6 +258,8 @@ export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterS
   const finalSnapshots = await regularFiles(resolvedReleaseRoot);
   assertSameSnapshot(snapshots, finalSnapshots);
   await assertSameSnapshotBytes(finalSnapshots, initialDigests);
+  await afterFinalRead?.(finalSnapshots);
+  assertSameSnapshot(snapshots, await regularFiles(resolvedReleaseRoot));
 
   return {
     receipt: "HOTEL_RELEASE_READBACK_PASS",

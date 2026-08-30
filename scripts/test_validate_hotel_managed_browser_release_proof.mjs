@@ -269,6 +269,15 @@ function toolCall(sequence, phase, toolName, resultObservation) {
   return call;
 }
 
+function refreshToolCallResultEvidence(call) {
+  const summary = toolCallResultSummary(call);
+  call.resultEvidence = {
+    ...call.resultEvidence,
+    canonicalSummary: canonicalResultSummary(summary),
+    sha256: sha256CanonicalResultSummary(summary),
+  };
+}
+
 const managedFixture = {
   profile: managedEvidenceProfile,
   status: "TEST_FIXTURE",
@@ -322,6 +331,7 @@ const managedFixture = {
       fingerprint,
     }),
     toolCall(3, expectedCallPhases[2], expectedTools[2], {
+      state: "COMMITTED",
       attemptCount: 1,
       bookingExists: true,
       effectStartCount: 1,
@@ -333,6 +343,7 @@ const managedFixture = {
       confirmationNumber,
     }),
     toolCall(4, expectedCallPhases[3], expectedTools[2], {
+      state: "RETRY_RECOGNIZED",
       attemptCount: 2,
       bookingExists: true,
       effectStartCount: 1,
@@ -510,6 +521,31 @@ test("candidate managed branch rejects a declaration-only discovery", async () =
   assert.throws(() => validateNativeDiscovery(managedRoot), /toolCalls|missing/u);
 });
 
+test("requires measured states in both native retry status observations", () => {
+  const valid = structuredClone(managedFixture);
+  const phaseStates = [
+    [2, "COMMITTED", "RETRY_RECOGNIZED"],
+    [3, "RETRY_RECOGNIZED", "COMMITTED"],
+  ];
+  for (const [index, state] of phaseStates) {
+    valid.toolCalls[index].resultObservation.state = state;
+    refreshToolCallResultEvidence(valid.toolCalls[index]);
+  }
+  assert.doesNotThrow(() => validateManagedBrowserDiscovery(valid, { allowTestFixture: true }));
+
+  for (const [index, , wrongState] of phaseStates) {
+    const missing = structuredClone(valid);
+    delete missing.toolCalls[index].resultObservation.state;
+    refreshToolCallResultEvidence(missing.toolCalls[index]);
+    assert.throws(() => validateManagedBrowserDiscovery(missing, { allowTestFixture: true }), /state|missing|unexpected/u, `missing state ${index}`);
+
+    const wrong = structuredClone(valid);
+    wrong.toolCalls[index].resultObservation.state = wrongState;
+    refreshToolCallResultEvidence(wrong.toolCalls[index]);
+    assert.throws(() => validateManagedBrowserDiscovery(wrong, { allowTestFixture: true }), /state|status|retry|committed/u, `wrong state ${index}`);
+  }
+});
+
 test("rejects status-before-retry before visible confirmation", () => {
   const invalid = structuredClone(managedFixture);
   invalid.interactionSequence = [
@@ -585,11 +621,13 @@ test("the CLI comparison rejects stored managed candidates with unrelated reconc
   changedObservationTime.observedAt = new Date(Date.parse(expected.observedAt) + 1).toISOString();
   assert.throws(() => compareStable(changedObservationTime, expected), /candidate observation time differs from native evidence/u);
   for (const location of ["statusCheck", "finalStatus"]) {
-    for (const field of ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"]) {
+    for (const field of ["state", "intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"]) {
       const actual = structuredClone(expected);
-      actual.browserObservation.reconciliation[location][field] = field === "eventCount"
-        ? 999
-        : field === "eventChainHead" ? "e".repeat(64) : "11111111-1111-5111-8111-111111111111";
+      actual.browserObservation.reconciliation[location][field] = field === "state"
+        ? location === "statusCheck" ? "RETRY_RECOGNIZED" : "COMMITTED"
+        : field === "eventCount"
+          ? 999
+          : field === "eventChainHead" ? "e".repeat(64) : "11111111-1111-5111-8111-111111111111";
       assert.throws(() => compareStable(actual, expected), /native browser observation record drifted/u, `${location}.${field}`);
     }
   }
@@ -606,12 +644,16 @@ test("accepts managed native and candidate fixtures through the Draft 2020-12 re
   const phaseMismatchCases = [
     ["native-status-before-reconciliation-state", (record) => { record.reconciliation.statusCheck.state = "RETRY_RECOGNIZED"; }],
     ["native-status-after-reconciliation-state", (record) => { record.reconciliation.finalStatus.state = "COMMITTED"; }],
+    ["native-status-before-observation-state", (record) => { record.discovery.toolCalls[2].resultObservation.state = "RETRY_RECOGNIZED"; }],
+    ["native-status-before-observation-missing-state", (record) => { delete record.discovery.toolCalls[2].resultObservation.state; }],
+    ["native-status-after-observation-state", (record) => { record.discovery.toolCalls[3].resultObservation.state = "COMMITTED"; }],
+    ["native-status-after-observation-missing-state", (record) => { delete record.discovery.toolCalls[3].resultObservation.state; }],
     ["native-status-before-attempt-two", (record) => { record.discovery.toolCalls[2].resultObservation.attemptCount = 2; }],
     ["native-status-before-event-four", (record) => { record.discovery.toolCalls[2].resultObservation.eventCount = 4; }],
     ["native-status-after-attempt-one", (record) => { record.discovery.toolCalls[3].resultObservation.attemptCount = 1; }],
     ["native-status-after-event-one", (record) => { record.discovery.toolCalls[3].resultObservation.eventCount = 1; }],
   ];
-  const managedReconciliationFields = ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"];
+  const managedReconciliationFields = ["state", "intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"];
   const managedBindingCases = [];
   const candidateStateCases = ["statusCheck", "finalStatus"].map((location) => {
     const invalid = structuredClone(candidatePositive);

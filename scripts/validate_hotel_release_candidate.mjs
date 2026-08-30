@@ -111,7 +111,17 @@ function assertManagedReconciliationBinding(nativeEvidence) {
   assert.equal(prepare.fingerprint, after.fingerprint, "managed status-after fingerprint differs from preparation");
 
   const assertStatusBinding = (status, observation, label) => {
-    for (const field of ["intentId", "fingerprint", "bookingId", "confirmationNumber", "attemptCount", "effectStartCount", "eventCount", "eventChainHead"]) {
+    for (const field of [
+      "state",
+      "intentId",
+      "fingerprint",
+      "bookingId",
+      "confirmationNumber",
+      "attemptCount",
+      "effectStartCount",
+      "eventCount",
+      "eventChainHead",
+    ]) {
       assert.equal(status[field], observation[field], `managed reconciliation ${label}.${field} differs from the native result`);
     }
     if (Object.hasOwn(status, "bookingExists")) {

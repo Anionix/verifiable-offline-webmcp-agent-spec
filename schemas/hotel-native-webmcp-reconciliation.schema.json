@@ -369,6 +369,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "state",
         "attemptCount",
         "bookingExists",
         "effectStartCount",
@@ -380,6 +381,7 @@
         "confirmationNumber"
       ],
       "properties": {
+        "state": { "enum": ["COMMITTED", "RETRY_RECOGNIZED"] },
         "attemptCount": { "type": "integer", "minimum": 1, "maximum": 2 },
         "bookingExists": { "const": true },
         "effectStartCount": { "const": 1 },
@@ -396,6 +398,7 @@
         { "$ref": "#/$defs/capabilityResultObservation" },
         {
           "properties": {
+            "state": { "const": "COMMITTED" },
             "attemptCount": { "const": 1 },
             "eventCount": { "const": 3 }
           }
@@ -407,6 +410,7 @@
         { "$ref": "#/$defs/capabilityResultObservation" },
         {
           "properties": {
+            "state": { "const": "RETRY_RECOGNIZED" },
             "attemptCount": { "const": 2 },
             "eventCount": { "const": 4 }
           }

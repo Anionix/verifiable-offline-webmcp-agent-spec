@@ -174,12 +174,13 @@ function assertPrepareObservation(value) {
   assert.equal(value.intentId, value.fingerprint, "managed prepare intentId and fingerprint differ");
 }
 
-function assertStatusObservation(value, expectedAttemptCount, expectedEventCount, label) {
+function assertStatusObservation(value, expectedState, expectedAttemptCount, expectedEventCount, label) {
   assertExactKeys(
     value,
-    ["attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead", "intentId", "fingerprint", "bookingId", "confirmationNumber"],
+    ["state", "attemptCount", "bookingExists", "effectStartCount", "eventCount", "eventChainHead", "intentId", "fingerprint", "bookingId", "confirmationNumber"],
     label,
   );
+  assert.equal(value.state, expectedState, `${label}.state changed`);
   assert.equal(value.attemptCount, expectedAttemptCount, `${label}.attemptCount changed`);
   assert.equal(value.bookingExists, true, `${label}.bookingExists must be true`);
   assert.equal(value.effectStartCount, 1, `${label}.effectStartCount must remain one`);
@@ -211,8 +212,8 @@ function assertToolCalls(value, allowTestFixture) {
     assertResultEvidence(call.resultEvidence, toolCallResultSummary(call), `managed discovery toolCalls[${index}].resultEvidence`, allowTestFixture);
     if (call.phase === "check") assertInitialCheckObservation(call.resultObservation);
     if (call.phase === "prepare") assertPrepareObservation(call.resultObservation);
-    if (call.phase === "status_before_retry") assertStatusObservation(call.resultObservation, 1, 3, "status_before_retry.resultObservation");
-    if (call.phase === "status_after_retry") assertStatusObservation(call.resultObservation, 2, 4, "status_after_retry.resultObservation");
+    if (call.phase === "status_before_retry") assertStatusObservation(call.resultObservation, "COMMITTED", 1, 3, "status_before_retry.resultObservation");
+    if (call.phase === "status_after_retry") assertStatusObservation(call.resultObservation, "RETRY_RECOGNIZED", 2, 4, "status_after_retry.resultObservation");
   }
 }
 

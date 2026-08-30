@@ -92,6 +92,41 @@ test("rejects an unrecognized WebVTT noncue block", () => {
   assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /unrecognized WebVTT block/u);
 });
 
+for (const scenario of [
+  {
+    name: "a reversed cue",
+    srtTiming: "00:00:02,000 --> 00:00:01,000",
+    vttTiming: "00:00:02.000 --> 00:00:01.000",
+  },
+  {
+    name: "a zero-length cue",
+    srtTiming: "00:00:01,000 --> 00:00:01,000",
+    vttTiming: "00:00:01.000 --> 00:00:01.000",
+  },
+]) {
+  test("rejects " + scenario.name + " when both files agree", () => {
+    const sourceText = "1\n" + scenario.srtTiming + "\nHello\n";
+    const publicText = "WEBVTT\n\n" + scenario.vttTiming + "\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /positive length/u);
+    const validSourceText = "1\n00:00:00,000 --> 00:00:03,000\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(validSourceText, publicText), /positive length/u);
+  });
+}
+
+test("rejects overlapping cues when both files agree", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:02,000\nFirst\n\n2\n00:00:01,000 --> 00:00:03,000\nSecond\n";
+  const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nFirst\n\n00:00:01.000 --> 00:00:03.000\nSecond\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /overlaps at cue 2/u);
+  const validSourceText = "1\n00:00:00,000 --> 00:00:03,000\nFirst\n";
+  assert.throws(() => compareSubtitleHistoryTexts(validSourceText, publicText), /WebVTT overlaps at cue 2/u);
+});
+
+test("rejects a non-sequential SubRip cue", () => {
+  const sourceText = "2\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /non-sequential SubRip cue/u);
+});
+
 test("rejects a public VTT when one cue timestamp changes", async () => {
   const [sourceText, publicText] = await Promise.all([readFile(sourceSubtitlePath, "utf8"), readFile(publicSubtitlePath, "utf8")]);
   const changedPublicText = publicText.replace("00:00:00.000 --> 00:00:00.700", "00:00:00.001 --> 00:00:00.700");

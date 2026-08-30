@@ -3,7 +3,7 @@
 // event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED
 // machine-contract: compare every authored cue and both timestamps; no video-file identity is inferred.
 // machine-contract: a PASS comparison uses the MATCHED transition; any text or cue-time mismatch uses the MISMATCHED transition.
-// machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file before binding bytes to a state.
+// machine-contract: history compares a distinct retained SubRip input file with a retained WebVTT output file, with positive ordered non-overlapping cues, before binding bytes to a state.
 // machine-contract: every non-empty block is a cue or an explicit WebVTT header, NOTE, STYLE, or REGION block; unknown blocks fail closed.
 // machine-contract: importing this module is inert; import.meta.main runs the CLI through symlinks and leaves processing errors uncaught.
 
@@ -51,8 +51,9 @@ function parseSubRipCueBlock(block, index) {
   const lines = block.split("\n");
   const timingMatch = SUBRIP_TIMING_PATTERN.exec(lines[1] ?? "");
   const cueText = normalizeText(lines.slice(2).join("\n"));
+  assert.equal(lines[0], String(index + 1), "SubRip block " + (index + 1) + " has a missing or non-sequential SubRip cue");
   assert.ok(
-    /^\uFEFF?\d+$/u.test(lines[0] ?? "") && timingMatch?.groups && cueText !== "" && !lines.slice(2).some((line) => SUBRIP_TIMING_PATTERN.test(line)),
+    timingMatch?.groups && cueText !== "" && !lines.slice(2).some((line) => SUBRIP_TIMING_PATTERN.test(line)),
     "SubRip block " + (index + 1) + " is an unparsed SubRip cue block",
   );
   return {
@@ -91,17 +92,33 @@ function parseWebVttHeader(block) {
   );
 }
 
+function validateCueTimeline(cues, format) {
+  let previousEnd = 0;
+  const label = format === "srt" ? "SubRip" : "WebVTT";
+  for (const [index, cue] of cues.entries()) {
+    assert.ok(cue.startMs < cue.endMs, label + " cue " + (index + 1) + " must have positive length");
+    assert.ok(cue.startMs >= previousEnd, label + " overlaps at cue " + (index + 1));
+    previousEnd = cue.endMs;
+  }
+}
+
 export function parseSubtitleCues(text, format) {
   const resolvedFormat = format ?? (/^\uFEFF?WEBVTT(?:[ \t].*)?(?:\r?\n|$)/u.test(text) ? "vtt" : "srt");
   assert.ok(resolvedFormat === "srt" || resolvedFormat === "vtt", "subtitle format must be srt or vtt");
   const blocks = subtitleBlocks(text);
-  if (resolvedFormat === "srt") return blocks.map(parseSubRipCueBlock);
+  if (resolvedFormat === "srt") {
+    const cues = blocks.map(parseSubRipCueBlock);
+    validateCueTimeline(cues, resolvedFormat);
+    return cues;
+  }
   assert.ok(blocks.length > 0, "WebVTT header is missing");
   parseWebVttHeader(blocks[0]);
-  return blocks.slice(1).flatMap((block, index) => {
+  const cues = blocks.slice(1).flatMap((block, index) => {
     if (isAllowedWebVttNonCueBlock(block)) return [];
     return [parseWebVttCueBlock(block, index)];
   });
+  validateCueTimeline(cues, resolvedFormat);
+  return cues;
 }
 
 export function compareSubtitleHistoryTexts(sourceText, publicText) {

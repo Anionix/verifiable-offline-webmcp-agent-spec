@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca
 // event_uuid_v7=01a0538f-f73f-753a-9f64-7e4fec9cb6fe state=LEGACY_CONTEXT_EXTRACTED->SQUASH_CONTEXT_CONTENT_BOUND occurred_at=2026-08-30T16:45:39.007Z
-// machine-contract: validate the recorded release context without changing the recorded evidence; squash comparison covers the full base-to-source range within the hotel build-input boundary.
+// machine-contract: validate the recorded release context without changing the recorded evidence; squash comparison covers the full common-ancestor-to-source range within the hotel build-input boundary.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -110,10 +110,14 @@ function assertSquashContent(repositoryRoot, baseCommit, sourceCommit, currentRe
     baseCommit,
     "release source common history must be an ancestor of the recorded base commit",
   );
-  const paths = changedPaths(repositoryRoot, baseCommit, sourceCommit).filter(
-    (path) => isSquashValidationInput(path),
+  // machine-contract: common..source covers inputs introduced by the recorded base; base..source retains historical rename paths that are absent from both endpoint trees.
+  const paths = new Set(
+    [
+      ...changedPaths(repositoryRoot, commonAncestor, sourceCommit),
+      ...changedPaths(repositoryRoot, baseCommit, sourceCommit),
+    ].filter((path) => isSquashValidationInput(path)),
   );
-  assert(paths.length > 0, "release source squash has no comparable file entries");
+  assert(paths.size > 0, "release source squash has no comparable file entries");
   for (const path of paths) {
     assert.equal(
       treeEntry(repositoryRoot, sourceCommit, path),

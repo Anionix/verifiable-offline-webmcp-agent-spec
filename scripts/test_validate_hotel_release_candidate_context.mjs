@@ -140,6 +140,35 @@ async function createSquashRepository({ currentRelease = "release\n", includeLiv
   return { directory, baseCommit, sourceCommit, currentCommit };
 }
 
+async function createBaseInputSquashRepository() {
+  const directory = await initializeRepository();
+  const commonCommit = await commitFile(directory, "common.txt", "common\n", "common");
+  runGit(directory, ["switch", "--quiet", "-c", "release-base", commonCommit]);
+  const baseCommit = await commitFile(
+    directory,
+    "src/typescript/hotel/base-input.js",
+    "base input\n",
+    "base release input",
+  );
+  runGit(directory, ["switch", "--quiet", "-c", "release-source"]);
+  const sourceCommit = await commitFile(
+    directory,
+    "src/typescript/hotel/source-input.js",
+    "source input\n",
+    "source hotel change",
+  );
+
+  runGit(directory, ["switch", "--quiet", "-c", "current", commonCommit]);
+  const currentCommit = await commitFile(
+    directory,
+    "src/typescript/hotel/source-input.js",
+    "source input\n",
+    "squashed source change",
+  );
+  runGit(directory, ["checkout", "--quiet", "--detach", currentCommit]);
+  return { directory, baseCommit, sourceCommit, currentCommit };
+}
+
 async function createUnrelatedSourceRepository() {
   const directory = await initializeRepository();
   const commonCommit = await commitFile(
@@ -318,6 +347,18 @@ test("accepts a squash checkout when source file entries are identical", async (
 
     assert.equal(result.status, 0, output(result));
     assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
+  });
+});
+
+test("rejects a squash checkout that drops an input introduced by the recorded base", async () => {
+  await withRepository(createBaseInputSquashRepository, ({ directory, baseCommit, sourceCommit }) => {
+    const result = runValidator({ directory, baseCommit, sourceCommit });
+
+    assert.notEqual(result.status, 0, output(result));
+    assert.match(
+      output(result),
+      /release source file entry differs after squash: src\/typescript\/hotel\/base-input\.js/u,
+    );
   });
 });
 

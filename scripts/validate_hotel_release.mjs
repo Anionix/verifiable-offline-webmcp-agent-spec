@@ -48,6 +48,7 @@ const boundRootHelperMaxEntries = 4_096;
 const releaseSnapshotMaxEntries = 4_096;
 const releaseValidationTimeoutMs = 30_000;
 const unsupportedPlatformError = "hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed";
+const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
 
 function releaseRootFromArguments() {
   const optionIndex = process.argv.indexOf("--release-root");
@@ -63,6 +64,7 @@ const requiredFiles = [
   "DEVPOST_VISUAL_GUIDE_JA.md",
   "RELEASE_GUIDE.md",
   "LICENSE",
+  hotelRetryDiagramPath,
   "release-manifest.json",
   "SHA256SUMS",
 ];
@@ -586,11 +588,19 @@ export async function validateRelease(
     assert.equal(manifest.presentation?.visualGuideJapanese, "DEVPOST_VISUAL_GUIDE_JA.md", "manifest Japanese visual guide is not bound");
     assert.equal(manifest.presentation?.releaseGuide, "RELEASE_GUIDE.md", "manifest release guide is not bound");
     assert.match(manifest.source?.commit ?? "", /^[0-9a-f]{40}$/u, "manifest source commit is not a full hash");
+    const diagramManifestEntry = Array.isArray(manifest.files) ? manifest.files.find((entry) => entry?.path === hotelRetryDiagramPath) : undefined;
+    assert.ok(diagramManifestEntry, "release manifest is missing the hotel retry diagram entry");
 
     const readme = await textFile("README.md");
     assert.match(readme, /Kyoto Booking Retry Proof/u);
     assert.match(readme, /2 attempts → 1 simulated booking → 1 confirmation number/u);
     assert.match(readme, /check_existing_hotel_booking/u);
+    assert.match(readme, /\]\(docs\/assets\/hotel-retry-explained\.png\)/u, "README.md must link to the packaged hotel retry diagram");
+    const diagramSnapshot = snapshotByPath.get(hotelRetryDiagramPath);
+    assert.ok(diagramSnapshot, "hotel retry diagram is missing from the release snapshot");
+    const diagramBytes = await readInitialSnapshot(diagramSnapshot);
+    assert.equal(diagramManifestEntry.bytes, diagramBytes.byteLength, "hotel retry diagram manifest byte count differs from packaged PNG");
+    assert.equal(diagramManifestEntry.sha256, digest(diagramBytes), "hotel retry diagram manifest SHA-256 differs from packaged PNG");
     const guide = await textFile("DEVPOST_VISUAL_GUIDE.md");
     assert.match(guide, /01-hero-empty/u);
     assert.match(guide, /05-retry-recognized/u);

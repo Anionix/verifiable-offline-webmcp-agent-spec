@@ -18,16 +18,29 @@ import { validateRelease } from "./validate_hotel_release.mjs";
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const validatorPath = resolve(repositoryRoot, "scripts/validate_hotel_release.mjs");
 const sourceCommit = "5583cdbeddbbeae2c6f16fd481fc809069a15296";
+const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
+const hotelRetryDiagramBytes = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+  "base64",
+);
 
 const baseFiles = new Map([
-  ["README.md", "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n"],
+  [
+    "README.md",
+    "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\n",
+  ],
   ["DEVPOST_VISUAL_GUIDE.md", "01-hero-empty\n05-retry-recognized\nAI-generated dramatization / Fictional booking\n"],
   ["DEVPOST_VISUAL_GUIDE_JA.md", "60秒の確認\n"],
   ["RELEASE_GUIDE.md", "shasum -a 256 -c SHA256SUMS\n"],
   ["LICENSE", "MIT License\n"],
+  [hotelRetryDiagramPath, hotelRetryDiagramBytes],
   [
     "release-manifest.json",
-    `${JSON.stringify({ presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" }, source: { commit: sourceCommit } })}\n`,
+    `${JSON.stringify({
+      presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" },
+      source: { commit: sourceCommit },
+      files: [{ path: hotelRetryDiagramPath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) }],
+    })}\n`,
   ],
   ["package-note.txt", "fixture-only package note\n"],
   ["package-provenance.txt", "fixture-only provenance\n"],
@@ -165,6 +178,15 @@ function runValidator(releaseRoot, options = {}) {
   return { ...result, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
 
+async function refreshChecksum(releaseRoot, relativePath) {
+  const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+  const checksum = await readFile(checksumPath, "utf8");
+  const originalLine = checksum.split("\n").find((line) => line.endsWith(`  ${relativePath}`));
+  assert.ok(originalLine, `${relativePath} is not recorded in the fixture checksum list`);
+  const bytes = await readFile(resolve(releaseRoot, relativePath));
+  await writeFile(checksumPath, checksum.replace(originalLine, `${sha256(bytes)}  ${relativePath}`));
+}
+
 function runTestChildWithTimeout(script, timeoutMs = 2000) {
   const child = spawn(process.execPath, ["--input-type=module", "--eval", script], {
     cwd: repositoryRoot,
@@ -277,6 +299,53 @@ test(
     }
   },
 );
+test("rejects the hotel retry diagram and its checksum entry when both are removed", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    await rm(resolve(releaseRoot, hotelRetryDiagramPath));
+    const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+    const checksum = await readFile(checksumPath, "utf8");
+    const withoutDiagram = checksum
+      .split("\n")
+      .filter((line) => !line.endsWith(`  ${hotelRetryDiagramPath}`))
+      .join("\n");
+    await writeFile(checksumPath, withoutDiagram);
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator accepted a release without its required diagram");
+    assert.match(result.output, /hotel retry diagram is missing from the release snapshot/u);
+  });
+});
+
+test("rejects a hotel retry diagram manifest receipt with wrong bytes or SHA-256", async () => {
+  for (const [field, value, message] of [
+    ["bytes", hotelRetryDiagramBytes.length + 1, /manifest byte count differs/u],
+    ["sha256", "0".repeat(64), /manifest SHA-256 differs/u],
+  ]) {
+    await withFixture({}, async (releaseRoot) => {
+      const manifestPath = resolve(releaseRoot, "release-manifest.json");
+      const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+      const diagramEntry = manifest.files.find(({ path }) => path === hotelRetryDiagramPath);
+      assert.ok(diagramEntry);
+      diagramEntry[field] = value;
+      await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`);
+      await refreshChecksum(releaseRoot, "release-manifest.json");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, `the validator accepted a wrong diagram manifest ${field}`);
+      assert.match(result.output, message);
+    });
+  }
+});
+
+test("rejects a README link that escapes the packaged hotel retry diagram", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    const readmePath = resolve(releaseRoot, "README.md");
+    const readme = await readFile(readmePath, "utf8");
+    await writeFile(readmePath, readme.replace("docs/assets/hotel-retry-explained.png", "../../docs/assets/hotel-retry-explained.png"));
+    await refreshChecksum(releaseRoot, "README.md");
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator accepted a README diagram link outside the package");
+    assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+  });
+});
 
 test("fails closed before file operations on Windows", { skip: process.platform === "win32" ? false : "Windows-only platform guard" }, async () => {
   await assert.rejects(
@@ -554,8 +623,11 @@ test(
             validateRelease(releaseRoot, {
               afterFinalRead: async () => {
                 await mkdir(replacementRoot);
-                for (const relativePath of [...baseFiles.keys(), "SHA256SUMS"])
-                  await link(resolve(releaseRoot, relativePath), resolve(replacementRoot, relativePath));
+                for (const relativePath of [...baseFiles.keys(), "SHA256SUMS"]) {
+                  const replacementPath = resolve(replacementRoot, relativePath);
+                  await mkdir(resolve(replacementPath, ".."), { recursive: true });
+                  await link(resolve(releaseRoot, relativePath), replacementPath);
+                }
                 await rename(releaseRoot, originalRoot);
                 originalRootMoved = true;
                 await rename(replacementRoot, releaseRoot);
@@ -849,7 +921,7 @@ test("keeps rejecting a checksum digest mismatch", async () => {
   await withFixture({}, async (releaseRoot) => {
     await writeFile(
       resolve(releaseRoot, "README.md"),
-      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\ntampered after checksum generation\n",
+      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\ntampered after checksum generation\n",
     );
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0);

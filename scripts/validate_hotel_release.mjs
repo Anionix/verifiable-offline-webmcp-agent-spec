@@ -6,11 +6,13 @@
 // event_uuid_v7=01a0545f-a323-7754-9efb-891d12216f19 state_transition=RELEASE_FILE_SET_READBACK_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T20:32:28.963Z
 // event_uuid_v7=01a05466-11dc-7121-b1fd-4a8017c96aa5 state_transition=CLI_PATH_GUARD_UNRESOLVED -> CLI_MAIN_ENTRYPOINT_VERIFIED occurred_at=2026-08-30T20:39:30.524Z
 // event_uuid_v7=01a05471-12e1-7902-81e5-896ed0c6aff4 state_transition=WINDOWS_RELEASE_VALIDATION_UNSUPPORTED -> WINDOWS_RELEASE_VALIDATION_FAIL_CLOSED occurred_at=2026-08-30T20:51:31.681Z
+// event_uuid_v7=01a05478-ac4b-704b-aca2-769202026762 state_transition=RELEASE_BYTES_INITIAL_HASHED -> RELEASE_BYTES_FINAL_HASH_VERIFIED occurred_at=2026-08-30T20:59:49.707Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
 // machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
 // machine-contract: the Node 24.15 CLI entrypoint check must not depend on the spelling or realpath of a filesystem symlink.
 // machine-contract: Windows fails before any release file operation because this validator cannot guarantee a safe non-following open there; no override flag exists.
+// machine-contract: every initial snapshot byte stream is hashed and each final non-following descriptor read must reproduce that hash; this detects same-inode rewrites but does not promise an atomic snapshot or prohibit later writes.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -165,18 +167,38 @@ function assertSameSnapshot(initialSnapshots, finalSnapshots) {
   }
 }
 
-export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot } = {}) {
+async function assertSameSnapshotBytes(snapshots, initialDigests) {
+  assert.equal(initialDigests.size, snapshots.length, "not every release snapshot has an initial digest");
+  for (const snapshot of snapshots) {
+    const initialDigest = initialDigests.get(snapshot.relativePath);
+    assert.ok(initialDigest, `${snapshot.relativePath} has no initial digest`);
+    const bytes = await readSnapshot(snapshot);
+    assert.equal(digest(bytes), initialDigest, `${snapshot.relativePath} content changed after initial read`);
+  }
+}
+
+export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot, afterInitialRead } = {}) {
   if (process.platform === "win32") throw new Error(unsupportedPlatformError);
   const resolvedReleaseRoot = resolve(releaseRoot);
   const snapshots = await regularFiles(resolvedReleaseRoot);
   const snapshotByPath = new Map(snapshots.map((snapshot) => [snapshot.relativePath, snapshot]));
-  // This callback is an in-process test seam; the command-line validator never supplies it.
+  // These callbacks are in-process test seams; the command-line validator never supplies them.
   await afterSnapshot?.(snapshots);
+  const initialDigests = new Map();
+
+  async function readInitialSnapshot(snapshot) {
+    const bytes = await readSnapshot(snapshot);
+    const currentDigest = digest(bytes);
+    const initialDigest = initialDigests.get(snapshot.relativePath);
+    if (initialDigest === undefined) initialDigests.set(snapshot.relativePath, currentDigest);
+    else assert.equal(currentDigest, initialDigest, `${snapshot.relativePath} content changed during initial validation`);
+    return bytes;
+  }
 
   async function textFile(relativePath) {
     const snapshot = snapshotByPath.get(relativePath);
     assert.ok(snapshot, `${relativePath} is missing from the release snapshot`);
-    return (await readSnapshot(snapshot)).toString("utf8");
+    return (await readInitialSnapshot(snapshot)).toString("utf8");
   }
 
   const manifest = JSON.parse(await textFile("release-manifest.json"));
@@ -223,14 +245,17 @@ export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterS
     assert.ok(absolutePath === resolvedReleaseRoot || absolutePath.startsWith(`${resolvedReleaseRoot}${sep}`), `${relativePath} escapes the release root`);
     const snapshot = snapshotByPath.get(relativePath);
     assert.ok(snapshot, `${relativePath} is missing from the release snapshot`);
-    const bytes = await readSnapshot(snapshot);
+    const bytes = await readInitialSnapshot(snapshot);
     assert.equal(digest(bytes), sha, `${relativePath} digest differs from SHA256SUMS`);
   }
   assert.ok(!checksumPaths.has("SHA256SUMS"), "checksum file must not self-reference");
   for (const relativePath of requiredFiles.filter((path) => path !== "SHA256SUMS"))
     assert.ok(checksumPaths.has(relativePath), `${relativePath} is not recorded`);
 
-  assertSameSnapshot(snapshots, await regularFiles(resolvedReleaseRoot));
+  await afterInitialRead?.(snapshots);
+  const finalSnapshots = await regularFiles(resolvedReleaseRoot);
+  assertSameSnapshot(snapshots, finalSnapshots);
+  await assertSameSnapshotBytes(finalSnapshots, initialDigests);
 
   return {
     receipt: "HOTEL_RELEASE_READBACK_PASS",

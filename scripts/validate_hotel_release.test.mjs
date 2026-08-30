@@ -180,6 +180,39 @@ test("rejects a regular file added after snapshot even when the release root ino
   });
 });
 
+test(
+  "rejects same-inode rewrites after all initial reads",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+      const rewrittenReadme = "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\nrewritten after initial read\n";
+      const originalChecksums = await readFile(checksumPath, "utf8");
+      const originalReadmeLine = originalChecksums.split("\n").find((line) => line.endsWith("  README.md"));
+      assert.ok(originalReadmeLine);
+      const rewrittenChecksums = originalChecksums.replace(originalReadmeLine, `${sha256(rewrittenReadme)}  README.md`);
+      const paths = [readmePath, checksumPath];
+      const initialIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
+      await assert.rejects(
+        () =>
+          validateRelease(releaseRoot, {
+            afterInitialRead: async () => {
+              await writeFile(readmePath, rewrittenReadme);
+              await writeFile(checksumPath, rewrittenChecksums);
+              const finalIdentities = await Promise.all(paths.map((path) => lstat(path, { bigint: true })));
+              for (let index = 0; index < paths.length; index += 1) {
+                assert.equal(finalIdentities[index].dev, initialIdentities[index].dev);
+                assert.equal(finalIdentities[index].ino, initialIdentities[index].ino);
+              }
+            },
+          }),
+        /content changed after initial read/u,
+      );
+    });
+  },
+);
+
 test("rejects an unrecorded nested file", async () => {
   await withFixture({ "nested/unexpected.json": "harmless nested file\n" }, (releaseRoot) => {
     const result = runValidator(releaseRoot);

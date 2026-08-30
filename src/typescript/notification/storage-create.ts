@@ -2,9 +2,13 @@
 // event_uuid_v7=01a05044-13e6-7415-b86e-0a3c1ef4634d
 // state_transition=PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION occurred_at=2026-08-30T01:23:53.958Z
 // machine-contract: the caller holds the reviewed parent descriptor until this fixed child exits; the child compares its current directory with that descriptor's exact identity before creating only single-component names. It never changes directory or falls back to an absolute creation path.
+// information_uuid_v5=e8dfa4b3-a12e-5e5c-b5b0-f0c5f879d8b2
+// event_uuid_v7=01a050d9-b310-759a-8f13-ba61b21f506e
+// state_transition=PATH_BOUND_CREATE_RACE -> DESCRIPTOR_VERIFIED_CHILD_CREATE occurred_at=2026-08-30T04:07:24.050Z
+// machine-contract: a missing-file callback may replace the named parent, but creation never starts until a child has inherited the still-open parent descriptor and proved that its already-established working directory has the same device and inode.
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { closeSync, constants, fstatSync, linkSync, openSync, readFileSync, statSync, unlinkSync } from "node:fs";
+import { closeSync, constants, fstatSync, linkSync, lstatSync, openSync, readFileSync, statSync, unlinkSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -115,21 +119,41 @@ export function createStorageFileAtRetainedParent(
   const windowsDirectory = process.env.WINDIR ?? process.env.windir;
   if (systemRoot !== undefined) environment.SystemRoot = systemRoot;
   if (windowsDirectory !== undefined) environment.WINDIR = windowsDirectory;
-  const child = spawnSync(process.execPath, ["--experimental-strip-types", fileURLToPath(import.meta.url)], {
-    cwd: parentPath,
-    env: environment,
-    input: JSON.stringify(request),
-    encoding: "utf8",
-    shell: false,
-    windowsHide: true,
-    timeout: 10_000,
-    killSignal: "SIGKILL",
-    maxBuffer: 16_384,
-  });
+  try {
+    const namedParent = lstatSync(parentPath, { bigint: true });
+    if (namedParent.isSymbolicLink() || !namedParent.isDirectory() || namedParent.dev !== parent.dev || namedParent.ino !== parent.ino) {
+      throw new TypeError(`${kind} parent changed before bound creation`);
+    }
+  } catch (error) {
+    if (error instanceof TypeError) throw error;
+    throw new TypeError(`${kind} bound creation helper failed`, { cause: error });
+  }
+  environment.STORAGE_CREATE_PARENT_FD = "3";
+  // Pass the still-open parent descriptor to the child. The child starts with
+  // the reviewed directory as its working directory, compares that directory
+  // with descriptor 3 before creating, and then uses only a basename. The
+  // pathname is therefore resolved once while the descriptor remains live;
+  // a later rename cannot redirect the relative create to a replacement.
+  let child;
+  try {
+    child = spawnSync(process.execPath, ["--experimental-strip-types", fileURLToPath(import.meta.url)], {
+      cwd: parentPath,
+      env: environment,
+      input: JSON.stringify(request),
+      encoding: "utf8",
+      shell: false,
+      windowsHide: true,
+      timeout: 10_000,
+      killSignal: "SIGKILL",
+      stdio: ["pipe", "pipe", "pipe", parentDescriptor],
+    });
+  } catch (error) {
+    throw new TypeError(`${kind} bound creation helper failed`, { cause: error });
+  }
   if (child.error || child.signal) throw new TypeError(`${kind} bound creation helper failed`, { cause: child.error });
   let receipt: { ok?: boolean; dev?: unknown; ino?: unknown; message?: unknown };
   try {
-    receipt = JSON.parse(child.stdout);
+    receipt = JSON.parse(child.stdout) as typeof receipt;
   } catch (error) {
     throw new TypeError(`${kind} bound creation helper returned no valid receipt`, { cause: error });
   }
@@ -143,7 +167,21 @@ export function createStorageFileAtRetainedParent(
   return { dev: receipt.dev, ino: receipt.ino };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.env.STORAGE_CREATE_PARENT_FD === "3") {
+  try {
+    const request = JSON.parse(readFileSync(0, "utf8"));
+    const parent = fstatSync(3, { bigint: true });
+    const current = statSync(".", { bigint: true });
+    if (!parent.isDirectory() || !current.isDirectory() || parent.dev !== current.dev || parent.ino !== current.ino) {
+      throw new TypeError("storage parent changed before bound creation");
+    }
+    const receipt = createStorageFileInWorkingDirectory(request);
+    process.stdout.write(JSON.stringify({ ok: true, ...receipt }));
+  } catch (error) {
+    process.stdout.write(JSON.stringify({ ok: false, message: error instanceof Error ? error.message : "bound storage creation failed" }));
+    process.exitCode = 1;
+  }
+} else if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const receipt = createStorageFileInWorkingDirectory(JSON.parse(readFileSync(0, "utf8")));
     process.stdout.write(JSON.stringify({ ok: true, ...receipt }));

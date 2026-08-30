@@ -191,6 +191,58 @@ async function createRenameSquashRepository({ destinationPath, currentFiles }) {
   return { directory, baseCommit, sourceCommit, currentCommit };
 }
 
+const directReleaseConfigurationDrifts = Object.freeze([
+  {
+    path: "package-lock.json",
+    source: '{"name":"root-source","lockfileVersion":3,"packages":{}}\n',
+    current: '{"name":"root-current","lockfileVersion":3,"packages":{}}\n',
+  },
+  {
+    path: "src/typescript/package-lock.json",
+    source: '{"name":"typescript-source","lockfileVersion":3,"packages":{}}\n',
+    current: '{"name":"typescript-current","lockfileVersion":3,"packages":{}}\n',
+  },
+  {
+    path: "src/typescript/package.json",
+    source: '{"scripts":{"test":"node --test source-suite.test.js"}}\n',
+    current: '{"scripts":{"test":"node --test current-suite.test.js"}}\n',
+  },
+]);
+
+async function createHotelConfigurationDriftRepository(configuration) {
+  const directory = await initializeRepository();
+  const commonCommit = await commitFile(directory, "common.txt", "common\n", "common");
+  runGit(directory, ["switch", "--quiet", "-c", "release-base", commonCommit]);
+  const baseCommit = await commitFile(directory, "base.txt", "base-only\n", "base");
+  runGit(directory, ["switch", "--quiet", "-c", "release-source"]);
+  const sourceCommit = await commitFiles(
+    directory,
+    [
+      {
+        path: "src/typescript/hotel/browser-store.js",
+        content: "liveness fixed\n",
+      },
+      { path: configuration.path, content: configuration.source },
+    ],
+    "hotel release and direct configuration",
+  );
+
+  runGit(directory, ["switch", "--quiet", "-c", "current", commonCommit]);
+  const currentCommit = await commitFiles(
+    directory,
+    [
+      {
+        path: "src/typescript/hotel/browser-store.js",
+        content: "liveness fixed\n",
+      },
+      { path: configuration.path, content: configuration.current },
+    ],
+    "squashed hotel release with configuration drift",
+  );
+  runGit(directory, ["checkout", "--quiet", "--detach", currentCommit]);
+  return { directory, baseCommit, sourceCommit, currentCommit };
+}
+
 function runValidator({ directory, baseCommit, sourceCommit }) {
   return spawnSync(
     process.execPath,
@@ -376,4 +428,21 @@ test("accepts an out-of-scope rename when the old file is deleted in the squash 
       assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
     },
   );
+});
+
+test("rejects a squash checkout when a hotel change coexists with direct release configuration drift", async () => {
+  for (const configuration of directReleaseConfigurationDrifts) {
+    await withRepository(
+      () => createHotelConfigurationDriftRepository(configuration),
+      ({ directory, baseCommit, sourceCommit }) => {
+        const result = runValidator({ directory, baseCommit, sourceCommit });
+
+        assert.notEqual(result.status, 0, output(result));
+        assert.ok(
+          output(result).includes(`release source file entry differs after squash: ${configuration.path}`),
+          output(result),
+        );
+      },
+    );
+  }
 });

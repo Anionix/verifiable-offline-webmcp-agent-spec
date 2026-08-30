@@ -198,7 +198,12 @@
     "devpostThumbnailUpdates": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/devpostThumbnailUpdate" }
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/devpostThumbnailUpdate" },
+          { "$ref": "#/$defs/devpostThumbnailSocialReadback" }
+        ]
+      }
     },
     "devpostThumbnailUpdate": {
       "$comment": "issue=202 information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246 event_uuid_v7=01a053bd-aba1-7772-928c-1b5a811b7cab state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE occurred_at=2026-08-30T17:35:34.305Z machine-contract=the public PNG readback and stale social metadata remain separate; AI_RE_RENDERED is observed and pixel identity remains NOT_ASSERTED",
@@ -299,6 +304,77 @@
         "projectNonImageComparison": { "const": "ALL_EQUAL" },
         "projectOnlyChangedField": { "const": "updated_at" },
         "projectComparisonExplanation": { "type": "string", "minLength": 20 },
+        "evidenceBoundary": { "type": "string", "minLength": 20 }
+      }
+    },
+    "devpostThumbnailSocialReadback": {
+      "$comment": "issue=202 information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246 event_uuid_v7=01a0543a-74de-71b6-ab45-5fbbf4f8f01c state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE -> PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED recorded_at=2026-08-30T19:51:52.286Z machine-contract=the public HTML image URLs and anonymous PNG readback match; recordedAt follows image hash and dimensions, the exact HTML fetch time is not recorded, and no external write operation occurred",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "uuidV5Namespace",
+        "uuidV5Name",
+        "observationUuidV7",
+        "recordedAt",
+        "issue",
+        "sourceCommit",
+        "projectId",
+        "version",
+        "state",
+        "publicUrl",
+        "publicSha256",
+        "publicFormat",
+        "publicWidth",
+        "publicHeight",
+        "ogImageUrl",
+        "twitterImageUrl",
+        "htmlEvidenceFileName",
+        "htmlEvidenceSha256",
+        "imageEvidenceFileName",
+        "imageEvidenceSha256",
+        "imageEvidenceFormat",
+        "imageEvidenceWidth",
+        "imageEvidenceHeight",
+        "recordedAfterImageReadback",
+        "htmlFetchAt",
+        "htmlFetchTimeState",
+        "uploadPerformed",
+        "updateProjectPerformed",
+        "resubmitPerformed",
+        "evidenceBoundary"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "ff53f0a8-5ba4-5332-8e67-1ebffe650246" },
+        "uuidV5Namespace": { "const": "URL" },
+        "uuidV5Name": { "const": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/202#devpost-cover-readback" },
+        "observationUuidV7": { "const": "01a0543a-74de-71b6-ab45-5fbbf4f8f01c" },
+        "recordedAt": { "const": "2026-08-30T19:51:52.286Z" },
+        "issue": { "const": 202 },
+        "sourceCommit": { "const": "5583cdbeddbbeae2c6f16fd481fc809069a15296" },
+        "projectId": { "const": 1405191 },
+        "version": { "const": 12 },
+        "state": { "const": "PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED" },
+        "publicUrl": { "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/206/575/datas/medium.png" },
+        "publicSha256": { "const": "8b8c63ca603c1e14c0c0c84ee1bac003da02d38e2ddb553028123c9803b3ca95" },
+        "publicFormat": { "const": "PNG" },
+        "publicWidth": { "const": 333 },
+        "publicHeight": { "const": 222 },
+        "ogImageUrl": { "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/206/575/datas/medium.png" },
+        "twitterImageUrl": { "const": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/206/575/datas/medium.png" },
+        "htmlEvidenceFileName": { "const": "devpost-public-202-followup.html" },
+        "htmlEvidenceSha256": { "const": "b38c31634efc0fde4483f023f84005fcabaa75881d5ea4aac18ae40d822f33a5" },
+        "imageEvidenceFileName": { "const": "devpost-cover-public-202-followup.png" },
+        "imageEvidenceSha256": { "const": "8b8c63ca603c1e14c0c0c84ee1bac003da02d38e2ddb553028123c9803b3ca95" },
+        "imageEvidenceFormat": { "const": "PNG" },
+        "imageEvidenceWidth": { "const": 333 },
+        "imageEvidenceHeight": { "const": 222 },
+        "recordedAfterImageReadback": { "const": true },
+        "htmlFetchAt": { "const": null },
+        "htmlFetchTimeState": { "const": "NOT_RECORDED" },
+        "uploadPerformed": { "const": false },
+        "updateProjectPerformed": { "const": false },
+        "resubmitPerformed": { "const": false },
         "evidenceBoundary": { "type": "string", "minLength": 20 }
       }
     },

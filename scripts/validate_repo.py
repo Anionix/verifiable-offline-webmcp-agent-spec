@@ -176,6 +176,7 @@ def subtitle_observation_errors(
 ) -> list[str]:
     findings: list[str] = []
     seen_events: dict[str, str] = dict(reserved_events or {})
+    previous_times: dict[str, int] = {}
     for collection_name, records in collections.items():
         if not isinstance(records, list):
             findings.append(f"{collection_name} must be an array")
@@ -200,13 +201,19 @@ def subtitle_observation_errors(
                 if recorded_ms < measured_ms:
                     findings.append(f"{entry_label} recordedAt precedes measuredAt")
             timestamp_field = SUBTITLE_TIMESTAMP_FIELDS.get(collection_name)
-            if root_updated_ms is not None and timestamp_field and timestamp_field in record:
+            record_time_ms = None
+            if timestamp_field and timestamp_field in record:
                 try:
                     record_time_ms = rfc3339_ms(record[timestamp_field])
                 except Exception:
                     record_time_ms = None
-                if record_time_ms is not None and root_updated_ms < record_time_ms:
-                    findings.append(f"{entry_label} {timestamp_field} exceeds document root updatedAt")
+                if record_time_ms is not None:
+                    previous_time_ms = previous_times.get(collection_name)
+                    if previous_time_ms is not None and record_time_ms < previous_time_ms:
+                        findings.append(f"{entry_label} {timestamp_field} precedes previous {collection_name} entry")
+                    previous_times[collection_name] = record_time_ms
+            if root_updated_ms is not None and record_time_ms is not None and root_updated_ms < record_time_ms:
+                findings.append(f"{entry_label} {timestamp_field} exceeds document root updatedAt")
             if "availableSubtitleCatalog" in record:
                 findings.extend(subtitle_capture_timing_errors(record, entry_label))
     return findings
@@ -311,6 +318,20 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     )
     if not any("captureTiming upperBound exceeds recordedAt" in finding for finding in invalid_capture_findings):
         findings.append("capture-timing upper-bound fixture was accepted")
+    for collection_name, timestamp_field in SUBTITLE_TIMESTAMP_FIELDS.items():
+        out_of_order_records = [
+            {
+                "observationUuidV7": uuid7_for_ms(2_000, 0x111, 0x111111111111111),
+                timestamp_field: rfc3339_from_ms(2_000),
+            },
+            {
+                "observationUuidV7": uuid7_for_ms(1_999, 0x222, 0x222222222222222),
+                timestamp_field: rfc3339_from_ms(1_999),
+            },
+        ]
+        out_of_order_findings = subtitle_observation_errors({collection_name: out_of_order_records})
+        if not any("precedes previous" in finding for finding in out_of_order_findings):
+            findings.append(f"{collection_name} accepted an out-of-order timestamp fixture")
     return findings
 
 

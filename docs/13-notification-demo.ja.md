@@ -33,6 +33,8 @@ English purpose: Prevent a second visible notification for the same logical oper
 | 通知アダプター | `preview`、`execute`、`reconcile`だけを公開 |
 | ブラウザー試験ページ | 通知権限要求、通知タグへの予定識別子設定、表示結果の読み戻し |
 
+参照実装のディスクSQLiteはPOSIX環境だけで使えます。WindowsではNode.jsの`DatabaseSync`が、実際に開いたSQLiteファイルを検査済みの実体へ結び付けるファイル記述子を公開していないため、ファイルを作成・書き込みする前に安全側で停止します。`:memory:`は全プラットフォームで使えます。このWindows境界は決定的な回帰試験と実Windows用の検査ジョブで確認します。
+
 制御状態と外部効果状態は分離します。
 
 ```text
@@ -59,7 +61,13 @@ NOT_STARTED -> AMBIGUOUS -> RECONCILING -> CONFIRMED_PRESENT
 <!-- event_uuid_v7=01a04cf4-5c1a-740e-bf0b-21652882816d state_transition=PLATFORM_AMBIGUOUS_STORAGE -> PLATFORM_BOUND_STORAGE occurred_at=2026-08-29T09:57:57.921Z -->
 <!-- machine-contract=Every platform enforces fixed roots, canonical containment, simple filenames, and link rejection; POSIX ownership and mode checks run only where those bits represent access control. -->
 
-監査ログとSQLiteのファイルは、リポジトリ内の固定`.local`か、試験用一時領域の直下一階層だけへ置けます。`.local`自体がシンボリックリンクなら、リンク先をたどる前、書き込む前、権限を変える前に拒否します。macOSとLinuxでは所有者と`0700`相当の権限も確認します。Windowsでは意味の異なるUnix形式の権限ビットを判定材料にせず、固定領域、実体パス包含、単純なファイル名、リンク拒否を維持します。構築時に親ディレクトリーのデバイス番号と inode 番号を保持し、後続の読み取り、追記、SQLite開始の前に毎回照合するため、親の差し替えは安全側で停止します。Windows分岐は自動試験済みですが、Windows実機でのアクセス制御読み戻しは`UNMEASURED`です。
+監査ログとSQLiteのファイルは、リポジトリ内の固定`.local`か、試験用一時領域の直下一階層だけへ置けます。`.local`自体がシンボリックリンクなら、リンク先をたどる前、書き込む前、権限を変える前に拒否します。macOSとLinuxでは所有者と`0700`相当の権限も確認します。Windowsでは意味の異なるUnix形式の権限ビットを判定材料にせず、固定領域、実体パス包含、単純なファイル名、リンク拒否を維持します。
+
+新規作成では、検査した親ディレクトリーを開いたまま、専用の子プロセスへ作成を任せます。子は自分の作業ディレクトリーが検査済みの実体と一致することを、丸めのない整数で確認し、その場所を変えずに単純なファイル名だけで作成します。確認前の差し替えは拒否し、確認後にmacOSやLinuxで元のフォルダーを移動されても、作成先は元の実体から変わりません。Windowsでは作業ディレクトリーの移動禁止を使い、実際のWindows用試験で別に検査します。呼び出し元は新規作成なしで開き直し、書き込み用の記述子を返す前に照合します。処理が停止すると元のフォルダーに空ファイルが残る場合はありますが、差し替え先に新しいファイルを置いてはいけません。
+
+これは新規ファイル作成の保証です。後でSQLite自身が名前から開くファイルや補助ファイルまで、同じ記述子に固定したという保証ではありません。WindowsのディスクSQLiteは前述のとおり停止します。公開中のホテルデモはブラウザー内保存であり、この通知用制限の影響は受けません。Windowsのアクセス権全体を実機で検証したとの主張もしません。
+
+作成契約の識別子は`eeccc01c-0134-5420-9946-9efe2adbb772`、状態遷移は`PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION`です。観測時刻は`2026-08-30T01:23:53.958Z`、観測識別子は`01a05044-13e6-7415-b86e-0a3c1ef4634d`。再発防止試験は[`notification-parent-creation.test.ts`](../src/typescript/test/notification-parent-creation.test.ts)にあります。根拠は[Appleの相対パス仕様](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/chdir.2.html)、[Microsoftの作業ディレクトリー固定仕様](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcurrentdirectory)、[Node.jsの子プロセス仕様](https://nodejs.org/download/release/v24.0.0/docs/api/child_process.html#child_processspawnsynccommand-args-options)です。
 
 ## 実行方法
 

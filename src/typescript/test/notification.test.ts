@@ -133,6 +133,11 @@ function assertFileUnchanged(path: string, before: ReturnType<typeof fileSnapsho
   assert.equal(after.mode, before.mode);
 }
 
+const windowsDiskSqliteError = {
+  name: "TypeError",
+  message: "disk-backed SQLite is disabled on Windows because node:sqlite DatabaseSync does not expose a bindable file handle",
+};
+
 test("notification storage rejects paths outside its fixed local and test roots", () => {
   const outsideTemporaryRoot = resolve("untrusted-outside-root", "notification-outside.sqlite");
   assert.throws(() => new NotificationStore(outsideTemporaryRoot), /outside the allowed storage roots/);
@@ -196,6 +201,10 @@ test("notification storage rejects a parent symlink that escapes an allowed root
   }
 });
 
+// information_uuid_v5=45e050dd-a95b-5166-8fba-2028adf9ee51
+// event_uuid_v7=01a05042-8899-7fbb-8aea-feab9bfd8c9f
+// state_transition=TEST_OVERRIDE_CAN_RELAX_NATIVE_POLICY -> NATIVE_WINDOWS_DISK_SQLITE_REJECTED occurred_at=2026-08-30T01:22:12.761Z
+// machine-contract: Windows rejects disk SQLite before callbacks; supported POSIX hosts execute and reject the parent replacement. Audit checks execute on every platform.
 test("notification storage rejects a replaced parent before audit or SQLite I/O", () => {
   const auditDirectory = mkdtempSync(join(tmpdir(), "notification-parent-replacement-audit-"));
   const auditMovedDirectory = `${auditDirectory}-moved`;
@@ -207,6 +216,7 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
   const databasePath = join(databaseDirectory, "queue.sqlite");
   const externalAuditPath = join(auditExternal, "audit.ndjson");
   const externalDatabaseFiles = ["queue.sqlite", "queue.sqlite-wal", "queue.sqlite-shm", "queue.sqlite-journal"].map((name) => join(databaseExternal, name));
+  let databaseParentReplacementCount = 0;
   try {
     const audit = new AuditLog(auditPath);
     writeFileSync(externalAuditPath, "external audit victim\n", { mode: 0o600 });
@@ -223,12 +233,16 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
       () =>
         new NotificationStore(databasePath, {
           afterParentIdentityCaptured() {
+            databaseParentReplacementCount += 1;
             renameSync(databaseDirectory, databaseMovedDirectory);
             symlinkSync(databaseExternal, databaseDirectory, "dir");
           },
         }),
-      /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
+      process.platform === "win32"
+        ? windowsDiskSqliteError
+        : /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
     );
+    assert.equal(databaseParentReplacementCount, process.platform === "win32" ? 0 : 1);
 
     assertFileUnchanged(externalAuditPath, auditBefore);
     externalDatabaseFiles.forEach((path, index) => assertFileUnchanged(path, databaseBefore[index]));
@@ -244,7 +258,7 @@ test("notification storage rejects a replaced parent before audit or SQLite I/O"
   }
 });
 
-test("notification storage rechecks a replaced parent before absent-file creation", () => {
+test("notification storage rejects a replaced parent before bound absent-file creation", () => {
   for (const platform of ["darwin", "win32"] as const) {
     const directory = mkdtempSync(join(tmpdir(), `notification-absence-parent-${platform}-`));
     const movedDirectory = `${directory}-moved`;
@@ -266,7 +280,7 @@ test("notification storage rechecks a replaced parent before absent-file creatio
               symlinkSync(external, directory, "dir");
             },
           }),
-        /database parent must not be a symbolic link|database parent changed during operation|database parent must be a non-link directory/,
+        /^TypeError: database parent changed before bound creation$/,
       );
       assertFileUnchanged(victim, before);
       assert.equal(existsSync(join(external, "queue.sqlite-wal")), false);
@@ -288,6 +302,7 @@ test("notification storage rejects a different regular parent before I/O", () =>
   const databaseMovedDirectory = `${databaseDirectory}-moved`;
   const audit = new AuditLog(join(auditDirectory, "audit.ndjson"));
   const databasePath = join(databaseDirectory, "queue.sqlite");
+  let databaseParentReplacementCount = 0;
   try {
     renameSync(auditDirectory, auditMovedDirectory);
     mkdirSync(auditDirectory, { mode: 0o700 });
@@ -298,12 +313,17 @@ test("notification storage rejects a different regular parent before I/O", () =>
       () =>
         new NotificationStore(databasePath, {
           afterParentIdentityCaptured() {
+            databaseParentReplacementCount += 1;
             renameSync(databaseDirectory, databaseMovedDirectory);
             mkdirSync(databaseDirectory, { mode: 0o700 });
           },
         }),
-      /database parent changed during validation|database parent changed during operation/,
+      process.platform === "win32"
+        ? windowsDiskSqliteError
+        : /database parent changed during validation|database parent changed during operation/,
     );
+    assert.equal(databaseParentReplacementCount, process.platform === "win32" ? 0 : 1);
+    assert.deepEqual(readdirSync(databaseDirectory), []);
   } finally {
     rmSync(auditDirectory, { recursive: true, force: true });
     rmSync(databaseDirectory, { recursive: true, force: true });
@@ -355,6 +375,61 @@ test("notification storage rejects final links when Windows cannot rely on O_NOF
     assertFileUnchanged(auditVictim, auditBefore);
   } finally {
     rmSync(directory, { recursive: true, force: true });
+    rmSync(external, { recursive: true, force: true });
+  }
+});
+
+test("disk-backed SQLite fails closed on Windows while in-memory SQLite remains available", () => {
+  const directory = mkdtempSync(join(tmpdir(), "notification-windows-sqlite-boundary-"));
+  const movedDirectory = `${directory}-moved`;
+  const external = mkdtempSync(join(tmpdir(), "notification-windows-sqlite-external-"));
+  const filenames = ["queue.sqlite", "queue.sqlite-wal", "queue.sqlite-shm", "queue.sqlite-journal"];
+  const platforms: Array<NodeJS.Platform | undefined> = process.platform === "win32" ? [undefined, "win32", "darwin", "linux"] : ["win32"];
+  let parentCaptureCount = 0;
+  try {
+    const databasePath = join(directory, "queue.sqlite");
+    const externalPaths = filenames.map((name) => join(external, name));
+    for (const path of externalPaths) writeFileSync(path, `external ${path}\n`, { mode: 0o600 });
+    const externalBefore = externalPaths.map(fileSnapshot);
+    const afterParentIdentityCaptured = () => {
+      parentCaptureCount += 1;
+      renameSync(directory, movedDirectory);
+      symlinkSync(external, directory, "dir");
+    };
+
+    for (const platform of platforms) {
+      assert.throws(
+        () => new NotificationStore(databasePath, { platform, afterParentIdentityCaptured }),
+        windowsDiskSqliteError,
+      );
+      assert.equal(parentCaptureCount, 0);
+      assert.deepEqual(readdirSync(directory), [], "no database, sidecar, or staging file may be created");
+    }
+
+    const existingPaths = filenames.map((name) => join(directory, name));
+    for (const path of existingPaths) writeFileSync(path, `existing ${path}\n`, { mode: 0o600 });
+    const existingBefore = existingPaths.map(fileSnapshot);
+    for (const platform of platforms) {
+      assert.throws(
+        () => new NotificationStore(databasePath, { platform, afterParentIdentityCaptured }),
+        windowsDiskSqliteError,
+      );
+      const memoryStore = new NotificationStore(":memory:", { platform, afterParentIdentityCaptured });
+      try {
+        assert.equal(memoryStore.database.prepare("SELECT 1 AS value").get()?.value, 1);
+      } finally {
+        memoryStore.close();
+      }
+      assert.equal(parentCaptureCount, 0);
+      assert.deepEqual(readdirSync(directory).sort(), [...filenames].sort());
+      assert.deepEqual(readdirSync(external).sort(), [...filenames].sort());
+      existingPaths.forEach((path, index) => assertFileUnchanged(path, existingBefore[index]));
+      externalPaths.forEach((path, index) => assertFileUnchanged(path, externalBefore[index]));
+    }
+  } finally {
+    if (lstatSync(directory, { throwIfNoEntry: false })?.isSymbolicLink()) unlinkSync(directory);
+    rmSync(directory, { recursive: true, force: true });
+    rmSync(movedDirectory, { recursive: true, force: true });
     rmSync(external, { recursive: true, force: true });
   }
 });

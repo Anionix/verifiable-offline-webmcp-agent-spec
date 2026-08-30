@@ -25,7 +25,7 @@
 // information_uuid_v5=e4ef6246-133f-58d8-9433-a3a29df2eb40
 // event_uuid_v7=01a04d0d-7648-762e-8124-3cef35f835f9
 // state_transition=PATH_VALIDATED_BEFORE_SQLITE_OPEN -> GUARDED_SINGLE_LINK_IDENTITY_RECHECKED occurred_at=2026-08-29T10:25:23.016Z
-// machine-contract: a disk-backed SQLite file stays pinned by a reviewed descriptor until DatabaseSync opens the same named inode; no schema or pragma write begins before the post-open identity check succeeds.
+// machine-contract: POSIX disk-backed SQLite is admitted only after the reviewed descriptor and named inode agree; Windows disk-backed SQLite fails closed because DatabaseSync exposes no bindable file handle.
 import { closeSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -87,6 +87,7 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../.
 const repositoryStorageRoot = join(repositoryRoot, ".local");
 
 export interface NotificationStoreOptions {
+  /** Test-only policy override; the native Windows restriction cannot be relaxed. */
   platform?: NodeJS.Platform;
   /** Deterministic test seam between parent capture and the first SQLite open. */
   afterParentIdentityCaptured?: (path: string) => void;
@@ -98,9 +99,18 @@ function containedDatabasePath(candidate: string, platform: NodeJS.Platform): st
 }
 
 function openContainedDatabase(candidate: string, options: NotificationStoreOptions): DatabaseSync {
-  const platform = options.platform ?? process.platform;
+  // information_uuid_v5=45e050dd-a95b-5166-8fba-2028adf9ee51
+  // event_uuid_v7=01a05042-8899-7fbb-8aea-feab9bfd8c9f
+  // state_transition=TEST_OVERRIDE_CAN_RELAX_NATIVE_POLICY -> NATIVE_WINDOWS_DISK_SQLITE_REJECTED occurred_at=2026-08-30T01:22:12.761Z
+  // machine-contract: native Windows always uses Windows validation and rejects disk SQLite before callbacks or storage opens; :memory: remains supported.
+  const platform = process.platform === "win32" ? "win32" : options.platform ?? process.platform;
   const path = containedDatabasePath(candidate, platform);
   if (path === ":memory:") return new DatabaseSync(path);
+  if (platform === "win32") {
+    throw new TypeError(
+      "disk-backed SQLite is disabled on Windows because node:sqlite DatabaseSync does not expose a bindable file handle",
+    );
+  }
 
   const expectedParent: StorageParentIdentity = captureNotificationStorageParent(path, "database", { platform });
   options.afterParentIdentityCaptured?.(path);

@@ -44,17 +44,16 @@
 // event_uuid_v7=01a04d46-6a82-75a1-8ee4-fd9364c93d58
 // state_transition=PARENT_IDENTITY_UNBOUND -> PARENT_IDENTITY_RECHECKED occurred_at=2026-08-29T14:45:00.000Z
 // machine-contract: every caller that retained a canonical storage path must also retain its parent device/inode identity; a later link or directory replacement fails before file I/O.
-// information_uuid_v5=0d5d0a5d-c2ba-53c2-96e1-c6cced7b4a63
-// event_uuid_v7=01a04f51-9e66-7c49-bec5-8bbf7d3ecf2a
-// state_transition=PARENT_ABSENCE_OBSERVED -> PARENT_RECHECKED_BEFORE_CREATE occurred_at=2026-08-30T00:12:00.000Z
-// machine-contract: the absence seam is followed by a fresh parent identity check before POSIX creation or Windows staging/publication; a replaced parent fails before a new named entry is created.
-import { randomBytes } from "node:crypto";
-import { closeSync, constants, fchmodSync, fstatSync, linkSync, lstatSync, mkdirSync, openSync, realpathSync, statSync, unlinkSync } from "node:fs";
+// information_uuid_v5=eeccc01c-0134-5420-9946-9efe2adbb772
+// event_uuid_v7=01a05044-13e6-7415-b86e-0a3c1ef4634d
+// state_transition=PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION occurred_at=2026-08-30T01:23:53.958Z
+// machine-contract: writable guards retain the validated parent descriptor through child creation. The child verifies and pins that directory; the caller only reopens without creation flags, then checks identity before returning a writable descriptor.
+import { closeSync, constants, fchmodSync, fstatSync, lstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-
-export type NotificationStorageKind = "audit" | "database";
+import { createStorageFileAtRetainedParent, STORAGE_CONFIG, type NotificationStorageKind } from "./storage-create.ts";
+export type { NotificationStorageKind } from "./storage-create.ts";
 
 export interface StoragePathOptions {
   repositoryStorageRoot?: string;
@@ -64,8 +63,8 @@ export interface StoragePathOptions {
 
 export interface StorageParentIdentity {
   readonly path: string;
-  readonly dev: number;
-  readonly ino: number;
+  readonly dev: bigint;
+  readonly ino: bigint;
 }
 
 export interface StorageDescriptorOptions {
@@ -74,17 +73,6 @@ export interface StorageDescriptorOptions {
   /** Deterministic test seam at the final-name absence/publication boundary. */
   afterStorageAbsenceObserved?: (path: string) => void;
 }
-
-const STORAGE_CONFIG = {
-  audit: {
-    filename: /^[A-Za-z0-9][A-Za-z0-9._-]{0,126}\.ndjson$/,
-    filenameMessage: "audit path must end in a simple .ndjson filename",
-  },
-  database: {
-    filename: /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.sqlite$/,
-    filenameMessage: "database path must end in a simple .sqlite filename",
-  },
-} as const;
 
 function hasPosixPermissionSemantics(platform: NodeJS.Platform): boolean {
   return platform !== "win32";
@@ -147,49 +135,6 @@ function openExistingStorageDescriptor(
   }
 }
 
-function createWindowsStorageDescriptor(
-  path: string,
-  kind: NotificationStorageKind,
-  accessFlags: number,
-  options: Pick<StorageDescriptorOptions, "expectedParent" | "platform">,
-): number {
-  const platform = options.platform ?? process.platform;
-  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
-  const stagingPath = join(dirname(path), `.${basename(path)}.${randomBytes(16).toString("hex")}.tmp`);
-  let descriptor: number | null = null;
-  let stagingNameExists = false;
-  try {
-    descriptor = openSync(stagingPath, accessFlags | constants.O_CREAT | constants.O_EXCL, 0o600);
-    stagingNameExists = true;
-    requireSingleLinkRegularFile(fstatSync(descriptor), kind);
-    if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
-    try {
-      linkSync(stagingPath, path);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
-        if (!namedStorageFileIsAbsent(path, kind)) {
-          throw new TypeError(`${kind} path changed during exclusive publication`, { cause: error });
-        }
-        throw new TypeError(`${kind} path changed during exclusive publication`, { cause: error });
-      }
-      throw error;
-    }
-    unlinkSync(stagingPath);
-    stagingNameExists = false;
-    return descriptor;
-  } catch (error) {
-    if (descriptor !== null) closeSync(descriptor);
-    if (stagingNameExists) {
-      try {
-        unlinkSync(stagingPath);
-      } catch (cleanupError) {
-        if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") throw cleanupError;
-      }
-    }
-    throw error;
-  }
-}
-
 function openStorageRootDescriptor(path: string, platform: NodeJS.Platform): number {
   return openSync(path, constants.O_RDONLY | constants.O_DIRECTORY | noFollowFlag(platform));
 }
@@ -208,11 +153,10 @@ function openStorageParentDescriptor(path: string, kind: NotificationStorageKind
   }
 }
 
-function readStorageParentIdentity(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): StorageParentIdentity {
-  const descriptor = openStorageParentDescriptor(path, kind, platform);
+function storageParentIdentityFromDescriptor(path: string, descriptor: number, kind: NotificationStorageKind): StorageParentIdentity {
   try {
-    const guarded = fstatSync(descriptor);
-    const named = lstatSync(dirname(path));
+    const guarded = fstatSync(descriptor, { bigint: true });
+    const named = lstatSync(dirname(path), { bigint: true });
     if (!guarded.isDirectory() || !named.isDirectory() || named.isSymbolicLink()) {
       throw new TypeError(`${kind} parent must be a non-link directory`);
     }
@@ -225,6 +169,13 @@ function readStorageParentIdentity(path: string, kind: NotificationStorageKind, 
       throw new TypeError(`${kind} parent changed during validation`, { cause: error });
     }
     throw error;
+  }
+}
+
+function readStorageParentIdentity(path: string, kind: NotificationStorageKind, platform: NodeJS.Platform): StorageParentIdentity {
+  const descriptor = openStorageParentDescriptor(path, kind, platform);
+  try {
+    return storageParentIdentityFromDescriptor(path, descriptor, kind);
   } finally {
     closeSync(descriptor);
   }
@@ -295,23 +246,28 @@ export function openExistingNotificationStorageGuard(path: string, kind: Notific
 
 function openWritableNotificationStorageGuard(path: string, kind: NotificationStorageKind, accessFlags: number, options: StorageDescriptorOptions): number {
   const platform = options.platform ?? process.platform;
-  if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
-  const noFollow = noFollowFlag(platform);
+  const parentDescriptor = openStorageParentDescriptor(path, kind, platform);
   let descriptor: number | null = null;
   try {
+    const parent = storageParentIdentityFromDescriptor(path, parentDescriptor, kind);
+    if (options.expectedParent && (
+      parent.path !== options.expectedParent.path || parent.dev !== options.expectedParent.dev || parent.ino !== options.expectedParent.ino
+    )) throw new TypeError(`${kind} parent changed during operation`);
+    const boundOptions = { ...options, expectedParent: parent };
     descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
     if (descriptor === null) {
       options.afterStorageAbsenceObserved?.(path);
-      // machine-contract: an absence observation never authorizes creation by itself; bind the next operation to a fresh identity read of the retained parent.
-      if (options.expectedParent) assertNotificationStorageParent(path, options.expectedParent, kind, { platform });
-      if (platform === "win32") {
-        descriptor = createWindowsStorageDescriptor(path, kind, accessFlags, options);
-      } else {
-        // machine-contract: this path already passed fixed-root containment and private-parent checks; POSIX O_NOFOLLOW plus O_EXCL prevents pre-existing or raced aliases.
-        descriptor = openSync(path, accessFlags | constants.O_CREAT | constants.O_EXCL | noFollow, 0o600);
+      const created = createStorageFileAtRetainedParent(parent.path, parentDescriptor, basename(path), kind, platform);
+      // The helper may have created an empty file in a renamed original directory; never create through the replacement name.
+      assertNotificationStorageParent(path, parent, kind, { platform });
+      descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
+      if (descriptor === null) throw new TypeError(`${kind} path changed after bound creation`);
+      const reopened = fstatSync(descriptor, { bigint: true });
+      if (reopened.dev.toString() !== created.dev || reopened.ino.toString() !== created.ino) {
+        throw new TypeError(`${kind} path changed after bound creation`);
       }
     }
-    assertNotificationStorageDescriptor(path, descriptor, kind, options);
+    assertNotificationStorageDescriptor(path, descriptor, kind, boundOptions);
     return descriptor;
   } catch (error) {
     if (descriptor !== null) closeSync(descriptor);
@@ -323,6 +279,8 @@ function openWritableNotificationStorageGuard(path: string, kind: NotificationSt
       throw new TypeError(`${kind} path must not be a symbolic link`, { cause: error });
     }
     throw error;
+  } finally {
+    closeSync(parentDescriptor);
   }
 }
 

@@ -43,7 +43,12 @@ try {
   if (existsSync(resolve(checkout, "dist"))) {
     throw new Error("clean-checkout fixture unexpectedly contains dist");
   }
-  symlinkSync(resolve(ROOT, "node_modules"), resolve(checkout, "node_modules"), "dir");
+  // information_uuid_v5=eabd305a-074b-5bf8-a1a4-1ca6a80089d7
+  // event_uuid_v7=01a05066-0020-7e9e-a9eb-89a7030da796
+  // state_transition=POSIX_SYMLINK -> WINDOWS_JUNCTION -> DEPENDENCY_LINK_READY occurred_at=2026-08-30T02:00:00.000Z
+  // machine-contract: a clean-checkout dependency link must be creatable without Developer Mode or elevated Windows symlink privileges.
+  const dependencyLinkType = process.platform === "win32" ? "junction" : "dir";
+  symlinkSync(resolve(ROOT, "node_modules"), resolve(checkout, "node_modules"), dependencyLinkType);
 
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   const validation = run(npm, ["run", "validate:void"], checkout);

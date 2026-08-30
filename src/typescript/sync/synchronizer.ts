@@ -59,8 +59,8 @@
 // state_transition=STALE_RECOVERY_OBSERVATION -> ATOMIC_QUARANTINE_IDENTITY_CHECKED occurred_at=2026-08-29T14:55:00.000Z
 // machine-contract: a recovery target is removed only after its observed directory identity and owner fingerprint survive an atomic rename to a private quarantine name; a replacement is restored and never deleted.
 import { createPublicKey } from "node:crypto";
-import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { canonicalJson, type CanonicalValue } from "../canonical.ts";
 import { isUuidVersion, uuidV7 } from "../uuid.ts";
@@ -98,8 +98,14 @@ interface TrustedDeviceKeyAnchor {
 interface TrustedKeyAnchorLockOwner {
   schemaVersion: 1;
   ownerProcessId: number;
+  ownerProcessStartTimeEpochMs: number;
   acquiredAtEpochMs: number;
   ownerEventId: string;
+}
+
+interface TrustedKeyAnchorLockOwnerRead {
+  owner: TrustedKeyAnchorLockOwner | null;
+  present: boolean;
 }
 
 interface TrustedKeyAnchorLockObservation {
@@ -127,7 +133,8 @@ const TRUST_ANCHOR_LOCK_TIMEOUT_MS = 5_000;
 const TRUST_ANCHOR_LOCK_RETRY_MS = 10;
 const TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS = 1_000;
 const TRUST_ANCHOR_LOCK_OWNER_FILE = "owner.json";
-const TRUST_ANCHOR_LOCK_OWNER_FIELDS = ["schemaVersion", "ownerProcessId", "acquiredAtEpochMs", "ownerEventId"] as const;
+const TRUST_ANCHOR_LOCK_OWNER_FIELDS = ["schemaVersion", "ownerProcessId", "ownerProcessStartTimeEpochMs", "acquiredAtEpochMs", "ownerEventId"] as const;
+const TRUST_ANCHOR_PROCESS_START_TOLERANCE_MS = 1_000;
 const TRUST_ANCHOR_LOCK_WAIT = new Int32Array(new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
 
 function hasExactFields(value: unknown, fields: readonly string[]): value is Record<string, unknown> {
@@ -149,7 +156,7 @@ function filesystemErrorCode(error: unknown): string | null {
   return typeof error.code === "string" ? error.code : null;
 }
 
-function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOwner | null {
+function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOwnerRead {
   const ownerPath = join(lockPath, TRUST_ANCHOR_LOCK_OWNER_FILE);
   let descriptor: number | null = null;
   let ownerText: string;
@@ -158,7 +165,7 @@ function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOw
     if (!fstatSync(descriptor).isFile()) throw new Error("trusted device key anchor lock owner must be a regular file");
     ownerText = readFileSync(descriptor, "utf8");
   } catch (error) {
-    if (filesystemErrorCode(error) === "ENOENT") return null;
+    if (filesystemErrorCode(error) === "ENOENT") return { owner: null, present: false };
     if (filesystemErrorCode(error) === "ELOOP") {
       throw new Error("trusted device key anchor lock owner must be a regular file", { cause: error });
     }
@@ -170,29 +177,40 @@ function readTrustedKeyAnchorLockOwner(lockPath: string): TrustedKeyAnchorLockOw
   try {
     value = JSON.parse(ownerText);
   } catch {
-    return null;
+    return { owner: null, present: true };
   }
   if (
     !hasExactFields(value, TRUST_ANCHOR_LOCK_OWNER_FIELDS) ||
     value.schemaVersion !== 1 ||
     !Number.isSafeInteger(value.ownerProcessId) ||
     (value.ownerProcessId as number) < 1 ||
+    !Number.isSafeInteger(value.ownerProcessStartTimeEpochMs) ||
+    (value.ownerProcessStartTimeEpochMs as number) < 0 ||
     !Number.isSafeInteger(value.acquiredAtEpochMs) ||
     (value.acquiredAtEpochMs as number) < 0 ||
     typeof value.ownerEventId !== "string" ||
     !isUuidVersion(value.ownerEventId, 7)
   )
-    return null;
-  return value as unknown as TrustedKeyAnchorLockOwner;
+    return { owner: null, present: true };
+  return { owner: value as unknown as TrustedKeyAnchorLockOwner, present: true };
 }
 
-function processIsDefinitelyDead(processId: number): boolean {
+// information_uuid_v5=2ea93f2d-0e22-5253-80b4-bf94474a994e
+// event_uuid_v7=01a05066-0020-7c7d-8b7f-d9a5c7f64f4b
+// state_transition=OWNER_PID_OBSERVED -> START_ID_COMPARED -> RECOVERY_ALLOWED_OR_BLOCKED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a live PID with an unknown process instance is never treated as dead; only ESRCH or a mismatched self start identity permits recovery.
+function currentProcessStartTimeEpochMs(): number {
+  return Math.max(0, Math.floor(Date.now() - process.uptime() * 1_000));
+}
+
+function processIsDefinitelyDead(owner: TrustedKeyAnchorLockOwner): boolean {
   try {
-    process.kill(processId, 0);
-    return false;
+    process.kill(owner.ownerProcessId, 0);
   } catch (error) {
     return filesystemErrorCode(error) === "ESRCH";
   }
+  if (owner.ownerProcessId !== process.pid) return false;
+  return Math.abs(owner.ownerProcessStartTimeEpochMs - currentProcessStartTimeEpochMs()) > TRUST_ANCHOR_PROCESS_START_TOLERANCE_MS;
 }
 
 function createTrustedKeyAnchorLockOwner(): TrustedKeyAnchorLockOwner {
@@ -200,6 +218,7 @@ function createTrustedKeyAnchorLockOwner(): TrustedKeyAnchorLockOwner {
   return {
     schemaVersion: 1,
     ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
     acquiredAtEpochMs,
     ownerEventId: uuidV7(acquiredAtEpochMs),
   };
@@ -210,8 +229,10 @@ function writeTrustedKeyAnchorLockOwner(lockPath: string, owner: TrustedKeyAncho
 }
 
 function trustedKeyAnchorLockIsOwnedBy(lockPath: string, owner: TrustedKeyAnchorLockOwner): boolean {
-  const currentOwner = readTrustedKeyAnchorLockOwner(lockPath);
-  return currentOwner?.ownerProcessId === owner.ownerProcessId && currentOwner.ownerEventId === owner.ownerEventId;
+  const currentOwner = readTrustedKeyAnchorLockOwner(lockPath).owner;
+  return currentOwner?.ownerProcessId === owner.ownerProcessId &&
+    currentOwner.ownerProcessStartTimeEpochMs === owner.ownerProcessStartTimeEpochMs &&
+    currentOwner.ownerEventId === owner.ownerEventId;
 }
 
 function observeTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number): TrustedKeyAnchorLockObservation | null {
@@ -226,13 +247,16 @@ function observeTrustedKeyAnchorLock(lockPath: string, nowEpochMs: number): Trus
     const directoryIdentity = `unsafe-${lockStats.dev}-${lockStats.ino}`;
     return { directoryIdentity, fingerprint: directoryIdentity, owner: null, recoverable: false };
   }
-  const owner = readTrustedKeyAnchorLockOwner(lockPath);
+  const ownerRead = readTrustedKeyAnchorLockOwner(lockPath);
+  const owner = ownerRead.owner;
   const directoryIdentity = `${lockStats.dev}-${lockStats.ino}`;
   return {
     directoryIdentity,
     fingerprint: `${directoryIdentity}-${owner?.ownerEventId ?? "uninitialized"}`,
     owner,
-    recoverable: owner === null ? nowEpochMs - lockStats.mtimeMs >= TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS : processIsDefinitelyDead(owner.ownerProcessId),
+    recoverable: ownerRead.present
+      ? owner !== null && processIsDefinitelyDead(owner)
+      : nowEpochMs - lockStats.mtimeMs >= TRUST_ANCHOR_LOCK_UNINITIALIZED_GRACE_MS,
   };
 }
 
@@ -275,6 +299,35 @@ function removeObservedTrustedKeyAnchorDirectory(
   }
 }
 
+// information_uuid_v5=70d490ad-c444-5b1e-8360-e1f50150dcfb
+// event_uuid_v7=01a05066-0020-70b2-b906-698975bb8bd6
+// state_transition=STALE_RECOVERY_OBSERVED -> RECOVERY_FENCE_HELD -> CANONICAL_NAME_REUSED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a recovery claim remains a fence while the canonical lock is absent; a new owner must wait until the observed target is removed or restored.
+function recoveryClaimPaths(lockPath: string): string[] {
+  let entries;
+  try {
+    entries = readdirSync(dirname(lockPath), { withFileTypes: true });
+  } catch (error) {
+    if (filesystemErrorCode(error) === "ENOENT") return [];
+    throw error;
+  }
+  const prefix = `${basename(lockPath)}.recovery-`;
+  return entries.filter((entry) => entry.name.startsWith(prefix)).map((entry) => join(dirname(lockPath), entry.name));
+}
+
+function hasActiveTrustedKeyAnchorRecoveryClaim(
+  lockPath: string,
+  afterObservation: ((path: string) => void) | undefined,
+): boolean {
+  for (const claimPath of recoveryClaimPaths(lockPath)) {
+    const observed = observeTrustedKeyAnchorLock(claimPath, Date.now());
+    if (!observed) continue;
+    if (!observed.recoverable) return true;
+    if (!removeObservedTrustedKeyAnchorDirectory(claimPath, observed, afterObservation)) return true;
+  }
+  return false;
+}
+
 function tryAcquireTrustedKeyAnchorRecoveryClaim(
   lockPath: string,
   directoryIdentity: string,
@@ -305,7 +358,13 @@ function tryAcquireTrustedKeyAnchorRecoveryClaim(
 
 function releaseTrustedKeyAnchorRecoveryClaim(claim: TrustedKeyAnchorRecoveryClaim): void {
   const current = observeTrustedKeyAnchorLock(claim.path, Date.now());
-  if (!current || current.owner?.ownerProcessId !== claim.owner.ownerProcessId || current.owner.ownerEventId !== claim.owner.ownerEventId) return;
+  const currentOwner = current?.owner;
+  if (
+    !currentOwner ||
+    currentOwner.ownerProcessId !== claim.owner.ownerProcessId ||
+    currentOwner.ownerProcessStartTimeEpochMs !== claim.owner.ownerProcessStartTimeEpochMs ||
+    currentOwner.ownerEventId !== claim.owner.ownerEventId
+  ) return;
   removeObservedTrustedKeyAnchorDirectory(claim.path, current, undefined);
 }
 
@@ -335,7 +394,11 @@ function cleanupFailedTrustedKeyAnchorLockInitialization(
     const current = observeTrustedKeyAnchorLock(lockPath, Date.now());
     if (
       current?.directoryIdentity === createdDirectoryIdentity &&
-      (current.owner === null || (current.owner.ownerProcessId === attemptedOwner.ownerProcessId && current.owner.ownerEventId === attemptedOwner.ownerEventId))
+      (current.owner === null || (
+        current.owner.ownerProcessId === attemptedOwner.ownerProcessId &&
+        current.owner.ownerProcessStartTimeEpochMs === attemptedOwner.ownerProcessStartTimeEpochMs &&
+        current.owner.ownerEventId === attemptedOwner.ownerEventId
+      ))
     ) {
       removeObservedTrustedKeyAnchorDirectory(lockPath, current, afterObservation);
     }
@@ -356,11 +419,30 @@ function withTrustedKeyAnchorLock<T>(
   let owner: TrustedKeyAnchorLockOwner | null = null;
   let ownerFingerprint: string | null = null;
   while (true) {
+    if (hasActiveTrustedKeyAnchorRecoveryClaim(lockPath, afterRecoveryObservation)) {
+      if (Date.now() >= deadline) {
+        throw new Error("timed out waiting for the trusted device key anchor lock");
+      }
+      Atomics.wait(TRUST_ANCHOR_LOCK_WAIT, 0, 0, TRUST_ANCHOR_LOCK_RETRY_MS);
+      continue;
+    }
     try {
       mkdirSync(lockPath, { mode: 0o700 });
       const createdDirectoryIdentity = observeTrustedKeyAnchorLock(lockPath, Date.now())?.directoryIdentity;
       if (createdDirectoryIdentity === undefined) {
         throw new Error("trusted device key anchor lock directory identity is unreadable");
+      }
+      if (hasActiveTrustedKeyAnchorRecoveryClaim(lockPath, afterRecoveryObservation)) {
+        removeObservedTrustedKeyAnchorDirectory(
+          lockPath,
+          { directoryIdentity: createdDirectoryIdentity, fingerprint: `${createdDirectoryIdentity}-uninitialized` },
+          undefined,
+        );
+        if (Date.now() >= deadline) {
+          throw new Error("timed out waiting for the trusted device key anchor lock");
+        }
+        Atomics.wait(TRUST_ANCHOR_LOCK_WAIT, 0, 0, TRUST_ANCHOR_LOCK_RETRY_MS);
+        continue;
       }
       owner = createTrustedKeyAnchorLockOwner();
       try {

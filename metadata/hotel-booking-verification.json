@@ -5,11 +5,11 @@
     "observationUuidV7": "01a04dcb-8678-76bf-b181-d86c21eaa1ea"
   },
   "observedAt": "2026-08-29T13:52:59.000Z",
-  "sourceCommit": "CHECKOUT_TREE",
+  "sourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
   "sourceState": "DEPLOYED_CURRENT",
   "sourceProvenance": {
     "providerReportedCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
-    "providerCommitReachability": "OFF_HISTORY",
+    "providerCommitReachability": "REACHABLE",
     "reproducibilityBoundary": "FULL_SITES_PACKAGE_DIGEST"
   },
   "artifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
@@ -40,7 +40,7 @@
   "scope": "Fictional device-local hotel booking demo; no real booking, payment, email, external cancellation, or personal information.",
   "liveDeployment": {
     "functionalSourceCommit": "5ac1fe51a29800eb052f9a63e7311559b7c01e45",
-    "deployedVersionSourceCommit": "CHECKOUT_TREE",
+    "deployedVersionSourceCommit": "f832cc611ed43613035a8735ca97d4bc1a0a8efc",
     "functionalArtifactDigest": "06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132",
     "fullSitesPackageDigest": "221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15",
     "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_feeff1aa402c8191a02e0945d9cdd04e",
@@ -51,7 +51,7 @@
     "accessMode": "PUBLIC",
     "status": "CURRENT_ARTIFACT_VERIFIED",
     "observedAt": "2026-08-29T13:52:59.000Z",
-    "evidence": "Sites version 12 and deployment readback reported provider source commit f832cc611ed43613035a8735ca97d4bc1a0a8efc, but that commit is not assumed reachable in every reviewed checkout. The current tracked checkout is therefore the source boundary, and the full package digest 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15 is the reproducibility boundary. The deployment succeeded at the public URL. Anonymous requests returned HTTP 200; app.js, index.css, service-worker.js, and service-integrations.json matched the local bytes, including registry SHA-256 9dea4961b965174e088a3b7004f9e85a9938e8c134f8a96f605025ee957931fe. Cloudflare appended a challenge script to the root HTML, so root-byte identity is not claimed. A fresh version 10 browser run directly proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 12 retains the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132; that earlier runtime proof is carried forward and is not described as a new browser run."
+    "evidence": "Sites version 12 and deployment readback reported provider source commit f832cc611ed43613035a8735ca97d4bc1a0a8efc, which is reachable from the reviewed main history. The full package digest 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15 remains the reproducibility boundary. The deployment succeeded at the public URL. Anonymous requests returned HTTP 200; app.js, index.css, service-worker.js, and service-integrations.json matched the local bytes, including registry SHA-256 9dea4961b965174e088a3b7004f9e85a9938e8c134f8a96f605025ee957931fe. Cloudflare appended a challenge script to the root HTML, so root-byte identity is not claimed. A fresh version 10 browser run directly proved PREPARED -> COMMITTED -> RETRY_RECOGNIZED, two attempts to one booking and one effect start, four WebMCP tools, and confirmation FKR-7EF2A00FA2. Version 12 retains the identical functional digest 06a753e5cd240eebd0663c57031a0993e87cbb87c7d61401eb220dbacd91e132; that earlier runtime proof is carried forward and is not described as a new browser run."
   },
   "checks": [
     {
@@ -130,7 +130,7 @@
       "checkId": "e72277c5-f851-57da-a456-bfffc43f9479",
       "name": "ChatGPT Sites live execution",
       "status": "PASS",
-      "evidence": "The public production URL loaded Sites version 12 anonymously. Provider source commit f832cc611ed43613035a8735ca97d4bc1a0a8efc is retained as an observation only because it is off-history in a reviewed checkout; the current tracked checkout and full Sites package digest 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15 form the reproducibility boundary. The full Sites package matched that digest. Its root, app.js, index.css, service-worker.js, and service-integrations.json returned HTTP 200; the four static files matched local bytes, while Cloudflare's root-HTML script injection is recorded separately. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 12 has the identical functional digest, so the runtime proof is carried forward without claiming a new browser run. Devpost submission 1158722 is final, and its anonymous Open Graph title and hotel image are current."
+      "evidence": "The public production URL loaded Sites version 12 anonymously and reported provider source commit f832cc611ed43613035a8735ca97d4bc1a0a8efc, which is an ancestor of the reviewed main history. The full Sites package digest 221b58c9ca984b58031b532402824e1877951c7b73844a8f32aacc895e1e1f15 remains the generated-artifact boundary and matched the local package. Its root, app.js, index.css, service-worker.js, and service-integrations.json returned HTTP 200; the four static files matched local bytes, while Cloudflare's root-HTML script injection is recorded separately. A fresh version 10 run directly proved four WebMCP tools, separate human confirmation, PREPARED -> COMMITTED -> RETRY_RECOGNIZED, 2 attempts to 1 booking and 1 effect start with confirmation FKR-7EF2A00FA2. Version 12 has the identical functional digest, so the runtime proof is carried forward without claiming a new browser run. Devpost submission 1158722 is final, and its anonymous Open Graph title and hotel image are current."
     },
     {
       "checkId": "d81f9523-0616-59e8-8bf5-46339ed98b57",

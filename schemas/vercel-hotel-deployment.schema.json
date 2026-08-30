@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/vercel-hotel-deployment.schema.json",
-  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04dbc-fbd0-7f5a-a66e-d3a9c1de9f50 state_transition=DEVPOST_VERSION_11_REGISTRY_CURRENT_ARTIFACT_VERIFIED -> PROVIDER_COMMIT_OFF_HISTORY_CURRENT_ARTIFACT_VERIFIED occurred_at=2026-08-30T00:00:00.000Z machine-contract=The hotel fallback is current only after provider READY, a provider-reported clean commit explicitly marked off-history, five anonymous matching files including the Devpost registry, and a bounded warning and error readback agree with the current checkout artifact digest",
+  "$comment": "information_uuid_v5=b5e254dc-08a3-59e9-a4dd-f2215b184964 event_uuid_v7=01a04dbc-fbd0-7f5a-a66e-d3a9c1de9f50 state_transition=DEVPOST_VERSION_11_REGISTRY_CURRENT_ARTIFACT_VERIFIED -> PROVIDER_COMMIT_REACHABLE_CURRENT_ARTIFACT_VERIFIED occurred_at=2026-08-30T00:00:00.000Z machine-contract=The hotel fallback is current only after provider READY, a reachable clean provider commit, five anonymous matching files including the Devpost registry, and bounded warning and error readback agree with the current artifact digest",
   "title": "Vercel hotel deployment receipt",
   "type": "object",
   "additionalProperties": false,
@@ -63,6 +63,10 @@
     },
     "sourceCommit": {
       "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "providerSourceCommit": {
+      "type": "string",
       "pattern": "^(?:[0-9a-f]{40}|CHECKOUT_TREE|OFF_HISTORY)$"
     },
     "projectId": {
@@ -90,7 +94,7 @@
       "required": ["from", "to", "eventId", "occurredAt", "machineContract"],
       "properties": {
         "from": { "const": "DEVPOST_VERSION_11_REGISTRY_CURRENT_ARTIFACT_VERIFIED" },
-        "to": { "const": "PROVIDER_COMMIT_OFF_HISTORY_CURRENT_ARTIFACT_VERIFIED" },
+        "to": { "const": "PROVIDER_COMMIT_REACHABLE_CURRENT_ARTIFACT_VERIFIED" },
         "eventId": { "$ref": "#/$defs/uuidV7" },
         "occurredAt": { "$ref": "#/$defs/observedAt" },
         "machineContract": { "type": "string", "minLength": 40, "maxLength": 500 }
@@ -150,8 +154,8 @@
         "projectId": { "$ref": "#/$defs/projectId" },
         "projectName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
         "deploymentId": { "$ref": "#/$defs/deploymentId" },
-        "sourceState": { "const": "PROVIDER_COMMIT_OFF_HISTORY" },
-        "providerGitCommit": { "$ref": "#/$defs/sourceCommit" },
+        "sourceState": { "const": "PROVIDER_COMMIT_REACHABLE" },
+        "providerGitCommit": { "$ref": "#/$defs/providerSourceCommit" },
         "providerGitCommitObservation": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "providerGitDirty": { "const": false },
         "uniqueUrl": { "type": "string", "format": "uri", "pattern": "^https://[a-z0-9-]+\\.vercel\\.app$" },

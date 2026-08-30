@@ -95,6 +95,10 @@ function fixture(name: string): { directory: string; database: string; close(): 
   };
 }
 
+function currentProcessStartTimeEpochMs(): number {
+  return Math.max(0, Math.floor(Date.now() - process.uptime() * 1_000));
+}
+
 function spawnConcurrentIngest(
   databasePath: string,
   payloadPath: string,
@@ -589,6 +593,7 @@ test("trust-anchor lock recovers abnormal termination but never displaces a live
       `${JSON.stringify({
         schemaVersion: 1,
         ownerProcessId: abandonedOwnerProcess.pid,
+        ownerProcessStartTimeEpochMs: 0,
         acquiredAtEpochMs: deadOwnerEpochMs,
         ownerEventId: uuidV7(deadOwnerEpochMs),
       })}\n`,
@@ -611,6 +616,7 @@ test("trust-anchor lock recovers abnormal termination but never displaces a live
     const liveOwner = {
       schemaVersion: 1,
       ownerProcessId: process.pid,
+      ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
       acquiredAtEpochMs: liveOwnerEpochMs,
       ownerEventId: uuidV7(liveOwnerEpochMs),
     };
@@ -638,6 +644,79 @@ test("trust-anchor lock recovers abnormal termination but never displaces a live
   }
 });
 
+// information_uuid_v5=2ea93f2d-0e22-5253-80b4-bf94474a994e
+// event_uuid_v7=01a05066-0020-7c7d-8b7f-d9a5c7f64f4b
+// state_transition=PID_REUSE_SIMULATED -> START_ID_MISMATCH -> RECOVERED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a reused PID with a different process-start identity is recoverable, while a matching live identity remains protected.
+test("trust-anchor lock distinguishes a reused PID from the current process", () => {
+  const item = fixture("reused-pid");
+  const now = clock();
+  const identity = createDeviceIdentity("reused-pid");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  try {
+    mkdirSync(lockPath, { mode: 0o700 });
+    const staleEpochMs = Date.now() - 60_000;
+    writeFileSync(
+      join(lockPath, "owner.json"),
+      `${JSON.stringify({
+        schemaVersion: 1,
+        ownerProcessId: process.pid,
+        ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs() - 60_000,
+        acquiredAtEpochMs: staleEpochMs,
+        ownerEventId: uuidV7(staleEpochMs),
+      })}\n`,
+      { encoding: "utf8", mode: 0o600, flag: "wx" },
+    );
+
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 80 });
+    ledger.registerDevice(identity, log.publicKeyPem());
+    assert.equal(existsSync(lockPath), false);
+    assert.equal(ledger.verifyGlobalChain().valid, true);
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
+// information_uuid_v5=70d490ad-c444-5b1e-8360-e1f50150dcfb
+// event_uuid_v7=01a05066-0020-70b2-b906-698975bb8bd6
+// state_transition=RECOVERY_CLAIM_PRESENT_WITHOUT_CANONICAL_LOCK -> ACQUISITION_BLOCKED -> CLAIM_PRESERVED occurred_at=2026-08-30T02:00:00.000Z
+// machine-contract: a recovery claim fences the canonical lock name even during the rename-and-identity-check gap.
+test("trust-anchor lock waits while a recovery claim fences an absent canonical name", () => {
+  const item = fixture("recovery-fence");
+  const now = clock();
+  const identity = createDeviceIdentity("recovery-fence");
+  const log = new SignedDeviceLog(identity, { now });
+  const anchorPath = trustAnchorPathForDatabase(item.database)!;
+  const lockPath = `${anchorPath}.lock`;
+  const recoveryClaimPath = `${lockPath}.recovery-fence`;
+  const ownerEpochMs = Date.now();
+  const owner = {
+    schemaVersion: 1,
+    ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
+    acquiredAtEpochMs: ownerEpochMs,
+    ownerEventId: uuidV7(ownerEpochMs),
+  };
+  try {
+    mkdirSync(recoveryClaimPath, { mode: 0o700 });
+    writeFileSync(join(recoveryClaimPath, "owner.json"), `${JSON.stringify(owner)}\n`, {
+      encoding: "utf8",
+      mode: 0o600,
+      flag: "wx",
+    });
+    const ledger = new LocalSyncLedger(item.database, { now, trustAnchorLockTimeoutMs: 40 });
+    assert.throws(() => ledger.registerDevice(identity, log.publicKeyPem()), /timed out waiting for the trusted device key anchor lock/);
+    assert.equal(existsSync(lockPath), false);
+    assert.deepEqual(JSON.parse(readFileSync(join(recoveryClaimPath, "owner.json"), "utf8")), owner);
+    ledger.close();
+  } finally {
+    item.close();
+  }
+});
+
 test("failed lock initialization preserves a replacement live owner's directory", () => {
   const item = fixture("lock-initialization-replacement");
   const now = clock();
@@ -649,6 +728,7 @@ test("failed lock initialization preserves a replacement live owner's directory"
   const replacementOwner = {
     schemaVersion: 1,
     ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
     acquiredAtEpochMs: replacementEpochMs,
     ownerEventId: uuidV7(replacementEpochMs),
   };
@@ -695,6 +775,7 @@ test("a replaced recovery claim survives the stale observer's quarantine attempt
   const replacementOwner = {
     schemaVersion: 1,
     ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
     acquiredAtEpochMs: replacementEpochMs,
     ownerEventId: uuidV7(replacementEpochMs),
   };
@@ -747,6 +828,7 @@ test("a replaced main lock survives a stale recovery observer", () => {
   const replacementOwner = {
     schemaVersion: 1,
     ownerProcessId: process.pid,
+    ownerProcessStartTimeEpochMs: currentProcessStartTimeEpochMs(),
     acquiredAtEpochMs: replacementEpochMs,
     ownerEventId: uuidV7(replacementEpochMs),
   };

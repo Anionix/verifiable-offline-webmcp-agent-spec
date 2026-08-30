@@ -6,7 +6,7 @@
 // WebMCP run, and release digests into one deterministic hard-gate receipt.
 
 import assert from "node:assert/strict";
-import { execFileSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
@@ -21,11 +21,11 @@ import {
   fullSitesPackageDigestScope,
   sitesPackageRoot,
 } from "./hotel-validator-common.mjs";
+import { validateReleaseContext } from "./release-validation-context.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const candidatePath = resolve(repositoryRoot, "metadata/hotel-release-candidate.json");
 const sourceTestDirectory = resolve(repositoryRoot, "src/typescript");
-const candidateBaseRef = "origin/codex/hotel-release-package";
 const publicReadbackPath = "metadata/hotel-public-release-readback.json";
 const nativeEvidencePath = "metadata/hotel-native-webmcp-reconciliation.json";
 const publicEvaluationsPath = "examples/hotel-booking-demo/public/webmcp-evals.json";
@@ -33,10 +33,6 @@ const informationUuidV5 = "f2da6444-7447-5120-a39d-446adda200ca";
 const expectedTools = Object.freeze(["check_existing_hotel_booking", "prepare_hotel_booking", "get_hotel_booking_status", "preview_hotel_cancellation"]);
 const forbiddenTools = Object.freeze(["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]);
 const requiredChromeFlags = Object.freeze(["#devtools-webmcp-support", "#enable-webmcp-testing"]);
-
-function command(name, args, cwd = repositoryRoot) {
-  return execFileSync(name, args, { cwd, encoding: "utf8" }).trim();
-}
 
 function deterministicUuid7(observedAt, seed) {
   const epochMs = Date.parse(observedAt);
@@ -73,15 +69,6 @@ function runTests() {
 
 async function readJson(path) {
   return JSON.parse(await readFile(resolve(repositoryRoot, path), "utf8"));
-}
-
-function assertCommit(value, label) {
-  assert.match(value, /^[0-9a-f]{40}$/u, `${label} must be a full commit hash`);
-  command("git", ["cat-file", "-e", `${value}^{commit}`]);
-}
-
-function assertDescendant(commit, descendant) {
-  command("git", ["merge-base", "--is-ancestor", commit, descendant]);
 }
 
 function assertExactArray(actual, expected, label) {
@@ -134,14 +121,11 @@ async function buildCandidate() {
   const sourceCommit = publicReadback.release.sourceCommit;
   const baseCommit = publicReadback.release.baseCommit;
   const branch = publicReadback.release.branch;
-  assertCommit(sourceCommit, "release source commit");
-  assertCommit(baseCommit, "release base commit");
-  assert.equal(command("git", ["merge-base", "HEAD", candidateBaseRef]), baseCommit, "release base changed");
-  assertDescendant(sourceCommit, "HEAD");
-  // machine-contract: pull-request checkouts are detached; GitHub exposes the
-  // source branch through GITHUB_HEAD_REF, while local release checks use Git.
-  const checkoutBranch = process.env.GITHUB_HEAD_REF || command("git", ["branch", "--show-current"]);
-  assert.equal(checkoutBranch, branch, "release branch changed");
+  validateReleaseContext({
+    repositoryRoot,
+    baseCommit,
+    sourceCommit,
+  });
 
   assert.equal(publicReadback.release.status, "COMMITTED_RELEASE");
   assert.equal(publicReadback.release.testRun.testCount, testRun.total, "public release test count differs from npm test");

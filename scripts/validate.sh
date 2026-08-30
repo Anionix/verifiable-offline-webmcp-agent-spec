@@ -18,6 +18,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$ROOT/.local"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$ROOT/.local/uv-cache}"
 npm --prefix "$ROOT" run quality:check
+node "$ROOT/scripts/test_validate_hotel_release_candidate_context.mjs"
 uv run --frozen python "$ROOT/scripts/validate_python_type_tools.py"
 uv run --frozen python "$ROOT/scripts/validate_repo.py" --report "$ROOT/.local/build-report.json"
 node "$ROOT/scripts/build_web_site.mjs"

@@ -8,20 +8,25 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// machine-contract: the positive boundary covers Vite publicDir, hotel runtime and test source, build entry configuration, and the package inputs used to run and build the candidate. Documentation, metadata, and validation control remain under their own checks.
+// machine-contract: the positive boundary covers executable TypeScript and demo source, data and schema fixtures, and named runtime/build/release metadata inputs. Unlisted documentation, metadata, and validation control remain under their own checks.
 const squashValidationInputPrefixes = Object.freeze([
-  "examples/hotel-booking-demo/",
-  "src/typescript/hotel/",
-  "src/typescript/test/",
+  "src/typescript/",
+  "examples/",
+  "data/",
+  "schemas/",
 ]);
 const squashValidationInputPaths = Object.freeze([
+  ".node-version",
   "index.html",
   "package.json",
   "package-lock.json",
+  "metadata/service-integration-registry.json",
+  "metadata/offline-sync-verification.json",
+  "metadata/online-planner-verification.json",
+  "metadata/slo-gate-verification.json",
   "scripts/build_web_site.mjs",
-  "src/typescript/package.json",
-  "src/typescript/package-lock.json",
   "vite.config.js",
+  "wrangler.jsonc",
 ]);
 const squashValidationDocumentationPaths = Object.freeze([
   "examples/hotel-booking-demo/README.md",

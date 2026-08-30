@@ -193,6 +193,11 @@ async function createRenameSquashRepository({ destinationPath, currentFiles }) {
 
 const directReleaseConfigurationDrifts = Object.freeze([
   {
+    path: ".node-version",
+    source: "24.15.0\n",
+    current: "24.14.0\n",
+  },
+  {
     path: "package-lock.json",
     source: '{"name":"root-source","lockfileVersion":3,"packages":{}}\n',
     current: '{"name":"root-current","lockfileVersion":3,"packages":{}}\n',
@@ -206,6 +211,26 @@ const directReleaseConfigurationDrifts = Object.freeze([
     path: "src/typescript/package.json",
     source: '{"scripts":{"test":"node --test source-suite.test.js"}}\n',
     current: '{"scripts":{"test":"node --test current-suite.test.js"}}\n',
+  },
+  {
+    path: "schemas/hotel-booking-tool-input.schema.json",
+    source: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"source"}\n',
+    current: '{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"current"}\n',
+  },
+  {
+    path: "src/typescript/canonical.ts",
+    source: 'export const CANONICAL_FIXTURE = "source";\n',
+    current: 'export const CANONICAL_FIXTURE = "current";\n',
+  },
+  {
+    path: "data/golden-vectors.json",
+    source: '{"name":"golden-vectors","version":"source","vectors":[]}\n',
+    current: '{"name":"golden-vectors","version":"current","vectors":[]}\n',
+  },
+  {
+    path: "metadata/offline-sync-verification.json",
+    source: '{"status":"PASS","source":"source"}\n',
+    current: '{"status":"PASS","source":"current"}\n',
   },
 ]);
 

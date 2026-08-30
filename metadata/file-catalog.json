@@ -2296,8 +2296,8 @@
     },
     {
       "path": "docs/source-map.md",
-      "sha256": "28f3b2a86af5bcaa18a19389ea7d92ad78b57e77007fbea1b5ac72629a7a3af2",
-      "bytes": 15511,
+      "sha256": "3895f1ab431d8b62a073c0fad4f631d3ddae4ded32e0023d7547f7de60ad20ea",
+      "bytes": 20732,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {

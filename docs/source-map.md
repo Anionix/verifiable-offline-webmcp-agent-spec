@@ -16,6 +16,29 @@ status: "design-specification"
 
 Each source record also exists in [`knowledge/sources.json`](../knowledge/sources.json).
 
+## Kyoto Booking Retry Proof evidence map / 京都ホテル再送の証拠対応表
+
+<!-- event_uuid_v7=01a0538a-86ff-7649-893a-19400c01cee9 occurred_at=2026-08-30T16:39:42.591Z state_transition=SOURCE_MAP_BASELINE -> HOTEL_EVIDENCE_MAP_ADDED -->
+
+Start with the existing [60-second judge path / 60秒手順](../examples/hotel-booking-demo/README.md#60-second-judge-path). / 最初に既存の60秒手順を読みます。
+
+It lists the four safe tools—`check_existing_hotel_booking`, `prepare_hotel_booking`, `get_hotel_booking_status`, and `preview_hotel_cancellation`—and says only the visible human button confirms; retry ends at `RETRY_RECOGNIZED`. / 4つの安全な機能を確認し、確定は画面の人だけが行い、再試行後に`RETRY_RECOGNIZED`を見ます。
+
+The four pairs below point both ways in the ledgers. Hotel evidence is related evidence, not a replacement for the general test. / 次の4組は台帳を双方向に結びます。ホテル証拠は関連証拠であり、一般試験の代わりではありません。
+
+Common provenance / 共通の出所: this document uses repository base `5583cdbeddbbeae2c6f16fd481fc809069a15296`. The [hotel verification record](../metadata/hotel-booking-verification.json) uses source `f832cc611ed43613035a8735ca97d4bc1a0a8efc`, observed `2026-08-29T13:52:59.000Z`, Sites version 12, and [this Sites URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site). The [native reconciliation record](../metadata/hotel-native-webmcp-reconciliation.json) and [public release readback](../metadata/hotel-public-release-readback.json) use source `c8be388d8047472ef7d6ad69656255adb5903e37`; observations are `2026-08-30T13:53:37.248Z` and `2026-08-30T13:56:24.118Z` at [Vercel](https://kyoto-booking-retry-proof.vercel.app/) and its [evaluation file](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json). The `c8be...` observation is not rewritten as a `5583...` execution. / この文書の基準は`5583...`です。SitesとVercelの記録は、それぞれ元の時刻とsourceを保ちます。
+
+The ledgers are [`knowledge/requirements.json`](../knowledge/requirements.json) and [`knowledge/tests.json`](../knowledge/tests.json); the catalog is [`metadata/file-catalog.json`](../metadata/file-catalog.json). Source basis is the existing [SRC-WEBMCP-2026](#src-webmcp-2026), [SRC-TLA-LAMPORT](#src-tla-lamport), [SRC-PROVO-2013](#src-provo-2013), and [SRC-DCAT3-2024](#src-dcat3-2024) records, plus the official [Open Knowledge Format specification](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md) and [Knowledge Catalog OKF specification](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/HEAD/okf/SPEC.md). No authentication, broad WebMCP conformance, or Open Knowledge Format conformance claim is added. / 認証や広い適合を新しく主張しません。
+
+| Read order / 読む順番 | General requirement / 一般要件 | General test / 一般試験 | Hotel evidence / ホテル証拠 | Status / 状態 | Time and version / 時刻と版 |
+|---|---|---|---|---|---|
+| 1. Read status first / 先に状態を読む | `REQ-EXEC-002`<br>不明な結果から変更操作へ直接再送しない / Do not retry a change directly from an unknown result. | `TEST-MODEL-002`<br>一般の有限状態モデル試験 / General finite-state model test. | Native reconciliation: status read found `COMMITTED`, then retry reached `RETRY_RECOGNIZED`; human confirmation only. | `PASS` in the native record. | `2026-08-30` / Vercel |
+| 2. Keep one effect / 効果を一回にする | `REQ-EXEC-003`<br>同じ意思の効果は高々1回 / The same intent starts an effect at most once. | `TEST-MODEL-003`<br>一般の有限状態モデル試験 / General finite-state model test. | `311a96f7-7859-5b7f-baf2-17e39b83502d`: 2 attempts → 1 booking. | `PASS` | `2026-08-29` / Sites v12 |
+| 3. Read back / 読み戻す | `REQ-TOOL-003`<br>書き込みの結果は読み戻して確かめる / Check a write result by reading it back. | `TEST-VERIFY-001`<br>一般の通知デモ向け試験 / General notification-demo test. | `6f65cf02-40eb-51c3-bdbc-4d532082fe0e`: Google Chrome page and WebMCP runtime. Native reconciliation separately records the read-before-retry flow. | Hotel verification: `INCONCLUSIVE`.<br>Native record: `PASS`. | `2026-08-29` / Sites v12; `2026-08-30` / Vercel |
+| 4. Separate claim and observation / 主張と観測を分ける | `REQ-AUDIT-010`<br>記録された主張と独立した観測を分ける / Separate a recorded claim from an independent observation. | `TEST-VERIFY-003`<br>一般の証拠分離試験 / General claim-versus-observation test. | `e72277c5-f851-57da-a456-bfffc43f9479`: ChatGPT Sites live execution. | `PASS` (related hotel evidence). | `2026-08-29` / Sites v12 |
+
+The three hotel-verification `INCONCLUSIVE` states remain so: Chrome/WebMCP runtime, keyboard focus, and screen-reader announcement. Local-video-to-public-video identity remains `UNMEASURED` in [`metadata/demo-video-production.json`](../metadata/demo-video-production.json). / ホテル確認の3件の`INCONCLUSIVE`と、動画同一性の`UNMEASURED`はそのままです。
+
 ## SRC-OPENAI-RESPONSES-CREATE-2026
 
 - **Title:** OpenAI Responses API Create Response reference

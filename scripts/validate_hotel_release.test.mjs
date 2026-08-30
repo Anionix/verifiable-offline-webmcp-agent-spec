@@ -230,6 +230,83 @@ test(
 );
 
 test(
+  "rejects a root symlink swapped after lstat before descriptor enumeration",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    const outsideDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-root-fd-race-"));
+    try {
+      await writeFile(resolve(outsideDirectory, "outside.txt"), "outside release root\n");
+      await withFixture({}, async (releaseRoot) => {
+        const originalRoot = `${releaseRoot}.original`;
+        let originalRootMoved = false;
+        try {
+          await assert.rejects(
+            () =>
+              validateRelease(releaseRoot, {
+                afterDirectoryLstat: async (relativeDirectory) => {
+                  if (relativeDirectory !== "") return;
+                  await rename(releaseRoot, originalRoot);
+                  originalRootMoved = true;
+                  await symlink(outsideDirectory, releaseRoot);
+                },
+              }),
+            /ELOOP|ENOTDIR|too many symbolic links/u,
+          );
+        } finally {
+          if (originalRootMoved) {
+            await rm(releaseRoot, { recursive: true, force: true });
+            await rename(originalRoot, releaseRoot);
+          }
+          await rm(originalRoot, { recursive: true, force: true });
+        }
+      });
+    } finally {
+      await rm(outsideDirectory, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "rejects a nested symlink swapped after lstat before descriptor enumeration",
+  { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
+  async () => {
+    const outsideDirectory = await mkdtemp(resolve(tmpdir(), "webmcp-issue-205-nested-fd-race-"));
+    try {
+      await mkdir(resolve(outsideDirectory, "group"));
+      await writeFile(resolve(outsideDirectory, "group/release-note.txt"), "outside nested directory\n");
+      await withFixture({}, async (releaseRoot) => {
+        await addNestedChecksummedFile(releaseRoot);
+        const nestedPath = resolve(releaseRoot, "nested");
+        const originalNestedPath = `${releaseRoot}.nested-original`;
+        let originalNestedMoved = false;
+        try {
+          await assert.rejects(
+            () =>
+              validateRelease(releaseRoot, {
+                afterDirectoryLstat: async (relativeDirectory) => {
+                  if (relativeDirectory !== "nested") return;
+                  await rename(nestedPath, originalNestedPath);
+                  originalNestedMoved = true;
+                  await symlink(outsideDirectory, nestedPath);
+                },
+              }),
+            /ELOOP|ENOTDIR|too many symbolic links/u,
+          );
+        } finally {
+          if (originalNestedMoved) {
+            await rm(nestedPath, { recursive: true, force: true });
+            await rename(originalNestedPath, nestedPath);
+          }
+          await rm(originalNestedPath, { recursive: true, force: true });
+        }
+      });
+    } finally {
+      await rm(outsideDirectory, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
   "rejects a release root replaced with hardlinks after the final hash read",
   { skip: process.platform === "win32" ? "Windows validator is unsupported" : false },
   async () => {

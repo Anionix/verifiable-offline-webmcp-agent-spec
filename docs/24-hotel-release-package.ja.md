@@ -28,6 +28,8 @@ shasum -a 256 -c SHA256SUMS
 
 この配布物検査は、安全なリンク追従なしのファイルオープンを保証できないためWindowsでは利用できません。これはブラウザーデモ本体とは別の制限です。
 
+POSIXでは、ディレクトリをNodeの`O_NOFOLLOW|O_DIRECTORY`で開き、fd 3だけを分離Python helperへ渡して`os.listdir(3)`で名前を読みます。時間と出力を制限し、配布物のpathはhelperへ渡しません。根拠は[Node.js v24.15 fs](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html)、[Node.js child_process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio)、[Python os.listdir](https://docs.python.org/3.14/library/os.html#os.listdir)です。これはディレクトリ列挙の保護であり、原子的snapshotの主張ではありません。
+
 JSONは、元コミット、コミット時刻、UUIDv5、決定的UUIDv7、機能部分・全クライアント・全Sites包装の三つのSHA-256要約値、公開先、YouTube動画、60秒の四手順、各内容ファイルの大きさとSHA-256を記録します。`SHA256SUMS`はJSON目録自身も検査しますが、自分自身は列挙しないため、自己参照による要約値の循環はありません。
 
 同じコミットで再生成した二つの要約値一覧が一致することは、次で確認できます。

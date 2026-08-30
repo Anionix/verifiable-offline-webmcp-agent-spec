@@ -30,6 +30,8 @@ Video binaries, credentials, environment files, personal information, and real b
 
 The release-package validator is unavailable on Windows because safe non-following file opens cannot be guaranteed; this is separate from the browser demo itself.
 
+On POSIX, directory reads use a Node `O_NOFOLLOW|O_DIRECTORY` descriptor, pass only fd 3 to an isolated Python helper, and call `os.listdir(3)` with bounded time and output. See the [Node.js v24.15 file-system API](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html), [Node.js child-process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio), and [Python `os.listdir`](https://docs.python.org/3.14/library/os.html#os.listdir) references. This protects the directory-listing step but does not claim an atomic snapshot.
+
 ## Reproduce the package
 
 Run from one clean, committed source checkout. The builder stops if the working tree is dirty, if the source commit changes, if a required public-evidence digest differs, or if Gitleaks is unavailable.

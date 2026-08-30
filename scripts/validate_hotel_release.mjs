@@ -9,8 +9,10 @@
 // event_uuid_v7=01a05478-ac4b-704b-aca2-769202026762 state_transition=RELEASE_BYTES_INITIAL_HASHED -> RELEASE_BYTES_FINAL_HASH_VERIFIED occurred_at=2026-08-30T20:59:49.707Z
 // event_uuid_v7=01a05490-b710-7496-8f7c-77058578081e state_transition=RELEASE_BYTES_FINAL_HASH_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:26:05.328Z
 // event_uuid_v7=01a05499-4fe4-7433-9cef-be33da14a776 state_transition=RELEASE_ANCESTOR_CHAIN_UNVERIFIED -> RELEASE_ANCESTOR_CHAIN_VERIFIED occurred_at=2026-08-30T21:35:28.740Z
+// event_uuid_v7=01a054a4-27a9-75a2-8762-c0fd4bcb86f0 state_transition=RELEASE_DIRECTORY_ENUMERATION_UNBOUND -> RELEASE_DIRECTORY_FD3_ENUMERATION_VERIFIED occurred_at=2026-08-30T21:47:19.337Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
+// machine-contract: each directory is opened with O_NOFOLLOW|O_DIRECTORY and fstat-bound before its names are read from fd 3 by an isolated helper that receives no release path.
 // machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
 // machine-contract: a second final release-tree enumeration follows the final hash reads to detect path-set or identity races at that boundary; this remains a bounded race check, not an atomic snapshot.
 // machine-contract: the Node 24.15 CLI entrypoint check must not depend on the spelling or realpath of a filesystem symlink.
@@ -18,15 +20,20 @@
 // machine-contract: every initial snapshot byte stream is hashed and each final non-following descriptor read must reproduce that hash; this detects same-inode rewrites but does not promise an atomic snapshot or prohibit later writes.
 
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { constants } from "node:fs";
-import { lstat, open, readdir } from "node:fs/promises";
+import { lstat, open } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const defaultReleaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
 const safeFileOpenFlags = constants.O_RDONLY | constants.O_NONBLOCK | (process.platform === "win32" ? 0 : constants.O_NOFOLLOW);
+const safeDirectoryOpenFlags = constants.O_RDONLY | (constants.O_DIRECTORY ?? 0) | (process.platform === "win32" ? 0 : (constants.O_NOFOLLOW ?? 0));
+const directoryListingHelperPath = resolve(repositoryRoot, "scripts/list_directory_fd.py");
+const directoryListingTimeoutMs = 5_000;
+const directoryListingMaxBuffer = 1024 * 1024;
 const unsupportedPlatformError = "hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed";
 
 function releaseRootFromArguments() {
@@ -105,7 +112,97 @@ async function assertCurrentFile(snapshot, phase) {
   assertIdentity(snapshot.identity, identity(current), `${snapshot.relativePath} changed ${phase}`);
 }
 
-async function regularFiles(releaseRoot, relativeDirectory = "", expectedIdentity = null, ancestorDirectories = []) {
+async function listDirectoryFromDescriptor(directoryHandle, label) {
+  const child = spawn("python3", ["-I", directoryListingHelperPath], {
+    cwd: repositoryRoot,
+    shell: false,
+    stdio: ["ignore", "pipe", "pipe", directoryHandle.fd],
+  });
+  const stdout = [];
+  const stderr = [];
+  let stdoutBytes = 0;
+  let stderrBytes = 0;
+  let timedOut = false;
+  let outputTooLarge = false;
+
+  return new Promise((resolvePromise, rejectPromise) => {
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGKILL");
+    }, directoryListingTimeoutMs);
+    const collect = (chunks, stream) => (chunk) => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      if (stream === "stdout") stdoutBytes += bytes.length;
+      else stderrBytes += bytes.length;
+      if ((stream === "stdout" ? stdoutBytes : stderrBytes) > directoryListingMaxBuffer) {
+        outputTooLarge = true;
+        child.kill("SIGKILL");
+        return;
+      }
+      chunks.push(bytes);
+    };
+    child.stdout.on("data", collect(stdout, "stdout"));
+    child.stderr.on("data", collect(stderr, "stderr"));
+    child.once("error", (error) => {
+      clearTimeout(timer);
+      rejectPromise(error);
+    });
+    child.once("close", (status, signal) => {
+      clearTimeout(timer);
+      if (timedOut) {
+        rejectPromise(new Error(`${label} descriptor listing timed out`));
+        return;
+      }
+      if (outputTooLarge) {
+        rejectPromise(new Error(`${label} descriptor listing exceeded its output limit`));
+        return;
+      }
+      if (status !== 0) {
+        const detail = Buffer.concat(stderr).toString("utf8").trim();
+        rejectPromise(new Error(`${label} descriptor listing failed${signal ? ` with ${signal}` : ""}${detail ? `: ${detail}` : ""}`));
+        return;
+      }
+      let names;
+      try {
+        names = JSON.parse(Buffer.concat(stdout).toString("utf8"));
+      } catch (error) {
+        rejectPromise(new Error(`${label} descriptor listing returned invalid JSON`, { cause: error }));
+        return;
+      }
+      try {
+        assert.ok(Array.isArray(names), `${label} descriptor listing must return an array`);
+        assert.ok(
+          names.every((name) => typeof name === "string"),
+          `${label} descriptor listing must return only names`,
+        );
+        assert.equal(new Set(names).size, names.length, `${label} descriptor listing returned duplicate names`);
+        resolvePromise(names);
+      } catch (error) {
+        rejectPromise(error);
+      }
+    });
+  });
+}
+
+async function enumerateDirectory(absoluteDirectory, label, expectedIdentity) {
+  const directoryHandle = await open(absoluteDirectory, safeDirectoryOpenFlags);
+  try {
+    const opened = await directoryHandle.stat({ bigint: true });
+    assert.ok(opened.isDirectory(), `${label} must be a directory`);
+    const openedIdentity = identity(opened);
+    assertIdentity(expectedIdentity, openedIdentity, `${label} changed before descriptor enumeration`);
+    const entries = await listDirectoryFromDescriptor(directoryHandle, label);
+    const after = await directoryHandle.stat({ bigint: true });
+    assert.ok(after.isDirectory(), `${label} must be a directory`);
+    const directoryIdentity = identity(after);
+    assertIdentity(openedIdentity, directoryIdentity, `${label} changed while enumerating`);
+    return { entries, directoryIdentity };
+  } finally {
+    await directoryHandle.close();
+  }
+}
+
+async function regularFiles(releaseRoot, relativeDirectory = "", expectedIdentity = null, ancestorDirectories = [], afterDirectoryLstat) {
   const absoluteDirectory = resolve(releaseRoot, relativeDirectory);
   const label = directoryLabel(relativeDirectory);
   const before = await lstat(absoluteDirectory, { bigint: true });
@@ -114,25 +211,25 @@ async function regularFiles(releaseRoot, relativeDirectory = "", expectedIdentit
   const beforeIdentity = identity(before);
   if (expectedIdentity) assertIdentity(expectedIdentity, beforeIdentity, label);
 
-  const entries = await readdir(absoluteDirectory, { withFileTypes: true });
+  await afterDirectoryLstat?.(relativeDirectory);
+  const { entries, directoryIdentity } = await enumerateDirectory(absoluteDirectory, label, beforeIdentity);
   const after = await lstat(absoluteDirectory, { bigint: true });
   if (after.isSymbolicLink()) assert.fail(`${label} must not be a symbolic link`);
   assert.ok(after.isDirectory(), `${label} must be a directory`);
-  const directoryIdentity = identity(after);
-  assertIdentity(beforeIdentity, directoryIdentity, `${label} changed while enumerating`);
+  assertIdentity(directoryIdentity, identity(after), `${label} changed after descriptor enumeration`);
   const currentDirectory = { absolutePath: absoluteDirectory, relativePath: relativeDirectory, identity: directoryIdentity };
   const allAncestorDirectories = [...ancestorDirectories, currentDirectory];
 
   const files = [];
-  for (const entry of entries) {
+  for (const name of entries) {
     await assertCurrentDirectory(absoluteDirectory, directoryIdentity, relativeDirectory);
-    const relativePath = relativeDirectory ? `${relativeDirectory}/${entry.name}` : entry.name;
+    const relativePath = relativeDirectory ? `${relativeDirectory}/${name}` : name;
     const absolutePath = resolve(releaseRoot, relativePath);
     const entryStats = await lstat(absolutePath, { bigint: true });
     if (entryStats.isSymbolicLink()) assert.fail(`${relativePath} must not be a symbolic link`);
     const entryIdentity = identity(entryStats);
     if (entryStats.isDirectory()) {
-      files.push(...(await regularFiles(releaseRoot, relativePath, entryIdentity, allAncestorDirectories)));
+      files.push(...(await regularFiles(releaseRoot, relativePath, entryIdentity, allAncestorDirectories, afterDirectoryLstat)));
     } else if (entryStats.isFile()) {
       files.push({
         relativePath,
@@ -199,10 +296,14 @@ async function assertSameSnapshotBytes(snapshots, initialDigests) {
   }
 }
 
-export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot, afterInitialRead, afterFinalRead } = {}) {
+export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot, afterInitialRead, afterFinalRead, afterDirectoryLstat } = {}) {
   if (process.platform === "win32") throw new Error(unsupportedPlatformError);
+  assert.ok(
+    Number.isInteger(constants.O_DIRECTORY) && Number.isInteger(constants.O_NOFOLLOW),
+    "hotel release validation requires POSIX O_DIRECTORY and O_NOFOLLOW",
+  );
   const resolvedReleaseRoot = resolve(releaseRoot);
-  const snapshots = await regularFiles(resolvedReleaseRoot);
+  const snapshots = await regularFiles(resolvedReleaseRoot, "", null, [], afterDirectoryLstat);
   const snapshotByPath = new Map(snapshots.map((snapshot) => [snapshot.relativePath, snapshot]));
   // These callbacks are in-process test seams; the command-line validator never supplies them.
   await afterSnapshot?.(snapshots);
@@ -275,11 +376,11 @@ export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterS
     assert.ok(checksumPaths.has(relativePath), `${relativePath} is not recorded`);
 
   await afterInitialRead?.(snapshots);
-  const finalSnapshots = await regularFiles(resolvedReleaseRoot);
+  const finalSnapshots = await regularFiles(resolvedReleaseRoot, "", null, [], afterDirectoryLstat);
   assertSameSnapshot(snapshots, finalSnapshots);
   await assertSameSnapshotBytes(finalSnapshots, initialDigests);
   await afterFinalRead?.(finalSnapshots);
-  assertSameSnapshot(snapshots, await regularFiles(resolvedReleaseRoot));
+  assertSameSnapshot(snapshots, await regularFiles(resolvedReleaseRoot, "", null, [], afterDirectoryLstat));
 
   return {
     receipt: "HOTEL_RELEASE_READBACK_PASS",

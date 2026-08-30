@@ -179,7 +179,11 @@ assert.match(sourceApplication, /ACTIVE_INTENT_STORAGE_KEY/);
 assert.match(sourceApplication, /onResult: reflectSafeToolResult/);
 assert.match(sourceApplication, /fetch\("\/service-integrations\.json"/);
 assert.doesNotMatch(sourceApplication, /import serviceRegistry/);
-assert.match(sourceApplication, /2 attempts → 1 simulated booking → 1 confirmation number/);
+assert.match(html, /id="state-summary"/);
+assert.match(sourceApplication, /deriveHotelBookingResult/);
+assert.match(sourceApplication, /stateSummary: document\.querySelector\("#state-summary"\)/);
+assert.match(sourceApplication, /elements\.stateSummary\.textContent = result\.summary/);
+assert.match(sourceApplication, /elements\.resultSummary\.textContent = result\.summary/);
 
 assert.match(serviceWorker, /cache\.addAll\(ASSETS\)/);
 for (const asset of ["/", "/assets/app.js", "/assets/index.css", "/favicon.svg", "/webmcp-evals.json", "/service-integrations.json"]) {

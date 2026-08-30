@@ -42,6 +42,9 @@ jobs:
         with:
           node-version-file: .node-version
 
+      - name: Verify the Windows hotel release guard
+        run: node --test --test-name-pattern="fails closed before file operations on Windows" scripts/validate_hotel_release.test.mjs
+
       - name: Install locked TypeScript dependencies
         working-directory: src/typescript
         run: npm ci

@@ -28,6 +28,13 @@ This package makes the fictional Kyoto hotel demo easy to run, inspect, and show
 
 Video binaries, credentials, environment files, personal information, and real booking data are excluded.
 
+The release-package validator is unavailable on Windows because safe non-following file opens cannot be guaranteed; this is separate from the browser demo itself.
+
+<!-- machine-contract information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2 event_uuid_v7=01a054f1-6b9b-7d84-8a31-53a43a4a52a0 state_transition=PER_OPERATION_HELPER_STARTUP -> ONE_BOUND_ROOT_HELPER_PER_VALIDATION occurred_at=2026-08-30T23:11:43.003Z -->
+One isolated Python process serves the whole validation, including all three tree enumerations. Requests run sequentially, recheck their directory chain each time, and use increasing sequence numbers and exact response byte counts. Each request and final shutdown has a five-second limit within the existing thirty-second validation deadline. Any malformed response or process failure ends validation; the helper closes before the retained root descriptor.
+
+On POSIX, validation holds the root as a Node `O_NOFOLLOW|O_DIRECTORY` descriptor and passes only fd 3 to an isolated Python helper. Nested list, stat, and file-read requests use strict relative components and `dir_fd`-relative `O_NOFOLLOW` opens; regular-file bytes are bounded to 8 MiB. Ancestors above the resolved release-root entry remain trusted because Node v24.15 has no `openat`-style API. See the [Node.js v24.15 file-system API](https://nodejs.org/download/release/v24.15.0/docs/api/fs.html), [Node.js child-process stdio](https://nodejs.org/download/release/v24.15.0/docs/api/child_process.html#optionsstdio), and [Python `os.listdir`](https://docs.python.org/3.14/library/os.html#os.listdir) references. This protects the bounded descriptor operations but does not claim an atomic snapshot.
+
 ## Reproduce the package
 
 Run from one clean, committed source checkout. The builder stops if the working tree is dirty, if the source commit changes, if a required public-evidence digest differs, or if Gitleaks is unavailable.

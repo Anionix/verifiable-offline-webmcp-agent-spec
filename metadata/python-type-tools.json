@@ -37,6 +37,7 @@
       "scripts/build_manifest.py",
       "scripts/final_verification.py",
       "scripts/generate_ids.py",
+      "scripts/list_directory_fd.py",
       "scripts/promote_tests.py",
       "scripts/validate_python_type_tools.py",
       "scripts/validate_repo.py"

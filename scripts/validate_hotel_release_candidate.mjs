@@ -24,6 +24,7 @@ import {
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const candidatePath = resolve(repositoryRoot, "metadata/hotel-release-candidate.json");
 const sourceTestDirectory = resolve(repositoryRoot, "src/typescript");
+const candidateBaseRef = "origin/codex/hotel-release-package";
 const informationUuidV5 = "f2da6444-7447-5120-a39d-446adda200ca";
 const browserObservation = Object.freeze({
   url: "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
@@ -91,7 +92,9 @@ async function readJson(path) {
 async function buildCandidate() {
   const testRun = runTests();
   const observedAt = new Date().toISOString();
-  const baseCommit = command("git", ["rev-parse", "HEAD"]);
+  // The candidate records the branch base, not the mutable HEAD that may later
+  // contain the candidate itself. This keeps --check valid after local commit.
+  const baseCommit = command("git", ["merge-base", "HEAD", candidateBaseRef]);
   const branch = command("git", ["branch", "--show-current"]);
   const publicReadback = await readJson("metadata/devpost-public-readback.json");
   const candidateTestCount = testRun.total;

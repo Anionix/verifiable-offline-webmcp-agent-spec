@@ -70,6 +70,7 @@ function changedPaths(repositoryRoot, baseCommit, sourceCommit) {
   return gitText(repositoryRoot, [
     "diff",
     "--name-only",
+    "--no-renames",
     "-z",
     baseCommit,
     sourceCommit,

@@ -173,6 +173,24 @@ async function createUnrelatedSourceRepository() {
   return { directory, baseCommit, sourceCommit, currentCommit };
 }
 
+async function createRenameSquashRepository({ destinationPath, currentFiles }) {
+  const directory = await initializeRepository();
+  const commonCommit = await commitFile(directory, "common.txt", "common\n", "common");
+  runGit(directory, ["switch", "--quiet", "-c", "release-base", commonCommit]);
+  const sourcePath = "src/typescript/hotel/renamed-from.js";
+  const baseCommit = await commitFile(directory, sourcePath, "renamed\n", "base");
+  runGit(directory, ["switch", "--quiet", "-c", "release-source"]);
+  await mkdir(join(directory, dirname(destinationPath)), { recursive: true });
+  runGit(directory, ["mv", sourcePath, destinationPath]);
+  runGit(directory, ["commit", "--quiet", "-m", "rename source file"]);
+  const sourceCommit = runGit(directory, ["rev-parse", "HEAD"]);
+
+  runGit(directory, ["switch", "--quiet", "-c", "current", commonCommit]);
+  const currentCommit = await commitFiles(directory, currentFiles, "squashed rename");
+  runGit(directory, ["checkout", "--quiet", "--detach", currentCommit]);
+  return { directory, baseCommit, sourceCommit, currentCommit };
+}
+
 function runValidator({ directory, baseCommit, sourceCommit }) {
   return spawnSync(
     process.execPath,
@@ -318,6 +336,44 @@ test("rejects a squash checkout that omits an intermediate liveness input", asyn
         output(result),
         /release source file entry differs after squash: src\/typescript\/hotel\/browser-store\.js/u,
       );
+    },
+  );
+});
+
+test("rejects an in-scope rename when the old file remains in the squash checkout", async () => {
+  await withRepository(
+    () =>
+      createRenameSquashRepository({
+        destinationPath: "src/typescript/hotel/renamed-to.js",
+        currentFiles: [
+          { path: "src/typescript/hotel/renamed-from.js", content: "stale old file\n" },
+          { path: "src/typescript/hotel/renamed-to.js", content: "renamed\n" },
+        ],
+      }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = runValidator({ directory, baseCommit, sourceCommit });
+
+      assert.notEqual(result.status, 0, output(result));
+      assert.match(
+        output(result),
+        /release source file entry differs after squash: src\/typescript\/hotel\/renamed-from\.js/u,
+      );
+    },
+  );
+});
+
+test("accepts an out-of-scope rename when the old file is deleted in the squash checkout", async () => {
+  await withRepository(
+    () =>
+      createRenameSquashRepository({
+        destinationPath: "docs/renamed.js",
+        currentFiles: [{ path: "docs/renamed.js", content: "renamed\n" }],
+      }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = runValidator({ directory, baseCommit, sourceCommit });
+
+      assert.equal(result.status, 0, output(result));
+      assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
     },
   );
 });

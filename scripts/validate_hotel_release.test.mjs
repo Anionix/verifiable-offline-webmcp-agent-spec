@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
+import { lstat, mkdtemp, mkdir, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
@@ -130,6 +130,23 @@ test("rejects an unrecorded root file", async () => {
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0, "the validator accepted an unrecorded root file");
     assert.match(result.output, /unlisted release files: unexpected\.txt/u);
+  });
+});
+
+test("rejects a regular file added after snapshot even when the release root inode is unchanged", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    const initialRoot = await lstat(releaseRoot, { bigint: true });
+    await assert.rejects(
+      () =>
+        validateRelease(releaseRoot, {
+          afterSnapshot: async () => {
+            await writeFile(resolve(releaseRoot, "UNLISTED.txt"), "unlisted after snapshot\n");
+            const finalRoot = await lstat(releaseRoot, { bigint: true });
+            assert.equal(finalRoot.ino, initialRoot.ino);
+          },
+        }),
+      /release file set changed after snapshot: added=.*UNLISTED\.txt/u,
+    );
   });
 });
 

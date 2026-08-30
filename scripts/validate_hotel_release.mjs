@@ -3,8 +3,10 @@
 // event_uuid_v7=01a050c7-34b7-7168-8c64-9443fbe87f36 state_transition=RELEASE_DIRECTORY_READY -> RELEASE_DIRECTORY_READBACK_VERIFIED occurred_at=2026-08-30T04:20:00.000Z
 // event_uuid_v7=01a05389-207c-70de-bf85-38e4f8931ecb state_transition=RELEASE_DIRECTORY_READBACK_VERIFIED -> RELEASE_FILE_SET_READBACK_VERIFIED occurred_at=2026-08-30T16:38:10.812Z
 // event_uuid_v7=01a053b4-8051-7707-9492-e22d539ff62d state_transition=PATH_SNAPSHOT_UNBOUND -> DESCRIPTOR_IDENTITY_BOUND_READ occurred_at=2026-08-30T17:25:33.393Z
+// event_uuid_v7=01a0545f-a323-7754-9efb-891d12216f19 state_transition=RELEASE_FILE_SET_READBACK_VERIFIED -> RELEASE_FILE_SET_FINAL_ENUMERATION_VERIFIED occurred_at=2026-08-30T20:32:28.973Z
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: directory and file identities are captured with lstat, checked again around enumeration, and bound to a non-following nonblocking descriptor before any bytes are read.
+// machine-contract: the final release-tree enumeration must match the initial snapshot's paths and lstat identities; this detects races but does not promise an atomic snapshot.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -141,6 +143,23 @@ async function readSnapshot(snapshot) {
   }
 }
 
+function assertSameSnapshot(initialSnapshots, finalSnapshots) {
+  const initialByPath = new Map(initialSnapshots.map((snapshot) => [snapshot.relativePath, snapshot]));
+  const finalByPath = new Map(finalSnapshots.map((snapshot) => [snapshot.relativePath, snapshot]));
+  const initialPaths = [...initialByPath.keys()].sort();
+  const finalPaths = [...finalByPath.keys()].sort();
+  const addedPaths = finalPaths.filter((relativePath) => !initialByPath.has(relativePath));
+  const removedPaths = initialPaths.filter((relativePath) => !finalByPath.has(relativePath));
+  assert.deepEqual(
+    { added: addedPaths, removed: removedPaths },
+    { added: [], removed: [] },
+    `release file set changed after snapshot: added=${addedPaths.join(", ")}; removed=${removedPaths.join(", ")}`,
+  );
+  for (const relativePath of initialPaths) {
+    assertIdentity(initialByPath.get(relativePath).identity, finalByPath.get(relativePath).identity, `${relativePath} changed after final enumeration`);
+  }
+}
+
 export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterSnapshot } = {}) {
   const resolvedReleaseRoot = resolve(releaseRoot);
   const snapshots = await regularFiles(resolvedReleaseRoot);
@@ -204,6 +223,8 @@ export async function validateRelease(releaseRoot = defaultReleaseRoot, { afterS
   assert.ok(!checksumPaths.has("SHA256SUMS"), "checksum file must not self-reference");
   for (const relativePath of requiredFiles.filter((path) => path !== "SHA256SUMS"))
     assert.ok(checksumPaths.has(relativePath), `${relativePath} is not recorded`);
+
+  assertSameSnapshot(snapshots, await regularFiles(resolvedReleaseRoot));
 
   return {
     receipt: "HOTEL_RELEASE_READBACK_PASS",

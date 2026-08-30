@@ -24,7 +24,7 @@ import {
   sha256CanonicalResultSummary,
   validateManagedBrowserDiscovery,
 } from "./hotel-managed-browser-release-proof.mjs";
-import { browserObservationFrom, validateNativeDiscovery } from "./validate_hotel_release_candidate.mjs";
+import { browserObservationFrom, compareStable, validateNativeDiscovery } from "./validate_hotel_release_candidate.mjs";
 
 const observedAt = "2026-08-30T19:50:43.312Z";
 const confirmationNumber = "FKR-SYNTHETIC214";
@@ -530,12 +530,26 @@ test("rejects a managed reconciliation that is not bound to the native status re
     ["status-check confirmation", (record) => { record.reconciliation.statusCheck.confirmationNumber = "FKR-DIFFERENT"; }],
     ["final-status attempt", (record) => { record.reconciliation.finalStatus.attemptCount = 1; }],
     ["final-status booking key", (record) => { record.reconciliation.finalStatus.bookingId = "11111111-1111-5111-8111-111111111111"; }],
+    [
+      "prepare and status-before event chain",
+      (record) => {
+        const prepareCall = record.discovery.toolCalls[1];
+        prepareCall.resultObservation.eventChainHead = record.discovery.toolCalls[2].resultObservation.eventChainHead;
+        const summary = toolCallResultSummary(prepareCall);
+        prepareCall.resultEvidence = {
+          ...prepareCall.resultEvidence,
+          canonicalSummary: canonicalResultSummary(summary),
+          sha256: sha256CanonicalResultSummary(summary),
+        };
+      },
+    ],
     ["shared tool sequence", (record) => { record.reconciliation.calledToolNames[1] = "get_hotel_booking_status"; }],
   ];
   for (const [name, mutate] of mutations) {
     const invalid = managedRootWithBoundReconciliation(oldChromeProof);
     mutate(invalid);
-    assert.throws(() => validateNativeDiscovery(invalid), /bound|status|finalStatus|confirmation|booking|sequence/u, name);
+    assert.throws(() => validateNativeDiscovery(invalid), /bound|status|finalStatus|confirmation|booking|sequence|event|chain/u, name);
+    assert.throws(() => browserObservationFrom(invalid, oldChromeProof.deployment.sourceCommit), /bound|status|finalStatus|confirmation|booking|sequence|event|chain/u, name);
   }
 });
 
@@ -558,6 +572,25 @@ test("candidate old branch keeps the strict Chrome configuration gate", async ()
 test("candidate old browser observation remains unchanged", async () => {
   const oldChromeProof = structuredClone(legacyChromeProof);
   assert.deepEqual(browserObservationFrom(oldChromeProof, oldChromeProof.deployment.sourceCommit), legacyCandidateBrowserObservation);
+});
+
+test("the CLI comparison rejects stored managed candidates with unrelated reconciliation values", async () => {
+  const expected = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
+  const nativeFixture = managedRootWithBoundReconciliation(legacyChromeProof);
+  expected.browserObservation = browserObservationFrom(nativeFixture, expected.source.commit);
+  assert.doesNotThrow(() => compareStable(structuredClone(expected), expected));
+  const changedObservationTime = structuredClone(expected);
+  changedObservationTime.observedAt = new Date(Date.parse(expected.observedAt) + 1).toISOString();
+  assert.throws(() => compareStable(changedObservationTime, expected), /candidate observation time differs from native evidence/u);
+  for (const location of ["statusCheck", "finalStatus"]) {
+    for (const field of ["intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"]) {
+      const actual = structuredClone(expected);
+      actual.browserObservation.reconciliation[location][field] = field === "eventCount"
+        ? 999
+        : field === "eventChainHead" ? "e".repeat(64) : "11111111-1111-5111-8111-111111111111";
+      assert.throws(() => compareStable(actual, expected), /native browser observation record drifted/u, `${location}.${field}`);
+    }
+  }
 });
 
 test("accepts managed native and candidate fixtures through the Draft 2020-12 registry", async () => {

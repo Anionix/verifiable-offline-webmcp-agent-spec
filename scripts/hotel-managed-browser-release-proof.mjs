@@ -277,6 +277,7 @@ export function validateManagedBrowserDiscovery(discovery, { allowTestFixture = 
   assert.equal(before.fingerprint, after.fingerprint, "status-before and status-after fingerprints differ");
   assert.equal(before.bookingId, after.bookingId, "status-before and status-after booking IDs differ");
   assert.equal(before.confirmationNumber, after.confirmationNumber, "status-before and status-after confirmation numbers differ");
+  assert.notEqual(prepare.eventChainHead, before.eventChainHead, "managed prepare and status-before event heads must advance");
   assert.notEqual(before.eventChainHead, after.eventChainHead, "status-before and status-after event heads must advance");
   return {
     evidenceProfile: discovery.profile,

@@ -337,7 +337,10 @@ async function buildCandidate() {
   return candidate;
 }
 
-function compareStable(actual, expected) {
+// machine-contract: expected is built from separately loaded and validated native
+// evidence; schema validation alone cannot establish equality of duplicated values.
+export function compareStable(actual, expected) {
+  assert.equal(actual.observedAt, expected.observedAt, "candidate observation time differs from native evidence");
   assert.deepEqual(actual.testRun, expected.testRun, "candidate test summary is stale");
   assert.deepEqual(actual.localLiveness, expected.localLiveness, "candidate liveness evidence drifted");
   assert.deepEqual(actual.artifacts, expected.artifacts, "candidate artifact digest is stale");
@@ -352,7 +355,6 @@ function compareStable(actual, expected) {
     deterministicUuid7(actual.observedAt, `${informationUuidV5}\0${actual.source.commit}\0${actual.testRun.total}`),
     "candidate observation identity is not reproducible from its recorded inputs",
   );
-  assert.match(actual.observedAt, /^2026-08-30T/u, "candidate observation must belong to the current run date");
 }
 
 if (import.meta.main) {

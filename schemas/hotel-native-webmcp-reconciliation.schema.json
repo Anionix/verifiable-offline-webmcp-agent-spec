@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-native-webmcp-reconciliation.schema.json",
   "$comment": "information_uuid_v5=1d4b92e2-85a9-5d03-a7b3-62c3d9ca4f83 event_uuid_v7=01a052e3-0000-7000-8000-000000000192 state_transition=NATIVE_TOOL_DISCOVERY_ZERO_EFFECT -> AGENT_RECONCILIATION_PROVED machine-contract=Native discovery and the later fictional lost-response read-before-retry run stay in separate records with one deployment and source commit.",
+  "description": "This schema checks structure. Accepting PASS additionally requires node scripts/validate_hotel_release_candidate.mjs --check, which validates native call bindings and compares the stored candidate with separately loaded native evidence. Schema-only validation is not semantic acceptance.",
   "title": "Hotel native WebMCP reconciliation evidence",
   "type": "object",
   "additionalProperties": false,

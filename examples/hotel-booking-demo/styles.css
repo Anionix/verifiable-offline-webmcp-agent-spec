@@ -8,6 +8,8 @@
   --indigo: #24295b;
   --indigo-deep: #171b43;
   --vermilion: #d9503f;
+  --notice-red: #9b3c30;
+  --focus-ring: #24295b;
   --paper: #fffefa;
   --paper-soft: #f1ede4;
   --line: #d9d4ca;
@@ -37,7 +39,7 @@ button, input, select { font: inherit; }
 button, select, input { min-height: 44px; }
 
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
-  outline: 3px solid #e98172;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
@@ -72,7 +74,7 @@ main, footer {
 
 .eyebrow, .step-label {
   margin: 0 0 0.85rem;
-  color: var(--vermilion);
+  color: var(--notice-red);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.12em;

@@ -5679,8 +5679,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_managed_browser_release_proof.mjs",
-      "sha256": "3333207415c8747dfeb380198e9088cdda46058578d47b252a303c34297b9882",
-      "bytes": 40968,
+      "sha256": "096be19cd48af06fe86c9b0a34b98413c863a38bb4134871f868148eb930e83f",
+      "bytes": 41903,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "9a7e81af0ff72654d79c4d7c54af92a816a8e31b7a2196d63b063edae230c50c",
-      "bytes": 25250,
+      "sha256": "7295333aba5526e21b9cd424512fd9f1edb50bcbcb02fc24d7d59b146fbcfd0d",
+      "bytes": 26819,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

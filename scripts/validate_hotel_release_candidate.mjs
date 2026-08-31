@@ -40,6 +40,13 @@ const requiredChromeFlags = Object.freeze(["#devtools-webmcp-support", "#enable-
 // state_transition=HISTORICAL_NATIVE_OBSERVATION -> FRESH_WORKTREE_CANDIDATE_OBSERVATION occurred_at=2026-08-31T06:05:00.000Z
 // machine-contract: an unpublished candidate gets a fresh observation clock and an identity derived from its measured artifact digests.
 
+// information_uuid_v5=2e51f3c1-4fa3-5a2f-8f2e-31c3b07b4f89
+// event_uuid_v7=01a056b7-6c2d-7f41-8a90-1234567890ab
+// state_transition=PRE_READY_NATIVE_RUN_ACCEPTED -> PUBLIC_READY_TIME_GATED occurred_at=2026-08-31T06:20:00.000Z
+// machine-contract: a native run is current evidence only when its completion is
+// at or after the public deployment READY boundary; the error keeps both IDs and
+// both times visible for a small, mechanical review.
+
 function deterministicUuid7(observedAt, seed) {
   const epochMs = Date.parse(observedAt);
   assert(Number.isSafeInteger(epochMs), `invalid observation time: ${observedAt}`);
@@ -157,6 +164,17 @@ function assertManagedReconciliationBinding(nativeEvidence) {
   assertStatusBinding(reconciliation.finalStatus, after, "finalStatus");
   assert.equal(reconciliation.sameConfirmation, before.confirmationNumber === after.confirmationNumber, "managed reconciliation confirmation binding differs");
   assert.equal(reconciliation.finalStatus.sameConfirmation, reconciliation.sameConfirmation, "managed final confirmation binding differs");
+}
+
+export function assertNativeRunAfterDeploymentReady(nativeEvidence) {
+  const { deployment, discovery, reconciliation } = nativeEvidence;
+  const publicSourceCommit = deployment?.sourceCommit ?? "UNMEASURED";
+  const deploymentId = deployment?.deploymentId ?? "UNMEASURED";
+  const readyAt = deployment?.readyAt;
+  const runAt = discovery?.profile === managedEvidenceProfile ? discovery?.runBinding?.completedAt : reconciliation?.observedAt;
+  const details = `publicSourceCommit=${publicSourceCommit} deploymentId=${deploymentId} readyAt=${readyAt ?? "UNMEASURED"} runAt=${runAt ?? "UNMEASURED"}`;
+  assert(Number.isFinite(Date.parse(readyAt)) && Number.isFinite(Date.parse(runAt)), `native run freshness timestamps are invalid: ${details}`);
+  assert(Date.parse(runAt) >= Date.parse(readyAt), `native run completed before public deployment READY: ${details}`);
 }
 
 export function validateNativeDiscovery(nativeEvidence) {
@@ -293,6 +311,11 @@ async function buildCandidate(mode = "--check") {
     artifacts.functionalClientSha256 === publicReadback.release.artifacts.functionalClientSha256 &&
     artifacts.fullClientSha256 === publicReadback.release.artifacts.fullClientSha256 &&
     artifacts.fullSitesPackageSha256 === publicReadback.release.artifacts.fullSitesPackageSha256;
+  if (artifactsMatchPublicRelease) {
+    // machine-contract: only a candidate whose bytes equal the public release
+    // may promote the native run from historical context to current evidence.
+    assertNativeRunAfterDeploymentReady(nativeEvidence);
+  }
   validateReleaseContext({
     repositoryRoot,
     baseCommit,

@@ -569,6 +569,44 @@ test("accepts a checkout-only change to an unrelated media evidence schema", asy
   );
 });
 
+test("accepts only the reviewed notification storage helpers outside hotel squash comparison", async () => {
+  await withRepository(
+    () =>
+      createCheckoutOnlyDriftSquashRepository({
+        commonFiles: [
+          { path: "src/typescript/notification/storage-create.ts", content: "historical helper\n" },
+          { path: "src/typescript/notification/storage-path.ts", content: "historical path helper\n" },
+        ],
+        currentFiles: [
+          { path: "src/typescript/notification/storage-create.ts", content: "reviewed helper\n" },
+          { path: "src/typescript/notification/storage-path.ts", content: "reviewed path helper\n" },
+        ],
+      }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = runValidator({ directory, baseCommit, sourceCommit });
+
+      assert.equal(result.status, 0, output(result));
+      assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
+    },
+  );
+});
+
+test("keeps adjacent notification source paths inside hotel squash comparison", async () => {
+  await withRepository(
+    () =>
+      createCheckoutOnlyDriftSquashRepository({
+        commonFiles: [{ path: "src/typescript/notification/other-helper.ts", content: "historical helper\n" }],
+        currentFiles: [{ path: "src/typescript/notification/other-helper.ts", content: "unreviewed helper\n" }],
+      }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = runValidator({ directory, baseCommit, sourceCommit });
+
+      assert.notEqual(result.status, 0, output(result));
+      assert.match(output(result), /release source file entry differs after squash: src\/typescript\/notification\/other-helper\.ts/u);
+    },
+  );
+});
+
 test("rejects a nonexistent base commit", async () => {
   await withRepository(createLinearRepository, ({ directory, sourceCommit }) => {
     const result = runValidator({

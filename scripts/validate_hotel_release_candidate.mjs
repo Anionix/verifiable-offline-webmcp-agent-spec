@@ -35,6 +35,11 @@ const expectedTools = Object.freeze(["check_existing_hotel_booking", "prepare_ho
 const forbiddenTools = Object.freeze(["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"]);
 const requiredChromeFlags = Object.freeze(["#devtools-webmcp-support", "#enable-webmcp-testing"]);
 
+// information_uuid_v5=c6b2a8f7-1d4e-5b90-8c3a-7e6f4d2b1a09
+// event_uuid_v7=01a0565a-3b8e-7d14-9c20-6f5a4b3d2e10
+// state_transition=HISTORICAL_NATIVE_OBSERVATION -> FRESH_WORKTREE_CANDIDATE_OBSERVATION occurred_at=2026-08-31T06:05:00.000Z
+// machine-contract: an unpublished candidate gets a fresh observation clock and an identity derived from its measured artifact digests.
+
 function deterministicUuid7(observedAt, seed) {
   const epochMs = Date.parse(observedAt);
   assert(Number.isSafeInteger(epochMs), `invalid observation time: ${observedAt}`);
@@ -44,6 +49,12 @@ function deterministicUuid7(observedAt, seed) {
   const value = (BigInt(epochMs) << 80n) | (7n << 76n) | (BigInt(randomA) << 64n) | (2n << 62n) | randomB;
   const hex = value.toString(16).padStart(32, "0");
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function candidateObservationSeed(sourceCommit, testCount, artifacts) {
+  return [informationUuidV5, sourceCommit, testCount, artifacts.functionalClientSha256, artifacts.fullClientSha256, artifacts.fullSitesPackageSha256].join(
+    "\0",
+  );
 }
 
 function sha256(bytes) {
@@ -228,7 +239,8 @@ export function browserObservationFrom(nativeEvidence, sourceCommit) {
   };
 }
 
-async function buildCandidate() {
+async function buildCandidate(mode = "--check") {
+  assert.ok(mode === "--write" || mode === "--check", "candidate build mode must be --write or --check");
   const testRun = runTests();
   const publicReadback = await readJson(publicReadbackPath);
   const nativeEvidence = await readJson(nativeEvidencePath);
@@ -237,12 +249,6 @@ async function buildCandidate() {
   const baseCommit = publicReadback.release.baseCommit;
   const branch = publicReadback.release.branch;
   const managedDiscovery = nativeEvidence.discovery.profile === managedEvidenceProfile;
-  validateReleaseContext({
-    repositoryRoot,
-    baseCommit,
-    sourceCommit,
-  });
-
   assert.equal(publicReadback.release.status, "COMMITTED_RELEASE");
   assert.equal(publicReadback.release.testRun.testCount, testRun.total, "public release test count differs from npm test");
   assert.equal(publicReadback.release.testRun.passed, testRun.passed, "public release passed count differs from npm test");
@@ -283,29 +289,61 @@ async function buildCandidate() {
     fullSitesPackageSha256: await digestTree(sitesPackageRoot, fullSitesPackageDigestScope.excludedPaths),
     fullSitesScope: fullSitesPackageDigestScope,
   };
-  assert.equal(
-    artifacts.functionalClientSha256,
-    publicReadback.release.artifacts.functionalClientSha256,
-    "functional digest differs from the published release",
-  );
-  assert.equal(artifacts.fullClientSha256, publicReadback.release.artifacts.fullClientSha256, "full client digest differs from the published release");
-  assert.equal(
-    artifacts.fullSitesPackageSha256,
-    publicReadback.release.artifacts.fullSitesPackageSha256,
-    "full Sites digest differs from the published release",
-  );
+  const artifactsMatchPublicRelease =
+    artifacts.functionalClientSha256 === publicReadback.release.artifacts.functionalClientSha256 &&
+    artifacts.fullClientSha256 === publicReadback.release.artifacts.fullClientSha256 &&
+    artifacts.fullSitesPackageSha256 === publicReadback.release.artifacts.fullSitesPackageSha256;
+  validateReleaseContext({
+    repositoryRoot,
+    baseCommit,
+    sourceCommit,
+    allowCurrentCheckoutDivergence: !artifactsMatchPublicRelease,
+  });
+  // machine-contract: a changed local client is a worktree candidate until a
+  // later deployment and public readback bind these new bytes; it never
+  // rewrites the historical public release receipt.
 
-  const observedAt = nativeEvidence.reconciliation.observedAt;
+  const storedCandidate = !artifactsMatchPublicRelease && mode === "--check" ? await readJson("metadata/hotel-release-candidate.json") : null;
+  const observedAt = artifactsMatchPublicRelease
+    ? nativeEvidence.reconciliation.observedAt
+    : mode === "--write"
+      ? new Date().toISOString()
+      : storedCandidate?.observedAt;
+  assert.equal(typeof observedAt, "string", "worktree candidate observation time is missing");
+  if (!artifactsMatchPublicRelease) {
+    assert.ok(
+      Date.parse(observedAt) > Date.parse(nativeEvidence.reconciliation.observedAt),
+      "worktree candidate observation must be later than the historical native run",
+    );
+  }
   const browserObservation = browserObservationFrom(nativeEvidence, sourceCommit);
+  if (!artifactsMatchPublicRelease) {
+    // machine-contract: the worktree candidate keeps the historical native
+    // run as history and describes only the measured artifact boundary.
+    browserObservation.reconciliation = {
+      ...browserObservation.reconciliation,
+      agentExplanation: `${browserObservation.reconciliation.agentExplanation} The local worktree artifact digests differ from the historical public release; no fresh public native run is claimed for this candidate.`,
+    };
+  }
   const publicReadbackTestCount = publicReadback.anonymousReadback.releaseEvidence.testCount;
+  // information_uuid_v5=9b9e2d43-6c71-5f2a-9b8e-4d0a7c1f6e25
+  // event_uuid_v7=01a0564c-4c2a-7f21-9a80-5e8d2b7c1f30
+  // state_transition=PUBLIC_ARTIFACT_MISMATCH -> FINAL_GATE_NOT_READY occurred_at=2026-08-31T06:00:00.000Z
+  // machine-contract: a worktree candidate may be locally valid, but exact public artifact equality is a separate required gate.
+  const finalGateReady = artifactsMatchPublicRelease;
   const candidate = {
     $schema: "../schemas/hotel-release-candidate.schema.json",
     identity: {
       informationUuidV5,
-      observationUuidV7: deterministicUuid7(observedAt, `${informationUuidV5}\0${sourceCommit}\0${testRun.total}`),
+      observationUuidV7: deterministicUuid7(observedAt, candidateObservationSeed(sourceCommit, testRun.total, artifacts)),
     },
     observedAt,
-    source: { commit: sourceCommit, state: "COMMITTED_CANDIDATE", branch, baseCommit },
+    source: {
+      commit: sourceCommit,
+      state: artifactsMatchPublicRelease ? "COMMITTED_CANDIDATE" : "WORKTREE_CANDIDATE",
+      branch,
+      baseCommit,
+    },
     testRun: { command: "npm test", directory: "src/typescript", ...testRun, derivedFrom: "node-test-summary" },
     localLiveness: {
       status: "PASS",
@@ -319,7 +357,7 @@ async function buildCandidate() {
     publicClaims: {
       candidateTestCount: testRun.total,
       publicReadbackTestCount,
-      status: "MATCH",
+      status: artifactsMatchPublicRelease ? "MATCH" : "PUBLIC_READBACK_TEST_COUNT_MATCH_ARTIFACTS_UNPUBLISHED",
       source: publicReadbackPath,
       releaseCommit: sourceCommit,
       deploymentId: publicReadback.deployment.deploymentId,
@@ -352,16 +390,23 @@ async function buildCandidate() {
       },
       {
         issue: 193,
-        status: "PASS",
-        reason:
-          "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result.",
+        status: finalGateReady ? "PASS" : "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+        reason: finalGateReady
+          ? "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result."
+          : "The local worktree artifacts differ from the historical public release; exact public artifact equality is not established, so issue 193 remains not ready until a later deployment and public readback bind these bytes.",
       },
     ],
     finalGate: {
       formula: "S AND L AND F_exact AND W AND E",
-      status: "PASS",
-      ready: true,
-      components: { S: "PASS", L: "PASS", F_exact: "PASS", W: "PASS", E: "PASS" },
+      status: finalGateReady ? "PASS" : "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+      ready: finalGateReady,
+      components: {
+        S: "PASS",
+        L: "PASS",
+        F_exact: finalGateReady ? "PASS" : "FAIL",
+        W: "PASS",
+        E: "PASS",
+      },
     },
   };
   return candidate;
@@ -370,7 +415,7 @@ async function buildCandidate() {
 // machine-contract: expected is built from separately loaded and validated native
 // evidence; schema validation alone cannot establish equality of duplicated values.
 export function compareStable(actual, expected) {
-  assert.equal(actual.observedAt, expected.observedAt, "candidate observation time differs from native evidence");
+  assert.equal(actual.observedAt, expected.observedAt, "candidate observation time differs from expected candidate evidence");
   assert.deepEqual(actual.testRun, expected.testRun, "candidate test summary is stale");
   assert.deepEqual(actual.localLiveness, expected.localLiveness, "candidate liveness evidence drifted");
   assert.deepEqual(actual.artifacts, expected.artifacts, "candidate artifact digest is stale");
@@ -385,7 +430,7 @@ export function compareStable(actual, expected) {
   assert.equal(actual.identity.informationUuidV5, informationUuidV5, "candidate information identity changed");
   assert.equal(
     actual.identity.observationUuidV7,
-    deterministicUuid7(actual.observedAt, `${informationUuidV5}\0${actual.source.commit}\0${actual.testRun.total}`),
+    deterministicUuid7(actual.observedAt, candidateObservationSeed(actual.source.commit, actual.testRun.total, actual.artifacts)),
     "candidate observation identity is not reproducible from its recorded inputs",
   );
 }
@@ -393,7 +438,7 @@ export function compareStable(actual, expected) {
 if (import.meta.main) {
   const mode = process.argv[2] ?? "--check";
   assert.ok(mode === "--write" || mode === "--check", "use --write or --check");
-  const candidate = await buildCandidate();
+  const candidate = await buildCandidate(mode);
   if (mode === "--write") {
     await writeFile(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
     console.log(

@@ -17,6 +17,10 @@ test("the booking explanation contains an accessible, current audit proof", asyn
 
   const details = html.match(/<details>[\s\S]*?<\/details>/u)?.[0] ?? "";
   assert.match(html, /<p id="state-summary" class="state-summary" aria-live="polite">/u);
+  const resultBox = html.match(/<div class="result-box"[^>]*>/u)?.[0] ?? "";
+  assert.equal((html.match(/id="state-summary"/gu) ?? []).length, 1);
+  assert.match(resultBox, /aria-atomic="true"/u);
+  assert.doesNotMatch(resultBox, /aria-live=/u);
   for (const id of ["proof-fingerprint", "proof-event-count", "proof-latest-event", "proof-chain-head", "proof-chain-valid"]) {
     assert.match(details, new RegExp(`id="${id}"`, "u"));
   }

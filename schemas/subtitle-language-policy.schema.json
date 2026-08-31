@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/subtitle-language-policy.schema.json",
+  "$comment": "information_uuid_v5=af1ce89f-9aff-51fb-a147-8dfc4a07fc71 event_uuid_v7=01a055f2-3169-747d-a80e-2bdbd2d0eaf4 state_transition=LANGUAGE_RULES_DUPLICATED -> LANGUAGE_RULES_SHARED occurred_at=2026-08-31T03:52:10.857Z machine-contract=The same language-tag grammar and English primary-subtag rule are consumed by the JSON Schema and the executable subtitle validator.",
+  "title": "Shared subtitle language policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policyName", "normalization", "englishPrimarySubtag", "primarySubtagMinLength", "primarySubtagMaxLength", "subtagMinLength", "subtagMaxLength"],
+  "properties": {
+    "policyName": { "const": "BCP47_LIKE_SUBTITLE_LANGUAGE_TAGS" },
+    "normalization": { "const": "LOWERCASE_PRIMARY_SUBTAG_ONLY" },
+    "englishPrimarySubtag": { "const": "en" },
+    "primarySubtagMinLength": { "const": 2 },
+    "primarySubtagMaxLength": { "const": 3 },
+    "subtagMinLength": { "const": 2 },
+    "subtagMaxLength": { "const": 8 }
+  },
+  "$defs": {
+    "languageTag": {
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+    },
+    "englishLanguageTag": {
+      "allOf": [
+        { "$ref": "#/$defs/languageTag" },
+        { "pattern": "^[Ee][Nn](?:-|$)" }
+      ]
+    }
+  }
+}

@@ -2,12 +2,12 @@
   "$schema": "../schemas/hotel-release-candidate.schema.json",
   "identity": {
     "informationUuidV5": "f2da6444-7447-5120-a39d-446adda200ca",
-    "observationUuidV7": "01a0554b-9abd-7098-a779-7a01c4833b8d"
+    "observationUuidV7": "01a0566a-07e4-79f5-a424-eef75495cf45"
   },
-  "observedAt": "2026-08-31T00:50:13.309Z",
+  "observedAt": "2026-08-31T06:03:04.548Z",
   "source": {
     "commit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
-    "state": "COMMITTED_CANDIDATE",
+    "state": "WORKTREE_CANDIDATE",
     "branch": "codex/hotel-readable-status-colors",
     "baseCommit": "20dfb20fd3b9aebdf693198da0d269b7f6ce2d16"
   },
@@ -35,7 +35,7 @@
     "approvalDigestRenewed": true
   },
   "artifacts": {
-    "functionalClientSha256": "6b270766afed0a8527dc335a5380277c800e95cdfd8f70d402eafd7cca9ba134",
+    "functionalClientSha256": "9bef79c7d09a953e19156c9d823f1d963b8102b63e651af50ac2cda94345f704",
     "functionalClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
@@ -45,14 +45,14 @@
         "service-integrations.json"
       ]
     },
-    "fullClientSha256": "1e2124cccd09204f0ec7d5ec508c0215538904163e665ecec54b169e0227416a",
+    "fullClientSha256": "8206697ef5b0d344d513e0c31d006ca4d86a9c505d9854d18468899d2fe4e4e6",
     "fullClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
       "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
       "excludedPaths": []
     },
-    "fullSitesPackageSha256": "4c77f7445a2cdc4e38d281bad0847903ad778a45c34c8245cf5c370cc6895615",
+    "fullSitesPackageSha256": "da8f7dcfb0292c4061f38983da87c0665f3dcff3bf5bcb892f7e3af12dbdc893",
     "fullSitesScope": {
       "algorithm": "SHA-256",
       "root": "dist",
@@ -63,7 +63,7 @@
   "publicClaims": {
     "candidateTestCount": 194,
     "publicReadbackTestCount": 194,
-    "status": "MATCH",
+    "status": "PUBLIC_READBACK_TEST_COUNT_MATCH_ARTIFACTS_UNPUBLISHED",
     "source": "metadata/hotel-public-release-readback.json",
     "releaseCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
@@ -124,7 +124,7 @@
       "sameConfirmation": true,
       "humanConfirmationBoundary": "visible_button_only",
       "driverAction": "visible_button_exercised_by_browser_driver",
-      "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect."
+      "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect. The local worktree artifact digests differ from the historical public release; no fresh public native run is claimed for this candidate."
     },
     "recording": {
       "status": "LOCAL_ARTIFACT",
@@ -357,18 +357,18 @@
     },
     {
       "issue": 193,
-      "status": "PASS",
-      "reason": "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result."
+      "status": "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+      "reason": "The local worktree artifacts differ from the historical public release; exact public artifact equality is not established, so issue 193 remains not ready until a later deployment and public readback bind these bytes."
     }
   ],
   "finalGate": {
     "formula": "S AND L AND F_exact AND W AND E",
-    "status": "PASS",
-    "ready": true,
+    "status": "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+    "ready": false,
     "components": {
       "S": "PASS",
       "L": "PASS",
-      "F_exact": "PASS",
+      "F_exact": "FAIL",
       "W": "PASS",
       "E": "PASS"
     }

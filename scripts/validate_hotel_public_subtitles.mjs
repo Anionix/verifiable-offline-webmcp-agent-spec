@@ -10,6 +10,7 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { TextDecoder } from "node:util";
@@ -31,7 +32,21 @@ const HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR = "en.*";
 const HISTORICAL_DOWNLOAD_COMMAND = `uvx yt-dlp --skip-download --write-subs --sub-langs "${HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR}" --sub-format vtt --no-write-auto-subs --no-cache-dir`;
 const HISTORICAL_CATALOG_COMMAND = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
 const REPRODUCTION_ONLY_COMMAND_STATUS = "REPRODUCTION_ONLY";
-const SUBTITLE_LANGUAGE_PATTERN = /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/u;
+const subtitleLanguagePolicy = JSON.parse(
+  readFileSync(new URL("../schemas/subtitle-language-policy.schema.json", import.meta.url), "utf8"),
+);
+const ENGLISH_PRIMARY_SUBTAG = subtitleLanguagePolicy.properties.englishPrimarySubtag.const;
+const subtitleLanguageRules = Object.freeze({
+  primaryMinLength: subtitleLanguagePolicy.properties.primarySubtagMinLength.const,
+  primaryMaxLength: subtitleLanguagePolicy.properties.primarySubtagMaxLength.const,
+  subtagMinLength: subtitleLanguagePolicy.properties.subtagMinLength.const,
+  subtagMaxLength: subtitleLanguagePolicy.properties.subtagMaxLength.const,
+});
+const LANGUAGE_PRIMARY_CHARACTERS = /^[A-Za-z]+$/u;
+const LANGUAGE_SUBTAG_CHARACTERS = /^[A-Za-z0-9]+$/u;
+const OBSERVED_DOWNLOAD_COMMAND =
+  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(ext)s ${SUBTITLE_WATCH_URL}`;
+const OBSERVED_CATALOG_COMMAND = `${HISTORICAL_CATALOG_COMMAND} ${SUBTITLE_WATCH_URL}`;
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
@@ -51,6 +66,32 @@ export function renderYtDlpSubtitleFileName(outputTemplate, infoLanguage, reques
 
 function normalizeText(text) {
   return text.replace(/\s+/gu, " ").trim();
+}
+
+// information_uuid_v5=af1ce89f-9aff-51fb-a147-8dfc4a07fc71
+// event_uuid_v7=01a055f2-3169-747d-a80e-2bdbd2d0eaf4 state_transition=LANGUAGE_TAG_UNNORMALIZED -> LANGUAGE_TAG_PRIMARY_SUBTAG_NORMALIZED
+// machine-contract: every accepted subtitle language uses the shared schema grammar; only the primary subtag is lowercased for comparison.
+function isSubtitleLanguageTag(language) {
+  const [primary, ...subtags] = language.split("-");
+  return (
+    primary.length >= subtitleLanguageRules.primaryMinLength &&
+    primary.length <= subtitleLanguageRules.primaryMaxLength &&
+    LANGUAGE_PRIMARY_CHARACTERS.test(primary) &&
+    subtags.every(
+      (subtag) =>
+        subtag.length >= subtitleLanguageRules.subtagMinLength &&
+        subtag.length <= subtitleLanguageRules.subtagMaxLength &&
+        LANGUAGE_SUBTAG_CHARACTERS.test(subtag),
+    )
+  );
+}
+
+export function normalizeSubtitleLanguage(language) {
+  assert.equal(typeof language, "string", "subtitle language must be a string");
+  assert.ok(isSubtitleLanguageTag(language), `invalid subtitle language code: ${language}`);
+  const [primary, ...subtags] = language.split("-");
+  const normalized = [primary.toLowerCase(), ...subtags].join("-");
+  return Object.freeze({ original: language, normalized, primary: primary.toLowerCase() });
 }
 
 function timestampToMilliseconds(timestamp) {
@@ -144,7 +185,8 @@ function parseWebVttHeader(block) {
     assert.equal(declarations.get("Kind"), "captions", "WebVTT header Kind must be captions for English captions");
   }
   if (declarations.has("Language")) {
-    assert.equal(declarations.get("Language"), "en", "WebVTT header Language must be en for English captions");
+    const normalizedLanguage = normalizeSubtitleLanguage(declarations.get("Language"));
+    assert.equal(normalizedLanguage.primary, ENGLISH_PRIMARY_SUBTAG, "WebVTT header Language must identify English captions");
   }
 }
 
@@ -246,7 +288,8 @@ function validateSubtitleCommand(command, label, watchUrl, outputFileName = null
   assert.equal(command.commandStatus, REPRODUCTION_ONLY_COMMAND_STATUS, `${label} command status differs`);
   assert.equal(watchUrl, SUBTITLE_WATCH_URL, `${label} watch URL differs`);
   const historicalCommand = outputFileName === null ? HISTORICAL_CATALOG_COMMAND : HISTORICAL_DOWNLOAD_COMMAND;
-  assert.equal(command.observedCommand, historicalCommand, `${label} historical command differs`);
+  const expectedObservedCommand = outputFileName === null ? OBSERVED_CATALOG_COMMAND : OBSERVED_DOWNLOAD_COMMAND;
+  assert.equal(command.observedCommand, expectedObservedCommand, `${label} observed command differs`);
   if (outputFileName !== null) {
     assert.equal(command.requestedLanguage, HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR, `${label} language selector differs`);
     assert.equal(typeof command.outputTemplate, "string", `${label} output template is missing`);
@@ -266,8 +309,9 @@ function validateSubtitleCommand(command, label, watchUrl, outputFileName = null
 function validateSubtitleCatalogLanguages(catalog, label, englishExpected) {
   assert.ok(Array.isArray(catalog?.languages), `${label} catalog languages must be an array`);
   assert.equal(new Set(catalog.languages).size, catalog.languages.length, `${label} catalog languages must be unique`);
-  assert.ok(catalog.languages.every((language) => typeof language === "string" && SUBTITLE_LANGUAGE_PATTERN.test(language)), `${label} catalog has an invalid language code`);
-  const hasEnglishLanguage = catalog.languages.some((language) => language.split("-", 1)[0].toLowerCase() === "en");
+  assert.ok(catalog.languages.every((language) => typeof language === "string" && isSubtitleLanguageTag(language)), `${label} catalog has an invalid language code`);
+  const normalizedLanguages = catalog.languages.map(normalizeSubtitleLanguage);
+  const hasEnglishLanguage = normalizedLanguages.some(({ primary }) => primary === ENGLISH_PRIMARY_SUBTAG);
   assert.equal(hasEnglishLanguage, englishExpected, englishExpected ? `${label} catalog must include English` : `${label} catalog must not include English`);
   assert.equal(catalog.authoredEnglishConfirmed, englishExpected, englishExpected ? `${label} catalog must confirm English` : `${label} catalog must not confirm English`);
 }
@@ -422,6 +466,10 @@ if (import.meta.main) {
       historyComparisonReadbackCount: history.comparisonReadbackCount,
       historyUnavailableReadbackCount: history.unavailableReadbackCount,
       historyValidationResult: history.validationResult,
+      subtitleLanguagePolicy: {
+        normalization: subtitleLanguagePolicy.properties.normalization.const,
+        englishPrimarySubtag: ENGLISH_PRIMARY_SUBTAG,
+      },
       authentication: "NO_COOKIES_OR_CREDENTIALS_SUPPLIED",
       videoFileIdentity: "UNMEASURED",
     }),

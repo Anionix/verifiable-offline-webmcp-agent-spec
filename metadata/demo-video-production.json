@@ -507,7 +507,7 @@
           "method": "YTDLP_ANONYMOUS_PUBLIC_SUBTITLE_DOWNLOAD",
           "command": "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir --output \"media/demo-video/youtube-public-201.%(ext)s\" \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"",
           "commandStatus": "REPRODUCTION_ONLY",
-          "observedCommand": "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir",
+          "observedCommand": "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(ext)s https://www.youtube.com/watch?v=tdSvJw4ghX8",
           "outputTemplate": "media/demo-video/youtube-public-201.%(ext)s",
           "authentication": "NONE",
           "requestedLanguage": "en.*",
@@ -519,7 +519,7 @@
           "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
           "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"",
           "commandStatus": "REPRODUCTION_ONLY",
-          "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+          "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8",
           "authentication": "NONE",
           "capturedAfterComparison": true,
           "captureTiming": {
@@ -564,14 +564,31 @@
       }
     ],
     "thumbnail": {
-      "canvaAssetSha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
-      "customApplicationState": "NOT_APPLIED_TOOL_TIMEOUT",
-      "failureReason": "YOUTUBE_FILE_CHOOSER_TIMEOUT",
-      "publicState": "AUTO_GENERATED_PUBLIC_VERIFIED",
+      "sourceArtifact": {
+        "path": "docs/assets/devpost-hotel-thumbnail.png",
+        "sourceCommit": "5583cdbeddbbeae2c6f16fd481fc809069a15296",
+        "bytes": 1240818,
+        "width": 1672,
+        "height": 941,
+        "sha256": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10"
+      },
+      "customApplicationState": "APPLIED_PUBLIC",
+      "failureReason": "NONE",
+      "publicState": "PUBLIC_THUMBNAIL_READBACK_VERIFIED",
       "publicUrl": "https://i.ytimg.com/vi/tdSvJw4ghX8/maxresdefault.jpg",
-      "publicSha256": "fa4250c3d9b712b45d0c7f47b938a996335947543a0a857825262398a7ffea3b",
+      "publicSha256": "3ad391ba3efc35f61566299848dd1a3deeff05efc1e263a8dbfd73af293c8792",
       "publicWidth": 1280,
-      "publicHeight": 720
+      "publicHeight": 720,
+      "historicalFallback": {
+        "canvaAssetSha256": "14f2bec542f3a56fc0dece3300a53fb7029559d6b5b4717c7555a3e34890afef",
+        "customApplicationState": "NOT_APPLIED_TOOL_TIMEOUT",
+        "failureReason": "YOUTUBE_FILE_CHOOSER_TIMEOUT",
+        "publicState": "AUTO_GENERATED_PUBLIC_VERIFIED",
+        "publicUrl": "https://i.ytimg.com/vi/tdSvJw4ghX8/maxresdefault.jpg",
+        "publicSha256": "fa4250c3d9b712b45d0c7f47b938a996335947543a0a857825262398a7ffea3b",
+        "publicWidth": 1280,
+        "publicHeight": 720
+      }
     },
     "thumbnailUpdates": [
       {
@@ -690,10 +707,12 @@
         "publicHeight": 222,
         "ogImageUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/206/575/datas/medium.png",
         "twitterImageUrl": "https://d112y698adiu2z.cloudfront.net/photos/production/software_thumbnail_photos/005/206/575/datas/medium.png",
-        "htmlEvidenceFileName": "devpost-public-202-followup.html",
+        "htmlEvidenceFileName": "verification-evidence/devpost-public-202-followup.html",
         "htmlEvidenceSha256": "b38c31634efc0fde4483f023f84005fcabaa75881d5ea4aac18ae40d822f33a5",
-        "imageEvidenceFileName": "devpost-cover-public-202-followup.png",
+        "htmlEvidenceBytes": 78513,
+        "imageEvidenceFileName": "verification-evidence/devpost-cover-public-202-followup.png",
         "imageEvidenceSha256": "8b8c63ca603c1e14c0c0c84ee1bac003da02d38e2ddb553028123c9803b3ca95",
+        "imageEvidenceBytes": 74952,
         "imageEvidenceFormat": "PNG",
         "imageEvidenceWidth": 333,
         "imageEvidenceHeight": 222,

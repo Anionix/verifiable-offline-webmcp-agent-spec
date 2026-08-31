@@ -9,6 +9,8 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { formatDraft202012Errors, validateDraft202012 } from "./public-release-alignment-schema.mjs";
+
 const ROOT = resolve(import.meta.dirname, "..");
 const ALIGNMENT_PATH = resolve(ROOT, "metadata/public-release-alignment-readback.json");
 const VERCEL_READBACK_PATH = resolve(ROOT, "metadata/hotel-public-release-readback.json");
@@ -24,6 +26,13 @@ const expectedSitesVersionId = "appgprj_6a923239002081918896546134a7dc8f~appgver
 const expectedVercelSource = "cda7ff7c51698f4ec7292f1c076468712a239bd8";
 const expectedDeployment = "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu";
 const expectedDevpostUpdatedAt = "2026-08-31T03:47:23.509Z";
+
+const schemaResult = validateDraft202012(alignment, schema);
+assert.equal(
+  schemaResult.errors.length,
+  0,
+  `metadata/public-release-alignment-readback.json violates Draft 2020-12: ${formatDraft202012Errors(schemaResult, "metadata/public-release-alignment-readback.json")}`,
+);
 
 function uuidVersion(value, version, label) {
   assert.match(value, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u, `${label} is not a UUID`);

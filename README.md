@@ -50,6 +50,15 @@ status: "design-specification"
 
 **60-second test:** **1. Check and prepare** → **2. Confirm booking — human action only** → **Retry the same booking** → verify `RETRY_RECOGNIZED`, attempts `2`, bookings `1`, effect starts `1`, and the same confirmation number.
 
+### 中学生向けの4段階図 / Four-step beginner guide
+
+<!-- information_uuid_v5=9814fe28-d4ee-5cdc-b331-e6f56c05e54d -->
+<!-- event_uuid_v7=01a056a4-8d6b-77e6-bd97-41deb529abd3 state_transition=IMAGE_GENERATED -> IMAGE_INSPECTED -> README_PLACED occurred_at=2026-08-31T07:06:41.232Z -->
+<!-- machine-contract=This generated image is an explanatory, fictional, non-measured guide; it shows status-first reconciliation and one simulated booking, with no real booking or payment. provenance_record=metadata/hotel-retry-student-guide.json; image_gen_invocations=1; sha256=b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82. -->
+![Four-step beginner guide: a lost reply is checked before retrying, and the same simulated booking is found / 中学生向け4段階図：返事が消えても先に状態を確認し、同じ架空予約を見つける](docs/assets/hotel-retry-student-guide.png)
+
+この図は、返事が消えたときにすぐ再送せず、まず同じ予約があるかを確認する流れを示します。架空デモの説明であり、実際の予約や支払いではありません。 / This is a fictional explanation, not a real booking or payment.
+
 **Open:** [Public ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site) · [2-minute-30-second video](https://youtu.be/tdSvJw4ghX8) · [Devpost](https://devpost.com/software/project-y79pb23hj1mz) · [Current Vercel release](https://kyoto-booking-retry-proof.vercel.app) · [Release README](examples/hotel-booking-demo/README.md) · [Visual guide](docs/25-devpost-visual-guide.en.md) · [Release instructions](docs/24-hotel-release-package.ja.md)
 
 [![Kyoto Booking Retry Proof showing RETRY_RECOGNIZED, two attempts, one booking, and one effect start](docs/assets/devpost-hotel-thumbnail.png)](https://kyoto-booking-retry-proof.anionix.chatgpt.site)

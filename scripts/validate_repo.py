@@ -105,6 +105,14 @@ ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE"
 OWNER_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED"
 OWNER_SUBTITLE_FAILURE_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
 SUBTITLE_ROOT_MATCH_SUFFIX = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
+KNOWN_SUBTITLE_DERIVED_SUFFIXES = {
+    OWNER_SUBTITLE_MATCH_STATE.rsplit(" -> ", 1)[-1],
+    OWNER_SUBTITLE_FAILURE_STATE.rsplit(" -> ", 1)[-1],
+    ANONYMOUS_SUBTITLE_MISMATCH_STATE.rsplit(" -> ", 1)[-1],
+    ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE.rsplit(" -> ", 1)[-1],
+    SUBTITLE_ROOT_MATCH_SUFFIX,
+    FUTURE_SUBTITLE_STATE_SUFFIX,
+}
 
 # information_uuid_v5=4bdf0ef2-2643-5e5c-99fb-5d53a34ad4dd
 # event_uuid_v7=01a05564-0000-7a8e-a368-40c6448db6da
@@ -821,6 +829,9 @@ def document_event_collision_errors(video_production: dict[str, Any]) -> list[st
     return findings
 
 
+# information_uuid_v5=a83c2d62-4b7e-507c-8630-b5f36d4f2ce2
+# event_uuid_v7=01a0570d-6633-7250-8250-0123456789ab state_transition=SUBTITLE_EVENT_GROUP_EMPTY -> KNOWN_SUBTITLE_SUFFIX_REQUIREMENT_ENFORCED occurred_at=2026-08-31T09:01:31.059Z
+# machine-contract: a known subtitle-derived suffix requires a newer subtitle event; media-only suffixes remain valid when the event group is empty.
 def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     # machine-contract: the previous root keeps its complete chain; the current chain may append later suffixes but cannot delete or reorder that prefix.
     findings: list[str] = []
@@ -921,7 +932,16 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                 )
                 break
             suffix_cursors = next_suffix_cursors
-        if event_groups and len(suffix) not in suffix_cursors:
+        if (
+            (event_groups and len(suffix) not in suffix_cursors)
+            or (
+                not event_groups
+                and any(
+                    suffix_token in KNOWN_SUBTITLE_DERIVED_SUFFIXES
+                    for suffix_token in suffix
+                )
+            )
+        ):
             findings.append("video production root state transition has an unbound subtitle suffix")
         findings.extend(
             subtitle_observation_errors(
@@ -1153,6 +1173,16 @@ def subtitle_root_suffix_fixture_errors(
     media_only["stateTransition"] = f"{previous_state} -> MEDIA_ONLY_READBACK_RECORDED"
     if document_history_errors(media_only):
         findings.append("root history rejected a media-only suffix without a newer subtitle event")
+
+    known_subtitle_suffix_without_event = json.loads(json.dumps(media_only))
+    known_subtitle_suffix_without_event["stateTransition"] = (
+        f"{previous_state} -> {OWNER_SUBTITLE_FAILURE_STATE.rsplit(' -> ', 1)[-1]}"
+    )
+    if not any(
+        "unbound subtitle suffix" in finding
+        for finding in document_history_errors(known_subtitle_suffix_without_event)
+    ):
+        findings.append("root history accepted a known subtitle suffix without a newer subtitle event")
     return findings
 
 

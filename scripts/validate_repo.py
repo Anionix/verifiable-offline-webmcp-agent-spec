@@ -1106,6 +1106,116 @@ def subtitle_root_suffix_fixture_errors(
     return findings
 
 
+# information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246
+# event_uuid_v7=01a053bd-aba1-7772-928c-1b5a811b7cab
+# state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE occurred_at=2026-08-30T17:35:34.305Z
+# machine-contract: the retained Devpost candidate metadata must match the repository PNG bytes and IHDR dimensions; editable metadata cannot turn a different file into this evidence.
+def devpost_thumbnail_candidate_errors(video_production: dict[str, Any]) -> list[str]:
+    findings: list[str] = []
+    publication = video_production.get("publication")
+    updates = publication.get("devpostThumbnailUpdates") if isinstance(publication, dict) else None
+    if not isinstance(updates, list):
+        return findings
+    candidate = next(
+        (record for record in updates if isinstance(record, dict) and record.get("state") == "THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE"),
+        None,
+    )
+    if not isinstance(candidate, dict):
+        return findings
+    expected_path = "docs/assets/devpost-hotel-cover-3x2.png"
+    if candidate.get("candidatePath") != expected_path:
+        findings.append("Devpost candidate path is not the retained repository PNG")
+        return findings
+    candidate_path = (ROOT / expected_path).resolve()
+    if ROOT not in candidate_path.parents or not candidate_path.is_file():
+        findings.append("Devpost candidate PNG is missing or outside the repository")
+        return findings
+    candidate_bytes = candidate_path.read_bytes()
+    if candidate.get("candidateSha256") != sha256(candidate_bytes):
+        findings.append("Devpost candidate SHA-256 differs from the repository PNG")
+    if candidate.get("candidateBytes") != len(candidate_bytes):
+        findings.append("Devpost candidate byte length differs from the repository PNG")
+    png_signature = b"\x89PNG\r\n\x1a\n"
+    if len(candidate_bytes) < 24 or not candidate_bytes.startswith(png_signature) or candidate_bytes[12:16] != b"IHDR":
+        findings.append("Devpost candidate is not a structurally recognizable PNG")
+    else:
+        candidate_width = int.from_bytes(candidate_bytes[16:20], "big")
+        candidate_height = int.from_bytes(candidate_bytes[20:24], "big")
+        if candidate.get("candidateWidth") != candidate_width:
+            findings.append("Devpost candidate width differs from the repository PNG")
+        if candidate.get("candidateHeight") != candidate_height:
+            findings.append("Devpost candidate height differs from the repository PNG")
+    return findings
+
+
+# information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246
+# event_uuid_v7=01a053bd-aba1-7772-928c-1b5a811b7cab,01a0543a-74de-71b6-ab45-5fbbf4f8f01c
+# state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE -> PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED occurred_at=2026-08-30T19:51:52.286Z
+# machine-contract: the first two Devpost observations are ordered and unique; later records keep the issue-202 identity, a UUIDv7 clock, and non-decreasing observation time.
+def devpost_thumbnail_history_errors(video_production: dict[str, Any]) -> list[str]:
+    findings: list[str] = []
+    publication = video_production.get("publication")
+    updates = publication.get("devpostThumbnailUpdates") if isinstance(publication, dict) else None
+    if not isinstance(updates, list):
+        return findings
+    required_states = {
+        "THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE",
+        "PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED",
+    }
+    if len(updates) < 2:
+        findings.append("Devpost thumbnail history has fewer than its two required observations")
+    else:
+        if not isinstance(updates[0], dict) or updates[0].get("state") != "THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE":
+            findings.append("Devpost thumbnail history requires the stale record at index 1")
+        if not isinstance(updates[1], dict) or updates[1].get("state") != "PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED":
+            findings.append("Devpost thumbnail history requires the matched readback at index 2")
+    stable_information_uuid = "ff53f0a8-5ba4-5332-8e67-1ebffe650246"
+    stable_name = "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/202#devpost-cover-readback"
+    seen_event_uuids: set[str] = set()
+    previous_time_ms: int | None = None
+    state_counts = {state: 0 for state in required_states}
+    for index, record in enumerate(updates, 1):
+        if not isinstance(record, dict):
+            findings.append(f"Devpost thumbnail history entry {index} is not an object")
+            continue
+        state = record.get("state")
+        if state in state_counts:
+            state_counts[state] += 1
+            if index > 2:
+                findings.append(f"Devpost thumbnail history repeats required state {state} at entry {index}")
+        if record.get("informationUuidV5") != stable_information_uuid:
+            findings.append(f"Devpost thumbnail history entry {index} has the wrong information UUID")
+        if record.get("uuidV5Namespace") != "URL" or record.get("uuidV5Name") != stable_name:
+            findings.append(f"Devpost thumbnail history entry {index} has the wrong UUIDv5 name binding")
+        event_value = record.get("observationUuidV7")
+        if not isinstance(event_value, str):
+            findings.append(f"Devpost thumbnail history entry {index} lacks an observation UUIDv7")
+            continue
+        timestamp_fields = [field for field in ("observedAt", "recordedAt") if isinstance(record.get(field), str)]
+        if len(timestamp_fields) != 1:
+            findings.append(f"Devpost thumbnail history entry {index} must have exactly one observation timestamp")
+            continue
+        try:
+            event_uuid = uuid.UUID(event_value)
+            event_time_ms = uuid7_ms(event_value)
+            recorded_time_ms = rfc3339_ms(record[timestamp_fields[0]])
+        except Exception as exc:
+            findings.append(f"Devpost thumbnail history entry {index} has invalid UUIDv7 or timestamp: {exc}")
+            continue
+        if event_uuid.version != 7 or event_time_ms != recorded_time_ms:
+            findings.append(f"Devpost thumbnail history entry {index} UUIDv7 does not match its timestamp")
+        if event_value in seen_event_uuids:
+            findings.append(f"Devpost thumbnail history repeats observation UUID {event_value}")
+        if previous_time_ms is not None and event_time_ms < previous_time_ms:
+            findings.append(f"Devpost thumbnail history timestamps decrease at entry {index}")
+        seen_event_uuids.add(event_value)
+        previous_time_ms = event_time_ms
+    for state, count in state_counts.items():
+        if count != 1:
+            findings.append(f"Devpost thumbnail history requires exactly one {state} record, found {count}")
+    return findings
+
+
 def merkle_leaf(d: str): return hashlib.sha256(b"\x00" + bytes.fromhex(d)).digest()
 
 def merkle_node(a: bytes, b: bytes): return hashlib.sha256(b"\x01" + a + b).digest()
@@ -2255,6 +2365,8 @@ def main():
     for e in video_production_validator.iter_errors(video_production):
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
     publication_for_schema_checks = video_production.get("publication")
+    errors.extend(devpost_thumbnail_candidate_errors(video_production))
+    errors.extend(devpost_thumbnail_history_errors(video_production))
     for required_field in ("subtitleUpdates", "subtitleAnonymousReadbacks"):
         missing_field = json.loads(json.dumps(video_production))
         missing_publication = missing_field.get("publication")
@@ -2273,6 +2385,92 @@ def main():
             errors.append("video production schema accepted a mismatched subtitle information identifier")
     elif isinstance(publication_for_schema_checks, dict):
         errors.append("video production schema mutation fixture lacks a subtitleUpdates entry")
+    devpost_updates_fixture = (
+        publication_for_schema_checks.get("devpostThumbnailUpdates")
+        if isinstance(publication_for_schema_checks, dict)
+        else None
+    )
+    if isinstance(devpost_updates_fixture, list) and devpost_updates_fixture:
+        candidate_field_mutations = {
+            "candidatePath": "docs/assets/not-the-retained-candidate.png",
+            "candidateSha256": "0" * 64,
+            "candidateBytes": 1,
+            "candidateWidth": 1,
+            "candidateHeight": 1,
+        }
+        for field, value in candidate_field_mutations.items():
+            candidate_fixture = json.loads(json.dumps(video_production))
+            candidate_record = candidate_fixture["publication"]["devpostThumbnailUpdates"][0]
+            candidate_record[field] = value
+            if not list(video_production_validator.iter_errors(candidate_fixture)):
+                errors.append(f"video production schema accepted a mutated Devpost candidate field: {field}")
+        new_social_url = devpost_updates_fixture[-1].get("publicUrl")
+        if isinstance(new_social_url, str):
+            for field in ("ogImageUrl", "twitterImageUrl"):
+                stale_url_fixture = json.loads(json.dumps(video_production))
+                stale_url_fixture["publication"]["devpostThumbnailUpdates"][0][field] = new_social_url
+                if not list(video_production_validator.iter_errors(stale_url_fixture)):
+                    errors.append(f"video production schema accepted the new social URL in the initial stale field: {field}")
+    elif isinstance(publication_for_schema_checks, dict):
+        errors.append("video production schema mutation fixture lacks a devpostThumbnailUpdates entry")
+    if isinstance(devpost_updates_fixture, list) and len(devpost_updates_fixture) >= 2:
+        issue_203_name = "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/203#devpost-cover-readback"
+        stable_identifier_mutations = {
+            "informationUuidV5": str(uuid.uuid5(uuid.NAMESPACE_URL, issue_203_name)),
+            "uuidV5Name": issue_203_name,
+        }
+        for field, value in stable_identifier_mutations.items():
+            identifier_fixture = json.loads(json.dumps(video_production))
+            identifier_fixture["publication"]["devpostThumbnailUpdates"][0][field] = value
+            if not list(video_production_validator.iter_errors(identifier_fixture)):
+                errors.append(f"video production schema accepted a mutated issue-202 UUID binding: {field}")
+        reversed_fixture = json.loads(json.dumps(video_production))
+        reversed_fixture["publication"]["devpostThumbnailUpdates"][:2] = reversed(
+            reversed_fixture["publication"]["devpostThumbnailUpdates"][:2]
+        )
+        if not list(video_production_validator.iter_errors(reversed_fixture)):
+            errors.append("video production schema accepted reversed Devpost thumbnail history")
+        if not any(
+            "requires the stale record at index 1" in finding
+            or "requires the matched readback at index 2" in finding
+            for finding in devpost_thumbnail_history_errors(reversed_fixture)
+        ):
+            errors.append("Devpost thumbnail history semantic gate accepted reversed required observations")
+        duplicate_fixture = json.loads(json.dumps(video_production))
+        duplicate_fixture["publication"]["devpostThumbnailUpdates"].append(
+            json.loads(json.dumps(duplicate_fixture["publication"]["devpostThumbnailUpdates"][0]))
+        )
+        if not list(video_production_validator.iter_errors(duplicate_fixture)):
+            errors.append("video production schema accepted a duplicate required Devpost thumbnail observation")
+        if not any(
+            "repeats observation UUID" in finding or "repeats required state" in finding
+            for finding in devpost_thumbnail_history_errors(duplicate_fixture)
+        ):
+            errors.append("Devpost thumbnail history semantic gate accepted a duplicate required observation")
+        second_time_ms = rfc3339_ms(devpost_updates_fixture[1]["recordedAt"])
+        future_time_ms = second_time_ms + 1
+        future_record = {
+            "informationUuidV5": "ff53f0a8-5ba4-5332-8e67-1ebffe650246",
+            "uuidV5Namespace": "URL",
+            "uuidV5Name": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/202#devpost-cover-readback",
+            "observationUuidV7": uuid7_for_ms(future_time_ms, 0x123, 0x456789ABCDEF),
+            "observedAt": rfc3339_from_ms(future_time_ms),
+            "state": "FUTURE_TEST_OBSERVATION",
+            "evidenceBoundary": "Synthetic validation fixture only; no future observation is recorded.",
+        }
+        future_fixture = json.loads(json.dumps(video_production))
+        future_fixture["publication"]["devpostThumbnailUpdates"].append(future_record)
+        if list(video_production_validator.iter_errors(future_fixture)):
+            errors.append("video production schema rejected a valid future Devpost history entry")
+        if devpost_thumbnail_history_errors(future_fixture):
+            errors.append("Devpost thumbnail history semantic gate rejected a valid future observation")
+        backwards_fixture = json.loads(json.dumps(future_fixture))
+        backwards_record = backwards_fixture["publication"]["devpostThumbnailUpdates"][-1]
+        backwards_time_ms = second_time_ms - 1
+        backwards_record["observationUuidV7"] = uuid7_for_ms(backwards_time_ms, 0x124, 0x456789ABCDEE)
+        backwards_record["observedAt"] = rfc3339_from_ms(backwards_time_ms)
+        if not any("timestamps decrease" in finding for finding in devpost_thumbnail_history_errors(backwards_fixture)):
+            errors.append("Devpost thumbnail history semantic gate accepted a decreasing future timestamp")
     errors.extend(document_history_errors(video_production))
     non_subtitle_observation_references = [
         ("publication", publication_for_schema_checks.get("observationUuidV7") if isinstance(publication_for_schema_checks, dict) else None),

@@ -646,17 +646,43 @@ def subtitle_root_suffix_options(collection_name: str, record: dict[str, Any]) -
 def subtitle_suffix_group_cursors(
     suffix: list[str], start: int, events: list[tuple[str, int, set[str]]]
 ) -> set[int]:
+    if not events:
+        return {start}
+
+    # machine-contract: equal-time subtitle events are an unordered group; use
+    # bipartite feasibility for each possible last suffix token, while groups
+    # at different times remain strictly ordered by document_history_errors.
+    def can_match(event_indexes: list[int], candidate_positions: range) -> bool:
+        matched_events: dict[int, int] = {}
+
+        def augment(event_index: int, visited_positions: set[int]) -> bool:
+            for suffix_index in candidate_positions:
+                if suffix_index in visited_positions:
+                    continue
+                if suffix[suffix_index] not in events[event_index][2]:
+                    continue
+                visited_positions.add(suffix_index)
+                previous_event = matched_events.get(suffix_index)
+                if previous_event is None or augment(previous_event, visited_positions):
+                    matched_events[suffix_index] = event_index
+                    return True
+            return False
+
+        return all(augment(event_index, set()) for event_index in event_indexes)
+
     possible_cursors: set[int] = set()
-
-    def assign(event_index: int, used_indexes: set[int]) -> None:
-        if event_index == len(events):
-            possible_cursors.add(max(used_indexes, default=start - 1) + 1)
-            return
-        for suffix_index in range(start, len(suffix)):
-            if suffix_index not in used_indexes and suffix[suffix_index] in events[event_index][2]:
-                assign(event_index + 1, used_indexes | {suffix_index})
-
-    assign(0, set())
+    event_indexes = list(range(len(events)))
+    for cursor in range(start + 1, len(suffix) + 1):
+        last_suffix_index = cursor - 1
+        for forced_event_index in event_indexes:
+            if suffix[last_suffix_index] not in events[forced_event_index][2]:
+                continue
+            remaining_event_indexes = [
+                event_index for event_index in event_indexes if event_index != forced_event_index
+            ]
+            if can_match(remaining_event_indexes, range(start, last_suffix_index)):
+                possible_cursors.add(cursor)
+                break
     return possible_cursors
 
 
@@ -863,6 +889,13 @@ def subtitle_root_suffix_fixture_errors(
             findings.append(f"schema rejected the {suffix_order} same-time subtitle root fixture")
         if document_history_errors(same_time):
             findings.append(f"root history rejected the {suffix_order} same-time subtitle root fixture")
+
+    large_same_time_suffix = [f"SAME_TIME_SUFFIX_{index}" for index in range(12)]
+    large_same_time_events = [
+        ("subtitleUpdates", index, set(large_same_time_suffix)) for index in range(12)
+    ]
+    if subtitle_suffix_group_cursors(large_same_time_suffix, 0, large_same_time_events) != {12}:
+        findings.append("root history same-time suffix matching lost the 12-event assignment result")
 
     different_time_reversal = json.loads(json.dumps(owner_failure))
     different_time_reversal["publication"]["subtitleAnonymousReadbacks"].append(json.loads(json.dumps(mismatch_record)))

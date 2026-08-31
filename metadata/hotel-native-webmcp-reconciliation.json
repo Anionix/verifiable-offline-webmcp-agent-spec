@@ -10,14 +10,14 @@
     "provider": "Vercel",
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_Kj3Nf6HM9WVYnmK1bwb4xj7hJQW3",
+    "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
     "target": "production",
     "state": "READY",
-    "sourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
+    "sourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-lmk2qct8l-aniotajp-1978s-projects.vercel.app/",
-    "readyAt": "2026-08-31T00:34:00.476Z",
-    "observedAt": "2026-08-31T00:52:12.695Z"
+    "uniqueUrl": "https://kyoto-booking-retry-proof-l03knh4zg-aniotajp-1978s-projects.vercel.app/",
+    "readyAt": "2026-08-31T01:51:43.509Z",
+    "observedAt": "2026-08-31T01:58:54.579Z"
   },
   "discovery": {
     "profile": "MANAGED_IAB_NATIVE_CAPABILITY_V1",
@@ -27,8 +27,8 @@
     "runBinding": {
       "rootObservationUuidV7": "01a0554b-9abd-7ed6-a5eb-dbd1982d9109",
       "completedAt": "2026-08-31T00:50:13.309Z",
-      "publicSourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
-      "deploymentId": "dpl_Kj3Nf6HM9WVYnmK1bwb4xj7hJQW3",
+      "publicSourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+      "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
       "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
       "recordingSha256": "68e11be18f5d2503ba67c013524cfd46361bb3688d33778e47bde30ebc2cb6d7"
     },
@@ -262,7 +262,7 @@
     "sameConfirmation": true,
     "humanConfirmationBoundary": "visible_button_only",
     "driverAction": "visible_button_exercised_by_browser_driver",
-    "agentExplanation": "The browser driver exercised the visible confirmation boundary, then the managed native status check found the existing booking; retry returned the same confirmation without a second effect."
+    "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect."
   },
   "recording": {
     "status": "LOCAL_ARTIFACT",

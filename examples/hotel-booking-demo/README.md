@@ -5,8 +5,8 @@ information_uuid_v5: "14f8eb1a-a861-59e4-a2a1-1a5b2a0114d6"
 event_uuid_v7: "01a050c7-3406-7a09-b8ea-f08a051a2cd6"
 state_transition: "UNPACKAGED_DEMO -> JUDGE_READY_RELEASE_GUIDE"
 occurred_at: "2026-08-30T04:20:00Z"
-public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
-updated_at: "2026-08-31T03:49:55.632Z"
+public_release_alignment_event_uuid_v7: "01a0573d-8e18-7534-9480-d5f1b43c54d0"
+updated_at: "2026-08-31T09:54:07.000Z"
 status: "release-guide"
 ---
 
@@ -16,7 +16,7 @@ status: "release-guide"
 
 Visible proof: `2 attempts → 1 simulated booking → 1 confirmation number`.
 
-Current public alignment: the submitted ChatGPT Site is version 14 from source `2fbbf1b714ca660ef1681239b638205a9835f7c5`; the Vercel backup is deployment `dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu` from source `cda7ff7c51698f4ec7292f1c076468712a239bd8`. Anonymous retrieval of both [`Sites webmcp-evals.json`](https://kyoto-booking-retry-proof.anionix.chatgpt.site/webmcp-evals.json) and [`Vercel webmcp-evals.json`](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json) reports the same 194-test release evidence and exact four-tool contract. The [alignment record](../../metadata/public-release-alignment-readback.json) keeps public readback separate from the earlier browser execution record.
+Current public alignment: the submitted ChatGPT Site is version 14 from source `2fbbf1b714ca660ef1681239b638205a9835f7c5`; the Vercel backup is deployment `dpl_BetejQ7wQwwouGcyC6HW588EiqK8` from source `adeaf3f549aa7379acacbc6960eae4c11bbc6ba2`. Anonymous retrieval of both [`Sites webmcp-evals.json`](https://kyoto-booking-retry-proof.anionix.chatgpt.site/webmcp-evals.json) and [`Vercel webmcp-evals.json`](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json) reports the same 194-test release evidence and exact four-tool contract. The [alignment record](../../metadata/public-release-alignment-readback.json) keeps public readback separate from the fresh native execution record.
 
 ## Short Japanese summary / 日本語要約
 

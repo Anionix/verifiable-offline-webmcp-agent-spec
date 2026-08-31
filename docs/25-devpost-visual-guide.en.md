@@ -4,8 +4,8 @@ language: "en"
 information_uuid_v5: "5a6fb249-361d-5745-953e-faf72130ffe9"
 event_uuid_v7: "01a050c7-3441-7930-9b51-a85ca5c5c82f"
 state_transition: "TECHNICAL_DESCRIPTION_FIRST -> JUDGE_VISIBLE_PROOF_ROUTE"
-public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
-occurred_at: "2026-08-31T03:49:55.632Z"
+public_release_alignment_event_uuid_v7: "01a0573d-8e18-7534-9480-d5f1b43c54d0"
+occurred_at: "2026-08-31T09:54:07.000Z"
 status: "visual-guide-public-release-aligned"
 ---
 

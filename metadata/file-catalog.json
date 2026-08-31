@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "7787adbf3e6b36e43a5a76a28e42dc060b21edac9615e18452b23d486176bc8e",
-      "bytes": 46826,
+      "sha256": "d9f3aa312470cd8fbf5b2c875585e7d1e899eef0f0dd66393d45f9708d0cece8",
+      "bytes": 46919,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1821,7 +1821,7 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "b605f73fd8afd009a146b47d8a50e9f84c18f23f7c395e5797f4f62281d3a8a7",
+      "sha256": "bd8a81d097a8b80b68a1b0aee710c21715c23b8a898cfa2de35874ef109bc053",
       "bytes": 22730,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1840,7 +1840,7 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "027ed09f6eab1d6337972c4830bd1e4b4b36ca3f3de4ed14acd5857cdc45ab47",
+      "sha256": "536a1585f12b655b2cbad007c70997204366d7e3cd0ca7febb71536028ab5af5",
       "bytes": 12331,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1859,7 +1859,7 @@
     },
     {
       "path": "docs/24-hotel-release-package.en.md",
-      "sha256": "7265b397f57668f4caea50e7f7dbd5fef69b21c997ed24bacc32f2a4d80e7a28",
+      "sha256": "b2e65769cffe558e9ad9868822e5a00a296d420d26714655facaafc53c65705e",
       "bytes": 6833,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1878,7 +1878,7 @@
     },
     {
       "path": "docs/24-hotel-release-package.ja.md",
-      "sha256": "a2fbdc6f30d0ee3a182d180954ef5d48da4aaa4a8ebc879df6d20ee9c691b335",
+      "sha256": "f762e9ebbfba2cf440a17af496139e83abcce0348366ed2bc05335b37624ad2b",
       "bytes": 6786,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1897,7 +1897,7 @@
     },
     {
       "path": "docs/25-devpost-visual-guide.en.md",
-      "sha256": "0d1c5028cdd4625fe1f53f3980bce5612a13ed3bcd3815d0e8a6f265e9b6ddaa",
+      "sha256": "408c31ca6e3ba0bb34570482856fb1494438b33de2b2e9f535d79c4a081d5faf",
       "bytes": 10469,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1916,7 +1916,7 @@
     },
     {
       "path": "docs/25-devpost-visual-guide.ja.md",
-      "sha256": "94277a892f49ed333e9699541194b58de1acf0b1669dee279aca4e81ac87c863",
+      "sha256": "fa3e6f394b3471d81e1e18b2074c7e84be65a1f4be3b700479c6b44910896fc2",
       "bytes": 5276,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -2353,8 +2353,8 @@
     },
     {
       "path": "docs/source-map.md",
-      "sha256": "2eb321d9166219552e71a86f6ef09b50f007b7c9b536c09bd3ec1be40ea3c5ed",
-      "bytes": 24318,
+      "sha256": "172ce4ada058e9d1f507a092826353a14687d8eeb0cbe0785bb9670d5a2f2180",
+      "bytes": 24385,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -2429,8 +2429,8 @@
     },
     {
       "path": "docs/validation-report.md",
-      "sha256": "e128c4bc72af966fb82965913bc6cfd4c6f88859992fab5abcec34c3add2e245",
-      "bytes": 16888,
+      "sha256": "1d14918c0b05034c75407b98d0efcc39bff646ca48efdca518583bd0367874ce",
+      "bytes": 16968,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -2486,7 +2486,7 @@
     },
     {
       "path": "examples/hotel-booking-demo/README.md",
-      "sha256": "48ce90fcc32dfd7fe62a3d683aafe7b89e62900ed412a2ff5e55031a3a10bfb7",
+      "sha256": "e9f875bb9ba4e662cc298ca3c5fa723958e2b3b63263f37bc124673f1b01a07d",
       "bytes": 10858,
       "mediaType": "text/markdown",
       "category": "examples",
@@ -4083,8 +4083,8 @@
     },
     {
       "path": "metadata/hotel-native-webmcp-reconciliation.json",
-      "sha256": "fa3f9074a293a5b831cfe87149df096bd3f1c4beb86f360e3cc1b1eb35fdec5e",
-      "bytes": 13263,
+      "sha256": "58fdbc945d7e2178885677c3a83787e4d99a1ee0621ac861ff6434594f4d52aa",
+      "bytes": 13514,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4121,7 +4121,7 @@
     },
     {
       "path": "metadata/hotel-public-release-readback.json",
-      "sha256": "287c27fd2876f0ca4a10327e8222a7adcbf6319d9859f517dddd569b7a774cc8",
+      "sha256": "39d84d9ed92eb54ab0d2bc9e2ecdb2a11fff5a7771ad26c45fdeaceb4cf52916",
       "bytes": 2214,
       "mediaType": "application/json",
       "category": "metadata",
@@ -4159,8 +4159,8 @@
     },
     {
       "path": "metadata/hotel-release-candidate.json",
-      "sha256": "71caa62651d8c7f1960069841a2c9a2579b6ce97f3ff54bd2161003aa65fc718",
-      "bytes": 17194,
+      "sha256": "3ad8c7af64137fbf7d32a829dee3180d5a9db40995cbd3ade67f301f7988ec8e",
+      "bytes": 17445,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4292,8 +4292,8 @@
     },
     {
       "path": "metadata/public-release-alignment-readback.json",
-      "sha256": "f0ee7e8944b278d02a8607f7e9f5893c7f8dd60b369b252171a299f211cf31a9",
-      "bytes": 8229,
+      "sha256": "401cb04dee22b065fe269118d0ab6032f50b42b1bc2c81ce32d035c140ca4f7e",
+      "bytes": 8254,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -5090,8 +5090,8 @@
     },
     {
       "path": "schemas/public-release-alignment-readback.schema.json",
-      "sha256": "edb4c73a21467b6e4f3d31d5ca9c7ee8211f4ffe7c0546dbfa84b9210a0dfc71",
-      "bytes": 11040,
+      "sha256": "de9ea2ee7dea385cb84f281580ac4643798aa0c2749f15a4c402a5dfbce7c20d",
+      "bytes": 11036,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -6002,7 +6002,7 @@
     },
     {
       "path": "scripts/validate_public_release_alignment.mjs",
-      "sha256": "36acfb0684fea9b06051aa68c95e895d26e0b0c790a3ec4964ca2c0d3c950faf",
+      "sha256": "89c308e5e6d4630d0307e7c8495b885422d5f8ed3209773d18ba2fb47ac399f0",
       "bytes": 8086,
       "mediaType": "application/octet-stream",
       "category": "scripts",

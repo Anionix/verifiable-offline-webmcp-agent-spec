@@ -111,6 +111,7 @@
         "subtitleUpdates",
         "subtitleAnonymousReadbacks",
         "thumbnail",
+        "thumbnailUpdates",
         "devpostReadback"
       ],
       "properties": {
@@ -146,6 +147,12 @@
           }
         },
         "thumbnail": { "$ref": "#/$defs/youtubeThumbnailReadback" },
+        "thumbnailUpdates": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/thumbnailUpdate" }
+        },
         "devpostReadback": { "$ref": "#/$defs/devpostVideoReadback" }
       }
     },
@@ -780,6 +787,114 @@
         "publicSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
         "publicWidth": { "const": 1280 },
         "publicHeight": { "const": 720 }
+      }
+    },
+    "thumbnailUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "This const-shaped definition records the single retained thumbnail observation; its fixed identifiers and evidence values preserve that receipt.",
+      "required": [
+        "informationUuidV5",
+        "eventUuidV7",
+        "observedAt",
+        "stateTransition",
+        "status",
+        "videoId",
+        "recordedBy",
+        "ownerApproval",
+        "sourceArtifact",
+        "ownerReadback",
+        "anonymousReadback",
+        "visualReadback",
+        "operationScope",
+        "sourceToPublicByteIdentity",
+        "sourceToPublicByteIdentityReason"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "f9fb8705-c71e-5c65-95ed-3da200a4bf34" },
+        "eventUuidV7": { "const": "01a05396-770e-7df5-94a3-fb592384c275" },
+        "observedAt": { "const": "2026-08-30T16:52:44.942Z" },
+        "stateTransition": { "const": "THUMBNAIL_UPLOAD_APPROVED -> PUBLIC_THUMBNAIL_READBACK_VERIFIED" },
+        "status": { "const": "PUBLIC_THUMBNAIL_READBACK_VERIFIED" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "recordedBy": { "const": "PARENT" },
+        "ownerApproval": { "$ref": "#/$defs/thumbnailOwnerApproval" },
+        "sourceArtifact": { "$ref": "#/$defs/thumbnailSourceArtifact" },
+        "ownerReadback": { "$ref": "#/$defs/thumbnailOwnerReadback" },
+        "anonymousReadback": { "$ref": "#/$defs/thumbnailAnonymousReadback" },
+        "visualReadback": { "$ref": "#/$defs/thumbnailVisualReadback" },
+        "operationScope": { "$ref": "#/$defs/thumbnailOperationScope" },
+        "sourceToPublicByteIdentity": { "const": "NOT_ASSERTED" },
+        "sourceToPublicByteIdentityReason": { "const": "The public JPEG was recompressed; source and public bytes are not claimed identical." }
+      }
+    },
+    "thumbnailOwnerApproval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "scope", "state"],
+      "properties": {
+        "actor": { "const": "USER" },
+        "scope": { "const": "THUMBNAIL_ONLY" },
+        "state": { "const": "GRANTED" }
+      }
+    },
+    "thumbnailSourceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sourceCommit", "bytes", "width", "height", "sha256"],
+      "properties": {
+        "path": { "const": "docs/assets/devpost-hotel-thumbnail.png" },
+        "sourceCommit": { "const": "5583cdbeddbbeae2c6f16fd481fc809069a15296" },
+        "bytes": { "const": 1240818 },
+        "width": { "const": 1672 },
+        "height": { "const": 941 },
+        "sha256": { "const": "c4b1df6eadc389cee52c5edef7fb716ae9abbe9d604d55dc592eb0ae35578e10" }
+      }
+    },
+    "thumbnailOwnerReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["screenState", "uploadedThumbnail", "saveEnabled", "visibility"],
+      "properties": {
+        "screenState": { "const": "UPLOADED_THUMBNAIL_SAVE_DISABLED_PUBLIC" },
+        "uploadedThumbnail": { "const": true },
+        "saveEnabled": { "const": false },
+        "visibility": { "const": "PUBLIC" }
+      }
+    },
+    "thumbnailAnonymousReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "httpStatus", "contentType", "width", "height", "sha256"],
+      "properties": {
+        "url": { "const": "https://i.ytimg.com/vi/tdSvJw4ghX8/maxresdefault.jpg" },
+        "httpStatus": { "const": 200 },
+        "contentType": { "const": "image/jpeg" },
+        "width": { "const": 1280 },
+        "height": { "const": 720 },
+        "sha256": { "const": "3ad391ba3efc35f61566299848dd1a3deeff05efc1e263a8dbfd73af293c8792" }
+      }
+    },
+    "thumbnailVisualReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchesRecordedObservation", "warningTextPresent", "blackBandPresent"],
+      "properties": {
+        "matchesRecordedObservation": { "const": true },
+        "warningTextPresent": { "const": false },
+        "blackBandPresent": { "const": false }
+      }
+    },
+    "thumbnailOperationScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["titleChanged", "bodyChanged", "videoChanged", "captionsChanged", "devpostChanged"],
+      "properties": {
+        "titleChanged": { "const": false },
+        "bodyChanged": { "const": false },
+        "videoChanged": { "const": false },
+        "captionsChanged": { "const": false },
+        "devpostChanged": { "const": false }
       }
     },
     "devpostVideoReadback": {

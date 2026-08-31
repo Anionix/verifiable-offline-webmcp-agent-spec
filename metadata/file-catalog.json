@@ -3911,8 +3911,8 @@
     },
     {
       "path": "metadata/demo-video-production.json",
-      "sha256": "2d3dc99df7641d380af26217fd61f9ce7954eb5415c9b9685687120bef38302a",
-      "bytes": 30979,
+      "sha256": "97b3bd336d792f06691d7f049620db887c006aaabaa0bd06eb527e8bc7a79721",
+      "bytes": 30993,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4729,8 +4729,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "2d5c8ce1a7ae863f24474c9ad6677ef372fdb78433f35082c4e468122e081738",
-      "bytes": 52467,
+      "sha256": "ce7f2fae1acda1128cc175bf38f02101562d8aa60017c2d610d86dc682a41af3",
+      "bytes": 52485,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5622,8 +5622,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_public_subtitles.mjs",
-      "sha256": "65223a2ee4fdd2094bd58520f143728a05e9b66bc6918ecd4c1ae7c4192d86ed",
-      "bytes": 37559,
+      "sha256": "2ee08a8cbc510808bfeec97748fd13bdff472f146bfb613fc91b00fe7d17105b",
+      "bytes": 37567,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5736,8 +5736,8 @@
     },
     {
       "path": "scripts/validate_hotel_public_subtitles.mjs",
-      "sha256": "684143d4e1aef9828fd9616f3ec9ddce5dfa9cec03b9c92f7399e4ab166c2d77",
-      "bytes": 24103,
+      "sha256": "8007205559e0f4b3b9f5f70495f0a0815ae0115e54a7dc4e858c04dee5690b93",
+      "bytes": 24319,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

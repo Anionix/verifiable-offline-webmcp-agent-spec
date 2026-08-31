@@ -27,7 +27,8 @@ export const UNAVAILABLE_SUBTITLE_STATE_TRANSITION =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE";
 const UNAVAILABLE_SUBTITLE_FAILURE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE";
 const SUBTITLE_WATCH_URL = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
-const HISTORICAL_DOWNLOAD_COMMAND = "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir";
+const HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR = "en.*";
+const HISTORICAL_DOWNLOAD_COMMAND = `uvx yt-dlp --skip-download --write-subs --sub-langs "${HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR}" --sub-format vtt --no-write-auto-subs --no-cache-dir`;
 const HISTORICAL_CATALOG_COMMAND = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
 const REPRODUCTION_ONLY_COMMAND_STATUS = "REPRODUCTION_ONLY";
 const SUBTITLE_LANGUAGE_PATTERN = /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/u;
@@ -247,6 +248,7 @@ function validateSubtitleCommand(command, label, watchUrl, outputFileName = null
   const historicalCommand = outputFileName === null ? HISTORICAL_CATALOG_COMMAND : HISTORICAL_DOWNLOAD_COMMAND;
   assert.equal(command.observedCommand, historicalCommand, `${label} historical command differs`);
   if (outputFileName !== null) {
+    assert.equal(command.requestedLanguage, HISTORICAL_SUBTITLE_LANGUAGE_SELECTOR, `${label} language selector differs`);
     assert.equal(typeof command.outputTemplate, "string", `${label} output template is missing`);
     assert.match(command.outputTemplate, /^media\/demo-video\/[A-Za-z0-9_-][A-Za-z0-9._-]*\.%\(ext\)s$/u, `${label} output template is unsafe`);
     const renderedOutputName = basename(renderYtDlpSubtitleFileName(command.outputTemplate, "NA", "en", "vtt"));

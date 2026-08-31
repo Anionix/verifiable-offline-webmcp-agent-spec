@@ -22,7 +22,7 @@ const publicSubtitleValidatorPath = fileURLToPath(new URL("./validate_hotel_publ
 const mismatchedSubtitleStateTransition =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED";
 const subtitleWatchUrl = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
-const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir";
+const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir";
 const historicalCatalogCommand = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
 const reproductionDownloadCommand = `${historicalDownloadCommand} --output "media/demo-video/youtube-public-201.%(ext)s" "${subtitleWatchUrl}"`;
 const reproductionCatalogCommand = `${historicalCatalogCommand} "${subtitleWatchUrl}"`;
@@ -127,7 +127,7 @@ test("passes quoted replay commands to yt-dlp without invoking the network", asy
           "--skip-download",
           "--write-subs",
           "--sub-langs",
-          "en",
+          "en.*",
           "--sub-format",
           "vtt",
           "--no-write-auto-subs",

@@ -716,6 +716,9 @@ def subtitle_root_suffix_options(collection_name: str, record: dict[str, Any]) -
     return set()
 
 
+# information_uuid_v5=748e1fb2-d38d-5ecf-9d09-09812c488167
+# event_uuid_v7=01a056e8-c0c0-79a3-89a3-0123456789ab state_transition=SUBTITLE_SUFFIX_CANDIDATE_SCAN -> EQUAL_TIME_GROUP_EXACT_WINDOW_BOUND occurred_at=2026-08-31T08:21:29.408Z
+# machine-contract: an equal-time subtitle group consumes exactly one state suffix per recorded event; no suffix may be skipped or left unbound.
 def subtitle_suffix_group_cursors(
     suffix: list[str], start: int, events: list[tuple[str, int, set[str]]]
 ) -> set[int]:
@@ -723,8 +726,8 @@ def subtitle_suffix_group_cursors(
         return {start}
 
     # machine-contract: equal-time subtitle events are an unordered group; use
-    # bipartite feasibility for each possible last suffix token, while groups
-    # at different times remain strictly ordered by document_history_errors.
+    # bipartite feasibility for the next exact group-sized suffix window, while
+    # groups at different times remain strictly ordered by document_history_errors.
     def can_match(event_indexes: list[int], candidate_positions: range) -> bool:
         matched_events: dict[int, int] = {}
 
@@ -743,20 +746,11 @@ def subtitle_suffix_group_cursors(
 
         return all(augment(event_index, set()) for event_index in event_indexes)
 
-    possible_cursors: set[int] = set()
     event_indexes = list(range(len(events)))
-    for cursor in range(start + 1, len(suffix) + 1):
-        last_suffix_index = cursor - 1
-        for forced_event_index in event_indexes:
-            if suffix[last_suffix_index] not in events[forced_event_index][2]:
-                continue
-            remaining_event_indexes = [
-                event_index for event_index in event_indexes if event_index != forced_event_index
-            ]
-            if can_match(remaining_event_indexes, range(start, last_suffix_index)):
-                possible_cursors.add(cursor)
-                break
-    return possible_cursors
+    group_end = start + len(event_indexes)
+    if group_end > len(suffix):
+        return set()
+    return {group_end} if can_match(event_indexes, range(start, group_end)) else set()
 
 
 def document_event_references(
@@ -927,6 +921,8 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                 )
                 break
             suffix_cursors = next_suffix_cursors
+        if event_groups and len(suffix) not in suffix_cursors:
+            findings.append("video production root state transition has an unbound subtitle suffix")
         findings.extend(
             subtitle_observation_errors(
                 {
@@ -1032,6 +1028,17 @@ def subtitle_root_suffix_fixture_errors(
             findings.append(f"schema rejected the {suffix_order} same-time subtitle root fixture")
         if document_history_errors(same_time):
             findings.append(f"root history rejected the {suffix_order} same-time subtitle root fixture")
+
+    missing_same_time_event = json.loads(json.dumps(owner_failure))
+    missing_same_time_event["stateTransition"] = (
+        f"{previous_state} -> {OWNER_SUBTITLE_FAILURE_STATE.split(' -> ')[-1]} -> "
+        f"{ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(' -> ')[-1]}"
+    )
+    if not any(
+        "unbound subtitle suffix" in finding
+        for finding in document_history_errors(missing_same_time_event)
+    ):
+        findings.append("root history accepted a missing same-time subtitle event")
 
     large_same_time_suffix = [f"SAME_TIME_SUFFIX_{index}" for index in range(12)]
     large_same_time_events = [

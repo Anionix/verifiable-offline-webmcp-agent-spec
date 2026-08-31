@@ -6040,8 +6040,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "66e542fdfdfd2b714dafd2fb5564258a10f60a437b5051d6121e6bf7c1a3ba12",
-      "bytes": 229729,
+      "sha256": "e3fbd9d929da3ada0c8f398fc825a31c84e47074c863ccffc79275c6be5bc772",
+      "bytes": 230350,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

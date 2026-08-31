@@ -8,24 +8,24 @@
   "identity": {
     "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "informationUuidV5": "bded1f61-139c-50b9-a0a1-d5f7901c2915",
-    "observationUuidV7": "01a05753-c598-7a3a-b440-9572a019ba1a",
-    "observedAt": "2026-08-31T10:18:23.000Z",
-    "repositoryCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb"
+    "observationUuidV7": "01a0576f-4c85-7731-b4b3-3833d8af4a2f",
+    "observedAt": "2026-08-31T10:48:27.013Z",
+    "repositoryCommit": "2d5abd679893ec7dff36758925477999424c3cc7"
   },
   "machineContract": {
     "stateTransition": {
-      "eventUuidV7": "01a05753-c598-7a3a-b440-9572a019ba1a",
-      "occurredAt": "2026-08-31T10:18:23.000Z",
+      "eventUuidV7": "01a0576f-4c85-7731-b4b3-3833d8af4a2f",
+      "occurredAt": "2026-08-31T10:48:27.013Z",
       "from": "PUBLIC_TARGETS_WITH_STALE_DESCRIPTION",
       "to": "PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED",
-      "evidence": "The submitted ChatGPT Site was read anonymously at version 14, the current Vercel deployment and evaluation file were read back with HTTP 200, and the authenticated Devpost project readback confirmed version 15 with the current deployment markers and the same four-tool, 194-test contract."
+      "evidence": "The submitted ChatGPT Site was read anonymously at version 14, the Vercel deployment and evaluation file were read back with HTTP 200 after READY, and the authenticated Devpost project readback confirmed version 16 with the current deployment markers and the same four-tool, 194-test contract."
     },
     "invariants": [
       "Sites, Vercel, and Devpost are separate publication observations; one URL does not prove another.",
       "The Sites target remains the submitted website and is recorded as version 14 from source commit 2fbbf1b714ca660ef1681239b638205a9835f7c5.",
-      "The Vercel fallback remains bound to deployment dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B and source commit bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb.",
+      "The Vercel fallback is bound to READY deployment dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E and source commit 2d5abd679893ec7dff36758925477999424c3cc7.",
       "Both public evaluation files report 194 executable tests and the exact four intended WebMCP tools.",
-      "The Devpost version 15 description update is recorded separately from the earlier submission receipt; no new submission receipt is invented.",
+      "The Devpost version 16 description update is recorded separately from the earlier submission receipt; no new submission receipt is invented.",
       "Native browser execution is recorded separately; native result fields do not measure page network traffic or external effects."
     ]
   },
@@ -85,13 +85,13 @@
     },
     "vercel": {
       "targetInformationUuidV5": "b7a49447-8f82-5650-9eb9-f840113516f5",
-      "observedAt": "2026-08-31T10:18:23.000Z",
+      "observedAt": "2026-08-31T10:47:08.000Z",
       "url": "https://kyoto-booking-retry-proof.vercel.app/",
       "evaluationUrl": "https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json",
       "statusCode": 200,
       "authentication": "ANONYMOUS",
-      "deploymentId": "dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B",
-      "sourceCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
+      "deploymentId": "dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E",
+      "sourceCommit": "2d5abd679893ec7dff36758925477999424c3cc7",
       "evaluation": {
         "measurementStatus": "CONTRACT_READY",
         "releaseEvidence": {
@@ -123,20 +123,20 @@
     },
     "devpost": {
       "targetInformationUuidV5": "92999fca-6172-5c8f-ad2c-0abe550f2d4e",
-      "observedAt": "2026-08-31T10:18:23.000Z",
+      "observedAt": "2026-08-31T10:48:27.013Z",
       "url": "https://devpost.com/software/project-y79pb23hj1mz",
       "projectId": "1405191",
       "projectSlug": "project-y79pb23hj1mz",
       "state": "published",
-      "projectVersion": 15,
-      "updatedAt": "2026-08-31T10:18:01.234Z",
+      "projectVersion": 16,
+      "updatedAt": "2026-08-31T10:48:27.013Z",
       "websiteUrl": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
       "videoUrl": "https://youtu.be/tdSvJw4ghX8",
       "descriptionMarkers": {
         "submittedWebsite": true,
         "sitesVersion14": true,
-        "vercelSourceCommitBbb1": true,
-        "vercelDeploymentA39": true,
+        "vercelSourceCommit2d5": true,
+        "vercelDeploymentHwjv": true,
         "testCount194": true,
         "exactTools": true,
         "forbiddenTools": true,
@@ -166,7 +166,7 @@
       {
         "checkIdUuidV5": "89e73373-70b1-574a-b16e-e52cfa47d614",
         "status": "PASS",
-        "description": "Devpost project 1405191 was read back as published version 15 with the submitted Site URL and current release markers."
+        "description": "Devpost project 1405191 was read back as published version 16 with the submitted Site URL and current release markers."
       },
       {
         "checkIdUuidV5": "d0e4723e-7b65-546d-b086-844519b2e624",
@@ -183,6 +183,6 @@
   "limitations": [
     "The public JSON proves a published contract and release count; it does not by itself prove a new native WebMCP execution.",
     "The notification-only main-branch fix is included in the current published hotel source commit and is not treated as a hotel behavior change.",
-    "The Devpost project update returned version 15 and preserved the prior submission 1158722; no new submit-project receipt or new rule agreement was created."
+    "The Devpost project update returned version 16 and preserved the prior submission 1158722; no new submit-project receipt or new rule agreement was created."
   ]
 }

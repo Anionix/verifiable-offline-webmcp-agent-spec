@@ -3,9 +3,9 @@ title: "Kyoto Booking Retry Proof — Devpost視覚導線"
 language: "ja"
 information_uuid_v5: "8919307c-9546-59bd-9054-fab238183fb5"
 event_uuid_v7: "01a050c7-347d-71a4-91a0-42db9761ce31"
-public_release_alignment_event_uuid_v7: "01a05753-c598-7a3a-b440-9572a019ba1a"
+public_release_alignment_event_uuid_v7: "01a0576f-4c85-7731-b4b3-3833d8af4a2f"
 state_transition: "TECHNICAL_DESCRIPTION_FIRST -> JUDGE_VISIBLE_PROOF_ROUTE_JA"
-occurred_at: "2026-08-31T10:18:23.000Z"
+occurred_at: "2026-08-31T10:48:27.013Z"
 status: "visual-guide-public-release-aligned"
 ---
 
@@ -17,7 +17,7 @@ status: "visual-guide-public-release-aligned"
 
 題名は**Kyoto Booking Retry Proof**、質問は**Did my hotel booking go through?**です。結果は`2 attempts → 1 simulated booking → 1 confirmation number`。入口は[公開ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site)です。
 
-提出先は[公開ChatGPT Site版14](https://kyoto-booking-retry-proof.anionix.chatgpt.site)、確認用の公開Vercel版は[こちら](https://kyoto-booking-retry-proof.vercel.app)です。Sites版14はソースコミット`2fbbf1b714ca660ef1681239b638205a9835f7c5`、Vercel本番は配置`dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B`とソースコミット`bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb`です。両方の評価ファイルは194件と四機能を報告し、対応表を[機械可読記録](../metadata/public-release-alignment-readback.json)に固定しています。ネイティブWebMCPは同じVercel配置の一意な別名で実行し、再送後の状態を別記録へ保存しています。結果欄はページ通信や外部効果を測定しません。
+提出先は[公開ChatGPT Site版14](https://kyoto-booking-retry-proof.anionix.chatgpt.site)、確認用の公開Vercel版は[こちら](https://kyoto-booking-retry-proof.vercel.app)です。Sites版14はソースコミット`2fbbf1b714ca660ef1681239b638205a9835f7c5`、Vercel本番の確認対象は配置`dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E`とソースコミット`2d5abd679893ec7dff36758925477999424c3cc7`です。両方の評価ファイルは194件と四機能を報告し、対応表を[機械可読記録](../metadata/public-release-alignment-readback.json)に固定しています。ネイティブWebMCPは公開HTTPS別名で実行し、再送後の状態を別記録へ保存しています。配置固有URLは分離ブラウザーでサインインへ転送されたため、実行は一般公開URLで行いました。結果欄はページ通信や外部効果を測定しません。
 
 ## 60秒の順番
 

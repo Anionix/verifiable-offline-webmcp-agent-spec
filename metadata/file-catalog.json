@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "d9f3aa312470cd8fbf5b2c875585e7d1e899eef0f0dd66393d45f9708d0cece8",
-      "bytes": 46919,
+      "sha256": "705ad836489b7ecf59c1764388990c7fd2fda80d8efa49ec7b356c4a8adee8a7",
+      "bytes": 47053,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -1821,7 +1821,7 @@
     },
     {
       "path": "docs/22-service-integrations.ja.md",
-      "sha256": "bd8a81d097a8b80b68a1b0aee710c21715c23b8a898cfa2de35874ef109bc053",
+      "sha256": "acebcc9971f139dfb99d9ccb02da1f163402f335e20f6fab95022a62540fcfd0",
       "bytes": 22730,
       "mediaType": "text/markdown",
       "category": "docs",
@@ -1840,8 +1840,8 @@
     },
     {
       "path": "docs/23-hotel-booking-demo.ja.md",
-      "sha256": "536a1585f12b655b2cbad007c70997204366d7e3cd0ca7febb71536028ab5af5",
-      "bytes": 12331,
+      "sha256": "809816331104546c60b663ec72ce3d23004df9e599bb45498f12e323f8b59496",
+      "bytes": 12467,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1859,8 +1859,8 @@
     },
     {
       "path": "docs/24-hotel-release-package.en.md",
-      "sha256": "b2e65769cffe558e9ad9868822e5a00a296d420d26714655facaafc53c65705e",
-      "bytes": 6833,
+      "sha256": "86f55a43519c111411bd47fd4702167e62814e05a8b512c30fe74e67055e4080",
+      "bytes": 6931,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1878,8 +1878,8 @@
     },
     {
       "path": "docs/24-hotel-release-package.ja.md",
-      "sha256": "f762e9ebbfba2cf440a17af496139e83abcce0348366ed2bc05335b37624ad2b",
-      "bytes": 6786,
+      "sha256": "38c1fdca15b710c84440ef975ddf0743e30f13bb270ab1071dca93df16586632",
+      "bytes": 6905,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1897,8 +1897,8 @@
     },
     {
       "path": "docs/25-devpost-visual-guide.en.md",
-      "sha256": "408c31ca6e3ba0bb34570482856fb1494438b33de2b2e9f535d79c4a081d5faf",
-      "bytes": 10469,
+      "sha256": "fec2da6b8177e61da94cbfe0e71d7ec3f0ef4a1a48e81f78efe5471c3907aaaf",
+      "bytes": 10563,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -1916,8 +1916,8 @@
     },
     {
       "path": "docs/25-devpost-visual-guide.ja.md",
-      "sha256": "fa3e6f394b3471d81e1e18b2074c7e84be65a1f4be3b700479c6b44910896fc2",
-      "bytes": 5276,
+      "sha256": "50336a1f35e6814587abaf974d4194e36dea092a6e09321f25f62b647a7dddab",
+      "bytes": 5401,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -2353,8 +2353,8 @@
     },
     {
       "path": "docs/source-map.md",
-      "sha256": "172ce4ada058e9d1f507a092826353a14687d8eeb0cbe0785bb9670d5a2f2180",
-      "bytes": 24385,
+      "sha256": "6418041f08806c01b545c42ec5e0b49600ffe10458b0ba04f9b76800b15217a8",
+      "bytes": 24354,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -2429,8 +2429,8 @@
     },
     {
       "path": "docs/validation-report.md",
-      "sha256": "1d14918c0b05034c75407b98d0efcc39bff646ca48efdca518583bd0367874ce",
-      "bytes": 16968,
+      "sha256": "7d56a47dab4571e2d545e4c97249242a849aaf2b60ce1647c0db93996d451b08",
+      "bytes": 16963,
       "mediaType": "text/markdown",
       "category": "docs",
       "identity": {
@@ -2486,8 +2486,8 @@
     },
     {
       "path": "examples/hotel-booking-demo/README.md",
-      "sha256": "e9f875bb9ba4e662cc298ca3c5fa723958e2b3b63263f37bc124673f1b01a07d",
-      "bytes": 10858,
+      "sha256": "c34844f52ad4cd28b887ecbb538f783aba1cbab26eabf16a685e93577e72f534",
+      "bytes": 10862,
       "mediaType": "text/markdown",
       "category": "examples",
       "identity": {
@@ -4083,8 +4083,8 @@
     },
     {
       "path": "metadata/hotel-native-webmcp-reconciliation.json",
-      "sha256": "58fdbc945d7e2178885677c3a83787e4d99a1ee0621ac861ff6434594f4d52aa",
-      "bytes": 13514,
+      "sha256": "1b19476f2e03579c3cfa14d8391a62c55a46e621bf7e48d31cda242871acbc53",
+      "bytes": 13803,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4121,8 +4121,8 @@
     },
     {
       "path": "metadata/hotel-public-release-readback.json",
-      "sha256": "39d84d9ed92eb54ab0d2bc9e2ecdb2a11fff5a7771ad26c45fdeaceb4cf52916",
-      "bytes": 2214,
+      "sha256": "920a3d3e64a95bef32623b5383e8966fce6d0ab18053f51be264f18409ec49de",
+      "bytes": 2215,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4159,8 +4159,8 @@
     },
     {
       "path": "metadata/hotel-release-candidate.json",
-      "sha256": "3ad8c7af64137fbf7d32a829dee3180d5a9db40995cbd3ade67f301f7988ec8e",
-      "bytes": 17445,
+      "sha256": "7a4695edadee5bdace4278929ce72cc06066d1f134280b46fcd6f0db15c3a7f6",
+      "bytes": 17734,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4292,8 +4292,8 @@
     },
     {
       "path": "metadata/public-release-alignment-readback.json",
-      "sha256": "401cb04dee22b065fe269118d0ab6032f50b42b1bc2c81ce32d035c140ca4f7e",
-      "bytes": 8254,
+      "sha256": "bd6668804ab0a1b4a395acaed4b47981334bc5f122dbb13defa8ea2e07776119",
+      "bytes": 8259,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -5090,7 +5090,7 @@
     },
     {
       "path": "schemas/public-release-alignment-readback.schema.json",
-      "sha256": "de9ea2ee7dea385cb84f281580ac4643798aa0c2749f15a4c402a5dfbce7c20d",
+      "sha256": "3cad238e0c727c3207850beb3da381d303de7a942da9bec6513c8bb46109beae",
       "bytes": 11036,
       "mediaType": "application/json",
       "category": "schemas",
@@ -6002,8 +6002,8 @@
     },
     {
       "path": "scripts/validate_public_release_alignment.mjs",
-      "sha256": "89c308e5e6d4630d0307e7c8495b885422d5f8ed3209773d18ba2fb47ac399f0",
-      "bytes": 8086,
+      "sha256": "945eb8dff203c27d133f68aaa9c41bd7aec9d6792e45db75d187a922b34e70a8",
+      "bytes": 8098,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

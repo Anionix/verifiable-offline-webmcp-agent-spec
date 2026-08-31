@@ -4,8 +4,8 @@ language: "en"
 information_uuid_v5: "5a6fb249-361d-5745-953e-faf72130ffe9"
 event_uuid_v7: "01a050c7-3441-7930-9b51-a85ca5c5c82f"
 state_transition: "TECHNICAL_DESCRIPTION_FIRST -> JUDGE_VISIBLE_PROOF_ROUTE"
-public_release_alignment_event_uuid_v7: "01a05753-c598-7a3a-b440-9572a019ba1a"
-occurred_at: "2026-08-31T10:18:23.000Z"
+public_release_alignment_event_uuid_v7: "01a0576f-4c85-7731-b4b3-3833d8af4a2f"
+occurred_at: "2026-08-31T10:48:27.013Z"
 status: "visual-guide-public-release-aligned"
 ---
 
@@ -89,7 +89,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - Display **AI-generated dramatization / Fictional booking** on both generated opening scenes.
 - Do not show real hotels, real people, addresses, passports, payment details, reservation emails, credentials, or private browser data.
 - Do not imply that the generated scene is a real booking screen.
-- The retained native Chrome WebMCP record is `PASS` for its tested configuration: HTTPS, `document.modelContext`, the exact four intended tools, zero discovery effects, and status recovery before retry. Do not generalize this bounded result to every Chrome release or treat the public alignment as a new native run.
+- The fresh native WebMCP record is `PASS` for its tested configuration: the canonical public HTTPS alias, `document.modelContext.getTools`, `document.modelContext.executeTool`, the exact four intended tools, zero discovery effects, and status recovery before retry. The deployment-specific alias was independently read but redirected to sign-in; do not generalize this bounded result to every browser release.
 - Keep the Site, Vercel, Devpost, and YouTube links as separate publication facts; one URL does not prove another.
 - Add Japanese subtitles as a separate subtitle file; English remains the primary spoken and burned-in language.
 

@@ -2,14 +2,14 @@
   "$schema": "../schemas/hotel-public-release-readback.schema.json",
   "identity": {
     "informationUuidV5": "5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39",
-    "observationUuidV7": "01a05753-c598-7087-a3d8-a85e7f60a8f8",
-    "observedAt": "2026-08-31T10:18:23.000Z"
+    "observationUuidV7": "01a0576e-17e0-7d22-a124-bd16d52068af",
+    "observedAt": "2026-08-31T10:47:08.000Z"
   },
   "release": {
     "status": "COMMITTED_RELEASE",
-    "sourceCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
+    "sourceCommit": "2d5abd679893ec7dff36758925477999424c3cc7",
     "branch": "main",
-    "baseCommit": "adeaf3f549aa7379acacbc6960eae4c11bbc6ba2",
+    "baseCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
     "testRun": {
       "command": "npm test",
       "directory": "src/typescript",
@@ -30,20 +30,20 @@
     "teamId": "team_npJWoj9cpy54Q7B3fpGdBCCX",
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B",
+    "deploymentId": "dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E",
     "target": "production",
     "state": "READY",
-    "sourceCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
+    "sourceCommit": "2d5abd679893ec7dff36758925477999424c3cc7",
     "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-npnpjh2p8-aniotajp-1978s-projects.vercel.app",
-    "readyAt": "2026-08-31T10:11:53.251Z",
-    "observedAt": "2026-08-31T10:18:23.000Z"
+    "uniqueUrl": "https://kyoto-booking-retry-proof-rnwn57v2i-aniotajp-1978s-projects.vercel.app/",
+    "readyAt": "2026-08-31T10:31:51.086Z",
+    "observedAt": "2026-08-31T10:47:08.000Z"
   },
   "anonymousReadback": {
     "url": "https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json",
     "statusCode": 200,
     "authentication": "ANONYMOUS",
-    "observedAt": "2026-08-31T10:18:23.000Z",
+    "observedAt": "2026-08-31T10:47:08.000Z",
     "contentSha256": "2851ce1bdc2aad55cf6f8f453e05b30e60e9ce52073c2e39d72a79c34da7c4fe",
     "localBuiltFileSha256": "2851ce1bdc2aad55cf6f8f453e05b30e60e9ce52073c2e39d72a79c34da7c4fe",
     "releaseEvidence": {

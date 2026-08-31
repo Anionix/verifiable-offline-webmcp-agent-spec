@@ -357,18 +357,18 @@
     },
     {
       "issue": 193,
-      "status": "PASS",
-      "reason": "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result."
+      "status": "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+      "reason": "The local worktree artifacts differ from the historical public release; exact public artifact equality is not established, so issue 193 remains not ready until a later deployment and public readback bind these bytes."
     }
   ],
   "finalGate": {
     "formula": "S AND L AND F_exact AND W AND E",
-    "status": "PASS",
-    "ready": true,
+    "status": "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+    "ready": false,
     "components": {
       "S": "PASS",
       "L": "PASS",
-      "F_exact": "PASS",
+      "F_exact": "FAIL",
       "W": "PASS",
       "E": "PASS"
     }

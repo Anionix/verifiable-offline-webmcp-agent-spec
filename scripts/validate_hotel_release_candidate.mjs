@@ -303,6 +303,11 @@ async function buildCandidate() {
     };
   }
   const publicReadbackTestCount = publicReadback.anonymousReadback.releaseEvidence.testCount;
+  // information_uuid_v5=9b9e2d43-6c71-5f2a-9b8e-4d0a7c1f6e25
+  // event_uuid_v7=01a0564c-4c2a-7f21-9a80-5e8d2b7c1f30
+  // state_transition=PUBLIC_ARTIFACT_MISMATCH -> FINAL_GATE_NOT_READY occurred_at=2026-08-31T06:00:00.000Z
+  // machine-contract: a worktree candidate may be locally valid, but exact public artifact equality is a separate required gate.
+  const finalGateReady = artifactsMatchPublicRelease;
   const candidate = {
     $schema: "../schemas/hotel-release-candidate.schema.json",
     identity: {
@@ -362,16 +367,23 @@ async function buildCandidate() {
       },
       {
         issue: 193,
-        status: "PASS",
-        reason:
-          "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result.",
+        status: finalGateReady ? "PASS" : "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+        reason: finalGateReady
+          ? "All five hard gates point to the same committed source, production deployment, executable test count, native tool enumeration, and read-before-retry result."
+          : "The local worktree artifacts differ from the historical public release; exact public artifact equality is not established, so issue 193 remains not ready until a later deployment and public readback bind these bytes.",
       },
     ],
     finalGate: {
       formula: "S AND L AND F_exact AND W AND E",
-      status: "PASS",
-      ready: true,
-      components: { S: "PASS", L: "PASS", F_exact: "PASS", W: "PASS", E: "PASS" },
+      status: finalGateReady ? "PASS" : "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+      ready: finalGateReady,
+      components: {
+        S: "PASS",
+        L: "PASS",
+        F_exact: finalGateReady ? "PASS" : "FAIL",
+        W: "PASS",
+        E: "PASS",
+      },
     },
   };
   return candidate;

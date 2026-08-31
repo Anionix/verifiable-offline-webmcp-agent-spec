@@ -1731,6 +1731,38 @@ def main():
     )
     for e in hotel_candidate_validator.iter_errors(hotel_candidate_evidence):
         errors.append(f"schema metadata/hotel-release-candidate.json: {e.message}")
+    # information_uuid_v5=9b9e2d43-6c71-5f2a-9b8e-4d0a7c1f6e25
+    # event_uuid_v7=01a0564c-4c2a-7f21-9a80-5e8d2b7c1f30
+    # state_transition=PUBLIC_ARTIFACT_MISMATCH -> FINAL_GATE_NOT_READY occurred_at=2026-08-31T06:00:00.000Z
+    # machine-contract: a worktree candidate must never present a public-artifact mismatch as a ready final gate.
+    if hotel_candidate_evidence.get("source", {}).get("state") == "WORKTREE_CANDIDATE":
+        expected_unpublished_gate = {
+            "formula": "S AND L AND F_exact AND W AND E",
+            "status": "NOT_READY_PUBLIC_ARTIFACT_MISMATCH",
+            "ready": False,
+            "components": {"S": "PASS", "L": "PASS", "F_exact": "FAIL", "W": "PASS", "E": "PASS"},
+        }
+        if hotel_candidate_evidence.get("finalGate") != expected_unpublished_gate:
+            errors.append("WORKTREE_CANDIDATE final gate must be explicitly not ready when public artifact equality is unmeasured")
+        issue_193 = next(
+            (entry for entry in hotel_candidate_evidence.get("issueReadiness", []) if entry.get("issue") == 193),
+            None,
+        )
+        if issue_193 is None or issue_193.get("status") != "NOT_READY_PUBLIC_ARTIFACT_MISMATCH":
+            errors.append("WORKTREE_CANDIDATE issue 193 must remain not ready until public artifact equality is read back")
+        ready_mutation = json.loads(json.dumps(hotel_candidate_evidence))
+        ready_mutation["finalGate"] = {
+            "formula": "S AND L AND F_exact AND W AND E",
+            "status": "PASS",
+            "ready": True,
+            "components": {"S": "PASS", "L": "PASS", "F_exact": "PASS", "W": "PASS", "E": "PASS"},
+        }
+        for entry in ready_mutation.get("issueReadiness", []):
+            if entry.get("issue") == 193:
+                entry["status"] = "PASS"
+        ready_mutation_errors = list(hotel_candidate_validator.iter_errors(ready_mutation))
+        if not ready_mutation_errors:
+            errors.append("hotel-release-candidate schema accepted a ready final gate for an unpublished worktree candidate")
     hotel_public_release = load_json(ROOT / "metadata/hotel-public-release-readback.json")
     hotel_public_release_validator = Draft202012Validator(
         schemas["hotel-public-release-readback"], registry=schema_registry, format_checker=format_checker

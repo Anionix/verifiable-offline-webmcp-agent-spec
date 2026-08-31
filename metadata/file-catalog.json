@@ -4140,8 +4140,8 @@
     },
     {
       "path": "metadata/hotel-release-candidate.json",
-      "sha256": "637d5e1d50f47d8f43c248b1207eaab79907906dc8f9370534008949faec1923",
-      "bytes": 17324,
+      "sha256": "5533825e582b27674b4424fa6ee6cd4868b4a8506331e30980f829ca4347fd7d",
+      "bytes": 17445,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4938,8 +4938,8 @@
     },
     {
       "path": "schemas/hotel-release-candidate.schema.json",
-      "sha256": "b1658785ffd91d3ad9dcf3b25d6d20b8b0eefe25010053decd4b44ee7fdc08b3",
-      "bytes": 17485,
+      "sha256": "eb833d8967625733f1a300cfc518aa0a71cfc16d1b53b45dc322570fd1730e7c",
+      "bytes": 19714,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "8c30e7627dc44a37fb6877bf57f2827bab468f82fa666175674c158448947e76",
-      "bytes": 23105,
+      "sha256": "9da27651482565422c34355383a711e07f94ae4173a166d13d4b6d9612976431",
+      "bytes": 23958,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5964,8 +5964,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "c26502c20931b32d374fae10dd4f4939f0ff506b98ce61230ead0086e44cb1ee",
-      "bytes": 227661,
+      "sha256": "66e542fdfdfd2b714dafd2fb5564258a10f60a437b5051d6121e6bf7c1a3ba12",
+      "bytes": 229729,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

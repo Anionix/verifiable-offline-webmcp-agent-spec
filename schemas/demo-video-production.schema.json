@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a05547-5fe9-777d-b1df-3260c4e09228 document_updated_at=2026-08-31T00:45:36.105Z document_state_transition_suffix=SUBTITLE_COMMAND_PROVENANCE_CLARIFIED previous_document_observation_uuid_v7=01a0543c-357b-7440-a307-0ff75b03a874 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain; observed commands stay separate from reproduction-only commands",
+  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a05563-29c8-7a8e-a368-40c6448db6d9 document_updated_at=2026-08-31T01:15:57.256Z document_state_transition_suffix=SUBTITLE_REPRODUCTION_COMMANDS_QUOTED_AND_EXTENSION_BOUND previous_document_observation_uuid_v7=01a05547-5fe9-777d-b1df-3260c4e09228 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain; the corrected reproduction command quotes the output template and watch URL, and yt-dlp appends the requested language before the extension; observed commands stay separate from reproduction-only commands",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
@@ -353,10 +353,10 @@
           "required": ["method", "command", "commandStatus", "observedCommand", "outputTemplate", "authentication", "requestedLanguage", "format", "automaticSubtitles", "fileName"],
           "properties": {
             "method": { "const": "YTDLP_ANONYMOUS_PUBLIC_SUBTITLE_DOWNLOAD" },
-            "command": { "type": "string", "pattern": "^uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(language\\)s\\.%\\(ext\\)s https://www\\.youtube\\.com/watch\\?v=tdSvJw4ghX8$" },
+            "command": { "type": "string", "pattern": "^uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output \"media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(ext\\)s\" \"https://www\\.youtube\\.com/watch\\?v=tdSvJw4ghX8\"$" },
             "commandStatus": { "const": "REPRODUCTION_ONLY" },
             "observedCommand": { "const": "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir" },
-            "outputTemplate": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(language\\)s\\.%\\(ext\\)s$" },
+            "outputTemplate": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(ext\\)s$" },
             "authentication": { "const": "NONE" },
             "requestedLanguage": { "const": "en" },
             "format": { "const": "vtt" },
@@ -370,7 +370,7 @@
           "required": ["source", "command", "commandStatus", "observedCommand", "authentication", "capturedAfterComparison", "captureTiming", "languages", "trackClass", "automaticCaptionsSeparate", "authoredEnglishConfirmed"],
           "properties": {
             "source": { "const": "ANONYMOUS_YOUTUBE_PLAYER_METADATA" },
-            "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+            "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"" },
             "commandStatus": { "const": "REPRODUCTION_ONLY" },
             "observedCommand": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
             "authentication": { "const": "NONE" },
@@ -563,7 +563,7 @@
       "required": ["source", "command", "commandStatus", "observedCommand", "authentication", "capturedAfterComparison", "captureTiming", "languages", "trackClass", "automaticCaptionsSeparate", "authoredEnglishConfirmed"],
       "properties": {
         "source": { "const": "ANONYMOUS_YOUTUBE_PLAYER_METADATA" },
-        "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"" },
         "commandStatus": { "const": "REPRODUCTION_ONLY" },
         "observedCommand": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
         "authentication": { "const": "NONE" },

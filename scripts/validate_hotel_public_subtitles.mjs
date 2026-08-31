@@ -40,6 +40,14 @@ function decodeUtf8(bytes) {
   return UTF8_DECODER.decode(bytes);
 }
 
+export function renderYtDlpSubtitleFileName(outputTemplate, infoLanguage, requestedLanguage, extension) {
+  const preparedFileName = outputTemplate.replace("%(language)s", infoLanguage).replace("%(ext)s", extension);
+  const extensionSuffix = `.${extension}`;
+  assert.ok(preparedFileName.endsWith(extensionSuffix), "yt-dlp subtitle output template must end with its extension");
+  const baseFileName = preparedFileName.slice(0, -extensionSuffix.length);
+  return `${baseFileName}.${requestedLanguage}${extensionSuffix}`;
+}
+
 function normalizeText(text) {
   return text.replace(/\s+/gu, " ").trim();
 }
@@ -235,20 +243,21 @@ function isUnavailableSubtitleReadback(record) {
 function validateSubtitleCommand(command, label, watchUrl, outputFileName = null) {
   assert.ok(command && typeof command === "object", `${label} command evidence is missing`);
   assert.equal(command.commandStatus, REPRODUCTION_ONLY_COMMAND_STATUS, `${label} command status differs`);
+  assert.equal(watchUrl, SUBTITLE_WATCH_URL, `${label} watch URL differs`);
   const historicalCommand = outputFileName === null ? HISTORICAL_CATALOG_COMMAND : HISTORICAL_DOWNLOAD_COMMAND;
   assert.equal(command.observedCommand, historicalCommand, `${label} historical command differs`);
   if (outputFileName !== null) {
     assert.equal(typeof command.outputTemplate, "string", `${label} output template is missing`);
-    assert.match(command.outputTemplate, /^media\/demo-video\/[A-Za-z0-9_-][A-Za-z0-9._-]*\.%\(language\)s\.%\(ext\)s$/u, `${label} output template is unsafe`);
-    const renderedOutputName = basename(command.outputTemplate.replace("%(language)s", "en").replace("%(ext)s", "vtt"));
+    assert.match(command.outputTemplate, /^media\/demo-video\/[A-Za-z0-9_-][A-Za-z0-9._-]*\.%\(ext\)s$/u, `${label} output template is unsafe`);
+    const renderedOutputName = basename(renderYtDlpSubtitleFileName(command.outputTemplate, "NA", "en", "vtt"));
     assert.equal(renderedOutputName, outputFileName, `${label} output template does not name its retained file`);
     assert.equal(
       command.command,
-      `${historicalCommand} --output ${command.outputTemplate} ${watchUrl}`,
+      `${historicalCommand} --output "${command.outputTemplate}" "${watchUrl}"`,
       `${label} reproduction command differs`,
     );
   } else {
-    assert.equal(command.command, `${historicalCommand} ${watchUrl}`, `${label} reproduction command differs`);
+    assert.equal(command.command, `${historicalCommand} "${watchUrl}"`, `${label} reproduction command differs`);
   }
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -13,6 +13,7 @@ import {
   compareSubtitleTexts,
   productionMetadataPath,
   publicSubtitlePath,
+  renderYtDlpSubtitleFileName,
   sourceSubtitlePath,
   validateSubtitleHistory,
 } from "./validate_hotel_public_subtitles.mjs";
@@ -23,8 +24,8 @@ const mismatchedSubtitleStateTransition =
 const subtitleWatchUrl = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
 const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir";
 const historicalCatalogCommand = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
-const reproductionDownloadCommand = `${historicalDownloadCommand} --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${subtitleWatchUrl}`;
-const reproductionCatalogCommand = `${historicalCatalogCommand} ${subtitleWatchUrl}`;
+const reproductionDownloadCommand = `${historicalDownloadCommand} --output "media/demo-video/youtube-public-201.%(ext)s" "${subtitleWatchUrl}"`;
+const reproductionCatalogCommand = `${historicalCatalogCommand} "${subtitleWatchUrl}"`;
 
 function uuidV7ForMilliseconds(epochMilliseconds) {
   const timestamp = BigInt(epochMilliseconds).toString(16).padStart(12, "0");
@@ -55,9 +56,9 @@ async function createSubtitleHistoryFixture(sourceBytes, publicBytes, prefix) {
 }
 
 function bindReproductionDownloadCommand(readback) {
-  const outputTemplate = `media/demo-video/${readback.download.fileName.replace(/\.[A-Za-z]{2,3}\.vtt$/u, ".%(language)s.%(ext)s")}`;
+  const outputTemplate = `media/demo-video/${readback.download.fileName.replace(/\.[A-Za-z]{2,3}\.vtt$/u, ".%(ext)s")}`;
   readback.download.outputTemplate = outputTemplate;
-  readback.download.command = `${historicalDownloadCommand} --output ${outputTemplate} ${subtitleWatchUrl}`;
+  readback.download.command = `${historicalDownloadCommand} --output "${outputTemplate}" "${subtitleWatchUrl}"`;
 }
 
 async function assertRejectsInvalidUtf8(sourceBytes, publicBytes, prefix) {
@@ -96,10 +97,83 @@ test("records replay commands separately from the historical command capture", a
   assert.equal(readback.download.observedCommand, historicalDownloadCommand);
   assert.equal(readback.download.commandStatus, "REPRODUCTION_ONLY");
   assert.equal(readback.download.command, reproductionDownloadCommand);
-  assert.equal(readback.download.outputTemplate, "media/demo-video/youtube-public-201.%(language)s.%(ext)s");
+  assert.equal(readback.download.outputTemplate, "media/demo-video/youtube-public-201.%(ext)s");
   assert.equal(readback.availableSubtitleCatalog.observedCommand, historicalCatalogCommand);
   assert.equal(readback.availableSubtitleCatalog.commandStatus, "REPRODUCTION_ONLY");
   assert.equal(readback.availableSubtitleCatalog.command, reproductionCatalogCommand);
+});
+
+test("passes quoted replay commands to yt-dlp without invoking the network", async (t) => {
+  const zshProbe = spawnSync("/bin/sh", ["-c", "command -v zsh"], { encoding: "utf8" });
+  const zshPath = zshProbe.stdout.trim();
+  if (zshProbe.status !== 0 || zshPath === "") {
+    t.skip("zsh is not available on this runner");
+    return;
+  }
+  const temporaryDirectory = await mkdtemp(resolve(tmpdir(), "hotel-public-subtitles-shell-"));
+  try {
+    const binDirectory = resolve(temporaryDirectory, "bin");
+    await mkdir(binDirectory);
+    const uvxStubPath = resolve(binDirectory, "uvx");
+    await writeFile(uvxStubPath, "#!/bin/sh\n[ \"$1\" = \"yt-dlp\" ] || exit 9\nprintf '%s\\n' \"$@\"\n", "utf8");
+    await chmod(uvxStubPath, 0o755);
+    const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+    const readback = metadata.publication.subtitleAnonymousReadbacks[0];
+    const commands = [
+      [
+        readback.download.command,
+        [
+          "yt-dlp",
+          "--skip-download",
+          "--write-subs",
+          "--sub-langs",
+          "en",
+          "--sub-format",
+          "vtt",
+          "--no-write-auto-subs",
+          "--no-cache-dir",
+          "--output",
+          "media/demo-video/youtube-public-201.%(ext)s",
+          subtitleWatchUrl,
+        ],
+      ],
+      [
+        readback.availableSubtitleCatalog.command,
+        ["yt-dlp", "--skip-download", "--list-subs", "--no-cache-dir", subtitleWatchUrl],
+      ],
+    ];
+    for (const [command, expectedArguments] of commands) {
+      const result = spawnSync(zshPath, ["-f", "-c", command], {
+        encoding: "utf8",
+        env: { ...process.env, PATH: `${binDirectory}:${process.env.PATH ?? ""}` },
+      });
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(result.stdout.trimEnd().split("\n"), expectedArguments);
+    }
+  } finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("models yt-dlp subtitle language insertion for three info-language cases", () => {
+  const oldTemplate = "media/demo-video/youtube-public-201.%(language)s.%(ext)s";
+  const correctTemplate = "media/demo-video/youtube-public-201.%(ext)s";
+  assert.deepEqual(
+    ["NA", "en", "ja"].map((infoLanguage) => renderYtDlpSubtitleFileName(oldTemplate, infoLanguage, "en", "vtt")),
+    [
+      "media/demo-video/youtube-public-201.NA.en.vtt",
+      "media/demo-video/youtube-public-201.en.en.vtt",
+      "media/demo-video/youtube-public-201.ja.en.vtt",
+    ],
+  );
+  assert.deepEqual(
+    ["NA", "en", "ja"].map((infoLanguage) => renderYtDlpSubtitleFileName(correctTemplate, infoLanguage, "en", "vtt")),
+    [
+      "media/demo-video/youtube-public-201.en.vtt",
+      "media/demo-video/youtube-public-201.en.vtt",
+      "media/demo-video/youtube-public-201.en.vtt",
+    ],
+  );
 });
 
 test("rejects a replay command that cannot contact the retained video or name its output", async () => {
@@ -461,7 +535,7 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
       track: "ENGLISH_AUTHORED_TRACK",
       availableSubtitleCatalog: {
         source: "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
-        command: `${historicalCatalogCommand} ${subtitleWatchUrl}`,
+        command: `${historicalCatalogCommand} "${subtitleWatchUrl}"`,
         commandStatus: "REPRODUCTION_ONLY",
         observedCommand: historicalCatalogCommand,
         authentication: "NONE",

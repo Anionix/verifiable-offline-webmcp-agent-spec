@@ -380,7 +380,7 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
         "track": "ENGLISH_AUTHORED_TRACK",
         "availableSubtitleCatalog": {
             "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
-            "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8",
+            "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"",
             "commandStatus": "REPRODUCTION_ONLY",
             "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
             "authentication": "NONE",
@@ -643,6 +643,23 @@ def subtitle_root_suffix_options(collection_name: str, record: dict[str, Any]) -
     return set()
 
 
+def subtitle_suffix_group_cursors(
+    suffix: list[str], start: int, events: list[tuple[str, int, set[str]]]
+) -> set[int]:
+    possible_cursors: set[int] = set()
+
+    def assign(event_index: int, used_indexes: set[int]) -> None:
+        if event_index == len(events):
+            possible_cursors.add(max(used_indexes, default=start - 1) + 1)
+            return
+        for suffix_index in range(start, len(suffix)):
+            if suffix_index not in used_indexes and suffix[suffix_index] in events[event_index][2]:
+                assign(event_index + 1, used_indexes | {suffix_index})
+
+    assign(0, set())
+    return possible_cursors
+
+
 def reserved_document_events(video_production: dict[str, Any]) -> dict[str, str]:
     document_identity = video_production.get("identity", {})
     previous_observation = video_production.get("previousDocumentObservation", {})
@@ -702,8 +719,8 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     publication = video_production.get("publication")
     if isinstance(publication, dict) and isinstance(current_state, str) and isinstance(previous_state, str):
         suffix = current_state[len(previous_state) + len(" -> ") :].split(" -> ")
-        newer_subtitle_events: list[tuple[int, int, int, set[str]]] = []
-        for collection_order, (collection_name, timestamp_field) in enumerate(SUBTITLE_TIMESTAMP_FIELDS.items()):
+        newer_subtitle_events: list[tuple[int, str, int, set[str]]] = []
+        for collection_name, timestamp_field in SUBTITLE_TIMESTAMP_FIELDS.items():
             records = publication.get(collection_name)
             if not isinstance(records, list):
                 continue
@@ -719,31 +736,28 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     continue
                 if record_time_ms > previous_updated_ms:
                     newer_subtitle_events.append(
-                        (record_time_ms, collection_order, record_order, root_suffix_options)
+                        (record_time_ms, collection_name, record_order, root_suffix_options)
                     )
-        newer_subtitle_events.sort(key=lambda event: event[:3])
-        required_suffix_options: list[set[str]] = []
-        event_labels: list[tuple[int, int]] = []
-        for _, collection_order, record_order, root_suffix_options in newer_subtitle_events:
-            if required_suffix_options and required_suffix_options[-1] & root_suffix_options:
-                required_suffix_options[-1].update(root_suffix_options)
+        newer_subtitle_events.sort(key=lambda event: event[0])
+        event_groups: list[tuple[int, list[tuple[str, int, set[str]]]]] = []
+        for event_time_ms, collection_name, record_order, root_suffix_options in newer_subtitle_events:
+            if event_groups and event_groups[-1][0] == event_time_ms:
+                event_groups[-1][1].append((collection_name, record_order, root_suffix_options))
             else:
-                required_suffix_options.append(root_suffix_options)
-                event_labels.append((collection_order, record_order))
-        suffix_cursor = 0
-        for root_suffix_options, (collection_order, record_order) in zip(required_suffix_options, event_labels):
-            suffix_index = next(
-                (index for index in range(suffix_cursor, len(suffix)) if suffix[index] in root_suffix_options),
-                None,
-            )
-            if suffix_index is None:
-                collection_name = tuple(SUBTITLE_TIMESTAMP_FIELDS)[collection_order]
+                event_groups.append((event_time_ms, [(collection_name, record_order, root_suffix_options)]))
+        suffix_cursors = {0}
+        for _, events in event_groups:
+            next_suffix_cursors = set()
+            for suffix_cursor in suffix_cursors:
+                next_suffix_cursors.update(subtitle_suffix_group_cursors(suffix, suffix_cursor, events))
+            if not next_suffix_cursors:
+                collection_name, record_order, _ = events[0]
                 findings.append(
                     f"video production root state transition lacks a derived suffix for "
                     f"{collection_name} entry {record_order + 1}"
                 )
                 break
-            suffix_cursor = suffix_index + 1
+            suffix_cursors = next_suffix_cursors
         findings.extend(
             subtitle_observation_errors(
                 {
@@ -834,6 +848,30 @@ def subtitle_root_suffix_fixture_errors(
     )
     if not document_history_errors(reversed_suffix):
         findings.append("root history accepted subtitle suffixes in the wrong event order")
+
+    same_time_mismatch = json.loads(json.dumps(mismatch_record))
+    same_time_mismatch["observationUuidV7"] = uuid7_for_ms(base_root_ms + 1, 0x8AC, 0x8ACDEF012345678)
+    same_time_mismatch["recordedAt"] = rfc3339_from_ms(base_root_ms + 1)
+    for suffix_order, suffixes in (
+        ("owner-first", [OWNER_SUBTITLE_FAILURE_STATE.split(" -> ")[-1], ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(" -> ")[-1]]),
+        ("anonymous-first", [ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(" -> ")[-1], OWNER_SUBTITLE_FAILURE_STATE.split(" -> ")[-1]]),
+    ):
+        same_time = json.loads(json.dumps(owner_failure))
+        same_time["publication"]["subtitleAnonymousReadbacks"].append(json.loads(json.dumps(same_time_mismatch)))
+        same_time["stateTransition"] = f"{previous_state} -> {' -> '.join(suffixes)}"
+        if list(validator.iter_errors(same_time)):
+            findings.append(f"schema rejected the {suffix_order} same-time subtitle root fixture")
+        if document_history_errors(same_time):
+            findings.append(f"root history rejected the {suffix_order} same-time subtitle root fixture")
+
+    different_time_reversal = json.loads(json.dumps(owner_failure))
+    different_time_reversal["publication"]["subtitleAnonymousReadbacks"].append(json.loads(json.dumps(mismatch_record)))
+    different_time_reversal["stateTransition"] = (
+        f"{previous_state} -> {ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(' -> ')[-1]} -> "
+        f"{OWNER_SUBTITLE_FAILURE_STATE.split(' -> ')[-1]}"
+    )
+    if not document_history_errors(different_time_reversal):
+        findings.append("root history accepted a different-time subtitle suffix reversal")
 
     media_only = json.loads(json.dumps(video_production))
     media_only["previousDocumentObservation"] = {

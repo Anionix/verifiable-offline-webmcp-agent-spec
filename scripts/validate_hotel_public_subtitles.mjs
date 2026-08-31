@@ -45,7 +45,7 @@ const subtitleLanguageRules = Object.freeze({
 const LANGUAGE_PRIMARY_CHARACTERS = /^[A-Za-z]+$/u;
 const LANGUAGE_SUBTAG_CHARACTERS = /^[A-Za-z0-9]+$/u;
 const OBSERVED_DOWNLOAD_COMMAND =
-  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${SUBTITLE_WATCH_URL}`;
+  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(ext)s ${SUBTITLE_WATCH_URL}`;
 const OBSERVED_CATALOG_COMMAND = `${HISTORICAL_CATALOG_COMMAND} ${SUBTITLE_WATCH_URL}`;
 
 const EXPECTED_CUE_COUNT = 184;

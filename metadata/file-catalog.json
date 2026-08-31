@@ -3930,8 +3930,8 @@
     },
     {
       "path": "metadata/demo-video-production.json",
-      "sha256": "dd0591529f890128bba8b118a532b07e7b8ac785d0e27ddffaf1909a924630bb",
-      "bytes": 39547,
+      "sha256": "ae21622b9c1b0ac456cf70e4f49f1d871a3bbb21f730df83be96dbb460eb1467",
+      "bytes": 39534,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4140,8 +4140,8 @@
     },
     {
       "path": "metadata/hotel-release-candidate.json",
-      "sha256": "5533825e582b27674b4424fa6ee6cd4868b4a8506331e30980f829ca4347fd7d",
-      "bytes": 17445,
+      "sha256": "cac0ad618c036fccb595e363999c9b4d2ac5e4a70bacd41c9da444518ee7c15c",
+      "bytes": 17437,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4767,8 +4767,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "9f5a52ce85bc6a5b393a37bb880098a964d4ba32fc6abf342a2ed736af28cade",
-      "bytes": 72850,
+      "sha256": "0f43dcf7aa7b2418fd173d1652d77ae40097e180c3b872bee0ea2ab4e820a929",
+      "bytes": 72837,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5679,8 +5679,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_managed_browser_release_proof.mjs",
-      "sha256": "eff5f1cb37403c01655db228aa9bc321ff426c425a2a92bde6bafee70fd5eda7",
-      "bytes": 40956,
+      "sha256": "3333207415c8747dfeb380198e9088cdda46058578d47b252a303c34297b9882",
+      "bytes": 40968,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5698,8 +5698,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_public_subtitles.mjs",
-      "sha256": "069023cfc4e1d67092757a12c2a5366f2c983556e1bbcbde0b66c9be787f7827",
-      "bytes": 40275,
+      "sha256": "3400ab619927292e7e78b5ebfc48390f4bdc26829d4892975407d97e3d979c2b",
+      "bytes": 40262,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5812,8 +5812,8 @@
     },
     {
       "path": "scripts/validate_hotel_public_subtitles.mjs",
-      "sha256": "1c7746984dd5978dde504216a1e11a319a8d3ce2190df751a3aa1022f0461043",
-      "bytes": 27077,
+      "sha256": "22fcd683bb736ec127b2bec516e0afc26dcf28dcb6782f3456c1bc7f6b090278",
+      "bytes": 27064,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "9da27651482565422c34355383a711e07f94ae4173a166d13d4b6d9612976431",
-      "bytes": 23958,
+      "sha256": "9a7e81af0ff72654d79c4d7c54af92a816a8e31b7a2196d63b063edae230c50c",
+      "bytes": 25250,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

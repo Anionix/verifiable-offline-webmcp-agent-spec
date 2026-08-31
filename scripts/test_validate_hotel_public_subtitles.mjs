@@ -26,7 +26,7 @@ const subtitleWatchUrl = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
 const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir";
 const historicalCatalogCommand = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
 const observedDownloadCommand =
-  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${subtitleWatchUrl}`;
+  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(ext)s ${subtitleWatchUrl}`;
 const observedCatalogCommand = `${historicalCatalogCommand} ${subtitleWatchUrl}`;
 const reproductionDownloadCommand = `${historicalDownloadCommand} --output "media/demo-video/youtube-public-201.%(ext)s" "${subtitleWatchUrl}"`;
 const reproductionCatalogCommand = `${historicalCatalogCommand} "${subtitleWatchUrl}"`;

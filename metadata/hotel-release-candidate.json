@@ -2,9 +2,9 @@
   "$schema": "../schemas/hotel-release-candidate.schema.json",
   "identity": {
     "informationUuidV5": "f2da6444-7447-5120-a39d-446adda200ca",
-    "observationUuidV7": "01a0554b-9abd-7098-a779-7a01c4833b8d"
+    "observationUuidV7": "01a0566a-07e4-79f5-a424-eef75495cf45"
   },
-  "observedAt": "2026-08-31T00:50:13.309Z",
+  "observedAt": "2026-08-31T06:03:04.548Z",
   "source": {
     "commit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "state": "WORKTREE_CANDIDATE",
@@ -124,7 +124,7 @@
       "sameConfirmation": true,
       "humanConfirmationBoundary": "visible_button_only",
       "driverAction": "visible_button_exercised_by_browser_driver",
-      "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect. The local worktree also changes the booking result live-region boundary; that accessibility change has not been included in a public native run."
+      "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect. The local worktree artifact digests differ from the historical public release; no fresh public native run is claimed for this candidate."
     },
     "recording": {
       "status": "LOCAL_ARTIFACT",

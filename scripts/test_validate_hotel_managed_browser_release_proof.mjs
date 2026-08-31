@@ -676,7 +676,7 @@ test("the CLI comparison rejects stored managed candidates with unrelated reconc
   assert.doesNotThrow(() => compareStable(structuredClone(expected), expected));
   const changedObservationTime = structuredClone(expected);
   changedObservationTime.observedAt = new Date(Date.parse(expected.observedAt) + 1).toISOString();
-  assert.throws(() => compareStable(changedObservationTime, expected), /candidate observation time differs from native evidence/u);
+  assert.throws(() => compareStable(changedObservationTime, expected), /candidate observation time differs from expected candidate evidence/u);
   for (const location of ["statusCheck", "finalStatus"]) {
     for (const field of ["state", "intentId", "fingerprint", "bookingId", "eventCount", "eventChainHead"]) {
       const actual = structuredClone(expected);

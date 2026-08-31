@@ -2,33 +2,33 @@
   "$schema": "../schemas/hotel-native-webmcp-reconciliation.schema.json",
   "identity": {
     "informationUuidV5": "1d4b92e2-85a9-5d03-a7b3-62c3d9ca4f83",
-    "observationUuidV7": "01a05751-b278-7724-a739-1d8bf7c03487",
-    "observedAt": "2026-08-31T10:16:07.032Z"
+    "observationUuidV7": "01a0576c-70f8-761b-a785-8eb7de313304",
+    "observedAt": "2026-08-31T10:45:19.736Z"
   },
   "status": "PASS",
   "deployment": {
     "provider": "Vercel",
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B",
+    "deploymentId": "dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E",
     "target": "production",
     "state": "READY",
-    "sourceCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
+    "sourceCommit": "2d5abd679893ec7dff36758925477999424c3cc7",
     "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-npnpjh2p8-aniotajp-1978s-projects.vercel.app/",
-    "readyAt": "2026-08-31T10:11:53.251Z",
-    "observedAt": "2026-08-31T10:18:23.000Z"
+    "uniqueUrl": "https://kyoto-booking-retry-proof-rnwn57v2i-aniotajp-1978s-projects.vercel.app/",
+    "readyAt": "2026-08-31T10:31:51.086Z",
+    "observedAt": "2026-08-31T10:47:08.000Z"
   },
   "discovery": {
     "profile": "MANAGED_IAB_NATIVE_CAPABILITY_V1",
     "status": "PASS",
-    "observedAt": "2026-08-31T10:16:07.032Z",
+    "observedAt": "2026-08-31T10:45:19.736Z",
     "surface": "MANAGED_IAB_NATIVE_CAPABILITY",
     "runBinding": {
-      "rootObservationUuidV7": "01a05751-b278-7724-a739-1d8bf7c03487",
-      "completedAt": "2026-08-31T10:16:07.032Z",
-      "publicSourceCommit": "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb",
-      "deploymentId": "dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B",
+      "rootObservationUuidV7": "01a0576c-70f8-761b-a785-8eb7de313304",
+      "completedAt": "2026-08-31T10:45:19.736Z",
+      "publicSourceCommit": "2d5abd679893ec7dff36758925477999424c3cc7",
+      "deploymentId": "dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E",
       "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
       "recordingSha256": "68e11be18f5d2503ba67c013524cfd46361bb3688d33778e47bde30ebc2cb6d7"
     },
@@ -103,14 +103,14 @@
           "bookingExists": false,
           "effectStartCount": 0,
           "eventCount": 1,
-          "eventChainHead": "15ff9962474926c4bad0845b94d8c481efb020f913b29bf76ddcc4ef943ec3a5",
+          "eventChainHead": "75fcf153ac21bd427a7835730b37b0fb50e9540ca252ddf226ff8134dba42efa",
           "intentId": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
           "fingerprint": "ab91a75d-a0ce-5d77-9068-3f47d780b45f"
         },
         "resultEvidence": {
-          "sha256": "857c5b9c258f8a881f4bf50fc28d3cb3f124ff7c7d21b3bf0827f2ba3a78bb78",
+          "sha256": "fe5dfa3ad6a8d6c2624986dc4f924f6c28ffebec8c8f0606ee61ecaf97cc096e",
           "basis": "EXPLICIT_SUMMARY_HASH",
-          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"prepare\",\"resultObservation\":{\"attemptCount\":1,\"bookingExists\":false,\"effectStartCount\":0,\"eventChainHead\":\"15ff9962474926c4bad0845b94d8c481efb020f913b29bf76ddcc4ef943ec3a5\",\"eventCount\":1,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"PREPARED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":2,\"status\":\"EXECUTED\",\"toolName\":\"prepare_hotel_booking\"}",
+          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"prepare\",\"resultObservation\":{\"attemptCount\":1,\"bookingExists\":false,\"effectStartCount\":0,\"eventChainHead\":\"75fcf153ac21bd427a7835730b37b0fb50e9540ca252ddf226ff8134dba42efa\",\"eventCount\":1,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"PREPARED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":2,\"status\":\"EXECUTED\",\"toolName\":\"prepare_hotel_booking\"}",
           "scope": "EXPLICIT_SUMMARY_ONLY_NOT_RAW_ATTESTATION",
           "description": "Explicit summary hash for the latest production native prepare result; raw native attestation is not retained."
         }
@@ -128,16 +128,16 @@
           "bookingExists": true,
           "effectStartCount": 1,
           "eventCount": 3,
-          "eventChainHead": "22120489d8a03cde8593558de9141e90ddb624875bc3f7618d9dd2e50b811018",
+          "eventChainHead": "004b73818fb6bc1bc55217c348c68cbf87d24d457741f6388ec3561d274064cf",
           "intentId": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
           "fingerprint": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
           "bookingId": "044fd545-58e0-5e86-856a-70ecc9294313",
           "confirmationNumber": "FKR-044FD54558"
         },
         "resultEvidence": {
-          "sha256": "64e90057cad3aaa2f9edf3b697b9eb10380a1c9d6938261ac0878dfc2f9976f8",
+          "sha256": "1d0df6164214af71b5136e107492a39e6bf3bfb142eb119805d70674f84cacb8",
           "basis": "EXPLICIT_SUMMARY_HASH",
-          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"status_before_retry\",\"resultObservation\":{\"attemptCount\":1,\"bookingExists\":true,\"bookingId\":\"044fd545-58e0-5e86-856a-70ecc9294313\",\"confirmationNumber\":\"FKR-044FD54558\",\"effectStartCount\":1,\"eventChainHead\":\"22120489d8a03cde8593558de9141e90ddb624875bc3f7618d9dd2e50b811018\",\"eventCount\":3,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"COMMITTED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":3,\"status\":\"EXECUTED\",\"toolName\":\"get_hotel_booking_status\"}",
+          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"status_before_retry\",\"resultObservation\":{\"attemptCount\":1,\"bookingExists\":true,\"bookingId\":\"044fd545-58e0-5e86-856a-70ecc9294313\",\"confirmationNumber\":\"FKR-044FD54558\",\"effectStartCount\":1,\"eventChainHead\":\"004b73818fb6bc1bc55217c348c68cbf87d24d457741f6388ec3561d274064cf\",\"eventCount\":3,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"COMMITTED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":3,\"status\":\"EXECUTED\",\"toolName\":\"get_hotel_booking_status\"}",
           "scope": "EXPLICIT_SUMMARY_ONLY_NOT_RAW_ATTESTATION",
           "description": "Explicit summary hash for the latest production native status_before_retry result; raw native attestation is not retained."
         }
@@ -155,16 +155,16 @@
           "bookingExists": true,
           "effectStartCount": 1,
           "eventCount": 4,
-          "eventChainHead": "bdcce9af20ab534772ffad4f629904acbde36d4bb1e8c74a25eb63b161401d5f",
+          "eventChainHead": "38195eefab8ee01bd117fe3623ca16c76218c3d458c6d5c20568c1c0bdf8a1b3",
           "intentId": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
           "fingerprint": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
           "bookingId": "044fd545-58e0-5e86-856a-70ecc9294313",
           "confirmationNumber": "FKR-044FD54558"
         },
         "resultEvidence": {
-          "sha256": "f7f32a24ab0d85b50eb9efdb193fa4cb22b4dcbe318682fcb4acac1bc96f40c3",
+          "sha256": "ff689d2ad63616c3799a3f28f248c5b1d214b16c44bd1481ff17ff04c61026ee",
           "basis": "EXPLICIT_SUMMARY_HASH",
-          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"status_after_retry\",\"resultObservation\":{\"attemptCount\":2,\"bookingExists\":true,\"bookingId\":\"044fd545-58e0-5e86-856a-70ecc9294313\",\"confirmationNumber\":\"FKR-044FD54558\",\"effectStartCount\":1,\"eventChainHead\":\"bdcce9af20ab534772ffad4f629904acbde36d4bb1e8c74a25eb63b161401d5f\",\"eventCount\":4,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"RETRY_RECOGNIZED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":4,\"status\":\"EXECUTED\",\"toolName\":\"get_hotel_booking_status\"}",
+          "canonicalSummary": "{\"kind\":\"toolCall\",\"method\":\"webmcp.capability.tool.call\",\"phase\":\"status_after_retry\",\"resultObservation\":{\"attemptCount\":2,\"bookingExists\":true,\"bookingId\":\"044fd545-58e0-5e86-856a-70ecc9294313\",\"confirmationNumber\":\"FKR-044FD54558\",\"effectStartCount\":1,\"eventChainHead\":\"38195eefab8ee01bd117fe3623ca16c76218c3d458c6d5c20568c1c0bdf8a1b3\",\"eventCount\":4,\"fingerprint\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"intentId\":\"ab91a75d-a0ce-5d77-9068-3f47d780b45f\",\"state\":\"RETRY_RECOGNIZED\"},\"resultStatus\":\"SUCCESS\",\"sequence\":4,\"status\":\"EXECUTED\",\"toolName\":\"get_hotel_booking_status\"}",
           "scope": "EXPLICIT_SUMMARY_ONLY_NOT_RAW_ATTESTATION",
           "description": "Explicit summary hash for the latest production native status_after_retry result; raw native attestation is not retained."
         }
@@ -220,7 +220,7 @@
   },
   "reconciliation": {
     "status": "PASS",
-    "observedAt": "2026-08-31T10:16:07.032Z",
+    "observedAt": "2026-08-31T10:45:19.736Z",
     "flow": [
       "AMBIGUOUS_OUTCOME",
       "AGENT_WEBMCP_STATUS_CHECK",
@@ -244,7 +244,7 @@
       "fingerprint": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
       "bookingId": "044fd545-58e0-5e86-856a-70ecc9294313",
       "eventCount": 3,
-      "eventChainHead": "22120489d8a03cde8593558de9141e90ddb624875bc3f7618d9dd2e50b811018"
+      "eventChainHead": "004b73818fb6bc1bc55217c348c68cbf87d24d457741f6388ec3561d274064cf"
     },
     "finalStatus": {
       "state": "RETRY_RECOGNIZED",
@@ -257,12 +257,12 @@
       "fingerprint": "ab91a75d-a0ce-5d77-9068-3f47d780b45f",
       "bookingId": "044fd545-58e0-5e86-856a-70ecc9294313",
       "eventCount": 4,
-      "eventChainHead": "bdcce9af20ab534772ffad4f629904acbde36d4bb1e8c74a25eb63b161401d5f"
+      "eventChainHead": "38195eefab8ee01bd117fe3623ca16c76218c3d458c6d5c20568c1c0bdf8a1b3"
     },
     "sameConfirmation": true,
     "humanConfirmationBoundary": "visible_button_only",
     "driverAction": "visible_button_exercised_by_browser_driver",
-    "agentExplanation": "The browser driver opened the empty fictional state at the unique alias of the current production deployment, discovered the four native tools, prepared one intent, exercised only the visible human confirmation, and retried once through the visible button. Native operation completion was 2026-08-31T10:15:33.955Z and final observations completed at 2026-08-31T10:16:07.032Z. Native status returned the same confirmation with attempts 2, bookings 1, and effect starts 1; the unique alias and canonical public URL are two aliases of the Vercel deployment recorded above. No fresh visual recording was captured for this run; the retained local recording is a separate visual supplement from an earlier run."
+    "agentExplanation": "The isolated browser cleared only the fictional site's local storage, opened the canonical public alias after the recorded production READY boundary, discovered the four native tools through document.modelContext.getTools, and executed the four-step WebMCP path with valid JSON input. The visible human confirmation button was exercised once and the visible retry button once. Native operation completion was 2026-08-31T10:45:05.366Z and final page observations completed at 2026-08-31T10:45:19.736Z. Native status returned the same confirmation with attempts 2, bookings 1, and effect starts 1. The Vercel deployment's unique alias was independently read but redirected to sign-in in the isolated browser, so the actual execution URL was the canonical public alias; both identifiers remain recorded. The final page console had zero errors and zero warnings. No fresh visual recording was captured for this run; the retained local recording is a separate visual supplement from an earlier run."
   },
   "recording": {
     "status": "LOCAL_ARTIFACT",

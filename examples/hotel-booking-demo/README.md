@@ -5,8 +5,8 @@ information_uuid_v5: "14f8eb1a-a861-59e4-a2a1-1a5b2a0114d6"
 event_uuid_v7: "01a050c7-3406-7a09-b8ea-f08a051a2cd6"
 state_transition: "UNPACKAGED_DEMO -> JUDGE_READY_RELEASE_GUIDE"
 occurred_at: "2026-08-30T04:20:00Z"
-public_release_alignment_event_uuid_v7: "01a05753-c598-7a3a-b440-9572a019ba1a"
-updated_at: "2026-08-31T10:18:23.000Z"
+public_release_alignment_event_uuid_v7: "01a0576f-4c85-7731-b4b3-3833d8af4a2f"
+updated_at: "2026-08-31T10:48:27.013Z"
 status: "release-guide"
 ---
 
@@ -16,7 +16,7 @@ status: "release-guide"
 
 Visible proof: `2 attempts → 1 simulated booking → 1 confirmation number`.
 
-Current public alignment: the submitted ChatGPT Site is version 14 from source `2fbbf1b714ca660ef1681239b638205a9835f7c5`; the Vercel backup is deployment `dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B` from source `bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb`. Anonymous retrieval of both [`Sites webmcp-evals.json`](https://kyoto-booking-retry-proof.anionix.chatgpt.site/webmcp-evals.json) and [`Vercel webmcp-evals.json`](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json) reports the same 194-test release evidence and exact four-tool contract. The [alignment record](../../metadata/public-release-alignment-readback.json) keeps public readback separate from the fresh native execution record.
+Current public alignment: the submitted ChatGPT Site is version 14 from source `2fbbf1b714ca660ef1681239b638205a9835f7c5`; the Vercel target is deployment `dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E` from source `2d5abd679893ec7dff36758925477999424c3cc7`. Anonymous retrieval of both [`Sites webmcp-evals.json`](https://kyoto-booking-retry-proof.anionix.chatgpt.site/webmcp-evals.json) and [`Vercel webmcp-evals.json`](https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json) reports the same 194-test release evidence and exact four-tool contract. The [alignment record](../../metadata/public-release-alignment-readback.json) keeps public readback separate from the fresh native execution record.
 
 ## Short Japanese summary / 日本語要約
 
@@ -100,6 +100,6 @@ The shared build creates `dist/client/**` for static hosts, `dist/server/index.j
 
 ## Evidence and limits
 
-The source repository keeps the detailed [hotel verification record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-booking-verification.json), [public release readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json), [public alignment readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/public-release-alignment-readback.json), [native WebMCP reconciliation record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json), [current release candidate](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-release-candidate.json), [video production record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/demo-video-production.json), [historical public readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/devpost-public-readback.json), and [release instructions](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md). The bounded supported-Chrome run is retained in the native reconciliation record and is not presented as a new run for this public alignment. This proves the tested configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader runs remain `INCONCLUSIVE`, and the local video file to public YouTube identity remains `UNMEASURED`.
+The source repository keeps the detailed [hotel verification record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-booking-verification.json), [public release readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json), [public alignment readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/public-release-alignment-readback.json), [native WebMCP reconciliation record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json), [current release candidate](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-release-candidate.json), [video production record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/demo-video-production.json), [historical public readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/devpost-public-readback.json), and [release instructions](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md). The fresh native run is retained separately from the public alignment record and is bound to the recorded Vercel target after its READY boundary. This proves the tested configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader runs remain `INCONCLUSIVE`, and the local video file to public YouTube identity remains `UNMEASURED`.
 
 This is an educational, fictional, device-local proof of safe retry behavior. It does not contact a hotel, airline, payment service, mail service, or booking provider.

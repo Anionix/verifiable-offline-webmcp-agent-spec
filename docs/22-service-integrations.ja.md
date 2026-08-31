@@ -4,8 +4,8 @@ information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
 event_uuid_v7: "01a04dcb-8678-7e22-973d-dc0d0617b0ce"
 observed_at: "2026-08-29T13:52:59.000Z"
 state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED -> SITES_VERSION_12_CURRENT_ARTIFACT_VERIFIED"
-public_release_alignment_event_uuid_v7: "01a05753-c598-7a3a-b440-9572a019ba1a"
-public_release_alignment_observed_at: "2026-08-31T10:18:23.000Z"
+public_release_alignment_event_uuid_v7: "01a0576f-4c85-7731-b4b3-3833d8af4a2f"
+public_release_alignment_observed_at: "2026-08-31T10:48:27.013Z"
 ---
 
 # サービス連携状態の読み方
@@ -56,10 +56,10 @@ public_release_alignment_observed_at: "2026-08-31T10:18:23.000Z"
 
 ## 現在の公開版対応
 
-<!-- information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a05753-c598-7a3a-b440-9572a019ba1a state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T10:18:23.000Z -->
+<!-- information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a0576f-4c85-7731-b4b3-3833d8af4a2f state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T10:48:27.013Z -->
 <!-- machine-contract=The service registry remains a historical integration baseline; this record binds the submitted Site, Vercel fallback, and Devpost description only after separate readbacks. -->
 
-公開版の対応は、提出先をChatGPT Sites版14（ソース`2fbbf1b714ca660ef1681239b638205a9835f7c5`）、確認用Vercel本番（配置`dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B`、ソース`bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb`）、Devpost版15へ分けて読み戻しました。三つの観測は、提出先URL、匿名HTTP 200、194件のNode試験、意図した四機能で一致します。これは[`metadata/public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json)の現行記録です。ネイティブWebMCPの実行は別の記録で、結果欄はページ通信や外部効果を測定しません。
+公開版の対応は、提出先をChatGPT Sites版14（ソース`2fbbf1b714ca660ef1681239b638205a9835f7c5`）、確認用Vercel本番（配置`dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E`、ソース`2d5abd679893ec7dff36758925477999424c3cc7`）、Devpost版16へ分けて読み戻しました。三つの観測は、提出先URL、匿名HTTP 200、194件のNode試験、意図した四機能で一致します。これは[`metadata/public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json)の現行記録です。ネイティブWebMCPの実行は別の記録で、結果欄はページ通信や外部効果を測定しません。
 
 ## Voidの端末内開発連携
 

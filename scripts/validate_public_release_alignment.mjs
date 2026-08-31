@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915
-// event_uuid_v7=01a05753-c598-7a3a-b440-9572a019ba1a
-// state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T10:18:23.000Z
+// event_uuid_v7=01a0576f-4c85-7731-b4b3-3833d8af4a2f
+// state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T10:48:27.013Z
 // machine-contract: validate the Sites, Vercel, and Devpost readbacks independently before allowing one alignment result.
 
 import assert from "node:assert/strict";
@@ -23,9 +23,9 @@ const expectedTools = ["check_existing_hotel_booking", "prepare_hotel_booking", 
 const expectedForbiddenTools = ["confirm_hotel_booking", "pay_for_hotel_booking", "cancel_hotel_booking"];
 const expectedSitesSource = "2fbbf1b714ca660ef1681239b638205a9835f7c5";
 const expectedSitesVersionId = "appgprj_6a923239002081918896546134a7dc8f~appgver_8543952287588191bce7d9d5ca0593ae";
-const expectedVercelSource = "bbb1b611dbaf9bb2172e59da3e63bbe71799bfeb";
-const expectedDeployment = "dpl_A39LNXnMRAA6RscBYJLkZBok1Y3B";
-const expectedDevpostUpdatedAt = "2026-08-31T10:18:01.234Z";
+const expectedVercelSource = "2d5abd679893ec7dff36758925477999424c3cc7";
+const expectedDeployment = "dpl_HWJVg4uCgFEaq9N2f5kvXwLjvK2E";
+const expectedDevpostUpdatedAt = "2026-08-31T10:48:27.013Z";
 
 const schemaResult = validateDraft202012(alignment, schema);
 assert.equal(
@@ -110,7 +110,7 @@ assert.equal(devpost.url, "https://devpost.com/software/project-y79pb23hj1mz");
 assert.equal(devpost.projectId, "1405191");
 assert.equal(devpost.projectSlug, "project-y79pb23hj1mz");
 assert.equal(devpost.state, "published");
-assert.equal(devpost.projectVersion, 15);
+assert.equal(devpost.projectVersion, 16);
 assert.equal(devpost.updatedAt, expectedDevpostUpdatedAt);
 assert.equal(devpost.websiteUrl, "https://kyoto-booking-retry-proof.anionix.chatgpt.site");
 assert.equal(devpost.submission.submissionId, 1158722);
@@ -131,4 +131,4 @@ assert.equal(serialized.includes("192 Node tests"), false, "current alignment re
 assert.equal(serialized.includes("c8be388d8047472ef7d6ad69656255adb5903e37"), false, "current alignment record contains stale source text");
 assert.equal(serialized.includes("Bearer"), false, "current alignment record contains a bearer credential");
 
-console.log("public release alignment: PASS (Sites v14, Vercel HTTP 200, Devpost v15, exact four-tool contract, 194 tests)");
+console.log("public release alignment: PASS (Sites v14, Vercel HTTP 200 after READY, Devpost v16, exact four-tool contract, 194 tests)");

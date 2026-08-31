@@ -14,13 +14,18 @@ export const HOTEL_RETRY_DIAGRAM_TARGET = "docs/assets/hotel-retry-explained.png
 export const HOTEL_RETRY_DIAGRAM_METADATA = "metadata/hotel-retry-diagram.json";
 export const HOTEL_RETRY_SOURCE_README_LINK = "../../docs/assets/hotel-retry-explained.png";
 export const HOTEL_RETRY_PACKAGED_README_LINK = "docs/assets/hotel-retry-explained.png";
+export const HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE = "docs/assets/hotel-retry-student-guide.png";
+export const HOTEL_RETRY_STUDENT_DIAGRAM_TARGET = "docs/assets/hotel-retry-student-guide.png";
+export const HOTEL_RETRY_STUDENT_DIAGRAM_METADATA = "metadata/hotel-retry-student-guide.json";
+export const HOTEL_RETRY_STUDENT_SOURCE_README_LINK = "../../docs/assets/hotel-retry-student-guide.png";
+export const HOTEL_RETRY_STUDENT_PACKAGED_README_LINK = "docs/assets/hotel-retry-student-guide.png";
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
-function assertCurrentDiagramProvenance(metadata, sourceDigest) {
-  assert.equal(metadata?.repository_copy?.path, HOTEL_RETRY_DIAGRAM_SOURCE, "diagram provenance path is not bound to the source PNG");
+function assertCurrentDiagramProvenance(metadata, sourceDigest, expectedPath = HOTEL_RETRY_DIAGRAM_SOURCE) {
+  assert.equal(metadata?.repository_copy?.path, expectedPath, "diagram provenance path is not bound to the source PNG");
   assert.equal(metadata?.repository_copy?.sha256, sourceDigest, "source PNG digest differs from repository provenance");
   assert.equal(metadata?.generation?.source_sha256, sourceDigest, "source PNG digest differs from generation provenance");
   assert.equal(typeof metadata?.identity?.uuid_v7, "string", "diagram provenance event UUIDv7 is missing");
@@ -39,7 +44,11 @@ function assertCurrentPackagedReadme(packagedReadme, eventUuidV7, sourceDigest) 
   const eventLineIndex = lines.findIndex((line) => line.split(/[;\s]+/u).includes(`event_uuid_v7=${eventUuidV7}`));
   assert.ok(eventLineIndex >= 0, "packaged README is not bound to the current diagram provenance event");
   const provenanceBlock = lines.slice(eventLineIndex, eventLineIndex + 2).join("\n");
-  assert.ok(provenanceBlock.split(/[;\s]+/u).includes(`source_sha256=${sourceDigest}`), "packaged README is not bound to the current diagram provenance hash");
+  const provenanceTokens = provenanceBlock.split(/[;\s]+/u);
+  assert.ok(
+    provenanceTokens.includes(`source_sha256=${sourceDigest}`) || provenanceTokens.includes(`sha256=${sourceDigest}`),
+    "packaged README is not bound to the current diagram provenance hash",
+  );
 }
 
 export async function packageHotelRetryDiagram({ sourceRoot, packageRoot }) {
@@ -59,6 +68,28 @@ export async function packageHotelRetryDiagram({ sourceRoot, packageRoot }) {
   await writeFile(packagedDiagram, sourceBytes);
   packagedReadme = packagedReadme.replaceAll(HOTEL_RETRY_SOURCE_README_LINK, HOTEL_RETRY_PACKAGED_README_LINK);
   assert.ok(!packagedReadme.includes(HOTEL_RETRY_SOURCE_README_LINK), "release README must not escape the release root for its diagram");
+  await writeFile(packagedReadmePath, packagedReadme);
+
+  return { packagedDiagram, packagedReadmePath };
+}
+
+export async function packageHotelRetryStudentGuide({ sourceRoot, packageRoot }) {
+  const sourceDiagram = resolve(sourceRoot, HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE);
+  const sourceBytes = await readFile(sourceDiagram);
+  const sourceDigest = sha256(sourceBytes);
+  const metadataPath = resolve(sourceRoot, HOTEL_RETRY_STUDENT_DIAGRAM_METADATA);
+  const metadata = JSON.parse(await readFile(metadataPath, "utf8"));
+  const eventUuidV7 = assertCurrentDiagramProvenance(metadata, sourceDigest, HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE);
+  const packagedReadmePath = resolve(packageRoot, "README.md");
+  let packagedReadme = await readFile(packagedReadmePath, "utf8");
+  assertCurrentPackagedReadme(packagedReadme, eventUuidV7, sourceDigest);
+  assert.ok(packagedReadme.includes(HOTEL_RETRY_STUDENT_SOURCE_README_LINK), "source README student guide link is missing from the release copy");
+
+  const packagedDiagram = resolve(packageRoot, HOTEL_RETRY_STUDENT_DIAGRAM_TARGET);
+  await mkdir(dirname(packagedDiagram), { recursive: true });
+  await writeFile(packagedDiagram, sourceBytes);
+  packagedReadme = packagedReadme.replaceAll(HOTEL_RETRY_STUDENT_SOURCE_README_LINK, HOTEL_RETRY_STUDENT_PACKAGED_README_LINK);
+  assert.ok(!packagedReadme.includes(HOTEL_RETRY_STUDENT_SOURCE_README_LINK), "release README must not escape the release root for its student guide");
   await writeFile(packagedReadmePath, packagedReadme);
 
   return { packagedDiagram, packagedReadmePath };

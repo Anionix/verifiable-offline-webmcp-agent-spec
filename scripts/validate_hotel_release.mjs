@@ -51,7 +51,7 @@ const boundRootHelperMaxEntries = 4_096;
 const releaseSnapshotMaxEntries = 4_096;
 const releaseValidationTimeoutMs = 30_000;
 const unsupportedPlatformError = "hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed";
-const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
+const hotelRetryDiagramPaths = ["docs/assets/hotel-retry-explained.png", "docs/assets/hotel-retry-student-guide.png"];
 
 function releaseRootFromArguments() {
   const optionIndex = process.argv.indexOf("--release-root");
@@ -67,7 +67,7 @@ const requiredFiles = [
   "DEVPOST_VISUAL_GUIDE_JA.md",
   "RELEASE_GUIDE.md",
   "LICENSE",
-  hotelRetryDiagramPath,
+  ...hotelRetryDiagramPaths,
   "release-manifest.json",
   "SHA256SUMS",
 ];
@@ -77,7 +77,7 @@ function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
-function hasPackagedDiagramImage(readme) {
+function hasPackagedDiagramImage(readme, expectedPath) {
   const withoutComments = readme.replace(/<!--[\s\S]*?(?:-->|$)/gu, "");
   let fence = null;
   for (const line of withoutComments.split(/\r?\n/u)) {
@@ -90,9 +90,14 @@ function hasPackagedDiagramImage(readme) {
       fence = marker[1];
       continue;
     }
-    if (/^!\[[^\r\n]*\]\(docs\/assets\/hotel-retry-explained\.png\)[\t ]*$/u.test(line)) return true;
+    const imageMatch = /^!\[[^\r\n]*\]\(([^)]+)\)[\t ]*$/u.exec(line);
+    if (imageMatch && imageMatch[1] === expectedPath) return true;
   }
   return false;
+}
+
+function diagramLabel(relativePath) {
+  return relativePath === hotelRetryDiagramPaths[0] ? "hotel retry diagram" : "hotel retry student guide";
 }
 
 function fileType(stats) {
@@ -599,7 +604,12 @@ export async function validateRelease(
 
     async function textFile(relativePath) {
       const snapshot = snapshotByPath.get(relativePath);
-      assert.ok(snapshot, `${relativePath} is missing from the release snapshot`);
+      assert.ok(
+        snapshot,
+        hotelRetryDiagramPaths.includes(relativePath)
+          ? `${diagramLabel(relativePath)} is missing from the release snapshot`
+          : `${relativePath} is missing from the release snapshot`,
+      );
       return (await readInitialSnapshot(snapshot)).toString("utf8");
     }
 
@@ -626,32 +636,35 @@ export async function validateRelease(
       const snapshot = snapshotByPath.get(relativePath);
       assert.ok(
         snapshot,
-        relativePath === hotelRetryDiagramPath
-          ? "hotel retry diagram is missing from the release snapshot"
+        hotelRetryDiagramPaths.includes(relativePath)
+          ? `${diagramLabel(relativePath)} is missing from the release snapshot`
           : `${relativePath} is missing from the release snapshot`,
       );
       const bytes = await readInitialSnapshot(snapshot);
       assert.equal(entry.bytes, bytes.byteLength, `${relativePath} manifest byte count differs from packaged file`);
       assert.equal(entry.sha256, digest(bytes), `${relativePath} manifest SHA-256 differs from packaged file`);
     }
-    const diagramManifestEntry = manifest.files.find((entry) => entry?.path === hotelRetryDiagramPath);
-    assert.ok(diagramManifestEntry, "release manifest is missing the hotel retry diagram entry");
+    for (const diagramPath of hotelRetryDiagramPaths) {
+      const diagramManifestEntry = manifest.files.find((entry) => entry?.path === diagramPath);
+      assert.ok(diagramManifestEntry, `release manifest is missing the ${diagramLabel(diagramPath)} entry`);
+      const diagramSnapshot = snapshotByPath.get(diagramPath);
+      assert.ok(diagramSnapshot, `${diagramLabel(diagramPath)} is missing from the release snapshot`);
+      const diagramBytes = await readInitialSnapshot(diagramSnapshot);
+      validateHotelRetryPng(diagramBytes);
+      assert.equal(diagramManifestEntry.bytes, diagramBytes.byteLength, `${diagramPath} manifest byte count differs from packaged PNG`);
+      assert.equal(diagramManifestEntry.sha256, digest(diagramBytes), `${diagramPath} manifest SHA-256 differs from packaged PNG`);
+    }
 
     const readme = await textFile("README.md");
     assert.match(readme, /Kyoto Booking Retry Proof/u);
     assert.match(readme, /2 attempts → 1 simulated booking → 1 confirmation number/u);
     assert.match(readme, /check_existing_hotel_booking/u);
-    assert.ok(hasPackagedDiagramImage(readme), "README.md must link to the packaged hotel retry diagram as an inline image");
+    for (const diagramPath of hotelRetryDiagramPaths)
+      assert.ok(hasPackagedDiagramImage(readme, diagramPath), `README.md must link to the packaged ${diagramLabel(diagramPath)} as an inline image`);
     assert.ok(
       !readme.includes("../../docs/assets/hotel-retry-explained.png"),
       "README.md must link to the packaged hotel retry diagram without an escaping source target",
     );
-    const diagramSnapshot = snapshotByPath.get(hotelRetryDiagramPath);
-    assert.ok(diagramSnapshot, "hotel retry diagram is missing from the release snapshot");
-    const diagramBytes = await readInitialSnapshot(diagramSnapshot);
-    validateHotelRetryPng(diagramBytes);
-    assert.equal(diagramManifestEntry.bytes, diagramBytes.byteLength, "hotel retry diagram manifest byte count differs from packaged PNG");
-    assert.equal(diagramManifestEntry.sha256, digest(diagramBytes), "hotel retry diagram manifest SHA-256 differs from packaged PNG");
     const guide = await textFile("DEVPOST_VISUAL_GUIDE.md");
     assert.match(guide, /01-hero-empty/u);
     assert.match(guide, /05-retry-recognized/u);

@@ -17,15 +17,21 @@ import {
   HOTEL_RETRY_DIAGRAM_TARGET,
   HOTEL_RETRY_PACKAGED_README_LINK,
   HOTEL_RETRY_SOURCE_README_LINK,
+  HOTEL_RETRY_STUDENT_DIAGRAM_METADATA,
+  HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE,
+  HOTEL_RETRY_STUDENT_DIAGRAM_TARGET,
+  HOTEL_RETRY_STUDENT_PACKAGED_README_LINK,
+  HOTEL_RETRY_STUDENT_SOURCE_README_LINK,
   packageHotelRetryDiagram,
+  packageHotelRetryStudentGuide,
 } from "./hotel-release-diagram.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
-function fixtureReadme(metadata) {
+function fixtureReadme(metadata, sourceReadmeLink = HOTEL_RETRY_SOURCE_README_LINK) {
   const eventUuidV7 = metadata.identity.uuid_v7;
   const sourceSha256 = metadata.repository_copy.sha256;
-  return `# Fixture\n\n<!-- event_uuid_v7=${eventUuidV7} state_transition=IMAGE_EDITED_FOR_RETRY_ACTION -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED -->\n<!-- machine-contract=fixture provenance source_sha256=${sourceSha256}; historical_events=RETAINED. -->\n![Hotel retry diagram](${HOTEL_RETRY_SOURCE_README_LINK})\n`;
+  return `# Fixture\n\n<!-- event_uuid_v7=${eventUuidV7} state_transition=IMAGE_EDITED_FOR_RETRY_ACTION -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED -->\n<!-- machine-contract=fixture provenance source_sha256=${sourceSha256}; historical_events=RETAINED. -->\n![Hotel retry diagram](${sourceReadmeLink})\n`;
 }
 
 function cloneMetadata(metadata) {
@@ -39,6 +45,17 @@ async function writeDiagramFixture({ sourceRoot, packageRoot, diagramBytes, meta
   await writeFile(resolve(sourceRoot, HOTEL_RETRY_DIAGRAM_SOURCE), diagramBytes);
   await writeFile(resolve(sourceRoot, HOTEL_RETRY_DIAGRAM_METADATA), `${JSON.stringify(metadata)}\n`);
   await writeFile(resolve(sourceRoot, "README.md"), fixtureReadme(metadata));
+  await cp(resolve(sourceRoot, "README.md"), resolve(packageRoot, "README.md"));
+  if (packagedReadme !== undefined) await writeFile(resolve(packageRoot, "README.md"), packagedReadme);
+}
+
+async function writeStudentGuideFixture({ sourceRoot, packageRoot, diagramBytes, metadata, packagedReadme }) {
+  await mkdir(resolve(sourceRoot, "docs/assets"), { recursive: true });
+  await mkdir(resolve(sourceRoot, "metadata"), { recursive: true });
+  await mkdir(packageRoot, { recursive: true });
+  await writeFile(resolve(sourceRoot, HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE), diagramBytes);
+  await writeFile(resolve(sourceRoot, HOTEL_RETRY_STUDENT_DIAGRAM_METADATA), `${JSON.stringify(metadata)}\n`);
+  await writeFile(resolve(sourceRoot, "README.md"), fixtureReadme(metadata, HOTEL_RETRY_STUDENT_SOURCE_README_LINK));
   await cp(resolve(sourceRoot, "README.md"), resolve(packageRoot, "README.md"));
   if (packagedReadme !== undefined) await writeFile(resolve(packageRoot, "README.md"), packagedReadme);
 }
@@ -71,6 +88,31 @@ test("packages the hotel retry diagram in an owned fixture", async () => {
     const sourceDiagram = await readFile(resolve(sourceRoot, HOTEL_RETRY_DIAGRAM_SOURCE));
     const packagedDiagram = await readFile(resolve(packageRoot, HOTEL_RETRY_DIAGRAM_TARGET));
     assert.equal(digest(packagedDiagram), digest(sourceDiagram), "packaged diagram differs from the source PNG");
+  } finally {
+    await rm(fixtureParent, { recursive: true, force: true });
+  }
+});
+
+test("packages the beginner retry guide in an owned fixture", async () => {
+  const fixtureParent = await mkdtemp(join(tmpdir(), "hotel-release-student-guide-fixture-"));
+  const sourceRoot = join(fixtureParent, "source");
+  const packageRoot = join(fixtureParent, "package");
+  try {
+    const diagramBytes = await readFile(resolve(repositoryRoot, HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE));
+    const metadata = JSON.parse(await readFile(resolve(repositoryRoot, HOTEL_RETRY_STUDENT_DIAGRAM_METADATA), "utf8"));
+    await writeStudentGuideFixture({ sourceRoot, packageRoot, diagramBytes, metadata });
+
+    await packageHotelRetryStudentGuide({ sourceRoot, packageRoot });
+
+    const sourceReadme = await readFile(resolve(sourceRoot, "README.md"), "utf8");
+    const packagedReadme = await readFile(resolve(packageRoot, "README.md"), "utf8");
+    assert.ok(sourceReadme.includes(`](${HOTEL_RETRY_STUDENT_SOURCE_README_LINK})`), "source README must retain its student guide link");
+    assert.ok(packagedReadme.includes(`](${HOTEL_RETRY_STUDENT_PACKAGED_README_LINK})`), "package README must use its self-contained student guide link");
+    assert.ok(!packagedReadme.includes(`](${HOTEL_RETRY_STUDENT_SOURCE_README_LINK})`), "package README must not escape its root for the student guide");
+
+    const sourceDiagram = await readFile(resolve(sourceRoot, HOTEL_RETRY_STUDENT_DIAGRAM_SOURCE));
+    const packagedDiagram = await readFile(resolve(packageRoot, HOTEL_RETRY_STUDENT_DIAGRAM_TARGET));
+    assert.equal(digest(packagedDiagram), digest(sourceDiagram), "packaged student guide differs from the source PNG");
   } finally {
     await rm(fixtureParent, { recursive: true, force: true });
   }

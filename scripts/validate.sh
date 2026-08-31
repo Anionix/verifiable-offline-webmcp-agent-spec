@@ -20,6 +20,8 @@ export UV_CACHE_DIR="${UV_CACHE_DIR:-$ROOT/.local/uv-cache}"
 npm --prefix "$ROOT" run quality:check
 node "$ROOT/scripts/test_validate_hotel_release_candidate_context.mjs"
 node "$ROOT/scripts/test_validate_hotel_managed_browser_release_proof.mjs"
+node "$ROOT/scripts/test_validate_hotel_public_subtitles.mjs"
+node "$ROOT/scripts/validate_hotel_public_subtitles.mjs"
 uv run --frozen python "$ROOT/scripts/validate_python_type_tools.py"
 uv run --frozen python "$ROOT/scripts/validate_repo.py" --report "$ROOT/.local/build-report.json"
 node "$ROOT/scripts/build_web_site.mjs"

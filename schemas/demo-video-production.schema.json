@@ -1,15 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission",
+  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a05563-29c8-7a8e-a368-40c6448db6d9 document_updated_at=2026-08-31T01:15:57.256Z document_state_transition_suffix=SUBTITLE_REPRODUCTION_COMMANDS_QUOTED_AND_EXTENSION_BOUND previous_document_observation_uuid_v7=01a05547-5fe9-777d-b1df-3260c4e09228 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain; the corrected reproduction command quotes the output template and watch URL, and yt-dlp appends the requested language before the extension; observed commands stay separate from reproduction-only commands; predecessor_subtitle_event_membership=SUBTITLE_EVENT_COUNTS_BOUND_TO_PREVIOUS_ROOT machine-contract=equal-time subtitle events are classified by recorded predecessor collection counts, never by repeated state tokens",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "identity", "updatedAt", "stateTransition", "billingBoundary", "mediaCapabilities", "assets", "productionFiles", "productionPlan", "publication"],
+  "required": ["$schema", "identity", "updatedAt", "previousDocumentObservation", "stateTransition", "billingBoundary", "mediaCapabilities", "assets", "productionFiles", "productionPlan", "publication"],
   "properties": {
     "$schema": { "const": "../schemas/demo-video-production.schema.json" },
     "identity": { "$ref": "#/$defs/identity" },
     "updatedAt": { "type": "string", "format": "date-time" },
+    "previousDocumentObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "updatedAt", "stateTransition", "subtitleEventCounts"],
+      "properties": {
+        "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "updatedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "type": "string", "minLength": 3 },
+        "subtitleEventCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subtitleUpdates", "subtitleAnonymousReadbacks"],
+          "properties": {
+            "subtitleUpdates": { "type": "integer", "minimum": 0 },
+            "subtitleAnonymousReadbacks": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
     "stateTransition": { "type": "string", "minLength": 3 },
     "billingBoundary": {
       "type": "object",
@@ -88,6 +108,8 @@
         "artifactToVideoIdentity",
         "anonymousReadback",
         "subtitles",
+        "subtitleUpdates",
+        "subtitleAnonymousReadbacks",
         "thumbnail",
         "devpostReadback"
       ],
@@ -106,6 +128,23 @@
         "artifactToVideoIdentity": { "$ref": "#/$defs/artifactToVideoIdentity" },
         "anonymousReadback": { "$ref": "#/$defs/youtubeAnonymousReadback" },
         "subtitles": { "$ref": "#/$defs/youtubeSubtitleReadback" },
+        "subtitleUpdates": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/subtitleUpdate" }
+        },
+        "subtitleAnonymousReadbacks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/subtitleAnonymousReadback" },
+              { "$ref": "#/$defs/subtitleAnonymousTrackUnavailableReadback" }
+            ]
+          }
+        },
         "thumbnail": { "$ref": "#/$defs/youtubeThumbnailReadback" },
         "devpostReadback": { "$ref": "#/$defs/devpostVideoReadback" }
       }
@@ -176,6 +215,556 @@
       "properties": {
         "englishAutomatic": { "const": "PUBLISHED" },
         "japaneseAuthored": { "const": "PUBLISHED" }
+      }
+    },
+    "subtitleUpdate": {
+      "oneOf": [
+        { "$ref": "#/$defs/ownerSubtitleSuccessUpdate" },
+        { "$ref": "#/$defs/ownerSubtitleFailureUpdate" }
+      ]
+    },
+    "ownerSubtitleFailureUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["informationUuidV5", "observationUuidV7", "observedAt", "stateTransition", "videoId", "watchUrl", "ownerReadback"],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "type": "string", "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "ownerReadback": { "$ref": "#/$defs/ownerSubtitleFailureReadback" }
+      }
+    },
+    "ownerSubtitleSuccessUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "observedAt",
+        "stateTransition",
+        "videoId",
+        "watchUrl",
+        "authorization",
+        "inputSubtitle",
+        "ownerReadback",
+        "videoReview",
+        "limitations",
+        "unchangedSurfaces"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "observedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "type": "string", "const": "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publicationScope", "additionalCreditsAuthorized", "preservedExistingTracks"],
+          "properties": {
+            "publicationScope": { "const": "ENGLISH_AUTHORED_TRACK" },
+            "additionalCreditsAuthorized": { "const": 25 },
+            "preservedExistingTracks": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true,
+              "items": { "const": "JAPANESE_AUTHORED" }
+            }
+          }
+        },
+        "inputSubtitle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "cueCount", "lastCueEndSeconds"],
+          "properties": {
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 1 },
+            "lastCueEndSeconds": { "type": "number", "minimum": 0 }
+          }
+        },
+        "ownerReadback": { "$ref": "#/$defs/ownerSubtitleSuccessReadback" },
+        "videoReview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "jobId", "scope", "reportedState", "coverageSeconds", "unconfirmedIntervals"],
+          "properties": {
+            "tool": { "const": "vidIQvideo_watch" },
+            "jobId": { "const": "job_23d70365-ebab-49b0-bb95-78d59ff9704d" },
+            "scope": { "const": "FULL_150_SECOND_AUDIO_AND_SCREEN_ALIGNMENT" },
+            "reportedState": { "const": "MATCH" },
+            "coverageSeconds": { "const": 150 },
+            "unconfirmedIntervals": { "const": 0 }
+          }
+        },
+        "limitations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["videoFileIdentity", "exactCueTimestampComparison", "anonymousSubtitleReadback", "audioVisualReportGranularity"],
+          "properties": {
+            "videoFileIdentity": { "const": "UNMEASURED" },
+            "exactCueTimestampComparison": { "const": "UNMEASURED" },
+            "anonymousSubtitleReadback": { "const": "UNMEASURED" },
+            "audioVisualReportGranularity": { "const": "NOT_WORD_OR_MILLISECOND_EXACT" }
+          }
+        },
+        "unchangedSurfaces": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": { "enum": ["TITLE", "VIDEO", "AUDIO", "THUMBNAIL", "DESCRIPTION", "DEVPOST", "JAPANESE_SUBTITLES"] }
+        }
+      }
+    },
+    "subtitleAnonymousReadback": {
+      "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 event_uuid_v7=01a053d0-3297-722c-b7f8-5ff273c9b729 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED measured_at=2026-08-30T17:48:28.216Z recorded_at=2026-08-30T17:55:48.503Z machine-contract=anonymous VTT download proves only the retrieved English subtitle bytes and cue comparison; each readback retains repository-relative input and public files for digest and comparison revalidation; future readbacks use structural UUIDv7 and date-time fields, while validation binds event time, rejects event reuse, and requires recorded_at >= measured_at; the player metadata list is a later approximate follow-up without an exact timestamp and does not prove video file identity or browser UI track selection",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "measuredAt",
+        "recordedAt",
+        "stateTransition",
+        "videoId",
+        "watchUrl",
+        "track",
+        "download",
+        "availableSubtitleCatalog",
+        "inputSubtitle",
+        "publicVtt",
+        "comparison",
+        "limitations"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "measuredAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "recordedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": {
+          "enum": [
+            "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED",
+            "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+          ]
+        },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "track": { "const": "ENGLISH_AUTHORED_TRACK" },
+        "download": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "command", "commandStatus", "observedCommand", "outputTemplate", "authentication", "requestedLanguage", "format", "automaticSubtitles", "fileName"],
+          "properties": {
+            "method": { "const": "YTDLP_ANONYMOUS_PUBLIC_SUBTITLE_DOWNLOAD" },
+            "command": { "type": "string", "pattern": "^uvx yt-dlp --skip-download --write-subs --sub-langs \"en\\.\\*\" --sub-format vtt --no-write-auto-subs --no-cache-dir --output \"media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(ext\\)s\" \"https://www\\.youtube\\.com/watch\\?v=tdSvJw4ghX8\"$" },
+            "commandStatus": { "const": "REPRODUCTION_ONLY" },
+            "observedCommand": { "const": "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir" },
+            "outputTemplate": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.%\\(ext\\)s$" },
+            "authentication": { "const": "NONE" },
+            "requestedLanguage": { "const": "en.*" },
+            "format": { "const": "vtt" },
+            "automaticSubtitles": { "const": "EXCLUDED" },
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" }
+          }
+        },
+        "availableSubtitleCatalog": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "command", "commandStatus", "observedCommand", "authentication", "capturedAfterComparison", "captureTiming", "languages", "trackClass", "automaticCaptionsSeparate", "authoredEnglishConfirmed"],
+          "properties": {
+            "source": { "const": "ANONYMOUS_YOUTUBE_PLAYER_METADATA" },
+            "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"" },
+            "commandStatus": { "const": "REPRODUCTION_ONLY" },
+            "observedCommand": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
+            "authentication": { "const": "NONE" },
+            "capturedAfterComparison": { "const": true },
+            "captureTiming": { "$ref": "#/$defs/captureTiming" },
+            "languages": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "contains": { "$ref": "#/$defs/englishSubtitleLanguageCode" },
+              "items": { "$ref": "#/$defs/subtitleLanguageCode" }
+            },
+            "trackClass": { "const": "MANUAL_SUBTITLES" },
+            "automaticCaptionsSeparate": { "const": true },
+            "authoredEnglishConfirmed": { "const": true }
+          }
+        },
+        "inputSubtitle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "cueCount", "lastCueEndMilliseconds"],
+          "properties": {
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 1 },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "publicVtt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "fileName", "sha256", "cueCount", "lastCueEndMilliseconds"],
+          "properties": {
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
+            "fileName": { "type": "string", "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*\\.vtt$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 0 },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "comparison": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "inputCueCount", "publicCueCount", "text", "timing", "lastCueEndMilliseconds", "result"],
+          "properties": {
+            "scope": { "type": "string", "pattern": "^FULL_[1-9][0-9]*_CUE_COMPARISON$" },
+            "inputCueCount": { "type": "integer", "minimum": 1 },
+            "publicCueCount": { "type": "integer", "minimum": 0 },
+            "text": { "enum": ["MATCH_AFTER_WHITESPACE_NORMALIZATION", "MISMATCH"] },
+            "timing": { "enum": ["MATCH_EXACT_INTEGER_MILLISECONDS", "MISMATCH"] },
+            "lastCueEndMilliseconds": { "type": "integer", "minimum": 0 },
+            "result": { "enum": ["PASS", "FAIL"] }
+          }
+        },
+        "limitations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["videoFileIdentity", "anonymousBrowserTrackSelection", "japaneseSubtitleDownload", "downloadDoesNotEstablishVideoFileIdentity"],
+          "properties": {
+            "videoFileIdentity": { "const": "UNMEASURED" },
+            "anonymousBrowserTrackSelection": { "const": "UNMEASURED" },
+            "japaneseSubtitleDownload": { "const": "NOT_RETRIEVED" },
+            "downloadDoesNotEstablishVideoFileIdentity": { "const": true }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "required": ["stateTransition", "comparison"],
+              "properties": {
+                "stateTransition": {
+                  "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_AND_CUE_TIMES_MATCHED_UI_TRACK_SELECTION_UNMEASURED"
+                },
+                "comparison": {
+                  "required": ["result", "text", "timing"],
+                  "properties": {
+                    "result": { "const": "PASS" },
+                    "text": { "const": "MATCH_AFTER_WHITESPACE_NORMALIZATION" },
+                    "timing": { "const": "MATCH_EXACT_INTEGER_MILLISECONDS" }
+                  }
+                }
+              }
+            },
+            {
+              "required": ["stateTransition", "comparison"],
+              "properties": {
+                "stateTransition": {
+                  "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED"
+                },
+                "comparison": {
+                  "required": ["result", "text", "timing"],
+                  "properties": { "result": { "const": "FAIL" } },
+                  "anyOf": [
+                    { "properties": { "text": { "const": "MISMATCH" } } },
+                    { "properties": { "timing": { "const": "MISMATCH" } } }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "required": ["comparison"],
+            "properties": {
+              "comparison": {
+                "required": ["result"],
+                "properties": { "result": { "const": "PASS" } }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "publicVtt": {
+                "required": ["cueCount", "lastCueEndMilliseconds"],
+                "properties": {
+                  "cueCount": { "minimum": 1 },
+                  "lastCueEndMilliseconds": { "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["comparison"],
+            "properties": {
+              "comparison": {
+                "required": ["result"],
+                "properties": { "result": { "const": "FAIL" } }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "publicVtt": {
+                "required": ["cueCount", "lastCueEndMilliseconds"],
+                "properties": {
+                  "cueCount": { "minimum": 0 },
+                  "lastCueEndMilliseconds": { "minimum": 0 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "subtitleAnonymousTrackUnavailableReadback": {
+      "$comment": "information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 state_transition=PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE machine-contract=an unavailable authored English track records only the observed anonymous catalog and failure; it does not claim a download, comparison, or retained VTT",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "informationUuidV5",
+        "observationUuidV7",
+        "measuredAt",
+        "recordedAt",
+        "stateTransition",
+        "videoId",
+        "watchUrl",
+        "track",
+        "availableSubtitleCatalog",
+        "failure"
+      ],
+      "properties": {
+        "informationUuidV5": { "const": "adeb6009-db9e-51be-8555-da27f170ca95" },
+        "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "measuredAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "recordedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "stateTransition": { "const": "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE" },
+        "videoId": { "const": "tdSvJw4ghX8" },
+        "watchUrl": { "const": "https://www.youtube.com/watch?v=tdSvJw4ghX8" },
+        "track": { "const": "ENGLISH_AUTHORED_TRACK" },
+        "availableSubtitleCatalog": { "$ref": "#/$defs/subtitleAnonymousUnavailableCatalog" },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["result", "reason"],
+          "properties": {
+            "result": { "const": "FAIL" },
+            "reason": { "const": "AUTHORED_ENGLISH_TRACK_UNAVAILABLE" }
+          }
+        }
+      }
+    },
+    "subtitleAnonymousUnavailableCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "command", "commandStatus", "observedCommand", "authentication", "capturedAfterComparison", "captureTiming", "languages", "trackClass", "automaticCaptionsSeparate", "authoredEnglishConfirmed"],
+      "properties": {
+        "source": { "const": "ANONYMOUS_YOUTUBE_PLAYER_METADATA" },
+        "command": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"" },
+        "commandStatus": { "const": "REPRODUCTION_ONLY" },
+        "observedCommand": { "const": "uvx yt-dlp --skip-download --list-subs --no-cache-dir" },
+        "authentication": { "const": "NONE" },
+        "capturedAfterComparison": { "const": false },
+        "captureTiming": { "$ref": "#/$defs/captureTiming" },
+        "languages": {
+          "type": "array",
+          "minItems": 0,
+          "uniqueItems": true,
+          "not": { "contains": { "$ref": "#/$defs/englishSubtitleLanguageCode" } },
+          "items": { "$ref": "#/$defs/subtitleLanguageCode" }
+        },
+        "trackClass": { "const": "MANUAL_SUBTITLES" },
+        "automaticCaptionsSeparate": { "const": true },
+        "authoredEnglishConfirmed": { "const": false }
+      }
+    },
+    "subtitleLanguageCode": {
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+    },
+    "englishSubtitleLanguageCode": {
+      "type": "string",
+      "pattern": "^[Ee][Nn](?:-|$)"
+    },
+    "subtitleTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "trackType", "status", "publishedDate"],
+      "properties": {
+        "language": { "enum": ["English", "Japanese"] },
+        "trackType": { "enum": ["VIDEO_LANGUAGE", "AUTOMATIC", "AUTHORED"] },
+        "status": { "const": "PUBLISHED" },
+        "publishedDate": { "type": "string", "format": "date" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "trackType": { "const": "VIDEO_LANGUAGE" } }, "required": ["trackType"] },
+          "then": { "properties": { "language": { "const": "English" }, "publishedDate": { "const": "2026-08-31" } } }
+        },
+        {
+          "if": { "properties": { "trackType": { "const": "AUTOMATIC" } }, "required": ["trackType"] },
+          "then": { "properties": { "language": { "const": "English" }, "publishedDate": { "const": "2026-08-29" } } }
+        },
+        {
+          "if": { "properties": { "trackType": { "const": "AUTHORED" } }, "required": ["trackType"] },
+          "then": { "properties": { "language": { "const": "Japanese" }, "publishedDate": { "const": "2026-08-29" } } }
+        }
+      ]
+    },
+    "subtitleStudioTableReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "tracks"],
+      "properties": {
+        "surface": { "const": "YOUTUBE_STUDIO_SUBTITLE_TABLE" },
+        "tracks": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/subtitleTrack" }
+        }
+      }
+    },
+    "ownerSubtitleSuccessReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surfaces", "studioTable", "watchPage"],
+      "properties": {
+        "surfaces": { "const": ["YOUTUBE_STUDIO_SUBTITLE_TABLE", "AUTHENTICATED_YOUTUBE_WATCH_PAGE"] },
+        "studioTable": { "$ref": "#/$defs/subtitleStudioTableReadback" },
+        "watchPage": { "$ref": "#/$defs/subtitleWatchPageReadback" }
+      }
+    },
+    "subtitleTrackFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "trackType", "status"],
+      "properties": {
+        "language": { "enum": ["English", "Japanese"] },
+        "trackType": { "enum": ["VIDEO_LANGUAGE", "AUTOMATIC", "AUTHORED"] },
+        "status": { "enum": ["DELETED", "UNAVAILABLE"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "VIDEO_LANGUAGE" } }
+          },
+          "then": { "properties": { "language": { "const": "English" } } }
+        },
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "AUTOMATIC" } }
+          },
+          "then": { "properties": { "language": { "const": "English" } } }
+        },
+        {
+          "if": {
+            "required": ["trackType"],
+            "properties": { "trackType": { "const": "AUTHORED" } }
+          },
+          "then": { "properties": { "language": { "const": "Japanese" } } }
+        }
+      ]
+    },
+    "subtitleStudioFailureReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "tracks"],
+      "properties": {
+        "surface": { "const": "YOUTUBE_STUDIO_SUBTITLE_TABLE" },
+        "tracks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/subtitleTrackFailure" },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "English" },
+                  "trackType": { "const": "VIDEO_LANGUAGE" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "English" },
+                  "trackType": { "const": "AUTOMATIC" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["language", "trackType"],
+                "properties": {
+                  "language": { "const": "Japanese" },
+                  "trackType": { "const": "AUTHORED" }
+                }
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          ]
+        }
+      }
+    },
+    "ownerSubtitleFailureReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surfaces", "status", "scope", "studioTable"],
+      "properties": {
+        "surfaces": { "const": ["YOUTUBE_STUDIO_SUBTITLE_TABLE"] },
+        "status": { "const": "FAIL" },
+        "scope": { "const": "OBSERVED_TRACK_STATUS_ONLY" },
+        "studioTable": { "$ref": "#/$defs/subtitleStudioFailureReadback" }
+      }
+    },
+    "subtitleWatchPageReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "trackSelectionAvailable", "transcript"],
+      "properties": {
+        "surface": { "const": "AUTHENTICATED_YOUTUBE_WATCH_PAGE" },
+        "trackSelectionAvailable": { "const": true },
+        "transcript": { "$ref": "#/$defs/subtitleTranscriptReadback" }
+      }
+    },
+    "subtitleTranscriptReadback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "sourcePath", "groupCount", "normalizedTextCharacterCount", "comparison"],
+      "properties": {
+        "scope": { "const": "FULL_TRANSCRIPT" },
+        "sourcePath": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
+        "groupCount": { "type": "integer", "minimum": 1 },
+        "normalizedTextCharacterCount": { "type": "integer", "minimum": 1 },
+        "comparison": { "const": "MATCH_AFTER_WHITESPACE_NORMALIZATION" }
       }
     },
     "youtubeThumbnailReadback": {
@@ -288,6 +877,17 @@
       "properties": {
         "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+      }
+    },
+    "captureTiming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["precision", "lowerBound", "upperBound", "description"],
+      "properties": {
+        "precision": { "enum": ["EXACT", "BOUNDED_APPROXIMATE"] },
+        "lowerBound": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "upperBound": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
+        "description": { "type": "string", "minLength": 3 }
       }
     },
     "asset": {

@@ -37,6 +37,7 @@ MEDIA_TYPES = {
     ".py": "text/x-python",
     ".toml": "application/toml",
     ".ts": "text/typescript",
+    ".vtt": "text/vtt",
     ".yaml": "application/yaml",
     ".yml": "application/yaml",
 }

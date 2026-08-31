@@ -48,10 +48,14 @@
 // event_uuid_v7=01a05044-13e6-7415-b86e-0a3c1ef4634d
 // state_transition=PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION occurred_at=2026-08-30T01:23:53.958Z
 // machine-contract: writable guards retain the validated parent descriptor through child creation. The child verifies and pins that directory; the caller only reopens without creation flags, then checks identity before returning a writable descriptor.
+// information_uuid_v5=e8dfa4b3-a12e-5e5c-b5b0-f0c5f879d8b2
+// event_uuid_v7=01a050d9-b310-759a-8f13-ba61b21f506e
+// state_transition=ABSENCE_SEAM_REPLACEMENT -> DESCRIPTOR_BOUND_CREATION_GATE occurred_at=2026-08-30T04:07:24.050Z
+// machine-contract: the absence seam runs before the bound child starts; any replacement is rejected by comparing descriptor 3 with the child's working directory before the first create flag is used.
 import { closeSync, constants, fchmodSync, fstatSync, lstatSync, mkdirSync, openSync, realpathSync, statSync } from "node:fs";
 import type { Stats } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { createStorageFileAtRetainedParent, STORAGE_CONFIG, type NotificationStorageKind } from "./storage-create.ts";
 export type { NotificationStorageKind } from "./storage-create.ts";
 
@@ -256,9 +260,20 @@ function openWritableNotificationStorageGuard(path: string, kind: NotificationSt
     const boundOptions = { ...options, expectedParent: parent };
     descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
     if (descriptor === null) {
+      // Keep the existing deterministic race seam before the child is started.
+      // The child receives the still-open descriptor and rejects any replacement
+      // before it can create a new entry.
       options.afterStorageAbsenceObserved?.(path);
-      const created = createStorageFileAtRetainedParent(parent.path, parentDescriptor, basename(path), kind, platform);
-      // The helper may have created an empty file in a renamed original directory; never create through the replacement name.
+      const created = createStorageFileAtRetainedParent(
+        parent.path,
+        parentDescriptor,
+        basename(path),
+        kind,
+        platform,
+      );
+      // The helper creates only after its already-started working directory is
+      // validated against the retained descriptor. A later pathname replacement
+      // therefore cannot receive the new entry.
       assertNotificationStorageParent(path, parent, kind, { platform });
       descriptor = openExistingStorageDescriptor(path, kind, platform, accessFlags);
       if (descriptor === null) throw new TypeError(`${kind} path changed after bound creation`);

@@ -65,11 +65,11 @@ NOT_STARTED -> AMBIGUOUS -> RECONCILING -> CONFIRMED_PRESENT
 
 `NotificationStore`の`platform`指定は試験用の補助情報ですが、実行中のオペレーティングシステムと異なる値を受け付けません。公開呼出元がこの指定でPOSIXの所有者・権限検査やリンク拒否を弱めることはできず、WindowsのディスクSQLite停止も回避できません。パス検査だけを模擬する試験用補助関数とは境界を分けます。
 
-新規作成では、検査した親ディレクトリーを開いたまま、専用の子プロセスへ作成を任せます。子は自分の作業ディレクトリーが検査済みの実体と一致することを、丸めのない整数で確認し、その場所を変えずに単純なファイル名だけで作成します。確認前の差し替えは拒否し、確認後にmacOSやLinuxで元のフォルダーを移動されても、作成先は元の実体から変わりません。Windowsでは作業ディレクトリーの移動禁止を使い、実際のWindows用試験で別に検査します。呼び出し元は新規作成なしで開き直し、書き込み用の記述子を返す前に照合します。処理が停止すると元のフォルダーに空ファイルが残る場合はありますが、差し替え先に新しいファイルを置いてはいけません。
+新規作成では、検査した親ディレクトリーを開いたまま、親の記述子を子プロセスの記述子3へ渡して作成を任せます。子は起動時に確定した作業ディレクトリーが検査済みの実体と一致することを、丸めのない整数で確認し、その場所を変えずに単純なファイル名だけで作成します。確認前の差し替えは拒否し、確認後にmacOSやLinuxで元のフォルダーを移動されても、作成先は元の実体から変わりません。Windowsでは作業ディレクトリーの移動禁止を使い、実際のWindows用試験で別に検査します。呼び出し元は新規作成なしで開き直し、書き込み用の記述子を返す前に照合します。処理が停止すると元のフォルダーに空ファイルが残る場合はありますが、差し替え先に新しいファイルを置いてはいけません。
 
 これは新規ファイル作成の保証です。後でSQLite自身が名前から開くファイルや補助ファイルまで、同じ記述子に固定したという保証ではありません。WindowsのディスクSQLiteは前述のとおり停止します。公開中のホテルデモはブラウザー内保存であり、この通知用制限の影響は受けません。Windowsのアクセス権全体を実機で検証したとの主張もしません。
 
-作成契約の識別子は`eeccc01c-0134-5420-9946-9efe2adbb772`、状態遷移は`PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION`です。観測時刻は`2026-08-30T01:23:53.958Z`、観測識別子は`01a05044-13e6-7415-b86e-0a3c1ef4634d`。再発防止試験は[`notification-parent-creation.test.ts`](../src/typescript/test/notification-parent-creation.test.ts)にあります。根拠は[Appleの相対パス仕様](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/chdir.2.html)、[Microsoftの作業ディレクトリー固定仕様](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcurrentdirectory)、[Node.jsの子プロセス仕様](https://nodejs.org/download/release/v24.0.0/docs/api/child_process.html#child_processspawnsynccommand-args-options)です。
+作成契約の識別子は`eeccc01c-0134-5420-9946-9efe2adbb772`、状態遷移は`PARENT_RECHECK_INSUFFICIENT -> RETAINED_PARENT_WORKING_DIRECTORY_CREATION`です。親記述子境界の追加契約は`e8dfa4b3-a12e-5e5c-b5b0-f0c5f879d8b2`、状態遷移は`PATH_BOUND_CREATE_RACE -> DESCRIPTOR_VERIFIED_CHILD_CREATE`、観測時刻は`2026-08-30T04:07:24.050Z`、観測識別子は`01a050d9-b310-759a-8f13-ba61b21f506e`です。再発防止試験は[`notification-parent-creation.test.ts`](../src/typescript/test/notification-parent-creation.test.ts)にあります。根拠は[Appleの相対パス仕様](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/chdir.2.html)、[Microsoftの作業ディレクトリー固定仕様](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcurrentdirectory)、[Node.jsの子プロセス仕様](https://nodejs.org/download/release/v24.0.0/docs/api/child_process.html#child_processspawnsynccommand-args-options)です。
 
 ## 実行方法
 

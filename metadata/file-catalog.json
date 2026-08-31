@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "36787710014474805dceca629674844e4367ea2fe20c3d64f0603b77019bb9a2",
-      "bytes": 46696,
+      "sha256": "fdb78832d8deee4f451b950d26f2a157710034f9019cf7113afc176d0914e810",
+      "bytes": 46798,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -2220,8 +2220,8 @@
     },
     {
       "path": "docs/assets/hotel-retry-student-guide.png",
-      "sha256": "b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82",
-      "bytes": 1405262,
+      "sha256": "0386b31bab6786ca47730fed8d2adba80263758e158d11dcec339a034ceacd32",
+      "bytes": 1455931,
       "mediaType": "application/octet-stream",
       "category": "docs",
       "identity": {
@@ -2486,8 +2486,8 @@
     },
     {
       "path": "examples/hotel-booking-demo/README.md",
-      "sha256": "5c5070a04cc58e15ed8e0f28d5bb7694a0ae1df5573eb4821e33d9fd58a774f4",
-      "bytes": 10776,
+      "sha256": "9dba28f7f9c9db2d1a20b9baf24140ecb67ebf4b4d3088a1d70cdc88de80a970",
+      "bytes": 10861,
       "mediaType": "text/markdown",
       "category": "examples",
       "identity": {
@@ -4197,8 +4197,8 @@
     },
     {
       "path": "metadata/hotel-retry-student-guide.json",
-      "sha256": "ef26457f095d290f1a21f0049b90e9479430efb9bbde52787bd0b23a9435580e",
-      "bytes": 2715,
+      "sha256": "12d4eae8c3a005ef7ad58dc28c8b7aa45446c6f1336990ecc4f3126f3bfe2f0c",
+      "bytes": 3308,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -5451,8 +5451,8 @@
     },
     {
       "path": "scripts/build_hotel_release.mjs",
-      "sha256": "904782508b3185c93118884735f70ac6fe12799c8b3afd87cf5819da5bfaef24",
-      "bytes": 12794,
+      "sha256": "b416f4d1b7c2dee18fe4a3795eecf637081564801f8da780bc1371d2513e166d",
+      "bytes": 14052,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5584,8 +5584,8 @@
     },
     {
       "path": "scripts/hotel-release-diagram.mjs",
-      "sha256": "42ffb7c80dd0c21ce0c73305c9fb10447c19a6e8d3d741587fcaf427f5f865a8",
-      "bytes": 4230,
+      "sha256": "309dddf42a8737b0464f03899396a3630a2b531aa4461b5676344721085635b6",
+      "bytes": 6326,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5698,8 +5698,8 @@
     },
     {
       "path": "scripts/test_build_hotel_release_diagram.mjs",
-      "sha256": "c6b190c216c055b90f6d06d13afb2db6f5b947099d881f4b1dc8debb8ac36a4c",
-      "bytes": 6985,
+      "sha256": "4e268d3ff9ae33ad4eb36dc806c86541d0a9ed68711a8890e3b023ba2b6b1f59",
+      "bytes": 9757,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.mjs",
-      "sha256": "2be3d46041e35287b5b0725b0de83643b3296841f8592aafcf4164fc64482406",
-      "bytes": 39027,
+      "sha256": "96014c21efc751a5031e51fd059783bb8aaf3f49a3079fb95a5d39bed4f2f184",
+      "bytes": 39602,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5888,8 +5888,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.test.mjs",
-      "sha256": "06b8e1b1a1666474163d3d0c4b3f3eaf0b189f3e167c910093fb5bc6a625ea9c",
-      "bytes": 48576,
+      "sha256": "8f87cf3ed2e4118c5c994ea6a7fdd797e438f7a2953f31ad618a44600887fb8b",
+      "bytes": 49769,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

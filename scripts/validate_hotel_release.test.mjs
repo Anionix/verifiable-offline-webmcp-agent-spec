@@ -21,6 +21,7 @@ const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const validatorPath = resolve(repositoryRoot, "scripts/validate_hotel_release.mjs");
 const sourceCommit = "5583cdbeddbbeae2c6f16fd481fc809069a15296";
 const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
+const hotelRetryStudentGuidePath = "docs/assets/hotel-retry-student-guide.png";
 const hotelRetryPngWidth = 1_672;
 const hotelRetryPngHeight = 941;
 const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -86,13 +87,14 @@ function highBitHeaderType(bytes) {
 const baseFiles = new Map([
   [
     "README.md",
-    "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\n",
+    "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\n![student guide](docs/assets/hotel-retry-student-guide.png)\n",
   ],
   ["DEVPOST_VISUAL_GUIDE.md", "01-hero-empty\n05-retry-recognized\nAI-generated dramatization / Fictional booking\n"],
   ["DEVPOST_VISUAL_GUIDE_JA.md", "60秒の確認\n"],
   ["RELEASE_GUIDE.md", "shasum -a 256 -c SHA256SUMS\n"],
   ["LICENSE", "MIT License\n"],
   [hotelRetryDiagramPath, hotelRetryDiagramBytes],
+  [hotelRetryStudentGuidePath, hotelRetryDiagramBytes],
   [
     "release-manifest.json",
     `${JSON.stringify({
@@ -103,7 +105,10 @@ const baseFiles = new Map([
         releaseGuide: "RELEASE_GUIDE.md",
       },
       source: { commit: sourceCommit },
-      files: [{ path: hotelRetryDiagramPath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) }],
+      files: [
+        { path: hotelRetryDiagramPath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) },
+        { path: hotelRetryStudentGuidePath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) },
+      ],
     })}\n`,
   ],
   ["package-note.txt", "fixture-only package note\n"],
@@ -443,6 +448,22 @@ test("rejects the hotel retry diagram and its checksum entry when both are remov
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0, "the validator accepted a release without its required diagram");
     assert.match(result.output, /hotel retry diagram is missing from the release snapshot/u);
+  });
+});
+
+test("rejects the beginner retry guide and its checksum entry when both are removed", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    await rm(resolve(releaseRoot, hotelRetryStudentGuidePath));
+    const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+    const checksum = await readFile(checksumPath, "utf8");
+    const withoutGuide = checksum
+      .split("\n")
+      .filter((line) => !line.endsWith(`  ${hotelRetryStudentGuidePath}`))
+      .join("\n");
+    await writeFile(checksumPath, withoutGuide);
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator accepted a release without its beginner retry guide");
+    assert.match(result.output, /hotel retry student guide is missing from the release snapshot/u);
   });
 });
 
@@ -1108,7 +1129,7 @@ test("keeps rejecting a checksum digest mismatch", async () => {
   await withFixture({}, async (releaseRoot) => {
     await writeFile(
       resolve(releaseRoot, "README.md"),
-      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\ntampered after checksum generation\n",
+      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\n![student guide](docs/assets/hotel-retry-student-guide.png)\ntampered after checksum generation\n",
     );
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0);

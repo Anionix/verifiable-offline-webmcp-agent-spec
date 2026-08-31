@@ -1,9 +1,9 @@
 {
-  "$comment": "information_uuid_v5=9814fe28-d4ee-5cdc-b331-e6f56c05e54d event_uuid_v7=01a056a3-137a-7d08-b7c0-6c2ba8bf2e76 state_transition=IMAGE_GENERATED -> IMAGE_INSPECTED -> REPOSITORY_COPIED occurred_at=2026-08-31T07:06:41.232Z machine-contract=This beginner guide is explanatory artwork, not measured-screen, performance, or real-booking evidence.",
+  "$comment": "information_uuid_v5=9814fe28-d4ee-5cdc-b331-e6f56c05e54d event_uuid_v7=01a056be-90df-77a6-afde-13eaa26eae09 state_transition=IMAGE_EDITED_FOR_RETRY_ACTION -> IMAGE_INSPECTED -> REPOSITORY_COPIED occurred_at=2026-08-31T07:35:24.639Z machine-contract=This beginner guide is explanatory artwork, not measured-screen, performance, or real-booking evidence.",
   "id": "ASSET-HOTEL-RETRY-STUDENT-GUIDE",
   "identity": {
     "uuid_v5": "9814fe28-d4ee-5cdc-b331-e6f56c05e54d",
-    "uuid_v7": "01a056a3-137a-7d08-b7c0-6c2ba8bf2e76",
+    "uuid_v7": "01a056be-90df-77a6-afde-13eaa26eae09",
     "uuid_namespace": "47f3e535-0e27-559a-9556-aa79a84f95eb",
     "canonical_name": "asset/hotel-retry-student-guide"
   },
@@ -15,21 +15,29 @@
       "source_sha256": "b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82",
       "generated_image_file": "exec-bda364de-e648-4e3d-b14b-f1d9b7af1a5f.png",
       "short_prompt": "Wide four-step classroom-friendly flow: confirm one simulated booking, lose the reply, check existing status first, find the same booking; green result strip; no real booking or payment."
+    },
+    {
+      "event_uuid_v7": "01a056be-90df-77a6-afde-13eaa26eae09",
+      "state_transition": "IMAGE_EDITED_FOR_RETRY_ACTION -> IMAGE_INSPECTED -> REPOSITORY_COPIED",
+      "occurred_at": "2026-08-31T07:35:24.639Z",
+      "source_sha256": "0386b31bab6786ca47730fed8d2adba80263758e158d11dcec339a034ceacd32",
+      "generated_image_file": "exec-21eb033f-a15b-4e5d-864f-a2ac1cac9093.png",
+      "short_prompt": "Edit the guide to show an explicit Retry the same booking action followed by Same booking found; preserve the fictional safety disclosure."
     }
   ],
-  "occurred_at": "2026-08-31T07:06:41.232Z",
+  "occurred_at": "2026-08-31T07:35:24.639Z",
   "generation": {
     "tool": "built-in image_gen",
-    "calls": 1,
-    "short_prompt": "Four large panels explain that a lost reply is not the same as a failed booking, then show status-first reconciliation and one simulated booking.",
-    "generated_image_file": "exec-bda364de-e648-4e3d-b14b-f1d9b7af1a5f.png",
-    "source_sha256": "b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82",
+    "calls": 2,
+    "short_prompt": "Five large panels explain that a lost reply is not the same as a failed booking, then show status-first reconciliation, Retry the same booking, and Same booking found.",
+    "generated_image_file": "exec-21eb033f-a15b-4e5d-864f-a2ac1cac9093.png",
+    "source_sha256": "0386b31bab6786ca47730fed8d2adba80263758e158d11dcec339a034ceacd32",
     "dimensions": "1672x941 PNG"
   },
   "repository_copy": {
     "path": "docs/assets/hotel-retry-student-guide.png",
-    "sha256": "b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82",
-    "bytes": 1405262,
+    "sha256": "0386b31bab6786ca47730fed8d2adba80263758e158d11dcec339a034ceacd32",
+    "bytes": 1455931,
     "format": "PNG 1672x941 8-bit RGB"
   },
   "content_boundary": "This image explains the fictional local demo only. It is not a measured screen, native WebMCP execution proof, performance measurement, or evidence of a real booking, payment, cancellation, or external effect. / この画像は端末内の架空デモだけを説明するもので、実測画面、ネイティブWebMCP実行証拠、性能測定、実在の予約・支払い・取消・外部効果の証拠ではない。",

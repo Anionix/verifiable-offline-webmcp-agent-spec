@@ -2,9 +2,12 @@
 
 <!-- information_uuid_v5=55e8dd64-ba47-5c26-897d-aa6893eb5ec5 -->
 <!-- event_uuid_v7=01a04dbb-0fa0-7ce4-a7b3-ec9f7ab149f3 state_transition=UNPACKAGED_HOTEL_ARTIFACT -> REPRODUCIBLE_RELEASE_CONTRACT_IMPLEMENTED occurred_at=2026-08-29T13:35:00.000Z -->
+<!-- event_uuid_v7=01a055f0-2130-7abc-8000-000000000abc state_transition=REPRODUCIBLE_RELEASE_CONTRACT_IMPLEMENTED -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T03:49:55.632Z machine-contract=Current Sites, Vercel, and Devpost alignment is recorded separately from the package build. -->
 <!-- machine-contract: 同じ確定済みコミットと同じ構築道具から、同じ並びのファイル集合と同じSHA-256一覧を作る。 -->
 
 `npm run release:hotel`は、既存のホテル画面とChatGPT Sites用成果物を構築して検査した後、`release/kyoto-booking-retry-proof/`へ再現可能なファイル集合を作ります。審査者が最初に読む英語主表示のREADME、英日二つの視覚導線、英語の再現手順を専用ファイルとして収録します。配布物を`dist/`の外へ分けるため、ChatGPT Sites包装へ混ざりません。`release/`はGitの追跡対象外です。
+
+現在の公開版対応は、提出先ChatGPT Sites版14（ソース`2fbbf1b714ca660ef1681239b638205a9835f7c5`）、Vercel本番配置`dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`（ソース`cda7ff7c51698f4ec7292f1c076468712a239bd8`）、Devpost版13を別々に読み戻した[`公開版対応表`](../metadata/public-release-alignment-readback.json)で確認します。三つの評価は194件と四機能で一致しますが、新しいネイティブWebMCP実行や外部効果はこの対応表から主張しません。
 
 実行には、Git、依存関係を導入済みのNode.js 24.15、`python3`、Gitleaksが必要です。Gitleaksは配布物の秘密情報検査に使います。macOSでは`brew install gitleaks`、それ以外は[Gitleaksの公式導入手順](https://github.com/gitleaks/gitleaks#installing)を使い、先に`gitleaks version`が成功することを確認してください。未導入なら、構築を始める前に具体的な導入方法を表示して停止します。
 

@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/public-release-alignment-readback.schema.json",
+  "$comment": "information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a055f0-2130-7abc-8000-000000000abc state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T03:49:55.632Z machine-contract=the submitted Site, Vercel fallback, and Devpost description are checked as separate observations and only their shared public contract is aligned",
+  "title": "Public release alignment readback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "format", "identity", "machineContract", "authorization", "previousRecord", "targets", "alignment", "limitations"],
+  "properties": {
+    "$schema": { "const": "../schemas/public-release-alignment-readback.schema.json" },
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "profile"],
+      "properties": {
+        "name": { "const": "OpenKnowledgeFormat-inspired evidence record" },
+        "version": { "const": "0.1" },
+        "profile": { "const": "public-release-alignment" }
+      }
+    },
+    "identity": { "$ref": "#/$defs/identity" },
+    "machineContract": { "$ref": "#/$defs/machineContract" },
+    "authorization": { "$ref": "#/$defs/authorization" },
+    "previousRecord": { "$ref": "#/$defs/previousRecord" },
+    "targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sites", "vercel", "devpost"],
+      "properties": {
+        "sites": { "$ref": "#/$defs/sitesTarget" },
+        "vercel": { "$ref": "#/$defs/vercelTarget" },
+        "devpost": { "$ref": "#/$defs/devpostTarget" }
+      }
+    },
+    "alignment": { "$ref": "#/$defs/alignment" },
+    "limitations": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "uuidV5": { "type": "string", "minLength": 36, "maxLength": 36 },
+    "uuidV7": { "type": "string", "minLength": 36, "maxLength": 36 },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaceUuidV5", "informationUuidV5", "observationUuidV7", "observedAt", "repositoryCommit"],
+      "properties": {
+        "namespaceUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "informationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observationUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "repositoryCommit": { "type": "string", "minLength": 40, "maxLength": 40 }
+      }
+    },
+    "machineContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stateTransition", "invariants"],
+      "properties": {
+        "stateTransition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["eventUuidV7", "occurredAt", "from", "to", "evidence"],
+          "properties": {
+            "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+            "occurredAt": { "$ref": "#/$defs/observedAt" },
+            "from": { "const": "PUBLIC_TARGETS_WITH_STALE_DESCRIPTION" },
+            "to": { "const": "PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED" },
+            "evidence": { "type": "string", "minLength": 1 }
+          }
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "sourceIssue", "eventUuidV7", "evidence"],
+      "properties": {
+        "state": { "const": "IMPLEMENTATION_AND_RELEASE_AUTHORIZED" },
+        "sourceIssue": { "const": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/196" },
+        "eventUuidV7": { "$ref": "#/$defs/uuidV7" },
+        "evidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "previousRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "observedAt", "version", "treatment"],
+      "properties": {
+        "path": { "const": "metadata/devpost-public-readback.json" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "version": { "const": 11 },
+        "treatment": { "const": "RETAINED_HISTORICAL_NOT_CURRENT" }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["measurementStatus", "releaseEvidence", "toolNames", "forbiddenToolNames", "reconciliation"],
+      "properties": {
+        "measurementStatus": { "const": "CONTRACT_READY" },
+        "releaseEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "testCommand", "testDirectory", "testCount", "countSource"],
+          "properties": {
+            "status": { "const": "PASS" },
+            "testCommand": { "const": "npm test" },
+            "testDirectory": { "const": "src/typescript" },
+            "testCount": { "const": 194 },
+            "countSource": { "const": "node-test-summary" }
+          }
+        },
+        "toolNames": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string" } },
+        "forbiddenToolNames": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } },
+        "reconciliation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "attemptCount", "bookingCount", "effectStartCount", "sameConfirmation"],
+          "properties": {
+            "status": { "const": "REPRODUCIBLE_PATH" },
+            "attemptCount": { "const": 2 },
+            "bookingCount": { "const": 1 },
+            "effectStartCount": { "const": 1 },
+            "sameConfirmation": { "const": true }
+          }
+        }
+      }
+    },
+    "sitesTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetInformationUuidV5",
+        "observedAt",
+        "url",
+        "evaluationUrl",
+        "statusCode",
+        "authentication",
+        "projectId",
+        "versionId",
+        "versionNumber",
+        "sourceCommit",
+        "providerState",
+        "evaluation"
+      ],
+      "properties": {
+        "targetInformationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "url": { "type": "string", "format": "uri" },
+        "evaluationUrl": { "type": "string", "format": "uri" },
+        "statusCode": { "const": 200 },
+        "authentication": { "const": "ANONYMOUS" },
+        "projectId": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "versionNumber": { "const": 14 },
+        "sourceCommit": { "type": "string", "minLength": 40, "maxLength": 40 },
+        "providerState": { "const": "active" },
+        "evaluation": { "$ref": "#/$defs/evaluation" }
+      }
+    },
+    "vercelTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetInformationUuidV5",
+        "observedAt",
+        "url",
+        "evaluationUrl",
+        "statusCode",
+        "authentication",
+        "deploymentId",
+        "sourceCommit",
+        "evaluation"
+      ],
+      "properties": {
+        "targetInformationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "url": { "type": "string", "format": "uri" },
+        "evaluationUrl": { "type": "string", "format": "uri" },
+        "statusCode": { "const": 200 },
+        "authentication": { "const": "ANONYMOUS" },
+        "deploymentId": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 40, "maxLength": 40 },
+        "evaluation": { "$ref": "#/$defs/evaluation" }
+      }
+    },
+    "devpostTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetInformationUuidV5",
+        "observedAt",
+        "url",
+        "projectId",
+        "projectSlug",
+        "state",
+        "projectVersion",
+        "updatedAt",
+        "websiteUrl",
+        "videoUrl",
+        "descriptionMarkers",
+        "submission"
+      ],
+      "properties": {
+        "targetInformationUuidV5": { "$ref": "#/$defs/uuidV5" },
+        "observedAt": { "$ref": "#/$defs/observedAt" },
+        "url": { "type": "string", "format": "uri" },
+        "projectId": { "const": "1405191" },
+        "projectSlug": { "const": "project-y79pb23hj1mz" },
+        "state": { "const": "published" },
+        "projectVersion": { "const": 13 },
+        "updatedAt": { "$ref": "#/$defs/observedAt" },
+        "websiteUrl": { "type": "string", "format": "uri" },
+        "videoUrl": { "type": "string", "format": "uri" },
+        "descriptionMarkers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "submittedWebsite",
+            "sitesVersion14",
+            "vercelSourceCommitCda7",
+            "vercelDeploymentFqc",
+            "testCount194",
+            "exactTools",
+            "forbiddenTools",
+            "noOld192",
+            "noOldC8be"
+          ],
+          "properties": {
+            "submittedWebsite": { "const": true },
+            "sitesVersion14": { "const": true },
+            "vercelSourceCommitCda7": { "const": true },
+            "vercelDeploymentFqc": { "const": true },
+            "testCount194": { "const": true },
+            "exactTools": { "const": true },
+            "forbiddenTools": { "const": true },
+            "noOld192": { "const": true },
+            "noOldC8be": { "const": true }
+          }
+        },
+        "submission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["submissionId", "status", "submittedAt"],
+          "properties": {
+            "submissionId": { "const": 1158722 },
+            "status": { "const": "Submitted" },
+            "submittedAt": { "$ref": "#/$defs/observedAt" }
+          }
+        }
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "checks"],
+      "properties": {
+        "status": { "const": "PASS" },
+        "checks": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["checkIdUuidV5", "status", "description"],
+            "properties": {
+              "checkIdUuidV5": { "$ref": "#/$defs/uuidV5" },
+              "status": { "const": "PASS" },
+              "description": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

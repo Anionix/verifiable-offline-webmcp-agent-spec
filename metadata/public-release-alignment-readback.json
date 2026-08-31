@@ -1,0 +1,188 @@
+{
+  "$schema": "../schemas/public-release-alignment-readback.schema.json",
+  "format": {
+    "name": "OpenKnowledgeFormat-inspired evidence record",
+    "version": "0.1",
+    "profile": "public-release-alignment"
+  },
+  "identity": {
+    "namespaceUuidV5": "47f3e535-0e27-559a-9556-aa79a84f95eb",
+    "informationUuidV5": "bded1f61-139c-50b9-a0a1-d5f7901c2915",
+    "observationUuidV7": "01a055f0-2130-7abc-8000-000000000abc",
+    "observedAt": "2026-08-31T03:49:55.632Z",
+    "repositoryCommit": "c72fe93b6049861f8a1ce208c350724c53259ac4"
+  },
+  "machineContract": {
+    "stateTransition": {
+      "eventUuidV7": "01a055f0-2130-7abc-8000-000000000abc",
+      "occurredAt": "2026-08-31T03:49:55.632Z",
+      "from": "PUBLIC_TARGETS_WITH_STALE_DESCRIPTION",
+      "to": "PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED",
+      "evidence": "The submitted ChatGPT Site was read anonymously at version 14, the Vercel evaluation file was read anonymously with HTTP 200, and the authenticated Devpost project readback confirmed the version 13 description update and the same four-tool, 194-test contract."
+    },
+    "invariants": [
+      "Sites, Vercel, and Devpost are separate publication observations; one URL does not prove another.",
+      "The Sites target remains the submitted website and is recorded as version 14 from source commit 2fbbf1b714ca660ef1681239b638205a9835f7c5.",
+      "The Vercel fallback remains bound to deployment dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu and source commit cda7ff7c51698f4ec7292f1c076468712a239bd8.",
+      "Both public evaluation files report 194 executable tests and the exact four intended WebMCP tools.",
+      "The Devpost description update is recorded separately from the earlier submission receipt; no new submission receipt is invented.",
+      "Native browser execution and external effects are not remeasured by this alignment readback."
+    ]
+  },
+  "authorization": {
+    "state": "IMPLEMENTATION_AND_RELEASE_AUTHORIZED",
+    "sourceIssue": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/196",
+    "eventUuidV7": "01a05387-c6aa-7ba6-b6b9-3bceea86dddb",
+    "evidence": "The user explicitly authorized implementation, review, integration, publication, and resubmission in the issue update; no purchase, rule agreement, or eligibility decision is included."
+  },
+  "previousRecord": {
+    "path": "metadata/devpost-public-readback.json",
+    "observedAt": "2026-08-29T13:17:42.000Z",
+    "version": 11,
+    "treatment": "RETAINED_HISTORICAL_NOT_CURRENT"
+  },
+  "targets": {
+    "sites": {
+      "targetInformationUuidV5": "5f0d8eae-4ae5-521d-9d71-60903ae72dfc",
+      "observedAt": "2026-08-31T03:49:34.239Z",
+      "url": "https://kyoto-booking-retry-proof.anionix.chatgpt.site/",
+      "evaluationUrl": "https://kyoto-booking-retry-proof.anionix.chatgpt.site/webmcp-evals.json",
+      "statusCode": 200,
+      "authentication": "ANONYMOUS",
+      "projectId": "appgprj_6a923239002081918896546134a7dc8f",
+      "versionId": "appgprj_6a923239002081918896546134a7dc8f~appgver_8543952287588191bce7d9d5ca0593ae",
+      "versionNumber": 14,
+      "sourceCommit": "2fbbf1b714ca660ef1681239b638205a9835f7c5",
+      "providerState": "active",
+      "evaluation": {
+        "measurementStatus": "CONTRACT_READY",
+        "releaseEvidence": {
+          "status": "PASS",
+          "testCommand": "npm test",
+          "testDirectory": "src/typescript",
+          "testCount": 194,
+          "countSource": "node-test-summary"
+        },
+        "toolNames": [
+          "check_existing_hotel_booking",
+          "prepare_hotel_booking",
+          "get_hotel_booking_status",
+          "preview_hotel_cancellation"
+        ],
+        "forbiddenToolNames": [
+          "confirm_hotel_booking",
+          "pay_for_hotel_booking",
+          "cancel_hotel_booking"
+        ],
+        "reconciliation": {
+          "status": "REPRODUCIBLE_PATH",
+          "attemptCount": 2,
+          "bookingCount": 1,
+          "effectStartCount": 1,
+          "sameConfirmation": true
+        }
+      }
+    },
+    "vercel": {
+      "targetInformationUuidV5": "b7a49447-8f82-5650-9eb9-f840113516f5",
+      "observedAt": "2026-08-31T03:49:39.646Z",
+      "url": "https://kyoto-booking-retry-proof.vercel.app/",
+      "evaluationUrl": "https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json",
+      "statusCode": 200,
+      "authentication": "ANONYMOUS",
+      "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
+      "sourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+      "evaluation": {
+        "measurementStatus": "CONTRACT_READY",
+        "releaseEvidence": {
+          "status": "PASS",
+          "testCommand": "npm test",
+          "testDirectory": "src/typescript",
+          "testCount": 194,
+          "countSource": "node-test-summary"
+        },
+        "toolNames": [
+          "check_existing_hotel_booking",
+          "prepare_hotel_booking",
+          "get_hotel_booking_status",
+          "preview_hotel_cancellation"
+        ],
+        "forbiddenToolNames": [
+          "confirm_hotel_booking",
+          "pay_for_hotel_booking",
+          "cancel_hotel_booking"
+        ],
+        "reconciliation": {
+          "status": "REPRODUCIBLE_PATH",
+          "attemptCount": 2,
+          "bookingCount": 1,
+          "effectStartCount": 1,
+          "sameConfirmation": true
+        }
+      }
+    },
+    "devpost": {
+      "targetInformationUuidV5": "92999fca-6172-5c8f-ad2c-0abe550f2d4e",
+      "observedAt": "2026-08-31T03:49:39.650Z",
+      "url": "https://devpost.com/software/project-y79pb23hj1mz",
+      "projectId": "1405191",
+      "projectSlug": "project-y79pb23hj1mz",
+      "state": "published",
+      "projectVersion": 13,
+      "updatedAt": "2026-08-31T03:47:23.509Z",
+      "websiteUrl": "https://kyoto-booking-retry-proof.anionix.chatgpt.site",
+      "videoUrl": "https://youtu.be/tdSvJw4ghX8",
+      "descriptionMarkers": {
+        "submittedWebsite": true,
+        "sitesVersion14": true,
+        "vercelSourceCommitCda7": true,
+        "vercelDeploymentFqc": true,
+        "testCount194": true,
+        "exactTools": true,
+        "forbiddenTools": true,
+        "noOld192": true,
+        "noOldC8be": true
+      },
+      "submission": {
+        "submissionId": 1158722,
+        "status": "Submitted",
+        "submittedAt": "2026-08-29T13:14:00.129Z"
+      }
+    }
+  },
+  "alignment": {
+    "status": "PASS",
+    "checks": [
+      {
+        "checkIdUuidV5": "3968cc8f-4bc8-52e9-b106-3d99c644ece4",
+        "status": "PASS",
+        "description": "The submitted ChatGPT Site returned HTTP 200 anonymously, is public, and reports version 14 from the recorded source commit."
+      },
+      {
+        "checkIdUuidV5": "f95230ee-2bf9-50f2-8b17-47880c674c9d",
+        "status": "PASS",
+        "description": "The Vercel fallback returned HTTP 200 anonymously and its evaluation file reported the same 194-test, four-tool contract."
+      },
+      {
+        "checkIdUuidV5": "89e73373-70b1-574a-b16e-e52cfa47d614",
+        "status": "PASS",
+        "description": "Devpost project 1405191 was read back as published version 13 with the submitted Site URL and current release markers."
+      },
+      {
+        "checkIdUuidV5": "d0e4723e-7b65-546d-b086-844519b2e624",
+        "status": "PASS",
+        "description": "Both public evaluation files list exactly the four intended tools and the three forbidden mutation tools."
+      },
+      {
+        "checkIdUuidV5": "cbc02daa-4969-521a-8eb5-7b67cbb1d1f3",
+        "status": "PASS",
+        "description": "The Sites, Vercel, and Devpost description all point to the 194-test release contract; the earlier version 11 record remains historical."
+      }
+    ]
+  },
+  "limitations": [
+    "The public JSON proves a published contract and release count; it does not by itself prove a new native WebMCP execution.",
+    "The notification-only main-branch fix is intentionally separate from the published hotel source commits and is not presented as a new hotel runtime observation.",
+    "The Devpost project update returned version 13 and preserved the prior submission 1158722; no new submit-project receipt or new rule agreement was created."
+  ]
+}

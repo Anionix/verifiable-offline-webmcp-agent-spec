@@ -3,9 +3,10 @@ title: "Kyoto Booking Retry Proof — Devpost視覚導線"
 language: "ja"
 information_uuid_v5: "8919307c-9546-59bd-9054-fab238183fb5"
 event_uuid_v7: "01a050c7-347d-71a4-91a0-42db9761ce31"
+public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
 state_transition: "TECHNICAL_DESCRIPTION_FIRST -> JUDGE_VISIBLE_PROOF_ROUTE_JA"
-occurred_at: "2026-08-30T04:20:00Z"
-status: "visual-guide"
+occurred_at: "2026-08-31T03:49:55.632Z"
+status: "visual-guide-public-release-aligned"
 ---
 
 # Devpost視覚導線（短い日本語版）
@@ -16,7 +17,7 @@ status: "visual-guide"
 
 題名は**Kyoto Booking Retry Proof**、質問は**Did my hotel booking go through?**です。結果は`2 attempts → 1 simulated booking → 1 confirmation number`。入口は[公開ChatGPT Site](https://kyoto-booking-retry-proof.anionix.chatgpt.site)です。
 
-現在のネイティブWebMCP実演は[公開Vercel版](https://kyoto-booking-retry-proof.vercel.app)です。配置`dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK`、ソースコミット`c8be388d8047472ef7d6ad69656255adb5903e37`、試験192件、四機能の発見、発見時の作用ゼロ、状態確認後の安全な再送を、[機械可読記録](../metadata/hotel-native-webmcp-reconciliation.json)に固定しています。
+提出先は[公開ChatGPT Site版14](https://kyoto-booking-retry-proof.anionix.chatgpt.site)、確認用の公開Vercel版は[こちら](https://kyoto-booking-retry-proof.vercel.app)です。Sites版14はソースコミット`2fbbf1b714ca660ef1681239b638205a9835f7c5`、Vercel本番は配置`dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`とソースコミット`cda7ff7c51698f4ec7292f1c076468712a239bd8`です。両方の評価ファイルは194件と四機能を報告し、対応表を[機械可読記録](../metadata/public-release-alignment-readback.json)に固定しています。新しいネイティブ実行はこの同期記録から主張しません。
 
 ## 60秒の順番
 
@@ -51,4 +52,4 @@ status: "visual-guide"
 
 画像 → 一行の困りごと → 60秒手順 → WebMCPの4機能 → 人間だけの確定 → 一件へ収束する証拠 → 架空・端末内の限界 → 公開Site、Vercel、リポジトリ、動画です。
 
-関連する[配布README](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md)、[英語導線](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/25-devpost-visual-guide.en.md)、[公開読戻し記録](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json)、[ネイティブWebMCP記録](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json)、[動画台本](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/media/demo-video/storyboard.md)も同じ順序を使います。
+関連する[配布README](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md)、[英語導線](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/25-devpost-visual-guide.en.md)、[公開読戻し記録](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json)、[公開版の対応表](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/public-release-alignment-readback.json)、[ネイティブWebMCP記録](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json)、[動画台本](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/media/demo-video/storyboard.md)も同じ順序を使います。

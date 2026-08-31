@@ -5,8 +5,8 @@ information_uuid_v5: "4f18aaff-864b-5bbd-a2ce-1c33f0add5f2"
 event_uuid_v7: "01a050c7-34b7-7168-8c64-9443fbe87f36"
 state_transition: "UNPACKAGED_HOTEL_ARTIFACT -> REPRODUCIBLE_RELEASE_PACKAGE"
 occurred_at: "2026-08-30T04:20:00Z"
-public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
-updated_at: "2026-08-31T03:49:55.632Z"
+public_release_alignment_event_uuid_v7: "01a0573d-8e18-7534-9480-d5f1b43c54d0"
+updated_at: "2026-08-31T09:54:07.000Z"
 status: "release-guide"
 ---
 
@@ -73,7 +73,7 @@ cmp /tmp/kyoto-booking-retry-proof.first.sha256 release/kyoto-booking-retry-proo
 
 The demo uses only the fictional `Fictional Kyoto Ryokan` and `Standard Flexible` plan. WebMCP exposes `check_existing_hotel_booking`, `prepare_hotel_booking`, `get_hotel_booking_status`, and `preview_hotel_cancellation`. It does not expose confirmation, payment, or cancellation mutation to an agent. A human-only visible button commits the simulated booking.
 
-The result is browser-local and publication-target-specific. `2 attempts → 1 simulated booking → 1 confirmation number` is a deterministic demonstration, not an external hotel transaction. The current Vercel production deployment `dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu` serves source commit `cda7ff7c51698f4ec7292f1c076468712a239bd8`. The submitted ChatGPT Site is version 14 from source commit `2fbbf1b714ca660ef1681239b638205a9835f7c5`; both public evaluation files report 194 tests and the exact four-tool contract. The managed browser proof is separate and is not re-run by this package alignment. This proves the recorded configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader evidence, and local-video-to-YouTube file identity, remain explicitly limited in the manifest and verification records. See the [public release readback](../metadata/hotel-public-release-readback.json), [public alignment readback](../metadata/public-release-alignment-readback.json), and [native reconciliation record](../metadata/hotel-native-webmcp-reconciliation.json).
+The result is browser-local and publication-target-specific. `2 attempts → 1 simulated booking → 1 confirmation number` is a deterministic demonstration, not an external hotel transaction. The current Vercel production deployment `dpl_BetejQ7wQwwouGcyC6HW588EiqK8` serves source commit `adeaf3f549aa7379acacbc6960eae4c11bbc6ba2`. The submitted ChatGPT Site is version 14 from source commit `2fbbf1b714ca660ef1681239b638205a9835f7c5`; both public evaluation files report 194 tests and the exact four-tool contract. A fresh managed browser proof ran through the unique alias of this same deployment after READY and is stored in the native reconciliation record. This proves the recorded configuration, not broad conformance of every Chrome release. Physical keyboard and screen-reader evidence, and local-video-to-YouTube file identity, remain explicitly limited in the manifest and verification records. See the [public release readback](../metadata/hotel-public-release-readback.json), [public alignment readback](../metadata/public-release-alignment-readback.json), and [native reconciliation record](../metadata/hotel-native-webmcp-reconciliation.json).
 
 ## Related evidence
 

@@ -3,8 +3,8 @@ title: "訪日旅行者向け・ホテル二重予約防止デモ"
 language: "ja"
 information_uuid_v5: "f91481fd-f6f9-53e4-8b23-b97065177b32"
 event_uuid_v7: "01a04dcb-8678-79cc-97a7-5daac61059f8"
-public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
-observed_at: "2026-08-31T03:49:55.632Z"
+public_release_alignment_event_uuid_v7: "01a0573d-8e18-7534-9480-d5f1b43c54d0"
+observed_at: "2026-08-31T09:54:07.000Z"
 status: "sites-version-14-vercel-release-current-devpost-version-13-aligned"
 ---
 
@@ -78,17 +78,17 @@ ChatGPT Sites版14の画面には、端末内履歴から読む検証パネル�
 | 読み上げ | 判断不能 | 構造は確認済み、VoiceOver実行は未記録 |
 | ChatGPT Sites一般公開 | 成功（現行版） | [本番URL](https://kyoto-booking-retry-proof.anionix.chatgpt.site)は公開中の版14で、提供元コミット`2fbbf1b714ca660ef1681239b638205a9835f7c5`へ結び付く。匿名評価ファイルはHTTP 200、194件の試験、四機能、再送の契約を報告する。版14で新しいネイティブ実行を行ったとは扱わない |
 | 可視証拠パネル | 成功（現行機能） | 版10でUUIDv5`64ccc2dc-0404-5566-b296-92d0eb7ed00f`、最新UUIDv7、履歴4件、SHA-256連鎖`Valid`を確認。版11で同じ結果を復元 |
-| Vercel一般公開 | 成功（現行版） | 本番配置`dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`はソースコミット`cda7ff7c51698f4ec7292f1c076468712a239bd8`へ結び付く。匿名取得した評価ファイルはHTTP 200、194件のNode試験、四機能、再送の契約を報告する。ネイティブ実行の新しい測定はこの再読取りに含めない |
+| Vercel一般公開 | 成功（現行版） | 本番配置`dpl_BetejQ7wQwwouGcyC6HW588EiqK8`はソースコミット`adeaf3f549aa7379acacbc6960eae4c11bbc6ba2`へ結び付く。匿名取得した評価ファイルはHTTP 200、194件のNode試験、四機能、再送の契約を報告する。ネイティブ実行は同じ配置の一意な別名で別に実測した |
 
 Sitesの機械可読正本は[`metadata/hotel-booking-verification.json`](../metadata/hotel-booking-verification.json)、過去のVercel配置記録は[`metadata/vercel-hotel-deployment.json`](../metadata/vercel-hotel-deployment.json)、現在のVercel公開読戻しは[`metadata/hotel-public-release-readback.json`](../metadata/hotel-public-release-readback.json)、ネイティブ実測は[`metadata/hotel-native-webmcp-reconciliation.json`](../metadata/hotel-native-webmcp-reconciliation.json)です。二つの提供元の配置証拠を混ぜません。
 
 ## 公開、動画、Devpostの現在状態
 
-- [公開版の対応表](../metadata/public-release-alignment-readback.json)は、Sites版14、Vercel本番、Devpost版13を別々に読み取り、提出先URL、版、ソース、HTTP 200、194件、四機能、未計測の境界を一つの機械可読記録へ結び付けています。古い版11のDevpost記録は履歴として保持します。
-- Vercelの本番配置`dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`はソースコミット`cda7ff7c51698f4ec7292f1c076468712a239bd8`へ結び付き、`2026-08-31T01:51:43.509Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名評価ファイルはHTTP 200と194件を返します。Sites版14の公開元は`2fbbf1b714ca660ef1681239b638205a9835f7c5`です。新しいネイティブWebMCP実行や外部効果は、この公開版同期からは主張しません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧済みで、現在も別プロジェクトです。
+- [公開版の対応表](../metadata/public-release-alignment-readback.json)は、Sites版14、Vercel本番、Devpost版14を別々に読み取り、提出先URL、版、ソース、HTTP 200、194件、四機能、未計測の境界を一つの機械可読記録へ結び付けています。古い版11と版13のDevpost記録は履歴として保持します。
+- Vercelの本番配置`dpl_BetejQ7wQwwouGcyC6HW588EiqK8`はソースコミット`adeaf3f549aa7379acacbc6960eae4c11bbc6ba2`へ結び付き、`2026-08-31T09:12:39.283Z`に`READY`となりました。[一般公開URL](https://kyoto-booking-retry-proof.vercel.app)の匿名評価ファイルはHTTP 200と194件を返します。Sites版14の公開元は`2fbbf1b714ca660ef1681239b638205a9835f7c5`です。ネイティブWebMCPは同じ配置の一意な別名で`2026-08-31T09:38:25.717Z`まで実測し、状態確認後の再送を記録しました。外部効果は測定していません。誤って対象にした旧通知プロジェクトは配置`dpl_3KTHTtZ5h8quDhviMTRo5GxBuUuE`へ復旧済みで、現在も別プロジェクトです。
 - 端末内で検査した最終動画v10は150秒、1920×1080、英語音声あり、英語字幕焼き込み済みです。生成映像20秒には架空表示があり、公開Site画面録画は113.2秒（75.5%）です。端末内ファイルのSHA-256は`3c2635029fe01f5a9f20b4effddd62a8d5c1edc28e1e90db443645dbe78c49e7`です。これとは別に、[YouTube](https://youtu.be/tdSvJw4ghX8)で`WebMCP vs Duplicate Bookings: A Live Demo`の一般公開、150秒の再生時間、匿名再生、英語字幕と日本語字幕トラック、処理完了、著作権検査の問題なしを読み戻しました。リポジトリ内にはアップロード操作由来の独立した受領記録がないため、端末内ファイルと公開動画が同一成果物であることは`UNMEASURED`であり、同一だとは断定しません。時間の一致と編集可能な自己記録は成果物同一性の根拠にしません。
 - Canvaで選んだ専用サムネイルは端末内に準備済みです。ただしYouTube画面のブラウザー用ファイル選択が失敗し、専用画像は反映できなかったため、現在はYouTubeが自動生成したサムネイルを使っています。これはYouTubeだけの状態です。
-- Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)は、版13として提出先をChatGPT Sites版14へ戻し、Vercelの現在の公開配置、194件のNode試験、四機能の契約、状態確認後の安全な再送を反映しています。提出先URLと本文の対応は[公開版の対応表](../metadata/public-release-alignment-readback.json)で確認できます。提出番号`1158722`は`Submitted`のままです。版13の説明更新は読み戻し済みで、新しい提出受領番号は作っていません。過去の版11・153件スナップショットは[`metadata/devpost-public-readback.json`](../metadata/devpost-public-readback.json)に履歴として保存しています。
+- Devpostの[一般プロジェクトページ](https://devpost.com/software/project-y79pb23hj1mz)は、版14として提出先をChatGPT Sites版14へ戻し、Vercelの現在の公開配置、194件のNode試験、四機能の契約、状態確認後の安全な再送を反映しています。提出先URLと本文の対応は[公開版の対応表](../metadata/public-release-alignment-readback.json)で確認できます。提出番号`1158722`は`Submitted`のままです。版14の説明更新は読み戻し済みで、新しい提出受領番号は作っていません。過去の版11・版13・153件スナップショットは履歴として保存しています。
 
 ## 構築と検査
 

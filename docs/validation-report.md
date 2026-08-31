@@ -98,9 +98,9 @@ status: "validation-report"
 
 ### Current public release alignment
 
-<!-- information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a055f0-2130-7abc-8000-000000000abc state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T03:49:55.632Z -->
+<!-- information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a0573d-8e18-7534-9480-d5f1b43c54d0 state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T09:54:07.000Z -->
 
-The later [`public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json) is a separate current observation. It binds submitted ChatGPT Sites version 14, Vercel deployment `dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`, and Devpost version 13 after anonymous and authenticated readback. All three records point to the submitted Site URL and the same 194-test, four-tool contract. It does not claim that the older native browser run was re-executed or that external effects were measured again.
+The later [`public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json) is a separate current observation. It binds submitted ChatGPT Sites version 14, Vercel deployment `dpl_BetejQ7wQwwouGcyC6HW588EiqK8`, and Devpost version 14 after anonymous and authenticated readback. All three records point to the submitted Site URL and the same 194-test, four-tool contract. The fresh native browser run is recorded separately against a unique alias of the same Vercel deployment; its result fields do not measure page network traffic or external effects.
 
 ### Optional online planner candidate
 

@@ -103,6 +103,7 @@ ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE = "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEA
 ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE"
 OWNER_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED"
 OWNER_SUBTITLE_FAILURE_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
+SUBTITLE_ROOT_MATCH_SUFFIX = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
 
 
 def is_ignored(path: Path):
@@ -608,6 +609,21 @@ def uuid7_for_ms(epoch_ms: int, random_a: int, random_b: int):
     return str(uuid.UUID(int=value))
 
 
+def subtitle_root_suffix_options(collection_name: str, record: dict[str, Any]) -> set[str]:
+    state = record.get("stateTransition")
+    if collection_name == "subtitleUpdates" and state == OWNER_SUBTITLE_MATCH_STATE:
+        return {state.rsplit(" -> ", 1)[-1], SUBTITLE_ROOT_MATCH_SUFFIX}
+    if collection_name == "subtitleAnonymousReadbacks" and state == ANONYMOUS_SUBTITLE_MATCH_STATE:
+        return {SUBTITLE_ROOT_MATCH_SUFFIX, FUTURE_SUBTITLE_STATE_SUFFIX}
+    if state in {
+        OWNER_SUBTITLE_FAILURE_STATE,
+        ANONYMOUS_SUBTITLE_MISMATCH_STATE,
+        ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE,
+    }:
+        return {state.rsplit(" -> ", 1)[-1]}
+    return set()
+
+
 def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     # machine-contract: the previous root keeps its complete chain; the current chain may append later suffixes but cannot delete or reorder that prefix.
     findings: list[str] = []
@@ -621,8 +637,6 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
         findings.append("video production document history requires current and previous state transitions")
     elif not current_state.startswith(f"{previous_state} -> "):
         findings.append("video production root state transition does not extend the previous complete chain")
-    if "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED" not in str(current_state).split(" -> "):
-        findings.append("video production root state transition does not retain the latest subtitle observation")
     if document_identity.get("informationUuidV5") != "8bb1420d-3305-5c00-81a0-e24c5c68d99a":
         findings.append("video production document information identifier changed")
     if previous_observation.get("informationUuidV5") != document_identity.get("informationUuidV5"):
@@ -642,7 +656,50 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     if document_updated_ms <= previous_updated_ms:
         findings.append("video production previous root updatedAt is not earlier than the current root")
     publication = video_production.get("publication")
-    if isinstance(publication, dict):
+    if isinstance(publication, dict) and isinstance(current_state, str) and isinstance(previous_state, str):
+        suffix = current_state[len(previous_state) + len(" -> ") :].split(" -> ")
+        newer_subtitle_events: list[tuple[int, int, int, set[str]]] = []
+        for collection_order, (collection_name, timestamp_field) in enumerate(SUBTITLE_TIMESTAMP_FIELDS.items()):
+            records = publication.get(collection_name)
+            if not isinstance(records, list):
+                continue
+            for record_order, record in enumerate(records):
+                if not isinstance(record, dict):
+                    continue
+                root_suffix_options = subtitle_root_suffix_options(collection_name, record)
+                if not root_suffix_options:
+                    continue
+                try:
+                    record_time_ms = rfc3339_ms(record[timestamp_field])
+                except Exception:
+                    continue
+                if record_time_ms > previous_updated_ms:
+                    newer_subtitle_events.append(
+                        (record_time_ms, collection_order, record_order, root_suffix_options)
+                    )
+        newer_subtitle_events.sort(key=lambda event: event[:3])
+        required_suffix_options: list[set[str]] = []
+        event_labels: list[tuple[int, int]] = []
+        for _, collection_order, record_order, root_suffix_options in newer_subtitle_events:
+            if required_suffix_options and required_suffix_options[-1] & root_suffix_options:
+                required_suffix_options[-1].update(root_suffix_options)
+            else:
+                required_suffix_options.append(root_suffix_options)
+                event_labels.append((collection_order, record_order))
+        suffix_cursor = 0
+        for root_suffix_options, (collection_order, record_order) in zip(required_suffix_options, event_labels):
+            suffix_index = next(
+                (index for index in range(suffix_cursor, len(suffix)) if suffix[index] in root_suffix_options),
+                None,
+            )
+            if suffix_index is None:
+                collection_name = tuple(SUBTITLE_TIMESTAMP_FIELDS)[collection_order]
+                findings.append(
+                    f"video production root state transition lacks a derived suffix for "
+                    f"{collection_name} entry {record_order + 1}"
+                )
+                break
+            suffix_cursor = suffix_index + 1
         findings.extend(
             subtitle_observation_errors(
                 {
@@ -656,6 +713,101 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                 },
             )
         )
+    return findings
+
+
+def subtitle_root_suffix_fixture_errors(
+    video_production: dict[str, Any], validator, owner_failure: dict[str, Any]
+) -> list[str]:
+    # machine-contract: subtitle events newer than the previous root must appear as ordered derived suffixes; media-only suffixes remain unrestricted when no such event exists.
+    base_root_ms = rfc3339_ms(video_production["updatedAt"])
+    previous_state = video_production["stateTransition"]
+    previous_identity = video_production["identity"]
+
+    future_subtitle = json.loads(json.dumps(owner_failure))
+    mismatch_record = json.loads(json.dumps(video_production["publication"]["subtitleAnonymousReadbacks"][0]))
+    mismatch_ms = base_root_ms + 3
+    mismatch_record.update(
+        {
+            "observationUuidV7": uuid7_for_ms(mismatch_ms, 0x8AB, 0x8ABCDEF01234567),
+            "recordedAt": rfc3339_from_ms(mismatch_ms),
+            "stateTransition": ANONYMOUS_SUBTITLE_MISMATCH_STATE,
+        }
+    )
+    mismatch_record["comparison"].update(
+        {"text": "MISMATCH", "timing": "MISMATCH", "result": "FAIL"}
+    )
+    unavailable_record = json.loads(json.dumps(video_production["publication"]["subtitleAnonymousReadbacks"][0]))
+    unavailable_ms = base_root_ms + 4
+    for field in ("download", "inputSubtitle", "publicVtt", "comparison", "limitations"):
+        unavailable_record.pop(field, None)
+    unavailable_record.update(
+        {
+            "observationUuidV7": uuid7_for_ms(unavailable_ms, 0x9CD, 0x9CDEF012345678),
+            "measuredAt": rfc3339_from_ms(unavailable_ms - 1),
+            "recordedAt": rfc3339_from_ms(unavailable_ms),
+            "stateTransition": ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE,
+            "availableSubtitleCatalog": {
+                **unavailable_record["availableSubtitleCatalog"],
+                "capturedAfterComparison": False,
+                "captureTiming": {
+                    "precision": "EXACT",
+                    "lowerBound": rfc3339_from_ms(unavailable_ms),
+                    "upperBound": rfc3339_from_ms(unavailable_ms),
+                    "description": "future validation fixture catalog capture time",
+                },
+                "languages": ["ja"],
+                "authoredEnglishConfirmed": False,
+            },
+            "failure": {"result": "FAIL", "reason": ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON},
+        }
+    )
+    future_subtitle["publication"]["subtitleAnonymousReadbacks"].extend(
+        [mismatch_record, unavailable_record]
+    )
+    future_subtitle["identity"]["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms + 5, 0xADE, 0xADEF0123456789A
+    )
+    future_subtitle["updatedAt"] = rfc3339_from_ms(base_root_ms + 5)
+    future_subtitle["stateTransition"] = (
+        f"{future_subtitle['stateTransition']} -> "
+        f"{ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(' -> ')[-1]} -> "
+        f"{ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE.split(' -> ')[-1]}"
+    )
+
+    findings: list[str] = []
+    if list(validator.iter_errors(future_subtitle)):
+        findings.append("schema rejected the ordered future subtitle root fixture")
+    if document_history_errors(future_subtitle):
+        findings.append("ordered future subtitle root fixture failed document history checks")
+
+    unrelated_suffix = json.loads(json.dumps(future_subtitle))
+    unrelated_suffix["stateTransition"] = f"{previous_state} -> UNRELATED_MEDIA_STATE"
+    if not document_history_errors(unrelated_suffix):
+        findings.append("root history accepted an unrelated suffix for newer subtitle observations")
+
+    reversed_suffix = json.loads(json.dumps(future_subtitle))
+    reversed_suffix["stateTransition"] = (
+        f"{previous_state} -> {ANONYMOUS_SUBTITLE_UNAVAILABLE_STATE.split(' -> ')[-1]} -> "
+        f"{ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(' -> ')[-1]} -> OWNER_TRACK_STATUS_READBACK_FAILED"
+    )
+    if not document_history_errors(reversed_suffix):
+        findings.append("root history accepted subtitle suffixes in the wrong event order")
+
+    media_only = json.loads(json.dumps(video_production))
+    media_only["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": video_production["updatedAt"],
+        "stateTransition": previous_state,
+    }
+    media_only["identity"]["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms + 1, 0xBEF, 0xBEF0123456789AB
+    )
+    media_only["updatedAt"] = rfc3339_from_ms(base_root_ms + 1)
+    media_only["stateTransition"] = f"{previous_state} -> MEDIA_ONLY_READBACK_RECORDED"
+    if document_history_errors(media_only):
+        findings.append("root history rejected a media-only suffix without a newer subtitle event")
     return findings
 
 
@@ -1920,6 +2072,7 @@ def main():
     owner_failure_history_findings = document_history_errors(owner_failure)
     if owner_failure_history_findings:
         errors.append("future owner subtitle failure readback failed document history checks")
+    errors.extend(subtitle_root_suffix_fixture_errors(video_production, video_production_validator, owner_failure))
     duplicate_owner_failure_tracks = json.loads(json.dumps(owner_failure))
     duplicate_owner_failure_tracks["publication"]["subtitleUpdates"][-1]["ownerReadback"]["studioTable"]["tracks"] = [
         {"language": "English", "trackType": "VIDEO_LANGUAGE", "status": "DELETED"},

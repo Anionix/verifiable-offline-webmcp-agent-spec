@@ -118,10 +118,20 @@ function parseWebVttHeader(block) {
   const lines = block.split("\n");
   assert.ok(!block.includes("-->"), "WebVTT header cannot contain -->");
   assert.ok(WEBVTT_HEADER_PATTERN.test(lines[0] ?? ""), "WebVTT header is missing");
-  assert.ok(
-    lines.slice(1).every((line) => /^(?:Kind|Language):[ \t].*$/u.test(line)),
-    "WebVTT header contains an unrecognized line",
-  );
+  const declarations = new Map();
+  for (const line of lines.slice(1)) {
+    const declaration = /^(?<name>Kind|Language):[ \t](?<value>.*)$/u.exec(line);
+    assert.ok(declaration?.groups, "WebVTT header contains an unrecognized line");
+    const { name, value } = declaration.groups;
+    assert.ok(!declarations.has(name), `WebVTT header contains duplicate ${name}`);
+    declarations.set(name, value);
+  }
+  if (declarations.has("Kind")) {
+    assert.equal(declarations.get("Kind"), "captions", "WebVTT header Kind must be captions for English captions");
+  }
+  if (declarations.has("Language")) {
+    assert.equal(declarations.get("Language"), "en", "WebVTT header Language must be en for English captions");
+  }
 }
 
 function validateCueTimeline(cues, format) {

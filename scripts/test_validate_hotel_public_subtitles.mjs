@@ -121,6 +121,28 @@ test("rejects a WebVTT header containing the cue separator", () => {
   assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /header cannot contain -->/u);
 });
 
+test("requires declared WebVTT track metadata to describe English captions", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  for (const declaration of ["Kind: subtitles", "Language: ja"]) {
+    const publicText = "WEBVTT\n" + declaration + "\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /English captions/u);
+  }
+});
+
+test("rejects duplicate WebVTT Kind or Language declarations", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  for (const declarations of ["Kind: captions\nKind: captions", "Language: en\nLanguage: en"]) {
+    const publicText = "WEBVTT\n" + declarations + "\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+    assert.throws(() => compareSubtitleHistoryTexts(sourceText, publicText), /duplicate/u);
+  }
+});
+
+test("allows a WebVTT header without optional track metadata", () => {
+  const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
+  const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nHello\n";
+  assert.equal(compareSubtitleHistoryTexts(sourceText, publicText).result, "PASS");
+});
+
 test("rejects WebVTT cue settings as unsupported by this comparator", () => {
   const sourceText = "1\n00:00:00,000 --> 00:00:01,000\nHello\n";
   const publicText = "WEBVTT\n\n00:00:00.000 --> 00:00:01.000 align:start\nHello\n";

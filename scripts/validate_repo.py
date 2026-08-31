@@ -624,6 +624,31 @@ def subtitle_root_suffix_options(collection_name: str, record: dict[str, Any]) -
     return set()
 
 
+def reserved_document_events(video_production: dict[str, Any]) -> dict[str, str]:
+    document_identity = video_production.get("identity", {})
+    previous_observation = video_production.get("previousDocumentObservation", {})
+    reserved: dict[str, str] = {}
+    for label, observation in (
+        ("current document root", document_identity),
+        ("previous document observation", previous_observation),
+    ):
+        event_id = observation.get("observationUuidV7") if isinstance(observation, dict) else None
+        if isinstance(event_id, str):
+            reserved.setdefault(event_id, label)
+    publication = video_production.get("publication")
+    if isinstance(publication, dict):
+        for label, observation in (
+            ("publication observation", publication),
+            ("publication artifact identity", publication.get("artifactToVideoIdentity")),
+            ("publication Devpost readback", publication.get("devpostReadback")),
+        ):
+            event_id = observation.get("observationUuidV7") if isinstance(observation, dict) else None
+            if isinstance(event_id, str):
+                # Existing non-subtitle references may intentionally share a document event; preserve the first label.
+                reserved.setdefault(event_id, label)
+    return reserved
+
+
 def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     # machine-contract: the previous root keeps its complete chain; the current chain may append later suffixes but cannot delete or reorder that prefix.
     findings: list[str] = []
@@ -707,10 +732,7 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     "subtitleAnonymousReadbacks": publication.get("subtitleAnonymousReadbacks"),
                 },
                 document_updated_ms,
-                {
-                    document_identity["observationUuidV7"]: "current document root",
-                    previous_observation["observationUuidV7"]: "previous document observation",
-                },
+                reserved_document_events(video_production),
             )
         )
     return findings
@@ -1979,6 +2001,33 @@ def main():
     elif isinstance(publication_for_schema_checks, dict):
         errors.append("video production schema mutation fixture lacks a subtitleUpdates entry")
     errors.extend(document_history_errors(video_production))
+    non_subtitle_observation_references = [
+        ("publication", publication_for_schema_checks.get("observationUuidV7") if isinstance(publication_for_schema_checks, dict) else None),
+        (
+            "publication artifact identity",
+            publication_for_schema_checks.get("artifactToVideoIdentity", {}).get("observationUuidV7")
+            if isinstance(publication_for_schema_checks, dict)
+            and isinstance(publication_for_schema_checks.get("artifactToVideoIdentity"), dict)
+            else None,
+        ),
+        (
+            "publication Devpost readback",
+            publication_for_schema_checks.get("devpostReadback", {}).get("observationUuidV7")
+            if isinstance(publication_for_schema_checks, dict)
+            and isinstance(publication_for_schema_checks.get("devpostReadback"), dict)
+            else None,
+        ),
+    ]
+    for reserved_label, reserved_event in non_subtitle_observation_references:
+        if not isinstance(reserved_event, str):
+            continue
+        for collection_name in ("subtitleUpdates", "subtitleAnonymousReadbacks"):
+            collision_fixture = json.loads(json.dumps(video_production))
+            collision_records = collision_fixture["publication"][collection_name]
+            collision_records[0]["observationUuidV7"] = reserved_event
+            collision_findings = document_history_errors(collision_fixture)
+            if not any("reuses observationUuidV7" in finding for finding in collision_findings):
+                errors.append(f"{collection_name} subtitle event reused the reserved {reserved_label} observation")
     missing_previous_state = json.loads(json.dumps(video_production))
     missing_previous_state.get("previousDocumentObservation", {}).pop("stateTransition", None)
     if not schema_has_required_error(video_production_validator.iter_errors(missing_previous_state), "stateTransition"):

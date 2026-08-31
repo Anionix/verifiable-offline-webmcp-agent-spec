@@ -5,6 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { validateReleaseContext } from "./release-validation-context.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const validatorPath = join(repositoryRoot, "scripts/release-validation-context.mjs");
@@ -495,6 +496,22 @@ test("accepts a squash checkout when source file entries are identical", async (
     assert.equal(result.status, 0, output(result));
     assert.match(output(result), /mode.*SQUASH_CONTENT_MATCH/u);
   });
+});
+
+test("allows explicitly unpublished worktree divergence after ancestry checks", async () => {
+  await withRepository(
+    () => createSquashRepository({ currentRelease: "unpublished local candidate\n" }),
+    ({ directory, baseCommit, sourceCommit }) => {
+      const result = validateReleaseContext({
+        repositoryRoot: directory,
+        baseCommit,
+        sourceCommit,
+        allowCurrentCheckoutDivergence: true,
+      });
+
+      assert.equal(result.mode, "WORKTREE_CANDIDATE_DIVERGENCE");
+    },
+  );
 });
 
 test("rejects a squash checkout that drops an input introduced by the recorded base", async () => {

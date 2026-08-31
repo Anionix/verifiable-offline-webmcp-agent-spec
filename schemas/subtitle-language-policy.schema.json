@@ -5,11 +5,15 @@
   "title": "Shared subtitle language policy",
   "type": "object",
   "additionalProperties": false,
-  "required": ["policyName", "normalization", "englishPrimarySubtag"],
+  "required": ["policyName", "normalization", "englishPrimarySubtag", "primarySubtagMinLength", "primarySubtagMaxLength", "subtagMinLength", "subtagMaxLength"],
   "properties": {
     "policyName": { "const": "BCP47_LIKE_SUBTITLE_LANGUAGE_TAGS" },
     "normalization": { "const": "LOWERCASE_PRIMARY_SUBTAG_ONLY" },
-    "englishPrimarySubtag": { "const": "en" }
+    "englishPrimarySubtag": { "const": "en" },
+    "primarySubtagMinLength": { "const": 2 },
+    "primarySubtagMaxLength": { "const": 3 },
+    "subtagMinLength": { "const": 2 },
+    "subtagMaxLength": { "const": 8 }
   },
   "$defs": {
     "languageTag": {

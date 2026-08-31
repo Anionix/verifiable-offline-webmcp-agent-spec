@@ -35,8 +35,15 @@ const REPRODUCTION_ONLY_COMMAND_STATUS = "REPRODUCTION_ONLY";
 const subtitleLanguagePolicy = JSON.parse(
   readFileSync(new URL("../schemas/subtitle-language-policy.schema.json", import.meta.url), "utf8"),
 );
-const SUBTITLE_LANGUAGE_PATTERN = new RegExp(subtitleLanguagePolicy.$defs.languageTag.pattern, "u");
 const ENGLISH_PRIMARY_SUBTAG = subtitleLanguagePolicy.properties.englishPrimarySubtag.const;
+const subtitleLanguageRules = Object.freeze({
+  primaryMinLength: subtitleLanguagePolicy.properties.primarySubtagMinLength.const,
+  primaryMaxLength: subtitleLanguagePolicy.properties.primarySubtagMaxLength.const,
+  subtagMinLength: subtitleLanguagePolicy.properties.subtagMinLength.const,
+  subtagMaxLength: subtitleLanguagePolicy.properties.subtagMaxLength.const,
+});
+const LANGUAGE_PRIMARY_CHARACTERS = /^[A-Za-z]+$/u;
+const LANGUAGE_SUBTAG_CHARACTERS = /^[A-Za-z0-9]+$/u;
 const OBSERVED_DOWNLOAD_COMMAND =
   `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${SUBTITLE_WATCH_URL}`;
 const OBSERVED_CATALOG_COMMAND = `${HISTORICAL_CATALOG_COMMAND} ${SUBTITLE_WATCH_URL}`;
@@ -64,9 +71,24 @@ function normalizeText(text) {
 // information_uuid_v5=af1ce89f-9aff-51fb-a147-8dfc4a07fc71
 // event_uuid_v7=01a055f2-3169-747d-a80e-2bdbd2d0eaf4 state_transition=LANGUAGE_TAG_UNNORMALIZED -> LANGUAGE_TAG_PRIMARY_SUBTAG_NORMALIZED
 // machine-contract: every accepted subtitle language uses the shared schema grammar; only the primary subtag is lowercased for comparison.
+function isSubtitleLanguageTag(language) {
+  const [primary, ...subtags] = language.split("-");
+  return (
+    primary.length >= subtitleLanguageRules.primaryMinLength &&
+    primary.length <= subtitleLanguageRules.primaryMaxLength &&
+    LANGUAGE_PRIMARY_CHARACTERS.test(primary) &&
+    subtags.every(
+      (subtag) =>
+        subtag.length >= subtitleLanguageRules.subtagMinLength &&
+        subtag.length <= subtitleLanguageRules.subtagMaxLength &&
+        LANGUAGE_SUBTAG_CHARACTERS.test(subtag),
+    )
+  );
+}
+
 export function normalizeSubtitleLanguage(language) {
   assert.equal(typeof language, "string", "subtitle language must be a string");
-  assert.match(language, SUBTITLE_LANGUAGE_PATTERN, `invalid subtitle language code: ${language}`);
+  assert.ok(isSubtitleLanguageTag(language), `invalid subtitle language code: ${language}`);
   const [primary, ...subtags] = language.split("-");
   const normalized = [primary.toLowerCase(), ...subtags].join("-");
   return Object.freeze({ original: language, normalized, primary: primary.toLowerCase() });
@@ -287,7 +309,7 @@ function validateSubtitleCommand(command, label, watchUrl, outputFileName = null
 function validateSubtitleCatalogLanguages(catalog, label, englishExpected) {
   assert.ok(Array.isArray(catalog?.languages), `${label} catalog languages must be an array`);
   assert.equal(new Set(catalog.languages).size, catalog.languages.length, `${label} catalog languages must be unique`);
-  assert.ok(catalog.languages.every((language) => typeof language === "string" && SUBTITLE_LANGUAGE_PATTERN.test(language)), `${label} catalog has an invalid language code`);
+  assert.ok(catalog.languages.every((language) => typeof language === "string" && isSubtitleLanguageTag(language)), `${label} catalog has an invalid language code`);
   const normalizedLanguages = catalog.languages.map(normalizeSubtitleLanguage);
   const hasEnglishLanguage = normalizedLanguages.some(({ primary }) => primary === ENGLISH_PRIMARY_SUBTAG);
   assert.equal(hasEnglishLanguage, englishExpected, englishExpected ? `${label} catalog must include English` : `${label} catalog must not include English`);

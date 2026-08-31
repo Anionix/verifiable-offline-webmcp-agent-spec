@@ -237,12 +237,6 @@ async function buildCandidate() {
   const baseCommit = publicReadback.release.baseCommit;
   const branch = publicReadback.release.branch;
   const managedDiscovery = nativeEvidence.discovery.profile === managedEvidenceProfile;
-  validateReleaseContext({
-    repositoryRoot,
-    baseCommit,
-    sourceCommit,
-  });
-
   assert.equal(publicReadback.release.status, "COMMITTED_RELEASE");
   assert.equal(publicReadback.release.testRun.testCount, testRun.total, "public release test count differs from npm test");
   assert.equal(publicReadback.release.testRun.passed, testRun.passed, "public release passed count differs from npm test");
@@ -287,6 +281,12 @@ async function buildCandidate() {
     artifacts.functionalClientSha256 === publicReadback.release.artifacts.functionalClientSha256 &&
     artifacts.fullClientSha256 === publicReadback.release.artifacts.fullClientSha256 &&
     artifacts.fullSitesPackageSha256 === publicReadback.release.artifacts.fullSitesPackageSha256;
+  validateReleaseContext({
+    repositoryRoot,
+    baseCommit,
+    sourceCommit,
+    allowCurrentCheckoutDivergence: !artifactsMatchPublicRelease,
+  });
   // machine-contract: a changed local client is a worktree candidate until a
   // later deployment and public readback bind these new bytes; it never
   // rewrites the historical public release receipt.

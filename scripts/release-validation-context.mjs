@@ -150,6 +150,7 @@ export function validateReleaseContext({
   baseCommit,
   sourceCommit,
   currentRef = "HEAD",
+  allowCurrentCheckoutDivergence = false,
 }) {
   assertCommit(repositoryRoot, sourceCommit, "release source commit");
   assertCommit(repositoryRoot, baseCommit, "release base commit");
@@ -159,6 +160,20 @@ export function validateReleaseContext({
     sourceCommit,
     "release base commit must be an ancestor of the source commit",
   );
+  if (allowCurrentCheckoutDivergence) {
+    const commonAncestor = mergeBase(repositoryRoot, sourceCommit, currentRef);
+    assert(commonAncestor, "release source commit has no common ancestor with the current checkout");
+    assertAncestor(
+      repositoryRoot,
+      commonAncestor,
+      baseCommit,
+      "release source common history must be an ancestor of the recorded base commit",
+    );
+    // information_uuid_v5=4e2c9a7d-5b61-5f34-8c20-1a9e7d6b4f03
+    // event_uuid_v7=01a0562a-8c4d-7e10-b9f2-3d6a1c5e8b70 state_transition=WORKTREE_RELEASE_CONTEXT_STRICT -> WORKTREE_RELEASE_CONTEXT_EXPLICITLY_UNPUBLISHED occurred_at=2026-08-31T05:40:00.000Z
+    // machine-contract: an unpublished candidate may diverge from the historical release tree only after source/base ancestry and common history are verified; public-release equality is not inferred.
+    return { mode: "WORKTREE_CANDIDATE_DIVERGENCE", baseCommit, sourceCommit };
+  }
   if (isAncestor(repositoryRoot, sourceCommit, currentRef)) {
     // machine-contract: SOURCE_ANCESTOR remains the shortcut when the current checkout already contains the complete source history; bidirectional comparison is for squashed checkouts only.
     return { mode: "SOURCE_ANCESTOR", baseCommit, sourceCommit };

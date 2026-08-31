@@ -5280,8 +5280,8 @@
     },
     {
       "path": "schemas/subtitle-language-policy.schema.json",
-      "sha256": "d4b26ab931885566275fd444c310267d7a23cd7eea6dc3e7be1ceea6a0d1e468",
-      "bytes": 1210,
+      "sha256": "f47a61d1547f35b5c59918c5253076628dc36c887ebd21cddf43bc1fb987ba5e",
+      "bytes": 1470,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5641,8 +5641,8 @@
     },
     {
       "path": "scripts/release-validation-context.mjs",
-      "sha256": "4f994b66fa541cd0fca00c1aac90b96068ce88b80bc5f3ffd127f5dd814e8461",
-      "bytes": 7986,
+      "sha256": "f26c42eaeff8c5d3d046749c0f3720fdfd516f0e0904199837da7d599d029867",
+      "bytes": 8970,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5717,8 +5717,8 @@
     },
     {
       "path": "scripts/test_validate_hotel_release_candidate_context.mjs",
-      "sha256": "47df3dac418d7a4a65489bbd1f1662aef98cc04f80b075b3220142d5b6e4c63f",
-      "bytes": 28434,
+      "sha256": "ffa4c637687a9c9d3a7386d7a66be383bd64148c0c953652e43ea14cf3435f33",
+      "bytes": 29028,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5812,8 +5812,8 @@
     },
     {
       "path": "scripts/validate_hotel_public_subtitles.mjs",
-      "sha256": "ff694f501267cec9c38425f127748010a8d71b8be88af3cee787bd106d89ca70",
-      "bytes": 26202,
+      "sha256": "1c7746984dd5978dde504216a1e11a319a8d3ce2190df751a3aa1022f0461043",
+      "bytes": 27077,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_hotel_release_candidate.mjs",
-      "sha256": "89d494b9123508e7157d4121dac906383d81e89b2036e11f5b4c06c499a27d96",
-      "bytes": 23040,
+      "sha256": "8c30e7627dc44a37fb6877bf57f2827bab468f82fa666175674c158448947e76",
+      "bytes": 23105,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

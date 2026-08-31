@@ -4615,8 +4615,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "5dc35d6a1c2fe1f6e66f6e5bf9025a6c6a2a72fd9341eb003d869181409fcf81",
-      "bytes": 4337,
+      "sha256": "eca0abaa828e883fd99dd8632705ae0658e5af7148b0a737fd9738e0039c209c",
+      "bytes": 4004,
       "mediaType": "application/json",
       "category": "root",
       "identity": {

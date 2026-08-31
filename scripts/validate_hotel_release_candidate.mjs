@@ -166,15 +166,20 @@ function assertManagedReconciliationBinding(nativeEvidence) {
   assert.equal(reconciliation.finalStatus.sameConfirmation, reconciliation.sameConfirmation, "managed final confirmation binding differs");
 }
 
-export function assertNativeRunAfterDeploymentReady(nativeEvidence) {
+export function assertNativeRunAfterDeploymentReady(nativeEvidence, publicDeployment = nativeEvidence?.deployment) {
   const { deployment, discovery, reconciliation } = nativeEvidence;
-  const publicSourceCommit = deployment?.sourceCommit ?? "UNMEASURED";
-  const deploymentId = deployment?.deploymentId ?? "UNMEASURED";
-  const readyAt = deployment?.readyAt;
+  const publicSourceCommit = publicDeployment?.sourceCommit ?? deployment?.sourceCommit ?? "UNMEASURED";
+  const deploymentId = publicDeployment?.deploymentId ?? deployment?.deploymentId ?? "UNMEASURED";
+  const recordedReadyAt = deployment?.readyAt;
+  const publicReadyAt = publicDeployment?.readyAt;
   const runAt = discovery?.profile === managedEvidenceProfile ? discovery?.runBinding?.completedAt : reconciliation?.observedAt;
-  const details = `publicSourceCommit=${publicSourceCommit} deploymentId=${deploymentId} readyAt=${readyAt ?? "UNMEASURED"} runAt=${runAt ?? "UNMEASURED"}`;
-  assert(Number.isFinite(Date.parse(readyAt)) && Number.isFinite(Date.parse(runAt)), `native run freshness timestamps are invalid: ${details}`);
-  assert(Date.parse(runAt) >= Date.parse(readyAt), `native run completed before public deployment READY: ${details}`);
+  const details = `publicSourceCommit=${publicSourceCommit} deploymentId=${deploymentId} recordedReadyAt=${recordedReadyAt ?? "UNMEASURED"} publicReadyAt=${publicReadyAt ?? "UNMEASURED"} runAt=${runAt ?? "UNMEASURED"}`;
+  assert(
+    Number.isFinite(Date.parse(recordedReadyAt)) && Number.isFinite(Date.parse(publicReadyAt)) && Number.isFinite(Date.parse(runAt)),
+    `native run freshness timestamps are invalid: ${details}`,
+  );
+  assert.equal(recordedReadyAt, publicReadyAt, `native evidence READY time differs from public readback: ${details}`);
+  assert(Date.parse(runAt) >= Date.parse(publicReadyAt), `native run completed before public deployment READY: ${details}`);
 }
 
 export function validateNativeDiscovery(nativeEvidence) {
@@ -314,7 +319,7 @@ async function buildCandidate(mode = "--check") {
   if (artifactsMatchPublicRelease) {
     // machine-contract: only a candidate whose bytes equal the public release
     // may promote the native run from historical context to current evidence.
-    assertNativeRunAfterDeploymentReady(nativeEvidence);
+    assertNativeRunAfterDeploymentReady(nativeEvidence, publicReadback.deployment);
   }
   validateReleaseContext({
     repositoryRoot,

@@ -638,13 +638,26 @@ test("accepts a native run completed at the public READY boundary", () => {
   assert.doesNotThrow(() => assertNativeRunAfterDeploymentReady(current));
 });
 
+test("rejects a native READY time that differs from the public readback", () => {
+  const invalid = structuredClone(legacyChromeProof);
+  const publicDeployment = structuredClone(invalid.deployment);
+  publicDeployment.readyAt = new Date(Date.parse(invalid.deployment.readyAt) + 1).toISOString();
+  assert.throws(
+    () => assertNativeRunAfterDeploymentReady(invalid, publicDeployment),
+    new RegExp(
+      `native evidence READY time differs from public readback: publicSourceCommit=${invalid.deployment.sourceCommit} deploymentId=${invalid.deployment.deploymentId} recordedReadyAt=${invalid.deployment.readyAt} publicReadyAt=${publicDeployment.readyAt} runAt=${invalid.reconciliation.observedAt}`,
+      "u",
+    ),
+  );
+});
+
 test("rejects a native run completed before READY and prints its binding details", () => {
   const invalid = structuredClone(legacyChromeProof);
   invalid.deployment.readyAt = new Date(Date.parse(invalid.reconciliation.observedAt) + 1).toISOString();
   assert.throws(
     () => assertNativeRunAfterDeploymentReady(invalid),
     new RegExp(
-      `native run completed before public deployment READY: publicSourceCommit=${invalid.deployment.sourceCommit} deploymentId=${invalid.deployment.deploymentId} readyAt=${invalid.deployment.readyAt} runAt=${invalid.reconciliation.observedAt}`,
+      `native run completed before public deployment READY: publicSourceCommit=${invalid.deployment.sourceCommit} deploymentId=${invalid.deployment.deploymentId} recordedReadyAt=${invalid.deployment.readyAt} publicReadyAt=${invalid.deployment.readyAt} runAt=${invalid.reconciliation.observedAt}`,
       "u",
     ),
   );

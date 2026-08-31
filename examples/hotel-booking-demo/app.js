@@ -17,6 +17,7 @@ import {
   recognizeHotelBookingRetry,
 } from "../../src/typescript/hotel/browser-store.js";
 import { registerHotelBookingTools } from "../../src/typescript/hotel/webmcp-adapter.js";
+import { deriveHotelBookingResult } from "./visual-state.js";
 
 const HOTEL_ID = "fictional-kyoto-ryokan";
 const ROOM_PLAN_ID = "standard-flexible";
@@ -37,6 +38,7 @@ const elements = Object.freeze({
   cancellationCopy: document.querySelector("#cancellation-copy"),
   stateName: document.querySelector("#state-name"),
   stateExplanation: document.querySelector("#state-explanation"),
+  stateSummary: document.querySelector("#state-summary"),
   attemptCount: document.querySelector("#attempt-count"),
   bookingCount: document.querySelector("#booking-count"),
   effectCount: document.querySelector("#effect-count"),
@@ -231,6 +233,7 @@ async function renderAuditProof(status) {
 function renderStatus(status) {
   if (expiryTimer !== null) clearTimeout(expiryTimer);
   expiryTimer = null;
+  const result = deriveHotelBookingResult(status);
   const state = status?.state ?? "EMPTY";
   activeBinding = status?.intentId
     ? Object.freeze({
@@ -242,6 +245,7 @@ function renderStatus(status) {
     : null;
   elements.stateName.textContent = state;
   elements.stateExplanation.textContent = explanations[state] ?? "The local state was recovered.";
+  elements.stateSummary.textContent = result.summary;
   elements.attemptCount.textContent = String(status?.attemptCount ?? 0);
   elements.bookingCount.textContent = status?.bookingExists ? "1" : "0";
   elements.effectCount.textContent = String(status?.effectStartCount ?? 0);
@@ -251,21 +255,9 @@ function renderStatus(status) {
   elements.approve.disabled = !canApprove;
   elements.retry.disabled = state !== "COMMITTED";
   elements.lostResponse.hidden = state !== "COMMITTED";
-  elements.confirmationNumber.textContent = "";
+  elements.confirmationNumber.textContent = result.confirmationNumber ?? "";
   rememberActiveIntent(status);
-
-  if (state === "PREPARED") {
-    elements.resultSummary.textContent = `Prepared for ${formatYen(status.quote.totalPriceJpy)}. Confirm within 120 seconds.`;
-  } else if (state === "COMMITTED") {
-    elements.resultSummary.textContent = "The response disappeared before the confirmation number was shown. Retry safely to recover it.";
-  } else if (state === "RETRY_RECOGNIZED") {
-    elements.resultSummary.textContent = "2 attempts → 1 simulated booking → 1 confirmation number";
-    elements.confirmationNumber.textContent = status.confirmationNumber;
-  } else if (state === "EXPIRED") {
-    elements.resultSummary.textContent = "Preparation expired. No booking was created.";
-  } else {
-    elements.resultSummary.textContent = "Prepare a booking to begin.";
-  }
+  elements.resultSummary.textContent = result.summary;
 
   if (state === "PREPARED" && !status.approvalExpired && status.approvalExpiresAt) {
     const generation = inputGeneration;

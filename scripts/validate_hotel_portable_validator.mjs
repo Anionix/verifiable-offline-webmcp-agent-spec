@@ -8,6 +8,8 @@
 // state_transition=NATIVE_WEBMCP_RECIPE_DECLARED -> PUBLIC_RUNTIME_PROOF_RECORDED occurred_at=2026-08-30T13:28:07.383Z
 // machine-contract: the public WebMCP file separates zero-effect native discovery,
 // the executable test count, and the later fictional human-confirmation retry.
+// event_uuid_v7=01a05494-dce5-72fd-8d96-fe000a925f31 state_transition=VISIBLE_TEST_COUNT_UNBOUND -> VISIBLE_TEST_COUNT_BOUND_TO_EVALUATIONS occurred_at=2026-08-30T21:30:37.157Z
+// machine-contract: the visible test-count sentence must match the public evaluation count; neither substitutes for a fresh public readback.
 
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
@@ -87,7 +89,7 @@ const expectedReleaseEvidence = Object.freeze({
   status: "PASS",
   testCommand: "npm test",
   testDirectory: "src/typescript",
-  testCount: 192,
+  testCount: 194,
   countSource: "node-test-summary",
 });
 
@@ -179,7 +181,11 @@ assert.match(sourceApplication, /ACTIVE_INTENT_STORAGE_KEY/);
 assert.match(sourceApplication, /onResult: reflectSafeToolResult/);
 assert.match(sourceApplication, /fetch\("\/service-integrations\.json"/);
 assert.doesNotMatch(sourceApplication, /import serviceRegistry/);
-assert.match(sourceApplication, /2 attempts → 1 simulated booking → 1 confirmation number/);
+assert.match(html, /id="state-summary"/);
+assert.match(sourceApplication, /deriveHotelBookingResult/);
+assert.match(sourceApplication, /stateSummary: document\.querySelector\("#state-summary"\)/);
+assert.match(sourceApplication, /elements\.stateSummary\.textContent = result\.summary/);
+assert.match(sourceApplication, /elements\.resultSummary\.textContent = result\.summary/);
 
 assert.match(serviceWorker, /cache\.addAll\(ASSETS\)/);
 for (const asset of ["/", "/assets/app.js", "/assets/index.css", "/favicon.svg", "/webmcp-evals.json", "/service-integrations.json"]) {
@@ -195,6 +201,10 @@ assert.deepEqual(
 );
 assert.deepEqual(evaluations.forbiddenTools, forbiddenTools);
 assert.deepEqual(evaluations.releaseEvidence, expectedReleaseEvidence);
+assert(
+  html.includes(`Public release evidence: ${evaluations.releaseEvidence.testCount} executable Node.js tests pass.`),
+  "visible release test count differs from the public evaluation count",
+);
 assert.deepEqual(evaluations.nativeRuntimeContract, expectedNativeRuntimeContract);
 assert.deepEqual(evaluations.agentReconciliationContract, expectedAgentReconciliationContract);
 assert.deepEqual(evaluations.recordingRecipe, expectedRecordingRecipe);

@@ -1,0 +1,98 @@
+{
+  "$schema": "../schemas/hotel-native-webmcp-reconciliation.schema.json",
+  "identity": {
+    "informationUuidV5": "1d4b92e2-85a9-5d03-a7b3-62c3d9ca4f83",
+    "observationUuidV7": "01a052f2-77e0-784c-a1c1-24e9f5378db4",
+    "observedAt": "2026-08-30T13:53:37.248Z"
+  },
+  "status": "PASS",
+  "deployment": {
+    "provider": "Vercel",
+    "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
+    "projectName": "kyoto-booking-retry-proof",
+    "deploymentId": "dpl_AdzeHw7CgM3sbsZBVutZZbLLbeAK",
+    "target": "production",
+    "state": "READY",
+    "sourceCommit": "c8be388d8047472ef7d6ad69656255adb5903e37",
+    "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
+    "uniqueUrl": "https://kyoto-booking-retry-proof-jnkzuh7r0-aniotajp-1978s-projects.vercel.app",
+    "readyAt": "2026-08-30T13:47:14.754Z",
+    "observedAt": "2026-08-30T13:56:24.118Z"
+  },
+  "discovery": {
+    "status": "PASS",
+    "observedAt": "2026-08-30T13:48:25.335Z",
+    "browser": "HeadlessChrome/152.0.0.0",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "secureContext": true,
+    "documentModelContext": "CONFIRMED_PRESENT",
+    "requiredChromeFlags": ["#devtools-webmcp-support", "#enable-webmcp-testing"],
+    "configuration": {
+      "launchArguments": ["--enable-features=WebMCP"],
+      "devtoolsWebmcpCategory": true,
+      "experimentalScreencast": true
+    },
+    "originTrialMetadataCount": 0,
+    "visibleToolNames": [
+      "check_existing_hotel_booking",
+      "prepare_hotel_booking",
+      "get_hotel_booking_status",
+      "preview_hotel_cancellation"
+    ],
+    "forbiddenToolNames": [
+      "confirm_hotel_booking",
+      "pay_for_hotel_booking",
+      "cancel_hotel_booking"
+    ],
+    "calledToolNames": [],
+    "discoveryEffectCounts": {
+      "bookingCount": 0,
+      "effectStartCount": 0,
+      "externalRequests": 0,
+      "permissionRequests": 0,
+      "notifications": 0
+    }
+  },
+  "reconciliation": {
+    "status": "PASS",
+    "observedAt": "2026-08-30T13:53:37.248Z",
+    "flow": [
+      "AMBIGUOUS_OUTCOME",
+      "AGENT_WEBMCP_STATUS_CHECK",
+      "EXISTING_RESULT_FOUND",
+      "NO_DUPLICATE_EFFECT"
+    ],
+    "calledToolNames": [
+      "check_existing_hotel_booking",
+      "prepare_hotel_booking",
+      "get_hotel_booking_status"
+    ],
+    "statusCheck": {
+      "toolName": "get_hotel_booking_status",
+      "state": "COMMITTED",
+      "bookingExists": true,
+      "confirmationNumber": "FKR-08DFFA4C4F",
+      "attemptCount": 1,
+      "bookingCount": 1,
+      "effectStartCount": 1
+    },
+    "finalStatus": {
+      "state": "RETRY_RECOGNIZED",
+      "attemptCount": 2,
+      "bookingCount": 1,
+      "effectStartCount": 1,
+      "confirmationNumber": "FKR-08DFFA4C4F",
+      "sameConfirmation": true
+    },
+    "sameConfirmation": true,
+    "humanConfirmationBoundary": "visible_button_only",
+    "driverAction": "visible_button_exercised_by_browser_driver",
+    "agentExplanation": "The native status check found the existing booking with confirmation FKR-08DFFA4C4F, so the retry recognized it and did not start a second effect."
+  },
+  "recording": {
+    "status": "LOCAL_ARTIFACT",
+    "path": "/private/tmp/webmcp-issue-189/.local/native-webmcp-reconciliation-c8be388d.mp4",
+    "sha256": "d06ad515923154837747ae990b3178979e9e55b749aba3f8b2766b82039bd42b",
+    "durationSeconds": 157.866667
+  }
+}

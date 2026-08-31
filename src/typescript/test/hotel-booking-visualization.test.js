@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { deriveHotelBookingResult } from "../../../examples/hotel-booking-demo/visual-state.js";
 
 const paths = Object.freeze({
   html: new URL("../../../index.html", import.meta.url),
@@ -15,6 +16,7 @@ test("the booking explanation contains an accessible, current audit proof", asyn
   const [html, application] = await Promise.all([readFile(paths.html, "utf8"), readFile(paths.application, "utf8")]);
 
   const details = html.match(/<details>[\s\S]*?<\/details>/u)?.[0] ?? "";
+  assert.match(html, /<p id="state-summary" class="state-summary" aria-live="polite">/u);
   for (const id of ["proof-fingerprint", "proof-event-count", "proof-latest-event", "proof-chain-head", "proof-chain-valid"]) {
     assert.match(details, new RegExp(`id="${id}"`, "u"));
   }
@@ -30,6 +32,11 @@ test("the booking explanation contains an accessible, current audit proof", asyn
   assert.match(application, /function invalidateVisibleApproval\(\) \{[\s\S]*markAuditProofRechecking\(\);/u);
   assert.match(application, /proofFingerprint\.textContent = "Rechecking…";/u);
   assert.match(application, /chainIsValid \? "Valid" : "Check failed"/u);
+  assert.match(application, /deriveHotelBookingResult\(status\)/u);
+  assert.match(application, /stateSummary: document\.querySelector\("#state-summary"\)/u);
+  assert.match(application, /elements\.stateSummary\.textContent = result\.summary;/u);
+  assert.match(application, /elements\.resultSummary\.textContent = result\.summary;/u);
+  assert.doesNotMatch(application, /2 attempts → 1 simulated booking → 1 confirmation number/u);
   assert.doesNotMatch(details, /(?:\/Users\/|\/private\/|token|secret|api[_-]?key)/iu);
 });
 
@@ -56,4 +63,52 @@ test("the page explains the practical difference between an ordinary retry and W
   assert.match(styles, /\.retry-path-risk \{ border-color: var\(--warning\); \}/u);
   assert.match(styles, /\.retry-path-safe \{ border-color: var\(--success\); \}/u);
   assert.match(styles, /@media \(max-width: 600px\)[\s\S]*\.retry-comparison[\s\S]*grid-template-columns: 1fr;/u);
+});
+
+test("empty, prepared, and committed states never expose a confirmation number", async () => {
+  const results = [
+    deriveHotelBookingResult({ state: "EMPTY", attemptCount: 0, bookingExists: false, effectStartCount: 0 }),
+    deriveHotelBookingResult({ state: "PREPARED", attemptCount: 1, bookingExists: false, effectStartCount: 0 }),
+    deriveHotelBookingResult({
+      state: "COMMITTED",
+      attemptCount: 1,
+      bookingExists: true,
+      effectStartCount: 1,
+      confirmationNumber: "FKR-SHOULD-STAY-HIDDEN",
+    }),
+  ];
+
+  assert.deepEqual(
+    results.map(({ summary, confirmationNumber }) => ({ summary, confirmationNumber })),
+    [
+      { summary: "No booking result yet.", confirmationNumber: null },
+      { summary: "No booking result yet; human confirmation is still pending.", confirmationNumber: null },
+      {
+        summary: "The success response was intentionally hidden. 1 attempt → 1 simulated booking → 1 effect start.",
+        confirmationNumber: null,
+      },
+    ],
+  );
+});
+
+test("retry proof derives attempts, bookings, and effect starts from the current state", async () => {
+  const twoAttempts = deriveHotelBookingResult({
+    state: "RETRY_RECOGNIZED",
+    attemptCount: 2,
+    bookingExists: true,
+    effectStartCount: 1,
+    confirmationNumber: "FKR-TEST-0001",
+  });
+  const threeAttempts = deriveHotelBookingResult({
+    state: "RETRY_RECOGNIZED",
+    attemptCount: 3,
+    bookingExists: true,
+    effectStartCount: 1,
+    confirmationNumber: "FKR-TEST-0001",
+  });
+
+  assert.equal(twoAttempts.summary, "Retry recognized: 2 attempts → 1 simulated booking → 1 effect start. The existing confirmation was recovered.");
+  assert.equal(twoAttempts.confirmationNumber, "FKR-TEST-0001");
+  assert.equal(threeAttempts.summary, "Retry recognized: 3 attempts → 1 simulated booking → 1 effect start. The existing confirmation was recovered.");
+  assert.equal(threeAttempts.confirmationNumber, twoAttempts.confirmationNumber);
 });

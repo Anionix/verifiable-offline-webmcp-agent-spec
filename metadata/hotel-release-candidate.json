@@ -2,14 +2,14 @@
   "$schema": "../schemas/hotel-release-candidate.schema.json",
   "identity": {
     "informationUuidV5": "f2da6444-7447-5120-a39d-446adda200ca",
-    "observationUuidV7": "01a0554b-9abd-7ffc-93a4-cc4bc8c58626"
+    "observationUuidV7": "01a0554b-9abd-7098-a779-7a01c4833b8d"
   },
   "observedAt": "2026-08-31T00:50:13.309Z",
   "source": {
-    "commit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
+    "commit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "state": "COMMITTED_CANDIDATE",
-    "branch": "codex/hotel-state-summary",
-    "baseCommit": "9a14aea0b74fbfee3afff74a94e8732dba01aac5"
+    "branch": "codex/hotel-readable-status-colors",
+    "baseCommit": "20dfb20fd3b9aebdf693198da0d269b7f6ce2d16"
   },
   "testRun": {
     "command": "npm test",
@@ -35,7 +35,7 @@
     "approvalDigestRenewed": true
   },
   "artifacts": {
-    "functionalClientSha256": "65b1a15a2be50cb4bab4152f616a0689f9c6ab76c439d2bffea906d6f16ac61f",
+    "functionalClientSha256": "6b270766afed0a8527dc335a5380277c800e95cdfd8f70d402eafd7cca9ba134",
     "functionalClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
@@ -45,14 +45,14 @@
         "service-integrations.json"
       ]
     },
-    "fullClientSha256": "c88046df314fa6eb1e154b265ab30d1ace8a4e16585f24f09e2e28d7f5969e2d",
+    "fullClientSha256": "1e2124cccd09204f0ec7d5ec508c0215538904163e665ecec54b169e0227416a",
     "fullClientScope": {
       "algorithm": "SHA-256",
       "root": "dist/client",
       "canonicalization": "LEXICOGRAPHIC_RELATIVE_POSIX_PATH_NUL_FILE_BYTES_NUL",
       "excludedPaths": []
     },
-    "fullSitesPackageSha256": "0ef5868c21d3d2ddf8dda6854bf5b4110cc65b8f8881896e109822e77ff6690f",
+    "fullSitesPackageSha256": "4c77f7445a2cdc4e38d281bad0847903ad778a45c34c8245cf5c370cc6895615",
     "fullSitesScope": {
       "algorithm": "SHA-256",
       "root": "dist",
@@ -65,16 +65,16 @@
     "publicReadbackTestCount": 194,
     "status": "MATCH",
     "source": "metadata/hotel-public-release-readback.json",
-    "releaseCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
-    "deploymentId": "dpl_Kj3Nf6HM9WVYnmK1bwb4xj7hJQW3",
+    "releaseCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+    "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
     "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/"
   },
   "browserObservation": {
     "url": "https://kyoto-booking-retry-proof.vercel.app/",
     "origin": "https://kyoto-booking-retry-proof.vercel.app",
     "observedAt": "2026-08-31T00:50:13.309Z",
-    "pageSourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
-    "candidateSourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
+    "pageSourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+    "candidateSourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "visibleToolNames": [
       "check_existing_hotel_booking",
       "prepare_hotel_booking",
@@ -124,7 +124,7 @@
       "sameConfirmation": true,
       "humanConfirmationBoundary": "visible_button_only",
       "driverAction": "visible_button_exercised_by_browser_driver",
-      "agentExplanation": "The browser driver exercised the visible confirmation boundary, then the managed native status check found the existing booking; retry returned the same confirmation without a second effect."
+      "agentExplanation": "The browser driver exercised the visible confirmation boundary on the prior functional release; this revision changes only presentation CSS and the dedicated contrast validator, so the native behavior proof is carried forward rather than claimed as a fresh native run. The managed native status check found the existing booking; retry returned the same confirmation without a second effect."
     },
     "recording": {
       "status": "LOCAL_ARTIFACT",
@@ -142,8 +142,8 @@
       "runBinding": {
         "rootObservationUuidV7": "01a0554b-9abd-7ed6-a5eb-dbd1982d9109",
         "completedAt": "2026-08-31T00:50:13.309Z",
-        "publicSourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
-        "deploymentId": "dpl_Kj3Nf6HM9WVYnmK1bwb4xj7hJQW3",
+        "publicSourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+        "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
         "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
         "recordingSha256": "68e11be18f5d2503ba67c013524cfd46361bb3688d33778e47bde30ebc2cb6d7"
       },
@@ -343,7 +343,7 @@
     {
       "issue": 190,
       "status": "PASS",
-      "reason": "The executable npm test summary and the anonymous public WebMCP release record both report 194 passed tests for release commit 3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8."
+      "reason": "The executable npm test summary and the anonymous public WebMCP release record both report 194 passed tests for release commit cda7ff7c51698f4ec7292f1c076468712a239bd8."
     },
     {
       "issue": 191,

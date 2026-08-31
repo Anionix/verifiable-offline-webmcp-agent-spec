@@ -2,14 +2,14 @@
   "$schema": "../schemas/hotel-public-release-readback.schema.json",
   "identity": {
     "informationUuidV5": "5dfb6e29-8be6-5ec4-b4b9-1d6a80992d39",
-    "observationUuidV7": "01a0554d-6d17-73b1-ac0d-62cf83ff240f",
-    "observedAt": "2026-08-31T00:52:12.695Z"
+    "observationUuidV7": "01a0558a-7d73-76dc-a593-fea07f9e0e18",
+    "observedAt": "2026-08-31T01:58:54.579Z"
   },
   "release": {
     "status": "COMMITTED_RELEASE",
-    "sourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
-    "branch": "codex/hotel-state-summary",
-    "baseCommit": "9a14aea0b74fbfee3afff74a94e8732dba01aac5",
+    "sourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
+    "branch": "codex/hotel-readable-status-colors",
+    "baseCommit": "20dfb20fd3b9aebdf693198da0d269b7f6ce2d16",
     "testRun": {
       "command": "npm test",
       "directory": "src/typescript",
@@ -20,9 +20,9 @@
       "countSource": "node-test-summary"
     },
     "artifacts": {
-      "functionalClientSha256": "65b1a15a2be50cb4bab4152f616a0689f9c6ab76c439d2bffea906d6f16ac61f",
-      "fullClientSha256": "c88046df314fa6eb1e154b265ab30d1ace8a4e16585f24f09e2e28d7f5969e2d",
-      "fullSitesPackageSha256": "0ef5868c21d3d2ddf8dda6854bf5b4110cc65b8f8881896e109822e77ff6690f"
+      "functionalClientSha256": "6b270766afed0a8527dc335a5380277c800e95cdfd8f70d402eafd7cca9ba134",
+      "fullClientSha256": "1e2124cccd09204f0ec7d5ec508c0215538904163e665ecec54b169e0227416a",
+      "fullSitesPackageSha256": "4c77f7445a2cdc4e38d281bad0847903ad778a45c34c8245cf5c370cc6895615"
     }
   },
   "deployment": {
@@ -30,20 +30,20 @@
     "teamId": "team_npJWoj9cpy54Q7B3fpGdBCCX",
     "projectId": "prj_sfErclBd1NgXtkeA5PVntIoj6Q3X",
     "projectName": "kyoto-booking-retry-proof",
-    "deploymentId": "dpl_Kj3Nf6HM9WVYnmK1bwb4xj7hJQW3",
+    "deploymentId": "dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu",
     "target": "production",
     "state": "READY",
-    "sourceCommit": "3b1ac0d62cf83ff240f3a6961e766fa37f01bbe8",
+    "sourceCommit": "cda7ff7c51698f4ec7292f1c076468712a239bd8",
     "publicUrl": "https://kyoto-booking-retry-proof.vercel.app/",
-    "uniqueUrl": "https://kyoto-booking-retry-proof-lmk2qct8l-aniotajp-1978s-projects.vercel.app",
-    "readyAt": "2026-08-31T00:34:00.476Z",
-    "observedAt": "2026-08-31T00:52:12.695Z"
+    "uniqueUrl": "https://kyoto-booking-retry-proof-l03knh4zg-aniotajp-1978s-projects.vercel.app",
+    "readyAt": "2026-08-31T01:51:43.509Z",
+    "observedAt": "2026-08-31T01:58:54.579Z"
   },
   "anonymousReadback": {
     "url": "https://kyoto-booking-retry-proof.vercel.app/webmcp-evals.json",
     "statusCode": 200,
     "authentication": "ANONYMOUS",
-    "observedAt": "2026-08-31T00:43:43.497Z",
+    "observedAt": "2026-08-31T01:58:54.579Z",
     "contentSha256": "2851ce1bdc2aad55cf6f8f453e05b30e60e9ce52073c2e39d72a79c34da7c4fe",
     "localBuiltFileSha256": "2851ce1bdc2aad55cf6f8f453e05b30e60e9ce52073c2e39d72a79c34da7c4fe",
     "releaseEvidence": {

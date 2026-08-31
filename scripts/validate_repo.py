@@ -274,6 +274,19 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     findings: list[str] = []
     if list(validator.iter_errors(future_video)):
         findings.append("video production schema rejected a future anonymous subtitle readback fixture")
+    additional_language = json.loads(json.dumps(future_video))
+    additional_language["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["en", "ja", "fr"]
+    if list(validator.iter_errors(additional_language)):
+        findings.append("video production schema rejected a catalog with an additional language")
+    missing_english = json.loads(json.dumps(future_video))
+    missing_english["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["ja", "fr"]
+    if not list(validator.iter_errors(missing_english)):
+        findings.append("video production schema accepted a successful catalog without English")
+    incomplete_command = json.loads(json.dumps(future_video))
+    incomplete_download = incomplete_command["publication"]["subtitleAnonymousReadbacks"][-1]["download"]
+    incomplete_download["command"] = incomplete_download["observedCommand"]
+    if not list(validator.iter_errors(incomplete_command)):
+        findings.append("video production schema accepted a reproduction command without URL or output template")
     findings.extend(subtitle_record_errors(future_record, "recordedAt", "future subtitleAnonymousReadbacks entry"))
     future_records = future_publication["subtitleAnonymousReadbacks"]
     findings.extend(document_history_errors(future_video))
@@ -367,7 +380,9 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
         "track": "ENGLISH_AUTHORED_TRACK",
         "availableSubtitleCatalog": {
             "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
-            "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+            "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8",
+            "commandStatus": "REPRODUCTION_ONLY",
+            "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
             "authentication": "NONE",
             "capturedAfterComparison": False,
             "captureTiming": {
@@ -376,7 +391,7 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
                 "upperBound": rfc3339_from_ms(capture_ms),
                 "description": "future validation fixture catalog capture time",
             },
-            "languages": ["ja"],
+            "languages": ["ja", "fr"],
             "trackClass": "MANUAL_SUBTITLES",
             "automaticCaptionsSeparate": True,
             "authoredEnglishConfirmed": False,
@@ -403,6 +418,10 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
     findings: list[str] = []
     if list(validator.iter_errors(unavailable_video)):
         findings.append("schema rejected a minimal anonymous authored-track-unavailable fixture")
+    unavailable_with_english = json.loads(json.dumps(unavailable_video))
+    unavailable_with_english["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["en", "fr"]
+    if not list(validator.iter_errors(unavailable_with_english)):
+        findings.append("schema accepted an unavailable-track catalog that contains English")
     record_findings = subtitle_record_errors(
         unavailable_record, "recordedAt", "future unavailable subtitleAnonymousReadbacks entry"
     )
@@ -778,7 +797,7 @@ def subtitle_root_suffix_fixture_errors(
                     "upperBound": rfc3339_from_ms(unavailable_ms),
                     "description": "future validation fixture catalog capture time",
                 },
-                "languages": ["ja"],
+                "languages": ["ja", "fr"],
                 "authoredEnglishConfirmed": False,
             },
             "failure": {"result": "FAIL", "reason": ANONYMOUS_SUBTITLE_UNAVAILABLE_REASON},

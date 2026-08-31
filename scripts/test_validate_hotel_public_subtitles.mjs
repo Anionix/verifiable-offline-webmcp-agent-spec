@@ -20,6 +20,11 @@ import {
 const publicSubtitleValidatorPath = fileURLToPath(new URL("./validate_hotel_public_subtitles.mjs", import.meta.url));
 const mismatchedSubtitleStateTransition =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_VTT_DOWNLOADED -> ENGLISH_VTT_TEXT_OR_CUE_TIMES_MISMATCHED_UI_TRACK_SELECTION_UNMEASURED";
+const subtitleWatchUrl = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
+const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir";
+const historicalCatalogCommand = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
+const reproductionDownloadCommand = `${historicalDownloadCommand} --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${subtitleWatchUrl}`;
+const reproductionCatalogCommand = `${historicalCatalogCommand} ${subtitleWatchUrl}`;
 
 function uuidV7ForMilliseconds(epochMilliseconds) {
   const timestamp = BigInt(epochMilliseconds).toString(16).padStart(12, "0");
@@ -49,6 +54,12 @@ async function createSubtitleHistoryFixture(sourceBytes, publicBytes, prefix) {
   return { temporaryDirectory, metadataFixturePath };
 }
 
+function bindReproductionDownloadCommand(readback) {
+  const outputTemplate = `media/demo-video/${readback.download.fileName.replace(/\.[A-Za-z]{2,3}\.vtt$/u, ".%(language)s.%(ext)s")}`;
+  readback.download.outputTemplate = outputTemplate;
+  readback.download.command = `${historicalDownloadCommand} --output ${outputTemplate} ${subtitleWatchUrl}`;
+}
+
 async function assertRejectsInvalidUtf8(sourceBytes, publicBytes, prefix) {
   const fixture = await createSubtitleHistoryFixture(sourceBytes, publicBytes, prefix);
   try {
@@ -76,6 +87,56 @@ test("accepts the retained public VTT when all authored cues match", async () =>
     unavailableReadbackCount: 0,
     validationResult: "PASS",
   });
+});
+
+test("records replay commands separately from the historical command capture", async () => {
+  const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
+  const readback = metadata.publication.subtitleAnonymousReadbacks[0];
+  assert.equal(readback.watchUrl, subtitleWatchUrl);
+  assert.equal(readback.download.observedCommand, historicalDownloadCommand);
+  assert.equal(readback.download.commandStatus, "REPRODUCTION_ONLY");
+  assert.equal(readback.download.command, reproductionDownloadCommand);
+  assert.equal(readback.download.outputTemplate, "media/demo-video/youtube-public-201.%(language)s.%(ext)s");
+  assert.equal(readback.availableSubtitleCatalog.observedCommand, historicalCatalogCommand);
+  assert.equal(readback.availableSubtitleCatalog.commandStatus, "REPRODUCTION_ONLY");
+  assert.equal(readback.availableSubtitleCatalog.command, reproductionCatalogCommand);
+});
+
+test("rejects a replay command that cannot contact the retained video or name its output", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const fixture = await createSubtitleHistoryFixture(sourceBytes, publicBytes, "hotel-public-subtitles-command-");
+  try {
+    const metadata = JSON.parse(await readFile(fixture.metadataFixturePath, "utf8"));
+    metadata.publication.subtitleAnonymousReadbacks[0].download.command = historicalDownloadCommand;
+    await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(
+      () => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory),
+      /reproduction command differs/u,
+    );
+  } finally {
+    await rm(fixture.temporaryDirectory, { recursive: true, force: true });
+  }
+});
+
+test("requires English in a successful catalog while allowing an additional language", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const fixture = await createSubtitleHistoryFixture(sourceBytes, publicBytes, "hotel-public-subtitles-language-");
+  try {
+    const metadata = JSON.parse(await readFile(fixture.metadataFixturePath, "utf8"));
+    const catalog = metadata.publication.subtitleAnonymousReadbacks[0].availableSubtitleCatalog;
+    catalog.languages = ["en", "ja", "fr"];
+    await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.doesNotReject(() => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory));
+
+    catalog.languages = ["ja", "fr"];
+    await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+    await assert.rejects(
+      () => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory),
+      /must include English/u,
+    );
+  } finally {
+    await rm(fixture.temporaryDirectory, { recursive: true, force: true });
+  }
 });
 
 test("rejects different invalid UTF-8 bytes in the SRT and VTT", async () => {
@@ -201,6 +262,7 @@ test("rejects a later readback when a malformed SRT cue and its VTT cue are both
     readback.publicVtt.sha256 = createHash("sha256").update(missingPublicText).digest("hex");
     readback.publicVtt.cueCount = 183;
     readback.download.fileName = "missing-cue.en.vtt";
+    bindReproductionDownloadCommand(readback);
     readback.comparison.scope = "FULL_183_CUE_COMPARISON";
     readback.comparison.inputCueCount = 183;
     readback.comparison.publicCueCount = 183;
@@ -334,6 +396,7 @@ test("rehashes every retained VTT and records a later mismatch instead of a fals
     readback.publicVtt.path = "media/demo-video/changed.en.vtt";
     readback.publicVtt.fileName = "changed.en.vtt";
     readback.download.fileName = "changed.en.vtt";
+    bindReproductionDownloadCommand(readback);
     readback.publicVtt.sha256 = createHash("sha256").update(changedPublicText).digest("hex");
     readback.comparison.timing = "MISMATCH";
     readback.comparison.result = "FAIL";
@@ -398,7 +461,9 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
       track: "ENGLISH_AUTHORED_TRACK",
       availableSubtitleCatalog: {
         source: "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
-        command: "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+        command: `${historicalCatalogCommand} ${subtitleWatchUrl}`,
+        commandStatus: "REPRODUCTION_ONLY",
+        observedCommand: historicalCatalogCommand,
         authentication: "NONE",
         capturedAfterComparison: false,
         captureTiming: {
@@ -407,7 +472,7 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
           upperBound: new Date(recordedMilliseconds - 1).toISOString(),
           description: "synthetic unavailable-track catalog capture time",
         },
-        languages: ["ja"],
+        languages: ["ja", "fr"],
         trackClass: "MANUAL_SUBTITLES",
         automaticCaptionsSeparate: true,
         authoredEnglishConfirmed: false,
@@ -434,7 +499,7 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
       ["wrong failure reason", (record) => (record.failure.reason = "OTHER"), /failure reason differs/u],
       ["comparison state", (record) => (record.stateTransition = mismatchedSubtitleStateTransition), /state transition differs/u],
       ["comparison catalog", (record) => (record.availableSubtitleCatalog.capturedAfterComparison = true), /must not claim a comparison/u],
-      ["English catalog", (record) => (record.availableSubtitleCatalog.languages = ["en"]), /must not include English/u],
+      ["English catalog", (record) => (record.availableSubtitleCatalog.languages = ["en", "fr"]), /must not include English/u],
       ["confirmed English catalog", (record) => (record.availableSubtitleCatalog.authoredEnglishConfirmed = true), /must not confirm English/u],
       ...["download", "inputSubtitle", "publicVtt", "comparison"].map((field) => [
         `extra ${field}`,
@@ -505,6 +570,7 @@ test("rejects a retained VTT without a WEBVTT header", async () => {
     readback.publicVtt.path = "media/demo-video/headerless.en.vtt";
     readback.publicVtt.fileName = "headerless.en.vtt";
     readback.download.fileName = "headerless.en.vtt";
+    bindReproductionDownloadCommand(readback);
     readback.publicVtt.sha256 = createHash("sha256").update(headerlessPublicText).digest("hex");
     metadata.publication.subtitleAnonymousReadbacks = [originalReadback, readback];
     const metadataFixturePath = resolve(temporaryDirectory, "demo-video-production.json");

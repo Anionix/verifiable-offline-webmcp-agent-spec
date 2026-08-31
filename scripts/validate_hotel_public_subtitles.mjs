@@ -26,6 +26,11 @@ export const MISMATCHED_SUBTITLE_STATE_TRANSITION =
 export const UNAVAILABLE_SUBTITLE_STATE_TRANSITION =
   "PUBLIC_SUBTITLE_ANONYMOUS_READBACK_UNMEASURED -> ANONYMOUS_ENGLISH_AUTHORED_TRACK_UNAVAILABLE";
 const UNAVAILABLE_SUBTITLE_FAILURE_REASON = "AUTHORED_ENGLISH_TRACK_UNAVAILABLE";
+const SUBTITLE_WATCH_URL = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
+const HISTORICAL_DOWNLOAD_COMMAND = "uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir";
+const HISTORICAL_CATALOG_COMMAND = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
+const REPRODUCTION_ONLY_COMMAND_STATUS = "REPRODUCTION_ONLY";
+const SUBTITLE_LANGUAGE_PATTERN = /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/u;
 
 const EXPECTED_CUE_COUNT = 184;
 const EXPECTED_LAST_CUE_END_MS = 147760;
@@ -227,6 +232,34 @@ function isUnavailableSubtitleReadback(record) {
   return record?.failure !== undefined || record?.stateTransition === UNAVAILABLE_SUBTITLE_STATE_TRANSITION;
 }
 
+function validateSubtitleCommand(command, label, watchUrl, outputFileName = null) {
+  assert.ok(command && typeof command === "object", `${label} command evidence is missing`);
+  assert.equal(command.commandStatus, REPRODUCTION_ONLY_COMMAND_STATUS, `${label} command status differs`);
+  const historicalCommand = outputFileName === null ? HISTORICAL_CATALOG_COMMAND : HISTORICAL_DOWNLOAD_COMMAND;
+  assert.equal(command.observedCommand, historicalCommand, `${label} historical command differs`);
+  if (outputFileName !== null) {
+    assert.equal(typeof command.outputTemplate, "string", `${label} output template is missing`);
+    assert.match(command.outputTemplate, /^media\/demo-video\/[A-Za-z0-9_-][A-Za-z0-9._-]*\.%\(language\)s\.%\(ext\)s$/u, `${label} output template is unsafe`);
+    const renderedOutputName = basename(command.outputTemplate.replace("%(language)s", "en").replace("%(ext)s", "vtt"));
+    assert.equal(renderedOutputName, outputFileName, `${label} output template does not name its retained file`);
+    assert.equal(
+      command.command,
+      `${historicalCommand} --output ${command.outputTemplate} ${watchUrl}`,
+      `${label} reproduction command differs`,
+    );
+  } else {
+    assert.equal(command.command, `${historicalCommand} ${watchUrl}`, `${label} reproduction command differs`);
+  }
+}
+
+function validateSubtitleCatalogLanguages(catalog, label, englishExpected) {
+  assert.ok(Array.isArray(catalog?.languages), `${label} catalog languages must be an array`);
+  assert.equal(new Set(catalog.languages).size, catalog.languages.length, `${label} catalog languages must be unique`);
+  assert.ok(catalog.languages.every((language) => typeof language === "string" && SUBTITLE_LANGUAGE_PATTERN.test(language)), `${label} catalog has an invalid language code`);
+  assert.equal(catalog.languages.includes("en"), englishExpected, englishExpected ? `${label} catalog must include English` : `${label} catalog must not include English`);
+  assert.equal(catalog.authoredEnglishConfirmed, englishExpected, englishExpected ? `${label} catalog must confirm English` : `${label} catalog must not confirm English`);
+}
+
 function validateUnavailableSubtitleReadback(record, label) {
   assert.deepEqual(
     Object.keys(record).sort(),
@@ -252,6 +285,7 @@ function validateUnavailableSubtitleReadback(record, label) {
   assert.deepEqual(Object.keys(record.failure ?? {}).sort(), ["reason", "result"], `${label} failure fields differ`);
   assert.equal(record.failure.result, "FAIL", `${label} unavailable failure result must be FAIL`);
   assert.equal(record.failure.reason, UNAVAILABLE_SUBTITLE_FAILURE_REASON, `${label} unavailable failure reason differs`);
+  assert.equal(record.watchUrl, SUBTITLE_WATCH_URL, `${label} watch URL differs`);
   const catalog = record.availableSubtitleCatalog;
   assert.deepEqual(
     Object.keys(catalog ?? {}).sort(),
@@ -262,20 +296,19 @@ function validateUnavailableSubtitleReadback(record, label) {
       "captureTiming",
       "capturedAfterComparison",
       "command",
+      "commandStatus",
       "languages",
+      "observedCommand",
       "source",
       "trackClass",
     ].sort(),
     `${label} unavailable catalog fields differ`,
   );
   assert.equal(catalog.source, "ANONYMOUS_YOUTUBE_PLAYER_METADATA", `${label} catalog source differs`);
-  assert.equal(catalog.command, "uvx yt-dlp --skip-download --list-subs --no-cache-dir", `${label} catalog command differs`);
+  validateSubtitleCommand(catalog, `${label} catalog`, record.watchUrl);
   assert.equal(catalog.authentication, "NONE", `${label} catalog authentication differs`);
   assert.equal(catalog.capturedAfterComparison, false, `${label} unavailable catalog must not claim a comparison`);
-  assert.equal(catalog.authoredEnglishConfirmed, false, `${label} unavailable catalog must not confirm English`);
-  assert.ok(Array.isArray(catalog.languages), `${label} unavailable catalog languages must be an array`);
-  assert.ok(!catalog.languages.includes("en"), `${label} unavailable catalog must not include English`);
-  assert.ok(catalog.languages.every((language) => language === "ja"), `${label} unavailable catalog has an unsupported language`);
+  validateSubtitleCatalogLanguages(catalog, `${label} unavailable`, false);
   assert.equal(catalog.trackClass, "MANUAL_SUBTITLES", `${label} catalog track class differs`);
   assert.equal(catalog.automaticCaptionsSeparate, true, `${label} catalog automatic-caption separation differs`);
   assert.ok(catalog.captureTiming && typeof catalog.captureTiming === "object", `${label} catalog capture timing is missing`);
@@ -328,6 +361,14 @@ export async function validateSubtitleHistory(metadataPath = productionMetadataP
     assertSubtitlePathExtension(record.publicVtt.path, `${label} publicVtt.path`, "vtt");
     assert.equal(record?.publicVtt?.fileName, basename(publicPath), `${label} publicVtt.fileName differs from its retained path`);
     assert.equal(record?.download?.fileName, basename(publicPath), `${label} download.fileName differs from its retained path`);
+    validateSubtitleCommand(
+      record?.download,
+      `${label} download`,
+      record?.watchUrl,
+      record?.download?.fileName,
+    );
+    validateSubtitleCommand(record?.availableSubtitleCatalog, `${label} catalog`, record?.watchUrl);
+    validateSubtitleCatalogLanguages(record?.availableSubtitleCatalog, `${label} catalog`, true);
     const [sourceBytes, publicBytes] = await Promise.all([readFile(inputPath), readFile(publicPath)]);
     const sourceText = decodeUtf8(sourceBytes);
     const publicText = decodeUtf8(publicBytes);

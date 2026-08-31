@@ -2,6 +2,9 @@
 // information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca
 // event_uuid_v7=01a0538f-f73f-753a-9f64-7e4fec9cb6fe state=LEGACY_CONTEXT_EXTRACTED->SQUASH_CONTEXT_CONTENT_BOUND occurred_at=2026-08-30T16:45:39.007Z
 // machine-contract: validate the recorded release context without changing the recorded evidence; squash comparison covers boundary-relevant paths changed from the common ancestor on either side.
+// information_uuid_v5=6e9b3f34-1e1b-5d79-9f28-b65e2de8bb4f
+// event_uuid_v7=01a055d4-bb00-74d2-8000-000021d950cb state=RELEASE_INPUT_SCOPE_OVERBROAD->AUXILIARY_NOTIFICATION_SCOPE_EXPLICIT occurred_at=2026-08-31T03:20:00.000Z
+// machine-contract: only the two reviewed notification storage helpers are auxiliary to the hotel release; their security proof remains mandatory in the notification suite and Windows job, while every other source path stays in the squash comparison.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -39,6 +42,10 @@ const squashValidationInputPaths = Object.freeze([
 // machine-contract: adding a runtime schema dependency requires a matching src/typescript/ change and an explicit exact-path allowlist update; dependency discovery is not inferred automatically.
 const squashValidationDocumentationPaths = Object.freeze([
   "examples/hotel-booking-demo/README.md",
+]);
+const squashValidationAuxiliaryPaths = Object.freeze([
+  "src/typescript/notification/storage-create.ts",
+  "src/typescript/notification/storage-path.ts",
 ]);
 
 function gitResult(repositoryRoot, args) {
@@ -99,6 +106,7 @@ function changedPaths(repositoryRoot, baseCommit, sourceCommit) {
 function isSquashValidationInput(path) {
   return (
     !squashValidationDocumentationPaths.includes(path) &&
+    !squashValidationAuxiliaryPaths.includes(path) &&
     (squashValidationInputPaths.includes(path) || squashValidationInputPrefixes.some((prefix) => path.startsWith(prefix)))
   );
 }

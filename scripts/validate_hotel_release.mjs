@@ -13,6 +13,8 @@
 // event_uuid_v7=01a054bb-6f17-785d-aa07-2420c4ff811e state_transition=RELEASE_ROOT_DESCRIPTOR_UNBOUND -> RELEASE_ROOT_DESCRIPTOR_HELD occurred_at=2026-08-30T22:12:44.951Z
 // event_uuid_v7=01a054d4-db72-7bfb-9cef-252977d955c6 state_transition=RELEASE_ROOT_PATH_CHECK_USE_UNVERIFIED -> RELEASE_ROOT_DESCRIPTOR_FIRST_OPEN_VERIFIED occurred_at=2026-08-30T22:40:31.090Z
 // event_uuid_v7=01a054f1-6b9b-7d84-8a31-53a43a4a52a0 state_transition=PER_OPERATION_HELPER_STARTUP -> ONE_BOUND_ROOT_HELPER_PER_VALIDATION occurred_at=2026-08-30T23:11:43.003Z
+// event_uuid_v7=01a05518-734e-754a-a3af-bff1bf6b2cce state_transition=DIAGRAM_LINK_SUBSTRING_PRESENT -> INLINE_DIAGRAM_AND_NO_ESCAPING_SOURCE_LINK occurred_at=2026-08-30T23:54:20.878Z
+// machine-contract: a normal link or comment cannot replace the standalone diagram image, and retaining a safe link never permits the source README's escaping image target.
 // machine-contract: one isolated helper serves strictly sequential bounded requests; each response has one JSON header and its exact declared byte payload, and the child closes before the held root descriptor.
 // machine-contract: the release manifest, presentation documents, and sorted SHA-256 list must all describe the same ignored release directory without video binaries, credentials, or environment files.
 // machine-contract: the resolved release-root entry is checked by Node, while all nested directory names, identities, and file bytes are resolved relative to one held root descriptor.
@@ -34,6 +36,7 @@ import { constants } from "node:fs";
 import { lstat, open } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { validateHotelRetryPng } from "./hotel-retry-png.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const defaultReleaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
@@ -48,6 +51,7 @@ const boundRootHelperMaxEntries = 4_096;
 const releaseSnapshotMaxEntries = 4_096;
 const releaseValidationTimeoutMs = 30_000;
 const unsupportedPlatformError = "hotel release validation is unsupported on Windows: safe non-following file opens cannot be guaranteed";
+const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
 
 function releaseRootFromArguments() {
   const optionIndex = process.argv.indexOf("--release-root");
@@ -63,6 +67,7 @@ const requiredFiles = [
   "DEVPOST_VISUAL_GUIDE_JA.md",
   "RELEASE_GUIDE.md",
   "LICENSE",
+  hotelRetryDiagramPath,
   "release-manifest.json",
   "SHA256SUMS",
 ];
@@ -70,6 +75,24 @@ const forbiddenExtensions = new Set([".avi", ".m4v", ".mkv", ".mov", ".mp4", ".w
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+function hasPackagedDiagramImage(readme) {
+  const withoutComments = readme.replace(/<!--[\s\S]*?(?:-->|$)/gu, "");
+  let fence = null;
+  for (const line of withoutComments.split(/\r?\n/u)) {
+    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/u.exec(line);
+    if (fence) {
+      if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && marker[2].trim() === "") fence = null;
+      continue;
+    }
+    if (marker) {
+      fence = marker[1];
+      continue;
+    }
+    if (/^!\[[^\r\n]*\]\(docs\/assets\/hotel-retry-explained\.png\)[\t ]*$/u.test(line)) return true;
+  }
+  return false;
 }
 
 function fileType(stats) {
@@ -586,11 +609,24 @@ export async function validateRelease(
     assert.equal(manifest.presentation?.visualGuideJapanese, "DEVPOST_VISUAL_GUIDE_JA.md", "manifest Japanese visual guide is not bound");
     assert.equal(manifest.presentation?.releaseGuide, "RELEASE_GUIDE.md", "manifest release guide is not bound");
     assert.match(manifest.source?.commit ?? "", /^[0-9a-f]{40}$/u, "manifest source commit is not a full hash");
+    const diagramManifestEntry = Array.isArray(manifest.files) ? manifest.files.find((entry) => entry?.path === hotelRetryDiagramPath) : undefined;
+    assert.ok(diagramManifestEntry, "release manifest is missing the hotel retry diagram entry");
 
     const readme = await textFile("README.md");
     assert.match(readme, /Kyoto Booking Retry Proof/u);
     assert.match(readme, /2 attempts → 1 simulated booking → 1 confirmation number/u);
     assert.match(readme, /check_existing_hotel_booking/u);
+    assert.ok(hasPackagedDiagramImage(readme), "README.md must link to the packaged hotel retry diagram as an inline image");
+    assert.ok(
+      !readme.includes("../../docs/assets/hotel-retry-explained.png"),
+      "README.md must link to the packaged hotel retry diagram without an escaping source target",
+    );
+    const diagramSnapshot = snapshotByPath.get(hotelRetryDiagramPath);
+    assert.ok(diagramSnapshot, "hotel retry diagram is missing from the release snapshot");
+    const diagramBytes = await readInitialSnapshot(diagramSnapshot);
+    validateHotelRetryPng(diagramBytes);
+    assert.equal(diagramManifestEntry.bytes, diagramBytes.byteLength, "hotel retry diagram manifest byte count differs from packaged PNG");
+    assert.equal(diagramManifestEntry.sha256, digest(diagramBytes), "hotel retry diagram manifest SHA-256 differs from packaged PNG");
     const guide = await textFile("DEVPOST_VISUAL_GUIDE.md");
     assert.match(guide, /01-hero-empty/u);
     assert.match(guide, /05-retry-recognized/u);

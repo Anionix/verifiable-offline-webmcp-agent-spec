@@ -21,6 +21,13 @@ import {
   functionalDigestScope,
   sitesPackageRoot,
 } from "./hotel-validator-common.mjs";
+import {
+  HOTEL_RETRY_DIAGRAM_SOURCE,
+  HOTEL_RETRY_DIAGRAM_TARGET,
+  HOTEL_RETRY_PACKAGED_README_LINK,
+  HOTEL_RETRY_SOURCE_README_LINK,
+  packageHotelRetryDiagram,
+} from "./hotel-release-diagram.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const releaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
@@ -145,7 +152,10 @@ await Promise.all([
   ...releaseDocuments.map(({ source, target }) => cp(resolve(repositoryRoot, source), resolve(releaseRoot, target))),
 ]);
 
+await packageHotelRetryDiagram({ sourceRoot: repositoryRoot, packageRoot: releaseRoot });
 const releaseReadme = await readFile(resolve(releaseRoot, "README.md"), "utf8");
+assert.ok(releaseReadme.includes(`](${HOTEL_RETRY_PACKAGED_README_LINK})`), "packaged README diagram link is missing");
+assert.ok(!releaseReadme.includes(`](${HOTEL_RETRY_SOURCE_README_LINK})`), "packaged README diagram link escapes the release root");
 assert.match(releaseReadme, /Kyoto Booking Retry Proof/u, "release README must identify the hotel demo");
 assert.match(releaseReadme, /2 attempts → 1 simulated booking → 1 confirmation number/u, "release README must show the judge result");
 assert.match(releaseReadme, /check_existing_hotel_booking/u, "release README must name the WebMCP boundary");
@@ -159,6 +169,10 @@ const releaseGuide = await readFile(resolve(releaseRoot, "RELEASE_GUIDE.md"), "u
 assert.match(releaseGuide, /shasum -a 256 -c SHA256SUMS/u, "release guide must include checksum verification");
 
 const payloadReceipts = await Promise.all((await filesUnder(releaseRoot)).map(fileReceipt));
+const diagramSourceDigest = sha256(await readFile(resolve(repositoryRoot, HOTEL_RETRY_DIAGRAM_SOURCE)));
+const diagramReceipt = payloadReceipts.find(({ path }) => path === HOTEL_RETRY_DIAGRAM_TARGET);
+assert.ok(diagramReceipt, "release manifest must include the packaged hotel retry diagram");
+assert.equal(diagramReceipt.sha256, diagramSourceDigest, "packaged hotel retry diagram differs from the source PNG");
 const eventUuidV7 = deterministicUuidV7(commitSeconds * 1000, `${sourceCommit}\0${functionalDigest}\0${fullSitesDigest}`);
 const manifest = {
   format: { name: "OpenKnowledgeFormat-inspired hotel release", version: "1.0" },
@@ -203,9 +217,18 @@ const manifest = {
   },
   files: payloadReceipts,
 };
+assert.ok(
+  manifest.files.some(({ path, sha256: digest }) => path === HOTEL_RETRY_DIAGRAM_TARGET && digest === diagramSourceDigest),
+  "release manifest must bind the packaged hotel retry diagram",
+);
 await writeFile(resolve(releaseRoot, "release-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 const allReceipts = await Promise.all((await filesUnder(releaseRoot)).map(fileReceipt));
-await writeFile(resolve(releaseRoot, "SHA256SUMS"), `${allReceipts.map((entry) => `${entry.sha256}  ${entry.path}`).join("\n")}\n`);
+const checksumContents = `${allReceipts.map((entry) => `${entry.sha256}  ${entry.path}`).join("\n")}\n`;
+assert.ok(
+  checksumContents.split("\n").includes(`${diagramReceipt.sha256}  ${HOTEL_RETRY_DIAGRAM_TARGET}`),
+  "SHA256SUMS must include the packaged hotel retry diagram",
+);
+await writeFile(resolve(releaseRoot, "SHA256SUMS"), checksumContents);
 command("gitleaks", ["dir", releaseRoot, "--redact", "--no-banner"]);
 assertCleanSource(sourceCommit);
 

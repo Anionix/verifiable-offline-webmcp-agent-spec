@@ -32,3 +32,4 @@ node "$ROOT/scripts/validate_service_integrations.mjs"
 node "$ROOT/scripts/validate_security_remediation.mjs"
 node "$ROOT/scripts/validate_review_comment_issues.mjs"
 uv run --frozen python "$ROOT/scripts/build_manifest.py" --check
+node --test "$ROOT/scripts/test_build_hotel_release_diagram.mjs"

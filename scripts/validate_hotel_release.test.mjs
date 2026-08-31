@@ -6,6 +6,8 @@ import { delimiter, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { crc32, deflateSync } from "node:zlib";
+import { validateHotelRetryPng } from "./hotel-retry-png.mjs";
 import { validateRelease } from "./validate_hotel_release.mjs";
 
 // information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2
@@ -18,16 +20,91 @@ import { validateRelease } from "./validate_hotel_release.mjs";
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const validatorPath = resolve(repositoryRoot, "scripts/validate_hotel_release.mjs");
 const sourceCommit = "5583cdbeddbbeae2c6f16fd481fc809069a15296";
+const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
+const hotelRetryPngWidth = 1_672;
+const hotelRetryPngHeight = 941;
+const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+function pngChunk(type, data) {
+  const typeBytes = Buffer.from(type, "ascii");
+  const chunk = Buffer.alloc(12 + data.length);
+  chunk.writeUInt32BE(data.length, 0);
+  typeBytes.copy(chunk, 4);
+  data.copy(chunk, 8);
+  chunk.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])) >>> 0, 8 + data.length);
+  return chunk;
+}
+
+function createRgbPng({ width = hotelRetryPngWidth, height = hotelRetryPngHeight, filterType = 0, idatData } = {}) {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 2;
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+  const chunks = [pngSignature, pngChunk("IHDR", ihdr)];
+  if (idatData !== null) {
+    const scanlineStride = width * 3 + 1;
+    const scanlines = Buffer.alloc(scanlineStride * height, 0x24);
+    for (let row = 0; row < height; row += 1) scanlines[row * scanlineStride] = filterType;
+    chunks.push(pngChunk("IDAT", idatData ?? deflateSync(scanlines)));
+  }
+  chunks.push(pngChunk("IEND", Buffer.alloc(0)));
+  return Buffer.concat(chunks);
+}
+
+const hotelRetryDiagramBytes = createRgbPng();
+
+function tamperChunkCrc(bytes, type) {
+  const copy = Buffer.from(bytes);
+  const typeOffset = copy.indexOf(Buffer.from(type, "ascii"));
+  assert.ok(typeOffset >= 4, `${type} chunk was not found in the PNG fixture`);
+  const dataLength = copy.readUInt32BE(typeOffset - 4);
+  copy[typeOffset + 4 + dataLength] ^= 1;
+  return copy;
+}
+
+function hugeChunkHeader() {
+  return Buffer.concat([pngSignature, Buffer.from([255, 255, 255, 255]), Buffer.from("IDAT", "ascii")]);
+}
+
+function prependToImageData(bytes, chunk) {
+  const chunkStart = bytes.indexOf(Buffer.from("IDAT", "ascii")) - 4;
+  assert.ok(chunkStart >= 8);
+  return Buffer.concat([bytes.subarray(0, chunkStart), chunk, bytes.subarray(chunkStart)]);
+}
+
+function highBitHeaderType(bytes) {
+  const copy = Buffer.from(bytes);
+  copy[12] |= 128;
+  copy.writeUInt32BE(crc32(copy.subarray(12, 29)) >>> 0, 29);
+  return copy;
+}
 
 const baseFiles = new Map([
-  ["README.md", "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n"],
+  [
+    "README.md",
+    "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\n",
+  ],
   ["DEVPOST_VISUAL_GUIDE.md", "01-hero-empty\n05-retry-recognized\nAI-generated dramatization / Fictional booking\n"],
   ["DEVPOST_VISUAL_GUIDE_JA.md", "60秒の確認\n"],
   ["RELEASE_GUIDE.md", "shasum -a 256 -c SHA256SUMS\n"],
   ["LICENSE", "MIT License\n"],
+  [hotelRetryDiagramPath, hotelRetryDiagramBytes],
   [
     "release-manifest.json",
-    `${JSON.stringify({ presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" }, source: { commit: sourceCommit } })}\n`,
+    `${JSON.stringify({
+      presentation: {
+        primaryReadme: "README.md",
+        visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md",
+        visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md",
+        releaseGuide: "RELEASE_GUIDE.md",
+      },
+      source: { commit: sourceCommit },
+      files: [{ path: hotelRetryDiagramPath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) }],
+    })}\n`,
   ],
   ["package-note.txt", "fixture-only package note\n"],
   ["package-provenance.txt", "fixture-only provenance\n"],
@@ -165,6 +242,15 @@ function runValidator(releaseRoot, options = {}) {
   return { ...result, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
 
+async function refreshChecksum(releaseRoot, relativePath) {
+  const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+  const checksum = await readFile(checksumPath, "utf8");
+  const originalLine = checksum.split("\n").find((line) => line.endsWith(`  ${relativePath}`));
+  assert.ok(originalLine, `${relativePath} is not recorded in the fixture checksum list`);
+  const bytes = await readFile(resolve(releaseRoot, relativePath));
+  await writeFile(checksumPath, checksum.replace(originalLine, `${sha256(bytes)}  ${relativePath}`));
+}
+
 function runTestChildWithTimeout(script, timeoutMs = 2000) {
   const child = spawn(process.execPath, ["--input-type=module", "--eval", script], {
     cwd: repositoryRoot,
@@ -206,6 +292,73 @@ async function withFixture(extraFiles, assertion) {
     await rm(testRoot, { recursive: true, force: true });
   }
 }
+
+async function replaceDiagramBytes(releaseRoot, bytes) {
+  await writeFile(resolve(releaseRoot, hotelRetryDiagramPath), bytes);
+  const manifestPath = resolve(releaseRoot, "release-manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const diagramEntry = manifest.files.find(({ path }) => path === hotelRetryDiagramPath);
+  assert.ok(diagramEntry);
+  diagramEntry.bytes = bytes.length;
+  diagramEntry.sha256 = sha256(bytes);
+  await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`);
+  await refreshChecksum(releaseRoot, "release-manifest.json");
+  await refreshChecksum(releaseRoot, hotelRetryDiagramPath);
+}
+
+test("accepts the valid repository hotel retry PNG", async () => {
+  const bytes = await readFile(resolve(repositoryRoot, hotelRetryDiagramPath));
+  assert.deepEqual(validateHotelRetryPng(bytes), {
+    width: hotelRetryPngWidth,
+    height: hotelRetryPngHeight,
+    bitDepth: 8,
+    colorType: 2,
+  });
+});
+
+test("rejects malformed hotel retry PNG datastreams", () => {
+  const cases = [
+    ["a huge chunk header", hugeChunkHeader(), /chunk length|truncated/u],
+    ["huge image dimensions", createRgbPng({ width: 0x7fffffff, height: 0x7fffffff, idatData: null }), /dimensions|width|height/u],
+    ["a truncated image", hotelRetryDiagramBytes.subarray(0, -1), /truncated|IEND/u],
+    ["random bytes", Buffer.alloc(64, 0xa5), /PNG signature/u],
+    ["a bad CRC", tamperChunkCrc(hotelRetryDiagramBytes, "IHDR"), /CRC/u],
+    ["wrong dimensions", createRgbPng({ width: hotelRetryPngWidth - 1, idatData: Buffer.from([0]) }), /dimensions|width|height/u],
+    ["invalid compressed data", createRgbPng({ idatData: Buffer.from("not-zlib", "ascii") }), /compressed|inflate|decompress/u],
+    ["an invalid scanline filter", createRgbPng({ filterType: 5 }), /filter/u],
+    ["missing image data", createRgbPng({ idatData: null }), /IDAT/u],
+    ["trailing bytes after IEND", Buffer.concat([hotelRetryDiagramBytes, Buffer.from([0])]), /trailing|IEND/u],
+    ["a non-ASCII chunk type", highBitHeaderType(hotelRetryDiagramBytes), /chunk type/u],
+    ["an invalid palette", prependToImageData(hotelRetryDiagramBytes, pngChunk("PLTE", Buffer.alloc(1))), /PLTE/u],
+    [
+      "duplicate palettes",
+      prependToImageData(hotelRetryDiagramBytes, Buffer.concat([pngChunk("PLTE", Buffer.alloc(3)), pngChunk("PLTE", Buffer.alloc(3))])),
+      /PLTE/u,
+    ],
+    [
+      "a second compressed stream",
+      createRgbPng({
+        idatData: Buffer.concat([deflateSync(Buffer.alloc(hotelRetryPngHeight * (1 + hotelRetryPngWidth * 3))), deflateSync(Buffer.from("extra"))]),
+      }),
+      /compressed|trailing/u,
+    ],
+    [
+      "excess decoded bytes",
+      createRgbPng({ idatData: deflateSync(Buffer.alloc(hotelRetryPngHeight * (1 + hotelRetryPngWidth * 3) + 2)) }),
+      /compressed|decoded/u,
+    ],
+  ];
+  for (const [label, bytes, expectedError] of cases) assert.throws(() => validateHotelRetryPng(bytes), expectedError, `${label} was accepted`);
+});
+
+test("applies PNG validation to the release validator's initial diagram buffer", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    await replaceDiagramBytes(releaseRoot, createRgbPng({ filterType: 5 }));
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the release validator accepted an invalid PNG with self-consistent receipts");
+    assert.match(result.output, /filter/u);
+  });
+});
 
 test("accepts a checksum-complete release package without extra files", async () => {
   await withFixture({}, (releaseRoot) => {
@@ -277,6 +430,87 @@ test(
     }
   },
 );
+test("rejects the hotel retry diagram and its checksum entry when both are removed", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    await rm(resolve(releaseRoot, hotelRetryDiagramPath));
+    const checksumPath = resolve(releaseRoot, "SHA256SUMS");
+    const checksum = await readFile(checksumPath, "utf8");
+    const withoutDiagram = checksum
+      .split("\n")
+      .filter((line) => !line.endsWith(`  ${hotelRetryDiagramPath}`))
+      .join("\n");
+    await writeFile(checksumPath, withoutDiagram);
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator accepted a release without its required diagram");
+    assert.match(result.output, /hotel retry diagram is missing from the release snapshot/u);
+  });
+});
+
+test("rejects a hotel retry diagram manifest receipt with wrong bytes or SHA-256", async () => {
+  for (const [field, value, message] of [
+    ["bytes", hotelRetryDiagramBytes.length + 1, /manifest byte count differs/u],
+    ["sha256", "0".repeat(64), /manifest SHA-256 differs/u],
+  ]) {
+    await withFixture({}, async (releaseRoot) => {
+      const manifestPath = resolve(releaseRoot, "release-manifest.json");
+      const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+      const diagramEntry = manifest.files.find(({ path }) => path === hotelRetryDiagramPath);
+      assert.ok(diagramEntry);
+      diagramEntry[field] = value;
+      await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`);
+      await refreshChecksum(releaseRoot, "release-manifest.json");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, `the validator accepted a wrong diagram manifest ${field}`);
+      assert.match(result.output, message);
+    });
+  }
+});
+
+test("rejects a README link that escapes the packaged hotel retry diagram", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    const readmePath = resolve(releaseRoot, "README.md");
+    const readme = await readFile(readmePath, "utf8");
+    await writeFile(readmePath, readme.replace("docs/assets/hotel-retry-explained.png", "../../docs/assets/hotel-retry-explained.png"));
+    await refreshChecksum(releaseRoot, "README.md");
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the validator accepted a README diagram link outside the package");
+    assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+  });
+});
+
+test("rejects an escaping diagram image even when a safe link remains elsewhere", async () => {
+  for (const decoy of [
+    "[reference](docs/assets/hotel-retry-explained.png)",
+    "<!-- [reference](docs/assets/hotel-retry-explained.png) -->",
+    "![another diagram](docs/assets/hotel-retry-explained.png)",
+  ]) {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const readme = await readFile(readmePath, "utf8");
+      const escapingReadme = readme.replace("docs/assets/hotel-retry-explained.png", "../../docs/assets/hotel-retry-explained.png");
+      await writeFile(readmePath, `${escapingReadme}\n${decoy}\n`);
+      await refreshChecksum(releaseRoot, "README.md");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, "the validator accepted an escaping diagram with a safe decoy");
+      assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+    });
+  }
+});
+
+test("rejects a text link, comment, or fenced example instead of the inline diagram", async () => {
+  const image = "![retry diagram](docs/assets/hotel-retry-explained.png)";
+  for (const replacement of [image.slice(1), `<!--\n${image}\n-->`, `\`\`\`markdown\n${image}\n\`\`\``, `~~~~\n${image}\n~~~~~`]) {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const readme = await readFile(readmePath, "utf8");
+      await writeFile(readmePath, readme.replace(image, replacement));
+      await refreshChecksum(releaseRoot, "README.md");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, "the validator accepted a non-image reference instead of the diagram");
+      assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+    });
+  }
+});
 
 test("fails closed before file operations on Windows", { skip: process.platform === "win32" ? false : "Windows-only platform guard" }, async () => {
   await assert.rejects(
@@ -554,8 +788,11 @@ test(
             validateRelease(releaseRoot, {
               afterFinalRead: async () => {
                 await mkdir(replacementRoot);
-                for (const relativePath of [...baseFiles.keys(), "SHA256SUMS"])
-                  await link(resolve(releaseRoot, relativePath), resolve(replacementRoot, relativePath));
+                for (const relativePath of [...baseFiles.keys(), "SHA256SUMS"]) {
+                  const replacementPath = resolve(replacementRoot, relativePath);
+                  await mkdir(resolve(replacementPath, ".."), { recursive: true });
+                  await link(resolve(releaseRoot, relativePath), replacementPath);
+                }
                 await rename(releaseRoot, originalRoot);
                 originalRootMoved = true;
                 await rename(replacementRoot, releaseRoot);
@@ -849,7 +1086,7 @@ test("keeps rejecting a checksum digest mismatch", async () => {
   await withFixture({}, async (releaseRoot) => {
     await writeFile(
       resolve(releaseRoot, "README.md"),
-      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\ntampered after checksum generation\n",
+      "# Kyoto Booking Retry Proof\n2 attempts → 1 simulated booking → 1 confirmation number\ncheck_existing_hotel_booking\n![retry diagram](docs/assets/hotel-retry-explained.png)\ntampered after checksum generation\n",
     );
     const result = runValidator(releaseRoot);
     assert.notEqual(result.status, 0);

@@ -6,6 +6,8 @@ import { delimiter, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { crc32, deflateSync } from "node:zlib";
+import { validateHotelRetryPng } from "./hotel-retry-png.mjs";
 import { validateRelease } from "./validate_hotel_release.mjs";
 
 // information_uuid_v5=4f18aaff-864b-5bbd-a2ce-1c33f0add5f2
@@ -19,10 +21,67 @@ const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const validatorPath = resolve(repositoryRoot, "scripts/validate_hotel_release.mjs");
 const sourceCommit = "5583cdbeddbbeae2c6f16fd481fc809069a15296";
 const hotelRetryDiagramPath = "docs/assets/hotel-retry-explained.png";
-const hotelRetryDiagramBytes = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-  "base64",
-);
+const hotelRetryPngWidth = 1_672;
+const hotelRetryPngHeight = 941;
+const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+function pngChunk(type, data) {
+  const typeBytes = Buffer.from(type, "ascii");
+  const chunk = Buffer.alloc(12 + data.length);
+  chunk.writeUInt32BE(data.length, 0);
+  typeBytes.copy(chunk, 4);
+  data.copy(chunk, 8);
+  chunk.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])) >>> 0, 8 + data.length);
+  return chunk;
+}
+
+function createRgbPng({ width = hotelRetryPngWidth, height = hotelRetryPngHeight, filterType = 0, idatData } = {}) {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 2;
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+  const chunks = [pngSignature, pngChunk("IHDR", ihdr)];
+  if (idatData !== null) {
+    const scanlineStride = width * 3 + 1;
+    const scanlines = Buffer.alloc(scanlineStride * height, 0x24);
+    for (let row = 0; row < height; row += 1) scanlines[row * scanlineStride] = filterType;
+    chunks.push(pngChunk("IDAT", idatData ?? deflateSync(scanlines)));
+  }
+  chunks.push(pngChunk("IEND", Buffer.alloc(0)));
+  return Buffer.concat(chunks);
+}
+
+const hotelRetryDiagramBytes = createRgbPng();
+
+function tamperChunkCrc(bytes, type) {
+  const copy = Buffer.from(bytes);
+  const typeOffset = copy.indexOf(Buffer.from(type, "ascii"));
+  assert.ok(typeOffset >= 4, `${type} chunk was not found in the PNG fixture`);
+  const dataLength = copy.readUInt32BE(typeOffset - 4);
+  copy[typeOffset + 4 + dataLength] ^= 1;
+  return copy;
+}
+
+function hugeChunkHeader() {
+  return Buffer.concat([pngSignature, Buffer.from([255, 255, 255, 255]), Buffer.from("IDAT", "ascii")]);
+}
+
+function prependToImageData(bytes, chunk) {
+  const chunkStart = bytes.indexOf(Buffer.from("IDAT", "ascii")) - 4;
+  assert.ok(chunkStart >= 8);
+  return Buffer.concat([bytes.subarray(0, chunkStart), chunk, bytes.subarray(chunkStart)]);
+}
+
+function highBitHeaderType(bytes) {
+  const copy = Buffer.from(bytes);
+  copy[12] |= 128;
+  copy.writeUInt32BE(crc32(copy.subarray(12, 29)) >>> 0, 29);
+  return copy;
+}
 
 const baseFiles = new Map([
   [
@@ -37,7 +96,12 @@ const baseFiles = new Map([
   [
     "release-manifest.json",
     `${JSON.stringify({
-      presentation: { primaryReadme: "README.md", visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md", visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md", releaseGuide: "RELEASE_GUIDE.md" },
+      presentation: {
+        primaryReadme: "README.md",
+        visualGuideEnglish: "DEVPOST_VISUAL_GUIDE.md",
+        visualGuideJapanese: "DEVPOST_VISUAL_GUIDE_JA.md",
+        releaseGuide: "RELEASE_GUIDE.md",
+      },
       source: { commit: sourceCommit },
       files: [{ path: hotelRetryDiagramPath, bytes: hotelRetryDiagramBytes.length, sha256: sha256(hotelRetryDiagramBytes) }],
     })}\n`,
@@ -228,6 +292,73 @@ async function withFixture(extraFiles, assertion) {
     await rm(testRoot, { recursive: true, force: true });
   }
 }
+
+async function replaceDiagramBytes(releaseRoot, bytes) {
+  await writeFile(resolve(releaseRoot, hotelRetryDiagramPath), bytes);
+  const manifestPath = resolve(releaseRoot, "release-manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const diagramEntry = manifest.files.find(({ path }) => path === hotelRetryDiagramPath);
+  assert.ok(diagramEntry);
+  diagramEntry.bytes = bytes.length;
+  diagramEntry.sha256 = sha256(bytes);
+  await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`);
+  await refreshChecksum(releaseRoot, "release-manifest.json");
+  await refreshChecksum(releaseRoot, hotelRetryDiagramPath);
+}
+
+test("accepts the valid repository hotel retry PNG", async () => {
+  const bytes = await readFile(resolve(repositoryRoot, hotelRetryDiagramPath));
+  assert.deepEqual(validateHotelRetryPng(bytes), {
+    width: hotelRetryPngWidth,
+    height: hotelRetryPngHeight,
+    bitDepth: 8,
+    colorType: 2,
+  });
+});
+
+test("rejects malformed hotel retry PNG datastreams", () => {
+  const cases = [
+    ["a huge chunk header", hugeChunkHeader(), /chunk length|truncated/u],
+    ["huge image dimensions", createRgbPng({ width: 0x7fffffff, height: 0x7fffffff, idatData: null }), /dimensions|width|height/u],
+    ["a truncated image", hotelRetryDiagramBytes.subarray(0, -1), /truncated|IEND/u],
+    ["random bytes", Buffer.alloc(64, 0xa5), /PNG signature/u],
+    ["a bad CRC", tamperChunkCrc(hotelRetryDiagramBytes, "IHDR"), /CRC/u],
+    ["wrong dimensions", createRgbPng({ width: hotelRetryPngWidth - 1, idatData: Buffer.from([0]) }), /dimensions|width|height/u],
+    ["invalid compressed data", createRgbPng({ idatData: Buffer.from("not-zlib", "ascii") }), /compressed|inflate|decompress/u],
+    ["an invalid scanline filter", createRgbPng({ filterType: 5 }), /filter/u],
+    ["missing image data", createRgbPng({ idatData: null }), /IDAT/u],
+    ["trailing bytes after IEND", Buffer.concat([hotelRetryDiagramBytes, Buffer.from([0])]), /trailing|IEND/u],
+    ["a non-ASCII chunk type", highBitHeaderType(hotelRetryDiagramBytes), /chunk type/u],
+    ["an invalid palette", prependToImageData(hotelRetryDiagramBytes, pngChunk("PLTE", Buffer.alloc(1))), /PLTE/u],
+    [
+      "duplicate palettes",
+      prependToImageData(hotelRetryDiagramBytes, Buffer.concat([pngChunk("PLTE", Buffer.alloc(3)), pngChunk("PLTE", Buffer.alloc(3))])),
+      /PLTE/u,
+    ],
+    [
+      "a second compressed stream",
+      createRgbPng({
+        idatData: Buffer.concat([deflateSync(Buffer.alloc(hotelRetryPngHeight * (1 + hotelRetryPngWidth * 3))), deflateSync(Buffer.from("extra"))]),
+      }),
+      /compressed|trailing/u,
+    ],
+    [
+      "excess decoded bytes",
+      createRgbPng({ idatData: deflateSync(Buffer.alloc(hotelRetryPngHeight * (1 + hotelRetryPngWidth * 3) + 2)) }),
+      /compressed|decoded/u,
+    ],
+  ];
+  for (const [label, bytes, expectedError] of cases) assert.throws(() => validateHotelRetryPng(bytes), expectedError, `${label} was accepted`);
+});
+
+test("applies PNG validation to the release validator's initial diagram buffer", async () => {
+  await withFixture({}, async (releaseRoot) => {
+    await replaceDiagramBytes(releaseRoot, createRgbPng({ filterType: 5 }));
+    const result = runValidator(releaseRoot);
+    assert.notEqual(result.status, 0, "the release validator accepted an invalid PNG with self-consistent receipts");
+    assert.match(result.output, /filter/u);
+  });
+});
 
 test("accepts a checksum-complete release package without extra files", async () => {
   await withFixture({}, (releaseRoot) => {

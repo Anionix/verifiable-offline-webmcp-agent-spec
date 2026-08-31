@@ -36,6 +36,7 @@ import { constants } from "node:fs";
 import { lstat, open } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { validateHotelRetryPng } from "./hotel-retry-png.mjs";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const defaultReleaseRoot = resolve(repositoryRoot, "release/kyoto-booking-retry-proof");
@@ -623,6 +624,7 @@ export async function validateRelease(
     const diagramSnapshot = snapshotByPath.get(hotelRetryDiagramPath);
     assert.ok(diagramSnapshot, "hotel retry diagram is missing from the release snapshot");
     const diagramBytes = await readInitialSnapshot(diagramSnapshot);
+    validateHotelRetryPng(diagramBytes);
     assert.equal(diagramManifestEntry.bytes, diagramBytes.byteLength, "hotel retry diagram manifest byte count differs from packaged PNG");
     assert.equal(diagramManifestEntry.sha256, digest(diagramBytes), "hotel retry diagram manifest SHA-256 differs from packaged PNG");
     const guide = await textFile("DEVPOST_VISUAL_GUIDE.md");

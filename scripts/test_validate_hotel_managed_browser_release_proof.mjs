@@ -24,7 +24,12 @@ import {
   sha256CanonicalResultSummary,
   validateManagedBrowserDiscovery,
 } from "./hotel-managed-browser-release-proof.mjs";
-import { browserObservationFrom, compareStable, validateNativeDiscovery } from "./validate_hotel_release_candidate.mjs";
+import {
+  assertNativeRunAfterDeploymentReady,
+  browserObservationFrom,
+  compareStable,
+  validateNativeDiscovery,
+} from "./validate_hotel_release_candidate.mjs";
 
 const observedAt = "2026-08-30T19:50:43.312Z";
 const confirmationNumber = "FKR-SYNTHETIC214";
@@ -625,6 +630,37 @@ test("rejects a run binding whose UUIDv7 time differs from the recorded completi
   invalid.discovery.runBinding.completedAt = shiftedAt;
   invalid.reconciliation.observedAt = shiftedAt;
   assert.throws(() => validateNativeDiscovery(invalid), /UUID|timestamp|time/u);
+});
+
+test("accepts a native run completed at the public READY boundary", () => {
+  const current = structuredClone(legacyChromeProof);
+  current.deployment.readyAt = current.reconciliation.observedAt;
+  assert.doesNotThrow(() => assertNativeRunAfterDeploymentReady(current));
+});
+
+test("rejects a native READY time that differs from the public readback", () => {
+  const invalid = structuredClone(legacyChromeProof);
+  const publicDeployment = structuredClone(invalid.deployment);
+  publicDeployment.readyAt = new Date(Date.parse(invalid.deployment.readyAt) + 1).toISOString();
+  assert.throws(
+    () => assertNativeRunAfterDeploymentReady(invalid, publicDeployment),
+    new RegExp(
+      `native evidence READY time differs from public readback: publicSourceCommit=${invalid.deployment.sourceCommit} deploymentId=${invalid.deployment.deploymentId} recordedReadyAt=${invalid.deployment.readyAt} publicReadyAt=${publicDeployment.readyAt} runAt=${invalid.reconciliation.observedAt}`,
+      "u",
+    ),
+  );
+});
+
+test("rejects a native run completed before READY and prints its binding details", () => {
+  const invalid = structuredClone(legacyChromeProof);
+  invalid.deployment.readyAt = new Date(Date.parse(invalid.reconciliation.observedAt) + 1).toISOString();
+  assert.throws(
+    () => assertNativeRunAfterDeploymentReady(invalid),
+    new RegExp(
+      `native run completed before public deployment READY: publicSourceCommit=${invalid.deployment.sourceCommit} deploymentId=${invalid.deployment.deploymentId} recordedReadyAt=${invalid.deployment.readyAt} publicReadyAt=${invalid.deployment.readyAt} runAt=${invalid.reconciliation.observedAt}`,
+      "u",
+    ),
+  );
 });
 
 test("candidate old branch keeps the strict Chrome configuration gate", async () => {

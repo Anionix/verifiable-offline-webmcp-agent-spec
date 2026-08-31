@@ -3911,8 +3911,8 @@
     },
     {
       "path": "metadata/demo-video-production.json",
-      "sha256": "7fef1732e5e45dced6bbb54e92bad08755e833fd5bde7d8cded941e1ce22c808",
-      "bytes": 30895,
+      "sha256": "2d3dc99df7641d380af26217fd61f9ce7954eb5415c9b9685687120bef38302a",
+      "bytes": 30979,
       "mediaType": "application/json",
       "category": "metadata",
       "identity": {
@@ -4729,8 +4729,8 @@
     },
     {
       "path": "schemas/demo-video-production.schema.json",
-      "sha256": "5787dd270fd01e5cbc56ce5d176496af1d39f1c4152121336912958ebaa5ed3d",
-      "bytes": 51857,
+      "sha256": "2d5c8ce1a7ae863f24474c9ad6677ef372fdb78433f35082c4e468122e081738",
+      "bytes": 52467,
       "mediaType": "application/json",
       "category": "schemas",
       "identity": {
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "scripts/validate_repo.py",
-      "sha256": "4f1b20e63e0cfe4e90fae247399f37dd6b774caa74fce6a57508e8d782b73286",
-      "bytes": 197212,
+      "sha256": "37485a5690f3a908ebdc3e5cf41235c6e6e160c0f16522cb09192dfffcaa79c2",
+      "bytes": 200969,
       "mediaType": "text/x-python",
       "category": "scripts",
       "identity": {

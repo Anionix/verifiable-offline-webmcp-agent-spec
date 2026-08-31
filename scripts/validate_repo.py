@@ -106,6 +106,21 @@ OWNER_SUBTITLE_MATCH_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS
 OWNER_SUBTITLE_FAILURE_STATE = "PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> OWNER_TRACK_STATUS_READBACK_FAILED"
 SUBTITLE_ROOT_MATCH_SUFFIX = "PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_RECORDED_UI_TRACK_SELECTION_UNMEASURED"
 
+# information_uuid_v5=4bdf0ef2-2643-5e5c-99fb-5d53a34ad4dd
+# event_uuid_v7=01a05564-0000-7a8e-a368-40c6448db6da
+# state_transition=STATE_TOKEN_INFERENCE_REJECTED -> PREDECESSOR_SUBTITLE_COUNTS_BOUND
+# machine-contract: a subtitle event at the predecessor root millisecond is historical only when its collection position is inside the recorded predecessor count; state-name overlap never proves membership.
+def subtitle_event_counts(video_production: dict[str, Any]) -> dict[str, int]:
+    publication = video_production.get("publication")
+    return {
+        collection_name: (
+            len(publication.get(collection_name, []))
+            if isinstance(publication, dict) and isinstance(publication.get(collection_name), list)
+            else 0
+        )
+        for collection_name in SUBTITLE_TIMESTAMP_FIELDS
+    }
+
 
 def is_ignored(path: Path):
     return any(part in IGNORED_PARTS for part in path.relative_to(ROOT).parts)
@@ -266,6 +281,7 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
         "observationUuidV7": previous_identity["observationUuidV7"],
         "updatedAt": previous_updated_at,
         "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(future_video),
     }
     future_publication["subtitleAnonymousReadbacks"].append(future_record)
     future_video["identity"]["observationUuidV7"] = uuid7_for_ms(future_root_ms, 0x456, 0x3456789ABCDEF01)
@@ -415,6 +431,7 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
         "observationUuidV7": previous_identity["observationUuidV7"],
         "updatedAt": previous_updated_at,
         "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(unavailable_video),
     }
     unavailable_publication["subtitleAnonymousReadbacks"].append(unavailable_record)
     unavailable_video["identity"]["observationUuidV7"] = uuid7_for_ms(root_ms, 0x456, 0x456789ABCDEF012)
@@ -801,12 +818,29 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     publication = video_production.get("publication")
     if isinstance(publication, dict) and isinstance(current_state, str) and isinstance(previous_state, str):
         suffix = current_state[len(previous_state) + len(" -> ") :].split(" -> ")
-        previous_state_tokens = set(previous_state.split(" -> "))
+        previous_event_counts = previous_observation.get("subtitleEventCounts")
+        if not isinstance(previous_event_counts, dict):
+            findings.append("video production previous observation lacks subtitle event counts")
+            previous_event_counts = {}
         newer_subtitle_events: list[tuple[int, str, int, set[str]]] = []
         for collection_name, timestamp_field in SUBTITLE_TIMESTAMP_FIELDS.items():
             records = publication.get(collection_name)
             if not isinstance(records, list):
                 continue
+            previous_event_count = previous_event_counts.get(collection_name)
+            if (
+                not isinstance(previous_event_count, int)
+                or isinstance(previous_event_count, bool)
+                or previous_event_count < 0
+            ):
+                findings.append(
+                    f"video production previous observation has an invalid {collection_name} event count"
+                )
+                previous_event_count = None
+            elif previous_event_count > len(records):
+                findings.append(
+                    f"video production previous observation {collection_name} event count exceeds current records"
+                )
             for record_order, record in enumerate(records):
                 if not isinstance(record, dict):
                     continue
@@ -817,12 +851,15 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     record_time_ms = rfc3339_ms(record[timestamp_field])
                 except Exception:
                     continue
-                # An equal-time event is new only when its derived suffix is
-                # absent from the complete predecessor chain; older events
-                # already represented there remain historical.
+                # The predecessor count is the membership boundary. An equal-
+                # time record before it belongs to the old root; a record at
+                # or after it is new even when its state suffix is repeated.
                 if record_time_ms > previous_updated_ms or (
                     record_time_ms == previous_updated_ms
-                    and not root_suffix_options & previous_state_tokens
+                    and (
+                        previous_event_count is None
+                        or record_order >= previous_event_count
+                    )
                 ):
                     newer_subtitle_events.append(
                         (record_time_ms, collection_name, record_order, root_suffix_options)
@@ -971,6 +1008,7 @@ def subtitle_root_suffix_fixture_errors(
         "observationUuidV7": previous_identity["observationUuidV7"],
         "updatedAt": video_production["updatedAt"],
         "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(boundary_time),
     }
     boundary_time["publication"]["subtitleAnonymousReadbacks"].append(boundary_time_event)
     boundary_time["identity"]["observationUuidV7"] = uuid7_for_ms(
@@ -987,6 +1025,34 @@ def subtitle_root_suffix_fixture_errors(
     if not document_history_errors(boundary_time_unrelated):
         findings.append("root history accepted an unrelated suffix for a predecessor-time subtitle event")
 
+    repeated_token_boundary_record = json.loads(
+        json.dumps(video_production["publication"]["subtitleAnonymousReadbacks"][0])
+    )
+    repeated_token_boundary_record["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms, 0x8AE, 0x8AE0123456789AC
+    )
+    repeated_token_boundary_record["recordedAt"] = rfc3339_from_ms(base_root_ms)
+    repeated_token_boundary = json.loads(json.dumps(video_production))
+    repeated_token_boundary["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": video_production["updatedAt"],
+        "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(repeated_token_boundary),
+    }
+    repeated_token_boundary["publication"]["subtitleAnonymousReadbacks"].append(
+        repeated_token_boundary_record
+    )
+    repeated_token_boundary["identity"]["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms + 1, 0x8AF, 0x8AF0123456789AC
+    )
+    repeated_token_boundary["updatedAt"] = rfc3339_from_ms(base_root_ms + 1)
+    repeated_token_boundary["stateTransition"] = f"{previous_state} -> UNRELATED_MEDIA_STATE"
+    if not document_history_errors(repeated_token_boundary):
+        findings.append(
+            "root history accepted an unrelated suffix for a newly appended repeated-token boundary event"
+        )
+
     predecessor_boundary_record = json.loads(
         json.dumps(video_production["publication"]["subtitleAnonymousReadbacks"][0])
     )
@@ -995,15 +1061,16 @@ def subtitle_root_suffix_fixture_errors(
     )
     predecessor_boundary_record["recordedAt"] = rfc3339_from_ms(base_root_ms)
     predecessor_boundary = json.loads(json.dumps(video_production))
+    predecessor_boundary["publication"]["subtitleAnonymousReadbacks"].append(
+        predecessor_boundary_record
+    )
     predecessor_boundary["previousDocumentObservation"] = {
         "informationUuidV5": previous_identity["informationUuidV5"],
         "observationUuidV7": previous_identity["observationUuidV7"],
         "updatedAt": video_production["updatedAt"],
         "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(predecessor_boundary),
     }
-    predecessor_boundary["publication"]["subtitleAnonymousReadbacks"].append(
-        predecessor_boundary_record
-    )
     predecessor_boundary["identity"]["observationUuidV7"] = uuid7_for_ms(
         base_root_ms + 1, 0x8B0, 0x8B00123456789AB
     )
@@ -1027,6 +1094,7 @@ def subtitle_root_suffix_fixture_errors(
         "observationUuidV7": previous_identity["observationUuidV7"],
         "updatedAt": video_production["updatedAt"],
         "stateTransition": previous_state,
+        "subtitleEventCounts": subtitle_event_counts(media_only),
     }
     media_only["identity"]["observationUuidV7"] = uuid7_for_ms(
         base_root_ms + 1, 0xBEF, 0xBEF0123456789AB
@@ -2311,6 +2379,7 @@ def main():
         "observationUuidV7": owner_failure["identity"]["observationUuidV7"],
         "updatedAt": owner_failure["updatedAt"],
         "stateTransition": owner_failure["stateTransition"],
+        "subtitleEventCounts": subtitle_event_counts(owner_failure),
     }
     owner_failure["publication"]["subtitleUpdates"].append(owner_failure_record)
     owner_failure["identity"]["observationUuidV7"] = uuid7_for_ms(owner_failure_root_ms, 0x789, 0x789ABCDEF012345)
@@ -2361,6 +2430,7 @@ def main():
         "observationUuidV7": revision_previous_identity["observationUuidV7"],
         "updatedAt": revision_previous_updated_at,
         "stateTransition": revision_previous_state,
+        "subtitleEventCounts": subtitle_event_counts(owner_revision),
     }
     owner_revision["publication"]["subtitleUpdates"].append(owner_revision_record)
     owner_revision["identity"]["observationUuidV7"] = uuid7_for_ms(

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/demo-video-production.schema.json",
-  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a05563-29c8-7a8e-a368-40c6448db6d9 document_updated_at=2026-08-31T01:15:57.256Z document_state_transition_suffix=SUBTITLE_REPRODUCTION_COMMANDS_QUOTED_AND_EXTENSION_BOUND previous_document_observation_uuid_v7=01a05547-5fe9-777d-b1df-3260c4e09228 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain; the corrected reproduction command quotes the output template and watch URL, and yt-dlp appends the requested language before the extension; observed commands stay separate from reproduction-only commands",
+  "$comment": "information_uuid_v5=e4f4bff1-5386-55c3-9ec5-e50274aa801f event_uuid_v7=01a04d7a-8fe8-74bd-ab4c-fbc8bfa1eb42 state_transition=DEVPOST_VERSION_10_PACKET_READY -> DEVPOST_VERSION_11_PUBLIC_TEST_VISIBLE_SOCIAL_METADATA_STALE_FINAL_SUBMISSION_PENDING occurred_at=2026-08-29T12:24:33.000Z machine-contract=public video identity remains separately UNMEASURED; the Devpost page visibly contains the hotel title and four-step test, the uploaded image association is INCONCLUSIVE, social metadata is stale, and only non-null submitted_at plus a provider receipt proves final submission; subtitle_update_information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95 subtitle_update_event_uuid_v7=01a053a6-2b2b-7b5f-8fde-9e34653ec0f9 subtitle_update_state_transition=PUBLIC_SUBTITLE_HISTORY_UNMEASURED -> OWNER_TRACKS_READ_BACK -> TRANSCRIPT_TEXT_MATCH_RECORDED_WITH_TIMING_UNMEASURED occurred_at=2026-08-30T17:09:54.091Z machine-contract=subtitle publication history does not promote video file identity or anonymous exact cue timing; document_information_uuid_v5=8bb1420d-3305-5c00-81a0-e24c5c68d99a document_event_uuid_v7=01a05563-29c8-7a8e-a368-40c6448db6d9 document_updated_at=2026-08-31T01:15:57.256Z document_state_transition_suffix=SUBTITLE_REPRODUCTION_COMMANDS_QUOTED_AND_EXTENSION_BOUND previous_document_observation_uuid_v7=01a05547-5fe9-777d-b1df-3260c4e09228 machine-contract=the root observation advances only after retaining the prior root identity and the complete prior state chain; the corrected reproduction command quotes the output template and watch URL, and yt-dlp appends the requested language before the extension; observed commands stay separate from reproduction-only commands; predecessor_subtitle_event_membership=SUBTITLE_EVENT_COUNTS_BOUND_TO_PREVIOUS_ROOT machine-contract=equal-time subtitle events are classified by recorded predecessor collection counts, never by repeated state tokens",
   "title": "Demo video production provenance",
   "type": "object",
   "additionalProperties": false,
@@ -13,12 +13,21 @@
     "previousDocumentObservation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["informationUuidV5", "observationUuidV7", "updatedAt", "stateTransition"],
+      "required": ["informationUuidV5", "observationUuidV7", "updatedAt", "stateTransition", "subtitleEventCounts"],
       "properties": {
         "informationUuidV5": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "observationUuidV7": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
         "updatedAt": { "type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$" },
-        "stateTransition": { "type": "string", "minLength": 3 }
+        "stateTransition": { "type": "string", "minLength": 3 },
+        "subtitleEventCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subtitleUpdates", "subtitleAnonymousReadbacks"],
+          "properties": {
+            "subtitleUpdates": { "type": "integer", "minimum": 0 },
+            "subtitleAnonymousReadbacks": { "type": "integer", "minimum": 0 }
+          }
+        }
       }
     },
     "stateTransition": { "type": "string", "minLength": 3 },

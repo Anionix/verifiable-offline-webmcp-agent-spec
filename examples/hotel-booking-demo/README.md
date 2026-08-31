@@ -22,6 +22,15 @@ Current public alignment: the submitted ChatGPT Site is version 14 from source `
 
 通信が切れて成功表示だけ消えたとき、同じ京都旅館の予約を再送しても一件に戻る架空デモです。WebMCPは確認・準備・状態取得・取消条件の表示だけを行い、確定は画面上の人間だけが押せます。個人情報、決済、実ホテル、メール、外部予約、実際の取消はありません。
 
+## 中学生向けの4段階図 / Four-step beginner guide
+
+<!-- information_uuid_v5=9814fe28-d4ee-5cdc-b331-e6f56c05e54d -->
+<!-- event_uuid_v7=01a056a4-8d6b-77e6-bd97-41deb529abd3 state_transition=IMAGE_GENERATED -> IMAGE_INSPECTED -> README_PLACED occurred_at=2026-08-31T07:06:41.232Z -->
+<!-- machine-contract=This generated image is an explanatory, fictional, non-measured guide; it shows status-first reconciliation and one simulated booking, with no real booking or payment. provenance_record=metadata/hotel-retry-student-guide.json; image_gen_invocations=1; sha256=b03628c1990b7ad8d1ea3a32b421f6828abb37a2fdcafb6462a9eef518750c82. -->
+![Four-step beginner guide: a lost reply is checked before retrying, and the same simulated booking is found / 中学生向け4段階図：返事が消えても先に状態を確認し、同じ架空予約を見つける](../../docs/assets/hotel-retry-student-guide.png)
+
+返事が消えても、すぐに二回目を作りません。先に状態を調べて、同じ架空予約を見つけます。 / A lost reply is reconciled before retrying; the result remains one simulated booking.
+
 <!-- information_uuid_v5=17898066-d1e0-50f3-96c7-e30c23316f5a -->
 <!-- event_uuid_v7=01a0539e-63c4-7a72-a39b-276bbe0b7d37 state_transition=IMAGE_GENERATED_ONCE -> SOURCE_SHA256_CAPTURED -> README_ASSET_COPIED occurred_at=2026-08-30T17:01:24.292Z -->
 <!-- machine-contract=This explanatory diagram is not measured-screen or real-booking evidence; image_gen_invocations=1; source_sha256=e02b5778dc1f111936919a4cf4b6484330391e05fc69eed9435b8049bc28519c; provenance_record=metadata/hotel-retry-diagram.json; historical_events=UNCHANGED. -->

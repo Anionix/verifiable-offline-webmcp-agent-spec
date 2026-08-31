@@ -11,6 +11,7 @@ import {
   compareSubtitleFiles,
   compareSubtitleHistoryTexts,
   compareSubtitleTexts,
+  normalizeSubtitleLanguage,
   productionMetadataPath,
   publicSubtitlePath,
   renderYtDlpSubtitleFileName,
@@ -24,6 +25,9 @@ const mismatchedSubtitleStateTransition =
 const subtitleWatchUrl = "https://www.youtube.com/watch?v=tdSvJw4ghX8";
 const historicalDownloadCommand = "uvx yt-dlp --skip-download --write-subs --sub-langs \"en.*\" --sub-format vtt --no-write-auto-subs --no-cache-dir";
 const historicalCatalogCommand = "uvx yt-dlp --skip-download --list-subs --no-cache-dir";
+const observedDownloadCommand =
+  `uvx yt-dlp --skip-download --write-subs --sub-langs en --sub-format vtt --no-write-auto-subs --no-cache-dir --output media/demo-video/youtube-public-201.%(language)s.%(ext)s ${subtitleWatchUrl}`;
+const observedCatalogCommand = `${historicalCatalogCommand} ${subtitleWatchUrl}`;
 const reproductionDownloadCommand = `${historicalDownloadCommand} --output "media/demo-video/youtube-public-201.%(ext)s" "${subtitleWatchUrl}"`;
 const reproductionCatalogCommand = `${historicalCatalogCommand} "${subtitleWatchUrl}"`;
 
@@ -94,13 +98,36 @@ test("records replay commands separately from the historical command capture", a
   const metadata = JSON.parse(await readFile(productionMetadataPath, "utf8"));
   const readback = metadata.publication.subtitleAnonymousReadbacks[0];
   assert.equal(readback.watchUrl, subtitleWatchUrl);
-  assert.equal(readback.download.observedCommand, historicalDownloadCommand);
+  assert.equal(readback.download.observedCommand, observedDownloadCommand);
   assert.equal(readback.download.commandStatus, "REPRODUCTION_ONLY");
   assert.equal(readback.download.command, reproductionDownloadCommand);
   assert.equal(readback.download.outputTemplate, "media/demo-video/youtube-public-201.%(ext)s");
-  assert.equal(readback.availableSubtitleCatalog.observedCommand, historicalCatalogCommand);
+  assert.equal(readback.availableSubtitleCatalog.observedCommand, observedCatalogCommand);
   assert.equal(readback.availableSubtitleCatalog.commandStatus, "REPRODUCTION_ONLY");
   assert.equal(readback.availableSubtitleCatalog.command, reproductionCatalogCommand);
+});
+
+test("rejects a replay-only command recorded as if it were the observed command", async () => {
+  const [sourceBytes, publicBytes] = await Promise.all([readFile(sourceSubtitlePath), readFile(publicSubtitlePath)]);
+  const fixture = await createSubtitleHistoryFixture(sourceBytes, publicBytes, "hotel-public-subtitles-observed-command-");
+  try {
+    const metadata = JSON.parse(await readFile(fixture.metadataFixturePath, "utf8"));
+    const readback = metadata.publication.subtitleAnonymousReadbacks[0];
+    for (const [commandEvidence, invalidObservedCommand, label] of [
+      [readback.download, historicalDownloadCommand, "download"],
+      [readback.availableSubtitleCatalog, historicalCatalogCommand, "catalog"],
+    ]) {
+      commandEvidence.observedCommand = invalidObservedCommand;
+      await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+      await assert.rejects(
+        () => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory),
+        new RegExp(`${label} observed command differs`, "u"),
+      );
+      commandEvidence.observedCommand = label === "download" ? observedDownloadCommand : observedCatalogCommand;
+    }
+  } finally {
+    await rm(fixture.temporaryDirectory, { recursive: true, force: true });
+  }
 });
 
 test("passes quoted replay commands to yt-dlp without invoking the network", async (t) => {
@@ -198,7 +225,7 @@ test("requires English in a successful catalog while allowing an additional lang
   try {
     const metadata = JSON.parse(await readFile(fixture.metadataFixturePath, "utf8"));
     const catalog = metadata.publication.subtitleAnonymousReadbacks[0].availableSubtitleCatalog;
-    for (const englishTag of ["en", "en-US", "EN"]) {
+    for (const englishTag of ["en", "en-US", "en-GB", "EN"]) {
       catalog.languages = [englishTag, "ja", "fr"];
       await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
       await assert.doesNotReject(() => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory));
@@ -213,6 +240,33 @@ test("requires English in a successful catalog while allowing an additional lang
   } finally {
     await rm(fixture.temporaryDirectory, { recursive: true, force: true });
   }
+});
+
+test("normalizes English primary subtags through the shared language policy", async () => {
+  assert.deepEqual(
+    ["en", "EN", "en-US", "EN-gb"].map(normalizeSubtitleLanguage),
+    [
+      { original: "en", normalized: "en", primary: "en" },
+      { original: "EN", normalized: "en", primary: "en" },
+      { original: "en-US", normalized: "en-US", primary: "en" },
+      { original: "EN-gb", normalized: "en-gb", primary: "en" },
+    ],
+  );
+  const [sourceText, publicText] = await Promise.all([
+    readFile(sourceSubtitlePath, "utf8"),
+    readFile(publicSubtitlePath, "utf8"),
+  ]);
+  for (const englishTag of ["en", "EN", "en-US", "en-GB"]) {
+    assert.equal(
+      compareSubtitleHistoryTexts(sourceText, publicText.replace("Language: en", `Language: ${englishTag}`)).result,
+      "PASS",
+    );
+  }
+  assert.throws(
+    () => compareSubtitleHistoryTexts(sourceText, publicText.replace("Language: en", "Language: ja")),
+    /English captions/u,
+  );
+  assert.throws(() => normalizeSubtitleLanguage("not a language"), /invalid subtitle language/u);
 });
 
 test("rejects different invalid UTF-8 bytes in the SRT and VTT", async () => {
@@ -539,7 +593,7 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
         source: "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
         command: `${historicalCatalogCommand} "${subtitleWatchUrl}"`,
         commandStatus: "REPRODUCTION_ONLY",
-        observedCommand: historicalCatalogCommand,
+        observedCommand: observedCatalogCommand,
         authentication: "NONE",
         capturedAfterComparison: false,
         captureTiming: {

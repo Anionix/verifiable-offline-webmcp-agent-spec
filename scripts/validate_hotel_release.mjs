@@ -609,7 +609,32 @@ export async function validateRelease(
     assert.equal(manifest.presentation?.visualGuideJapanese, "DEVPOST_VISUAL_GUIDE_JA.md", "manifest Japanese visual guide is not bound");
     assert.equal(manifest.presentation?.releaseGuide, "RELEASE_GUIDE.md", "manifest release guide is not bound");
     assert.match(manifest.source?.commit ?? "", /^[0-9a-f]{40}$/u, "manifest source commit is not a full hash");
-    const diagramManifestEntry = Array.isArray(manifest.files) ? manifest.files.find((entry) => entry?.path === hotelRetryDiagramPath) : undefined;
+    assert.ok(Array.isArray(manifest.files), "release manifest files must be an array");
+    const manifestPaths = new Set();
+    for (const [index, entry] of manifest.files.entries()) {
+      assert.ok(entry && typeof entry === "object" && !Array.isArray(entry), `release manifest file entry ${index + 1} must be an object`);
+      const relativePath = entry.path;
+      assert.equal(typeof relativePath, "string", `release manifest file entry ${index + 1} path must be a string`);
+      assert.ok(relativePath !== "", `release manifest file entry ${index + 1} path must not be empty`);
+      relativeComponents(relativePath);
+      assert.notEqual(relativePath, "release-manifest.json", "release manifest must not self-reference");
+      assert.notEqual(relativePath, "SHA256SUMS", "release manifest must not reference its checksum list");
+      assert.ok(!manifestPaths.has(relativePath), `duplicate release manifest path: ${relativePath}`);
+      manifestPaths.add(relativePath);
+      assert.ok(Number.isSafeInteger(entry.bytes) && entry.bytes >= 0, `${relativePath} manifest byte count is invalid`);
+      assert.match(entry.sha256 ?? "", /^[0-9a-f]{64}$/u, `${relativePath} manifest SHA-256 is invalid`);
+      const snapshot = snapshotByPath.get(relativePath);
+      assert.ok(
+        snapshot,
+        relativePath === hotelRetryDiagramPath
+          ? "hotel retry diagram is missing from the release snapshot"
+          : `${relativePath} is missing from the release snapshot`,
+      );
+      const bytes = await readInitialSnapshot(snapshot);
+      assert.equal(entry.bytes, bytes.byteLength, `${relativePath} manifest byte count differs from packaged file`);
+      assert.equal(entry.sha256, digest(bytes), `${relativePath} manifest SHA-256 differs from packaged file`);
+    }
+    const diagramManifestEntry = manifest.files.find((entry) => entry?.path === hotelRetryDiagramPath);
     assert.ok(diagramManifestEntry, "release manifest is missing the hotel retry diagram entry");
 
     const readme = await textFile("README.md");

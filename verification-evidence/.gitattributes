@@ -1,0 +1,4 @@
+# information_uuid_v5=0a5ee2c6-2b99-5f9b-9d43-8b6c7e4a1d20
+# event_uuid_v7=01a05611-7f2c-7c4a-9d2e-6a1b8c3d5e70 state_transition=DEVPOST_HTML_TEXT_NORMALIZATION_ALLOWED -> DEVPOST_HTML_CAPTURE_BYTES_PRESERVED occurred_at=2026-08-31T05:30:00.000Z
+# machine-contract: retained Devpost HTML is evidence bytes; Git must not normalize its line endings before hash validation.
+*.html binary

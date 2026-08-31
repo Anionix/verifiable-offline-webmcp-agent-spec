@@ -404,7 +404,7 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
             "source": "ANONYMOUS_YOUTUBE_PLAYER_METADATA",
             "command": "uvx yt-dlp --skip-download --list-subs --no-cache-dir \"https://www.youtube.com/watch?v=tdSvJw4ghX8\"",
             "commandStatus": "REPRODUCTION_ONLY",
-            "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir",
+            "observedCommand": "uvx yt-dlp --skip-download --list-subs --no-cache-dir https://www.youtube.com/watch?v=tdSvJw4ghX8",
             "authentication": "NONE",
             "capturedAfterComparison": False,
             "captureTiming": {
@@ -759,29 +759,72 @@ def subtitle_suffix_group_cursors(
     return possible_cursors
 
 
-def reserved_document_events(video_production: dict[str, Any]) -> dict[str, str]:
-    document_identity = video_production.get("identity", {})
-    previous_observation = video_production.get("previousDocumentObservation", {})
-    reserved: dict[str, str] = {}
-    for label, observation in (
-        ("current document root", document_identity),
-        ("previous document observation", previous_observation),
-    ):
-        event_id = observation.get("observationUuidV7") if isinstance(observation, dict) else None
+def document_event_references(
+    video_production: dict[str, Any], excluded_collections: set[str] | None = None
+) -> list[tuple[str, str, str | None]]:
+    # information_uuid_v5=9e0c5d79-c1c0-5c5d-8c9b-6eaf5cfa0f54
+    # event_uuid_v7=01a055f8-1e66-7d5f-9c28-8e8ccf22e2a1 state_transition=DEVPOST_EVENT_SCOPE_PARTIAL -> DOCUMENT_EVENT_REFERENCES_ENUMERATED occurred_at=2026-08-31T04:03:12.000Z
+    # machine-contract: every document-level observationUuidV7 or eventUuidV7 is named before a Devpost event can be accepted as unique.
+    excluded = excluded_collections or set()
+    references: list[tuple[str, str, str | None]] = []
+
+    def add(label: str, observation: Any, field: str, collection: str | None = None) -> None:
+        if not isinstance(observation, dict):
+            return
+        event_id = observation.get(field)
         if isinstance(event_id, str):
-            reserved.setdefault(event_id, label)
+            references.append((event_id, label, collection))
+
+    add("current document root", video_production.get("identity"), "observationUuidV7")
+    add("previous document observation", video_production.get("previousDocumentObservation"), "observationUuidV7")
     publication = video_production.get("publication")
-    if isinstance(publication, dict):
-        for label, observation in (
-            ("publication observation", publication),
-            ("publication artifact identity", publication.get("artifactToVideoIdentity")),
-            ("publication Devpost readback", publication.get("devpostReadback")),
-        ):
-            event_id = observation.get("observationUuidV7") if isinstance(observation, dict) else None
-            if isinstance(event_id, str):
-                # Existing non-subtitle references may intentionally share a document event; preserve the first label.
-                reserved.setdefault(event_id, label)
+    if not isinstance(publication, dict):
+        return references
+    add("publication observation", publication, "observationUuidV7")
+    add("publication artifact identity", publication.get("artifactToVideoIdentity"), "observationUuidV7")
+    add("publication Devpost readback", publication.get("devpostReadback"), "observationUuidV7")
+    for collection_name, field in (
+        ("subtitleUpdates", "observationUuidV7"),
+        ("subtitleAnonymousReadbacks", "observationUuidV7"),
+        ("thumbnailUpdates", "eventUuidV7"),
+        ("devpostThumbnailUpdates", "observationUuidV7"),
+    ):
+        if collection_name in excluded:
+            continue
+        records = publication.get(collection_name)
+        if not isinstance(records, list):
+            continue
+        for index, record in enumerate(records, 1):
+            add(f"publication {collection_name} entry {index}", record, field, collection_name)
+    return references
+
+
+def reserved_document_events(
+    video_production: dict[str, Any], excluded_collections: set[str] | None = None
+) -> dict[str, str]:
+    excluded = {"subtitleUpdates", "subtitleAnonymousReadbacks"}
+    excluded.update(excluded_collections or set())
+    reserved: dict[str, str] = {}
+    for event_id, label, _ in document_event_references(video_production, excluded):
+        # Existing non-subtitle references may intentionally share a document event; preserve the first label.
+        reserved.setdefault(event_id, label)
     return reserved
+
+
+def document_event_collision_errors(video_production: dict[str, Any]) -> list[str]:
+    findings: list[str] = []
+    seen: dict[str, tuple[str, str | None]] = {}
+    for event_id, label, collection in document_event_references(video_production):
+        previous = seen.get(event_id)
+        if previous is not None:
+            previous_label, previous_collection = previous
+            if collection == "devpostThumbnailUpdates" or previous_collection == "devpostThumbnailUpdates":
+                findings.append(
+                    f"document event UUID {event_id} is reused by {previous_label} and {label}"
+                )
+        else:
+            seen[event_id] = (label, collection)
+    return findings
 
 
 def document_history_errors(video_production: dict[str, Any]) -> list[str]:
@@ -1148,12 +1191,95 @@ def devpost_thumbnail_candidate_errors(video_production: dict[str, Any]) -> list
     return findings
 
 
+# information_uuid_v5=0bb8a5d7-13fa-5d31-bd1d-1f2b18d2b67e
+# event_uuid_v7=01a055f9-2d80-7c6a-9e5a-4c8c2d1a7f03 state_transition=DEVPOST_EVIDENCE_PATH_ONLY -> DEVPOST_EVIDENCE_BYTES_RETAINED_AND_VERIFIED occurred_at=2026-08-31T04:04:08.000Z
+# machine-contract: a public Devpost social-image claim is valid only when each retained HTML or PNG evidence file is safe, present, byte-counted, and hash-bound to the record.
+def devpost_social_evidence_errors(video_production: dict[str, Any]) -> list[str]:
+    findings: list[str] = []
+    publication = video_production.get("publication")
+    updates = publication.get("devpostThumbnailUpdates") if isinstance(publication, dict) else None
+    if not isinstance(updates, list):
+        return findings
+    readback = next(
+        (
+            record
+            for record in reversed(updates)
+            if isinstance(record, dict) and record.get("state") == "PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED"
+        ),
+        None,
+    )
+    if not isinstance(readback, dict):
+        return findings
+
+    evidence_specs = (
+        ("HTML", "htmlEvidenceFileName", "htmlEvidenceSha256", "htmlEvidenceBytes"),
+        ("image", "imageEvidenceFileName", "imageEvidenceSha256", "imageEvidenceBytes"),
+    )
+    for label, path_field, sha_field, bytes_field in evidence_specs:
+        path_value = readback.get(path_field)
+        path_parts = Path(path_value).parts if isinstance(path_value, str) else ()
+        if (
+            not isinstance(path_value, str)
+            or not path_value
+            or Path(path_value).is_absolute()
+            or Path(path_value).as_posix() != path_value
+            or any(part in {"", ".", ".."} for part in path_parts)
+            or any(re.fullmatch(r"[A-Za-z0-9._-]+", part) is None for part in path_parts)
+        ):
+            findings.append(f"Devpost {label} evidence file name is not a safe repository file name")
+            continue
+        evidence_path = (ROOT / path_value).resolve()
+        try:
+            evidence_path.relative_to(ROOT)
+        except ValueError:
+            findings.append(f"Devpost {label} evidence file resolves outside the repository")
+            continue
+        if not evidence_path.is_file():
+            findings.append(f"Devpost {label} evidence file is missing: {path_value}")
+            continue
+        evidence_bytes = evidence_path.read_bytes()
+        if readback.get(bytes_field) != len(evidence_bytes):
+            findings.append(f"Devpost {label} evidence byte length differs from the repository file")
+        if readback.get(sha_field) != sha256(evidence_bytes):
+            findings.append(f"Devpost {label} evidence SHA-256 differs from the repository file")
+        if label == "HTML":
+            try:
+                evidence_bytes.decode("utf-8")
+            except UnicodeDecodeError:
+                findings.append("Devpost HTML evidence is not valid UTF-8")
+        else:
+            png_signature = b"\x89PNG\r\n\x1a\n"
+            if len(evidence_bytes) < 24 or not evidence_bytes.startswith(png_signature) or evidence_bytes[12:16] != b"IHDR":
+                findings.append("Devpost image evidence is not a structurally recognizable PNG")
+            else:
+                image_width = int.from_bytes(evidence_bytes[16:20], "big")
+                image_height = int.from_bytes(evidence_bytes[20:24], "big")
+                if readback.get("imageEvidenceFormat") != "PNG":
+                    findings.append("Devpost image evidence format differs from PNG")
+                if readback.get("imageEvidenceWidth") != image_width:
+                    findings.append("Devpost image evidence width differs from the repository PNG")
+                if readback.get("imageEvidenceHeight") != image_height:
+                    findings.append("Devpost image evidence height differs from the repository PNG")
+    if (
+        readback.get("publicSha256") != readback.get("imageEvidenceSha256")
+        or readback.get("publicWidth") != readback.get("imageEvidenceWidth")
+        or readback.get("publicHeight") != readback.get("imageEvidenceHeight")
+        or readback.get("ogImageUrl") != readback.get("publicUrl")
+        or readback.get("twitterImageUrl") != readback.get("publicUrl")
+    ):
+        findings.append("Devpost social image readback does not match its retained image evidence")
+    return findings
+
+
 # information_uuid_v5=ff53f0a8-5ba4-5332-8e67-1ebffe650246
 # event_uuid_v7=01a053bd-aba1-7772-928c-1b5a811b7cab,01a0543a-74de-71b6-ab45-5fbbf4f8f01c
 # state_transition=THUMBNAIL_UPLOADED_PUBLIC_ASSET_VERIFIED_SOCIAL_METADATA_STALE -> PUBLIC_PROJECT_SOCIAL_IMAGE_MATCHED occurred_at=2026-08-30T19:51:52.286Z
 # machine-contract: the first two Devpost observations are ordered and unique; later records keep the issue-202 identity, a UUIDv7 clock, and non-decreasing observation time.
-def devpost_thumbnail_history_errors(video_production: dict[str, Any]) -> list[str]:
+def devpost_thumbnail_history_errors(
+    video_production: dict[str, Any], reserved_events: dict[str, str] | None = None
+) -> list[str]:
     findings: list[str] = []
+    reserved = reserved_events or {}
     publication = video_production.get("publication")
     updates = publication.get("devpostThumbnailUpdates") if isinstance(publication, dict) else None
     if not isinstance(updates, list):
@@ -1191,6 +1317,10 @@ def devpost_thumbnail_history_errors(video_production: dict[str, Any]) -> list[s
         if not isinstance(event_value, str):
             findings.append(f"Devpost thumbnail history entry {index} lacks an observation UUIDv7")
             continue
+        if event_value in reserved:
+            findings.append(
+                f"Devpost thumbnail history entry {index} reuses document event UUID {event_value} from {reserved[event_value]}"
+            )
         timestamp_fields = [field for field in ("observedAt", "recordedAt") if isinstance(record.get(field), str)]
         if len(timestamp_fields) != 1:
             findings.append(f"Devpost thumbnail history entry {index} must have exactly one observation timestamp")
@@ -2366,7 +2496,12 @@ def main():
         errors.append(f"schema metadata/demo-video-production.json: {e.message}")
     publication_for_schema_checks = video_production.get("publication")
     errors.extend(devpost_thumbnail_candidate_errors(video_production))
-    errors.extend(devpost_thumbnail_history_errors(video_production))
+    errors.extend(devpost_thumbnail_history_errors(
+        video_production,
+        reserved_document_events(video_production, {"devpostThumbnailUpdates"}),
+    ))
+    errors.extend(devpost_social_evidence_errors(video_production))
+    errors.extend(document_event_collision_errors(video_production))
     for required_field in ("subtitleUpdates", "subtitleAnonymousReadbacks"):
         missing_field = json.loads(json.dumps(video_production))
         missing_publication = missing_field.get("publication")
@@ -2413,6 +2548,17 @@ def main():
                     errors.append(f"video production schema accepted the new social URL in the initial stale field: {field}")
     elif isinstance(publication_for_schema_checks, dict):
         errors.append("video production schema mutation fixture lacks a devpostThumbnailUpdates entry")
+    if isinstance(devpost_updates_fixture, list) and len(devpost_updates_fixture) >= 2:
+        social_mutations = {
+            "htmlEvidenceBytes": devpost_updates_fixture[-1].get("htmlEvidenceBytes", 0) + 1,
+            "imageEvidenceSha256": "0" * 64,
+            "imageEvidenceFileName": "missing-devpost-image.png",
+        }
+        for field, value in social_mutations.items():
+            social_fixture = json.loads(json.dumps(video_production))
+            social_fixture["publication"]["devpostThumbnailUpdates"][-1][field] = value
+            if not devpost_social_evidence_errors(social_fixture):
+                errors.append(f"Devpost social evidence accepted a mutated retained file field: {field}")
     if isinstance(devpost_updates_fixture, list) and len(devpost_updates_fixture) >= 2:
         issue_203_name = "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/issues/203#devpost-cover-readback"
         stable_identifier_mutations = {
@@ -2471,6 +2617,18 @@ def main():
         backwards_record["observedAt"] = rfc3339_from_ms(backwards_time_ms)
         if not any("timestamps decrease" in finding for finding in devpost_thumbnail_history_errors(backwards_fixture)):
             errors.append("Devpost thumbnail history semantic gate accepted a decreasing future timestamp")
+        collision_fixture = json.loads(json.dumps(video_production))
+        collision_fixture["publication"]["devpostThumbnailUpdates"][0]["observationUuidV7"] = (
+            collision_fixture["identity"]["observationUuidV7"]
+        )
+        if not document_event_collision_errors(collision_fixture):
+            errors.append("Devpost thumbnail history accepted a document-wide event UUID collision")
+        collision_history_findings = devpost_thumbnail_history_errors(
+            collision_fixture,
+            reserved_document_events(collision_fixture, {"devpostThumbnailUpdates"}),
+        )
+        if not any("reuses document event UUID" in finding for finding in collision_history_findings):
+            errors.append("Devpost thumbnail history did not report a document-wide event UUID collision")
     errors.extend(document_history_errors(video_production))
     non_subtitle_observation_references = [
         ("publication", publication_for_schema_checks.get("observationUuidV7") if isinstance(publication_for_schema_checks, dict) else None),
@@ -2682,6 +2840,21 @@ def main():
         ]
         if list(video_production_validator.iter_errors(valid_owner_failure_track)):
             errors.append(f"schema rejected valid {valid_language} {valid_track_type} owner failure track pair")
+    additional_owner_track = json.loads(json.dumps(video_production))
+    additional_tracks = additional_owner_track["publication"]["subtitleUpdates"][0]["ownerReadback"]["studioTable"]["tracks"]
+    additional_tracks.append({
+        "language": "French",
+        "trackType": "AUTHORED",
+        "status": "PUBLISHED",
+        "publishedDate": "2026-08-31",
+    })
+    if list(video_production_validator.iter_errors(additional_owner_track)):
+        errors.append("schema rejected a valid additional published owner subtitle track")
+    duplicate_owner_success_tracks = json.loads(json.dumps(video_production))
+    duplicate_success_tracks = duplicate_owner_success_tracks["publication"]["subtitleUpdates"][0]["ownerReadback"]["studioTable"]["tracks"]
+    duplicate_success_tracks.append(json.loads(json.dumps(duplicate_success_tracks[0])))
+    if not list(video_production_validator.iter_errors(duplicate_owner_success_tracks)):
+        errors.append("schema accepted a duplicate baseline owner subtitle track with an additional track")
     inconsistent_owner_success = json.loads(json.dumps(owner_failure))
     inconsistent_owner_success["publication"]["subtitleUpdates"][-1]["stateTransition"] = OWNER_SUBTITLE_MATCH_STATE
     if not list(video_production_validator.iter_errors(inconsistent_owner_success)):
@@ -2956,15 +3129,74 @@ def main():
                 or subtitles_readback.get("englishAutomatic") != "PUBLISHED"
             ):
                 errors.append("public YouTube evidence does not preserve both observed subtitle tracks")
+            thumbnail_updates = publication.get("thumbnailUpdates")
+            latest_thumbnail_update = (
+                thumbnail_updates[-1]
+                if isinstance(thumbnail_updates, list) and thumbnail_updates and isinstance(thumbnail_updates[-1], dict)
+                else {}
+            )
+            historical_fallback = thumbnail_readback.get("historicalFallback")
             if (
                 len(canva_thumbnails) != 1
-                or thumbnail_readback.get("canvaAssetSha256") != canva_thumbnails[0].get("sha256")
-                or thumbnail_readback.get("customApplicationState") != "NOT_APPLIED_TOOL_TIMEOUT"
-                or thumbnail_readback.get("failureReason") != "YOUTUBE_FILE_CHOOSER_TIMEOUT"
-                or thumbnail_readback.get("publicState") != "AUTO_GENERATED_PUBLIC_VERIFIED"
-                or thumbnail_readback.get("publicSha256") == thumbnail_readback.get("canvaAssetSha256")
+                or not isinstance(historical_fallback, dict)
+                or historical_fallback.get("canvaAssetSha256") != canva_thumbnails[0].get("sha256")
+                or historical_fallback.get("customApplicationState") != "NOT_APPLIED_TOOL_TIMEOUT"
+                or historical_fallback.get("failureReason") != "YOUTUBE_FILE_CHOOSER_TIMEOUT"
+                or historical_fallback.get("publicState") != "AUTO_GENERATED_PUBLIC_VERIFIED"
+                or historical_fallback.get("publicSha256") == historical_fallback.get("canvaAssetSha256")
             ):
-                errors.append("YouTube thumbnail evidence does not preserve the failed custom upload and verified fallback")
+                errors.append("YouTube thumbnail evidence does not preserve the failed custom upload as historical fallback")
+            current_source = thumbnail_readback.get("sourceArtifact")
+            anonymous_thumbnail = latest_thumbnail_update.get("anonymousReadback")
+            if (
+                current_source != latest_thumbnail_update.get("sourceArtifact")
+                or thumbnail_readback.get("customApplicationState") != "APPLIED_PUBLIC"
+                or thumbnail_readback.get("failureReason") != "NONE"
+                or thumbnail_readback.get("publicState") != "PUBLIC_THUMBNAIL_READBACK_VERIFIED"
+                or not isinstance(anonymous_thumbnail, dict)
+                or thumbnail_readback.get("publicUrl") != anonymous_thumbnail.get("url")
+                or thumbnail_readback.get("publicSha256") != anonymous_thumbnail.get("sha256")
+                or thumbnail_readback.get("publicWidth") != anonymous_thumbnail.get("width")
+                or thumbnail_readback.get("publicHeight") != anonymous_thumbnail.get("height")
+            ):
+                errors.append("YouTube thumbnail current summary differs from the latest public readback")
+            if isinstance(current_source, dict):
+                source_path_value = current_source.get("path")
+                if not isinstance(source_path_value, str):
+                    errors.append("YouTube thumbnail source artifact path is missing")
+                else:
+                    source_path = (ROOT / source_path_value).resolve()
+                    try:
+                        source_path.relative_to(ROOT)
+                    except ValueError:
+                        errors.append("YouTube thumbnail source artifact resolves outside the repository")
+                    else:
+                        if not source_path.is_file():
+                            errors.append("YouTube thumbnail source artifact is missing")
+                        else:
+                            source_bytes = source_path.read_bytes()
+                            source_png_signature = b"\x89PNG\r\n\x1a\n"
+                            if current_source.get("bytes") != len(source_bytes):
+                                errors.append("YouTube thumbnail source artifact byte count differs from its file")
+                            if current_source.get("sha256") != sha256(source_bytes):
+                                errors.append("YouTube thumbnail source artifact SHA-256 differs from its file")
+                            if len(source_bytes) < 24 or not source_bytes.startswith(source_png_signature) or source_bytes[12:16] != b"IHDR":
+                                errors.append("YouTube thumbnail source artifact is not a structurally recognizable PNG")
+                            else:
+                                source_width = int.from_bytes(source_bytes[16:20], "big")
+                                source_height = int.from_bytes(source_bytes[20:24], "big")
+                                if current_source.get("width") != source_width or current_source.get("height") != source_height:
+                                    errors.append("YouTube thumbnail source artifact dimensions differ from its file")
+            readme_path = ROOT / "README.md"
+            try:
+                readme_text = readme_path.read_text(encoding="utf-8")
+            except OSError as exc:
+                errors.append(f"YouTube thumbnail README alignment cannot be read: {exc}")
+            else:
+                if "public YouTube video still uses a YouTube-generated thumbnail" in readme_text:
+                    errors.append("README still describes the current YouTube thumbnail as auto-generated")
+                if thumbnail_readback.get("publicSha256") not in readme_text:
+                    errors.append("README does not identify the current YouTube thumbnail readback SHA-256")
             if (
                 devpost.get("videoUrl") != publication.get("youtubeUrl")
                 or devpost.get("projectState") != "published"

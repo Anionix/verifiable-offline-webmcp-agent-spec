@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/schemas/hotel-release-candidate.schema.json",
-  "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8 state_transition=LOCAL_LIVENESS_PROVED -> PUBLIC_WEBMCP_RELEASE_READY occurred_at=2026-08-30T13:28:07.383Z machine-contract=The five hard gates are pass only when local behavior, exact public count, native tool discovery, agent read-before-retry, and the committed production deployment share one source boundary.",
+  "$comment": "information_uuid_v5=f2da6444-7447-5120-a39d-446adda200ca event_uuid_v7=01a052db-1fd7-7f69-a40f-540e4dc061a8 state_transition=LOCAL_LIVENESS_PROVED -> PUBLIC_WEBMCP_RELEASE_READY occurred_at=2026-08-30T13:28:07.383Z event_uuid_v7=01a05601-4f10-7b6d-9c28-8e8ccf22e2a1 state_transition=COMMITTED_CANDIDATE -> WORKTREE_CANDIDATE_EXPLICITLY_UNPUBLISHED occurred_at=2026-08-31T05:13:10.000Z machine-contract=the release candidate may retain a historical public readback while local artifact hashes differ, but that state must be explicit and must not be presented as a newly deployed release.",
   "description": "This schema checks structure. Accepting PASS additionally requires node scripts/validate_hotel_release_candidate.mjs --check. Its native binding validation and compareStable step reject candidate reconciliation values unrelated to the separately loaded native call results. Schema-only validation is not semantic acceptance.",
   "title": "Hotel release candidate evidence",
   "type": "object",
@@ -29,7 +29,7 @@
       "required": ["commit", "state", "branch", "baseCommit"],
       "properties": {
         "commit": { "$ref": "#/$defs/commit" },
-        "state": { "const": "COMMITTED_CANDIDATE" },
+        "state": { "enum": ["COMMITTED_CANDIDATE", "WORKTREE_CANDIDATE"] },
         "branch": { "type": "string", "minLength": 1 },
         "baseCommit": { "$ref": "#/$defs/commit" }
       }
@@ -56,7 +56,7 @@
       "properties": {
         "candidateTestCount": { "type": "integer", "minimum": 1 },
         "publicReadbackTestCount": { "type": "integer", "minimum": 1 },
-        "status": { "const": "MATCH" },
+        "status": { "enum": ["MATCH", "PUBLIC_READBACK_TEST_COUNT_MATCH_ARTIFACTS_UNPUBLISHED"] },
         "source": { "const": "metadata/hotel-public-release-readback.json" },
         "releaseCommit": { "$ref": "#/$defs/commit" },
         "deploymentId": { "$ref": "#/$defs/deploymentId" },

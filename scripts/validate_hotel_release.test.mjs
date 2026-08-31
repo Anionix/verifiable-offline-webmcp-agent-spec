@@ -466,6 +466,28 @@ test("rejects a hotel retry diagram manifest receipt with wrong bytes or SHA-256
   }
 });
 
+test("rejects a non-diagram manifest receipt with wrong bytes or SHA-256", async () => {
+  for (const [field, value, message] of [
+    ["bytes", 1, /manifest byte count differs/u],
+    ["sha256", "0".repeat(64), /manifest SHA-256 differs/u],
+  ]) {
+    await withFixture({}, async (releaseRoot) => {
+      const manifestPath = resolve(releaseRoot, "release-manifest.json");
+      const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+      manifest.files.push({
+        path: "package-note.txt",
+        bytes: field === "bytes" ? value : "fixture-only package note\n".length,
+        sha256: field === "sha256" ? value : sha256(Buffer.from("fixture-only package note\n")),
+      });
+      await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`);
+      await refreshChecksum(releaseRoot, "release-manifest.json");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, `the validator accepted a wrong non-diagram manifest ${field}`);
+      assert.match(result.output, message);
+    });
+  }
+});
+
 test("rejects a README link that escapes the packaged hotel retry diagram", async () => {
   await withFixture({}, async (releaseRoot) => {
     const readmePath = resolve(releaseRoot, "README.md");

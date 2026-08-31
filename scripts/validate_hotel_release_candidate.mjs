@@ -283,20 +283,25 @@ async function buildCandidate() {
     fullSitesPackageSha256: await digestTree(sitesPackageRoot, fullSitesPackageDigestScope.excludedPaths),
     fullSitesScope: fullSitesPackageDigestScope,
   };
-  assert.equal(
-    artifacts.functionalClientSha256,
-    publicReadback.release.artifacts.functionalClientSha256,
-    "functional digest differs from the published release",
-  );
-  assert.equal(artifacts.fullClientSha256, publicReadback.release.artifacts.fullClientSha256, "full client digest differs from the published release");
-  assert.equal(
-    artifacts.fullSitesPackageSha256,
-    publicReadback.release.artifacts.fullSitesPackageSha256,
-    "full Sites digest differs from the published release",
-  );
+  const artifactsMatchPublicRelease =
+    artifacts.functionalClientSha256 === publicReadback.release.artifacts.functionalClientSha256 &&
+    artifacts.fullClientSha256 === publicReadback.release.artifacts.fullClientSha256 &&
+    artifacts.fullSitesPackageSha256 === publicReadback.release.artifacts.fullSitesPackageSha256;
+  // machine-contract: a changed local client is a worktree candidate until a
+  // later deployment and public readback bind these new bytes; it never
+  // rewrites the historical public release receipt.
 
   const observedAt = nativeEvidence.reconciliation.observedAt;
   const browserObservation = browserObservationFrom(nativeEvidence, sourceCommit);
+  if (!artifactsMatchPublicRelease) {
+    // machine-contract: a worktree presentation change does not inherit the
+    // prior native run as fresh evidence; make that boundary visible in the
+    // candidate instead of silently carrying forward an outdated explanation.
+    browserObservation.reconciliation = {
+      ...browserObservation.reconciliation,
+      agentExplanation: `${browserObservation.reconciliation.agentExplanation} The local worktree also changes the booking result live-region boundary; that accessibility change has not been included in a public native run.`,
+    };
+  }
   const publicReadbackTestCount = publicReadback.anonymousReadback.releaseEvidence.testCount;
   const candidate = {
     $schema: "../schemas/hotel-release-candidate.schema.json",
@@ -305,7 +310,12 @@ async function buildCandidate() {
       observationUuidV7: deterministicUuid7(observedAt, `${informationUuidV5}\0${sourceCommit}\0${testRun.total}`),
     },
     observedAt,
-    source: { commit: sourceCommit, state: "COMMITTED_CANDIDATE", branch, baseCommit },
+    source: {
+      commit: sourceCommit,
+      state: artifactsMatchPublicRelease ? "COMMITTED_CANDIDATE" : "WORKTREE_CANDIDATE",
+      branch,
+      baseCommit,
+    },
     testRun: { command: "npm test", directory: "src/typescript", ...testRun, derivedFrom: "node-test-summary" },
     localLiveness: {
       status: "PASS",
@@ -319,7 +329,7 @@ async function buildCandidate() {
     publicClaims: {
       candidateTestCount: testRun.total,
       publicReadbackTestCount,
-      status: "MATCH",
+      status: artifactsMatchPublicRelease ? "MATCH" : "PUBLIC_READBACK_TEST_COUNT_MATCH_ARTIFACTS_UNPUBLISHED",
       source: publicReadbackPath,
       releaseCommit: sourceCommit,
       deploymentId: publicReadback.deployment.deploymentId,

@@ -89,6 +89,7 @@ SRT_TIMING = re.compile(
     r" --> "
     r"(?P<end_h>\d{2}):(?P<end_m>\d{2}):(?P<end_s>\d{2}),(?P<end_ms>\d{3})"
 )
+OWNER_SUBTITLE_PATH = re.compile(r"^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\.srt$")
 # fixture information_uuid_v5=adeb6009-db9e-51be-8555-da27f170ca95
 # fixture event_uuid_v7=DERIVED_FROM_PRODUCTION_TIMELINE state_transition=PUBLIC_SUBTITLE_ANONYMOUS_VTT_READBACK_FOLLOW_UP_RECORDED occurred_at=MAX_ROOT_OR_READBACK_TIME_PLUS_ONE_MILLISECOND
 # machine-contract: future anonymous subtitle evidence must bind UUIDv7 to recordedAt, reject event reuse, keep recordedAt after measuredAt, and advance the document root time.
@@ -278,6 +279,11 @@ def subtitle_anonymous_future_fixture_errors(video_production: dict[str, Any], v
     additional_language["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["en", "ja", "fr"]
     if list(validator.iter_errors(additional_language)):
         findings.append("video production schema rejected a catalog with an additional language")
+    for english_tag in ("en-US", "EN"):
+        language_variant = json.loads(json.dumps(future_video))
+        language_variant["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = [english_tag, "ja", "fr"]
+        if list(validator.iter_errors(language_variant)):
+            findings.append(f"video production schema rejected the English language tag {english_tag}")
     missing_english = json.loads(json.dumps(future_video))
     missing_english["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["ja", "fr"]
     if not list(validator.iter_errors(missing_english)):
@@ -422,6 +428,11 @@ def subtitle_anonymous_unavailable_fixture_errors(video_production: dict[str, An
     unavailable_with_english["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = ["en", "fr"]
     if not list(validator.iter_errors(unavailable_with_english)):
         findings.append("schema accepted an unavailable-track catalog that contains English")
+    for english_tag in ("en-US", "EN"):
+        unavailable_with_language_variant = json.loads(json.dumps(unavailable_video))
+        unavailable_with_language_variant["publication"]["subtitleAnonymousReadbacks"][-1]["availableSubtitleCatalog"]["languages"] = [english_tag, "fr"]
+        if not list(validator.iter_errors(unavailable_with_language_variant)):
+            findings.append(f"schema accepted an unavailable-track catalog with English tag {english_tag}")
     record_findings = subtitle_record_errors(
         unavailable_record, "recordedAt", "future unavailable subtitleAnonymousReadbacks entry"
     )
@@ -579,6 +590,51 @@ def parse_subrip(path: Path) -> dict[str, Any]:
         "lastEndMs": cues[-1]["end"] if cues else 0,
         "cues": cues,
     }
+
+
+def owner_subtitle_success_artifact_errors(record: dict[str, Any], label: str) -> list[str]:
+    findings: list[str] = []
+    input_subtitle = record.get("inputSubtitle")
+    if not isinstance(input_subtitle, dict):
+        return [f"{label} inputSubtitle must be an object"]
+    path_value = input_subtitle.get("path")
+    if not isinstance(path_value, str) or OWNER_SUBTITLE_PATH.fullmatch(path_value) is None:
+        return [f"{label} inputSubtitle path is not a safe retained SubRip path"]
+    path = (ROOT / path_value).resolve()
+    try:
+        path.relative_to(ROOT)
+    except ValueError:
+        return [f"{label} inputSubtitle path resolves outside the repository"]
+    if not path.is_file():
+        return [f"{label} inputSubtitle file is missing: {path_value}"]
+    try:
+        file_bytes = path.read_bytes()
+        parsed = parse_subrip(path)
+    except Exception as exc:
+        return [f"{label} inputSubtitle cannot be parsed: {exc}"]
+    if input_subtitle.get("sha256") != sha256(file_bytes):
+        findings.append(f"{label} inputSubtitle SHA-256 differs from its retained file")
+    if input_subtitle.get("cueCount") != parsed["captionCount"]:
+        findings.append(f"{label} inputSubtitle cue count differs from its retained file")
+    try:
+        last_end_seconds_ms = round(float(input_subtitle["lastCueEndSeconds"]) * 1000)
+    except Exception as exc:
+        findings.append(f"{label} inputSubtitle last cue ending is invalid: {exc}")
+    else:
+        if last_end_seconds_ms != parsed["lastEndMs"]:
+            findings.append(f"{label} inputSubtitle ending differs from its retained file")
+
+    transcript = record.get("ownerReadback", {}).get("watchPage", {}).get("transcript")
+    if not isinstance(transcript, dict):
+        findings.append(f"{label} owner transcript is missing")
+        return findings
+    if transcript.get("sourcePath") != path_value:
+        findings.append(f"{label} owner transcript source path differs from inputSubtitle.path")
+    if transcript.get("normalizedTextCharacterCount") != len(
+        re.sub(r"\s+", " ", " ".join(cue["caption"] for cue in parsed["cues"])).strip()
+    ):
+        findings.append(f"{label} owner transcript text length differs from its retained file")
+    return findings
 
 
 def canonical_bytes(value):
@@ -760,7 +816,9 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     record_time_ms = rfc3339_ms(record[timestamp_field])
                 except Exception:
                     continue
-                if record_time_ms > previous_updated_ms:
+                # An observation at the predecessor's millisecond is a new
+                # boundary event; observations before it remain historical.
+                if record_time_ms >= previous_updated_ms:
                     newer_subtitle_events.append(
                         (record_time_ms, collection_name, record_order, root_suffix_options)
                     )
@@ -896,6 +954,33 @@ def subtitle_root_suffix_fixture_errors(
     ]
     if subtitle_suffix_group_cursors(large_same_time_suffix, 0, large_same_time_events) != {12}:
         findings.append("root history same-time suffix matching lost the 12-event assignment result")
+
+    boundary_time_event = json.loads(json.dumps(mismatch_record))
+    boundary_time_event["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms, 0x8AD, 0x8AD0123456789AB
+    )
+    boundary_time_event["recordedAt"] = rfc3339_from_ms(base_root_ms)
+    boundary_time = json.loads(json.dumps(video_production))
+    boundary_time["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": video_production["updatedAt"],
+        "stateTransition": previous_state,
+    }
+    boundary_time["publication"]["subtitleAnonymousReadbacks"].append(boundary_time_event)
+    boundary_time["identity"]["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms + 1, 0x8AE, 0x8AE0123456789AB
+    )
+    boundary_time["updatedAt"] = rfc3339_from_ms(base_root_ms + 1)
+    boundary_time["stateTransition"] = (
+        f"{previous_state} -> {ANONYMOUS_SUBTITLE_MISMATCH_STATE.split(' -> ')[-1]}"
+    )
+    if document_history_errors(boundary_time):
+        findings.append("root history rejected a subtitle event at the predecessor timestamp")
+    boundary_time_unrelated = json.loads(json.dumps(boundary_time))
+    boundary_time_unrelated["stateTransition"] = f"{previous_state} -> UNRELATED_MEDIA_STATE"
+    if not document_history_errors(boundary_time_unrelated):
+        findings.append("root history accepted an unrelated suffix for a predecessor-time subtitle event")
 
     different_time_reversal = json.loads(json.dumps(owner_failure))
     different_time_reversal["publication"]["subtitleAnonymousReadbacks"].append(json.loads(json.dumps(mismatch_record)))
@@ -2211,6 +2296,69 @@ def main():
     owner_failure_history_findings = document_history_errors(owner_failure)
     if owner_failure_history_findings:
         errors.append("future owner subtitle failure readback failed document history checks")
+    owner_revision = json.loads(json.dumps(video_production))
+    revision_previous_identity = owner_revision["identity"]
+    revision_previous_updated_at = owner_revision["updatedAt"]
+    revision_previous_state = owner_revision["stateTransition"]
+    revision_base_ms = rfc3339_ms(revision_previous_updated_at)
+    revised_path_value = "media/demo-video/subtitles.en.revised-fixture.srt"
+    revised_path = ROOT / revised_path_value
+    revised_bytes = revised_path.read_bytes()
+    revised_parsed = parse_subrip(revised_path)
+    revised_transcript_text = " ".join(cue["caption"] for cue in revised_parsed["cues"])
+    owner_revision_record = json.loads(json.dumps(owner_revision["publication"]["subtitleUpdates"][0]))
+    owner_revision_record.update(
+        {
+            "observationUuidV7": uuid7_for_ms(revision_base_ms + 1, 0x8F1, 0x8F10123456789AB),
+            "observedAt": rfc3339_from_ms(revision_base_ms + 1),
+        }
+    )
+    owner_revision_record["inputSubtitle"] = {
+        "path": revised_path_value,
+        "sha256": sha256(revised_bytes),
+        "cueCount": revised_parsed["captionCount"],
+        "lastCueEndSeconds": revised_parsed["lastEndMs"] / 1000,
+    }
+    owner_revision_record["ownerReadback"]["watchPage"]["transcript"].update(
+        {
+            "sourcePath": revised_path_value,
+            "groupCount": revised_parsed["captionCount"],
+            "normalizedTextCharacterCount": len(re.sub(r"\s+", " ", revised_transcript_text).strip()),
+        }
+    )
+    owner_revision["previousDocumentObservation"] = {
+        "informationUuidV5": revision_previous_identity["informationUuidV5"],
+        "observationUuidV7": revision_previous_identity["observationUuidV7"],
+        "updatedAt": revision_previous_updated_at,
+        "stateTransition": revision_previous_state,
+    }
+    owner_revision["publication"]["subtitleUpdates"].append(owner_revision_record)
+    owner_revision["identity"]["observationUuidV7"] = uuid7_for_ms(
+        revision_base_ms + 2, 0x8F2, 0x8F20123456789AB
+    )
+    owner_revision["updatedAt"] = rfc3339_from_ms(revision_base_ms + 2)
+    owner_revision["stateTransition"] = (
+        f"{revision_previous_state} -> {OWNER_SUBTITLE_MATCH_STATE.rsplit(' -> ', 1)[-1]}"
+    )
+    if list(video_production_validator.iter_errors(owner_revision)):
+        errors.append("video production schema rejected a later owner subtitle artifact revision")
+    revision_artifact_findings = owner_subtitle_success_artifact_errors(
+        owner_revision_record, "future revised subtitleUpdates entry"
+    )
+    if revision_artifact_findings:
+        errors.append("future owner subtitle artifact revision failed retained-file checks")
+    if document_history_errors(owner_revision):
+        errors.append("future owner subtitle artifact revision failed document history checks")
+    invalid_owner_revision = json.loads(json.dumps(owner_revision))
+    invalid_owner_revision["publication"]["subtitleUpdates"][-1]["inputSubtitle"]["sha256"] = "0" * 64
+    if not any(
+        "SHA-256 differs" in finding
+        for finding in owner_subtitle_success_artifact_errors(
+            invalid_owner_revision["publication"]["subtitleUpdates"][-1],
+            "invalid revised subtitleUpdates entry",
+        )
+    ):
+        errors.append("owner subtitle artifact digest mutation was accepted")
     errors.extend(subtitle_root_suffix_fixture_errors(video_production, video_production_validator, owner_failure))
     duplicate_owner_failure_tracks = json.loads(json.dumps(owner_failure))
     duplicate_owner_failure_tracks["publication"]["subtitleUpdates"][-1]["ownerReadback"]["studioTable"]["tracks"] = [
@@ -2397,6 +2545,8 @@ def main():
                     errors.append(f"{label} must be an object")
                     continue
                 errors.extend(subtitle_record_errors(record, timestamp_field, label))
+                if collection_name == "subtitleUpdates" and "inputSubtitle" in record:
+                    errors.extend(owner_subtitle_success_artifact_errors(record, label))
             if records:
                 invalid_timestamp_record = json.loads(json.dumps(records[0]))
                 try:

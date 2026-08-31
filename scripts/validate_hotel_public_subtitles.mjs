@@ -265,7 +265,8 @@ function validateSubtitleCatalogLanguages(catalog, label, englishExpected) {
   assert.ok(Array.isArray(catalog?.languages), `${label} catalog languages must be an array`);
   assert.equal(new Set(catalog.languages).size, catalog.languages.length, `${label} catalog languages must be unique`);
   assert.ok(catalog.languages.every((language) => typeof language === "string" && SUBTITLE_LANGUAGE_PATTERN.test(language)), `${label} catalog has an invalid language code`);
-  assert.equal(catalog.languages.includes("en"), englishExpected, englishExpected ? `${label} catalog must include English` : `${label} catalog must not include English`);
+  const hasEnglishLanguage = catalog.languages.some((language) => language.split("-", 1)[0].toLowerCase() === "en");
+  assert.equal(hasEnglishLanguage, englishExpected, englishExpected ? `${label} catalog must include English` : `${label} catalog must not include English`);
   assert.equal(catalog.authoredEnglishConfirmed, englishExpected, englishExpected ? `${label} catalog must confirm English` : `${label} catalog must not confirm English`);
 }
 

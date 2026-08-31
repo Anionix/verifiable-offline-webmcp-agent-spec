@@ -198,9 +198,11 @@ test("requires English in a successful catalog while allowing an additional lang
   try {
     const metadata = JSON.parse(await readFile(fixture.metadataFixturePath, "utf8"));
     const catalog = metadata.publication.subtitleAnonymousReadbacks[0].availableSubtitleCatalog;
-    catalog.languages = ["en", "ja", "fr"];
-    await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
-    await assert.doesNotReject(() => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory));
+    for (const englishTag of ["en", "en-US", "EN"]) {
+      catalog.languages = [englishTag, "ja", "fr"];
+      await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
+      await assert.doesNotReject(() => validateSubtitleHistory(fixture.metadataFixturePath, fixture.temporaryDirectory));
+    }
 
     catalog.languages = ["ja", "fr"];
     await writeFile(fixture.metadataFixturePath, `${JSON.stringify(metadata)}\n`, "utf8");
@@ -574,6 +576,7 @@ test("accepts a schema-valid anonymous track-unavailable readback in history", a
       ["comparison state", (record) => (record.stateTransition = mismatchedSubtitleStateTransition), /state transition differs/u],
       ["comparison catalog", (record) => (record.availableSubtitleCatalog.capturedAfterComparison = true), /must not claim a comparison/u],
       ["English catalog", (record) => (record.availableSubtitleCatalog.languages = ["en", "fr"]), /must not include English/u],
+      ["English language-tag variant", (record) => (record.availableSubtitleCatalog.languages = ["en-US", "fr"]), /must not include English/u],
       ["confirmed English catalog", (record) => (record.availableSubtitleCatalog.authoredEnglishConfirmed = true), /must not confirm English/u],
       ...["download", "inputSubtitle", "publicVtt", "comparison"].map((field) => [
         `extra ${field}`,

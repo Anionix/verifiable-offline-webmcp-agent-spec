@@ -273,10 +273,10 @@
           "additionalProperties": false,
           "required": ["path", "sha256", "cueCount", "lastCueEndSeconds"],
           "properties": {
-            "path": { "const": "media/demo-video/subtitles.en.srt" },
-            "sha256": { "const": "4c7cc11986a256bd4b1dd4769a9d6ae4c8b110dc65affbbb2b7efcc4b8d4b56f" },
-            "cueCount": { "const": 184 },
-            "lastCueEndSeconds": { "const": 147.76 }
+            "path": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cueCount": { "type": "integer", "minimum": 1 },
+            "lastCueEndSeconds": { "type": "number", "minimum": 0 }
           }
         },
         "ownerReadback": { "$ref": "#/$defs/ownerSubtitleSuccessReadback" },
@@ -380,7 +380,7 @@
               "type": "array",
               "minItems": 1,
               "uniqueItems": true,
-              "contains": { "const": "en" },
+              "contains": { "$ref": "#/$defs/englishSubtitleLanguageCode" },
               "items": { "$ref": "#/$defs/subtitleLanguageCode" }
             },
             "trackClass": { "const": "MANUAL_SUBTITLES" },
@@ -573,7 +573,7 @@
           "type": "array",
           "minItems": 0,
           "uniqueItems": true,
-          "not": { "contains": { "const": "en" } },
+          "not": { "contains": { "$ref": "#/$defs/englishSubtitleLanguageCode" } },
           "items": { "$ref": "#/$defs/subtitleLanguageCode" }
         },
         "trackClass": { "const": "MANUAL_SUBTITLES" },
@@ -584,6 +584,10 @@
     "subtitleLanguageCode": {
       "type": "string",
       "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+    },
+    "englishSubtitleLanguageCode": {
+      "type": "string",
+      "pattern": "^[Ee][Nn](?:-|$)"
     },
     "subtitleTrack": {
       "type": "object",
@@ -748,9 +752,9 @@
       "required": ["scope", "sourcePath", "groupCount", "normalizedTextCharacterCount", "comparison"],
       "properties": {
         "scope": { "const": "FULL_TRANSCRIPT" },
-        "sourcePath": { "const": "media/demo-video/subtitles.en.srt" },
-        "groupCount": { "const": 26 },
-        "normalizedTextCharacterCount": { "const": 2146 },
+        "sourcePath": { "type": "string", "pattern": "^media/demo-video/[A-Za-z0-9_-][A-Za-z0-9._-]*\\.srt$" },
+        "groupCount": { "type": "integer", "minimum": 1 },
+        "normalizedTextCharacterCount": { "type": "integer", "minimum": 1 },
         "comparison": { "const": "MATCH_AFTER_WHITESPACE_NORMALIZATION" }
       }
     },

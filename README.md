@@ -133,7 +133,7 @@ This repository is a bilingual, GitHub-ready design specification for a mobile-f
 - `metadata/hotel-native-webmcp-reconciliation.json` — current native WebMCP discovery and read-before-retry browser evidence
 - `metadata/hotel-release-candidate.json` — exact release test count, artifact digests, public-count comparison, and all five hard gates
 - `metadata/demo-video-production.json` — generated-media prompts, service identifiers, billing boundary, local paths, and SHA-256 values without committing the video files
-- `metadata/hotel-retry-diagram.json` — the explanatory image's UUIDs, one-call generation boundary, source digest, and README placements
+- `metadata/hotel-retry-diagram.json` — the explanatory image's identifiers, initial generation and targeted edit, source digests, and README placements
 - `metadata/security-remediation.json` — one-to-one CodeQL alert and issue ledger, separate dependency audits, and the pending main-branch rescan gate
 - `MANIFEST.sha256` — artifact integrity manifest
 

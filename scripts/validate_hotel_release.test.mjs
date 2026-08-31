@@ -347,6 +347,40 @@ test("rejects a README link that escapes the packaged hotel retry diagram", asyn
   });
 });
 
+test("rejects an escaping diagram image even when a safe link remains elsewhere", async () => {
+  for (const decoy of [
+    "[reference](docs/assets/hotel-retry-explained.png)",
+    "<!-- [reference](docs/assets/hotel-retry-explained.png) -->",
+    "![another diagram](docs/assets/hotel-retry-explained.png)",
+  ]) {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const readme = await readFile(readmePath, "utf8");
+      const escapingReadme = readme.replace("docs/assets/hotel-retry-explained.png", "../../docs/assets/hotel-retry-explained.png");
+      await writeFile(readmePath, `${escapingReadme}\n${decoy}\n`);
+      await refreshChecksum(releaseRoot, "README.md");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, "the validator accepted an escaping diagram with a safe decoy");
+      assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+    });
+  }
+});
+
+test("rejects a text link, comment, or fenced example instead of the inline diagram", async () => {
+  const image = "![retry diagram](docs/assets/hotel-retry-explained.png)";
+  for (const replacement of [image.slice(1), `<!--\n${image}\n-->`, `\`\`\`markdown\n${image}\n\`\`\``, `~~~~\n${image}\n~~~~~`]) {
+    await withFixture({}, async (releaseRoot) => {
+      const readmePath = resolve(releaseRoot, "README.md");
+      const readme = await readFile(readmePath, "utf8");
+      await writeFile(readmePath, readme.replace(image, replacement));
+      await refreshChecksum(releaseRoot, "README.md");
+      const result = runValidator(releaseRoot);
+      assert.notEqual(result.status, 0, "the validator accepted a non-image reference instead of the diagram");
+      assert.match(result.output, /README\.md must link to the packaged hotel retry diagram/u);
+    });
+  }
+});
+
 test("fails closed before file operations on Windows", { skip: process.platform === "win32" ? false : "Windows-only platform guard" }, async () => {
   await assert.rejects(
     () => validateRelease("/definitely/missing"),

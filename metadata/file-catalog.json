@@ -510,8 +510,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "91d10b5737a8c1bbd6149dbbfcfdb05e8d10403fb989cc6d5ead4db9ae5977bd",
-      "bytes": 45267,
+      "sha256": "fc5b97670f0e8940502432cd6d3db8238524cb7ccdad58a2c974f1c0f2ca1670",
+      "bytes": 45282,
       "mediaType": "text/markdown",
       "category": "root",
       "identity": {
@@ -5565,8 +5565,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.mjs",
-      "sha256": "fa928bb18e2de06c9672ee8efb3c921887a374becba0b420c3c287fedd917265",
-      "bytes": 36030,
+      "sha256": "828798aca1b9d416fde19f56cbc3661e07b6c4513890ce61c7720413b94fc17f",
+      "bytes": 37176,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {
@@ -5584,8 +5584,8 @@
     },
     {
       "path": "scripts/validate_hotel_release.test.mjs",
-      "sha256": "b959f683265299671245d88fa2a6c0229494ec344aaf9206e0b7e402c8c9ee7a",
-      "bytes": 40092,
+      "sha256": "5675865e50684b8bd62a096a1ec140f588d93d85ff59467351744db35dfc0a00",
+      "bytes": 41973,
       "mediaType": "application/octet-stream",
       "category": "scripts",
       "identity": {

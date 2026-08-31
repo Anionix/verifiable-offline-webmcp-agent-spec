@@ -4,8 +4,9 @@ language: "en"
 information_uuid_v5: "5a6fb249-361d-5745-953e-faf72130ffe9"
 event_uuid_v7: "01a050c7-3441-7930-9b51-a85ca5c5c82f"
 state_transition: "TECHNICAL_DESCRIPTION_FIRST -> JUDGE_VISIBLE_PROOF_ROUTE"
-occurred_at: "2026-08-30T04:20:00Z"
-status: "visual-guide"
+public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
+occurred_at: "2026-08-31T03:49:55.632Z"
+status: "visual-guide-public-release-aligned"
 ---
 
 # Devpost visual guide
@@ -88,7 +89,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - Display **AI-generated dramatization / Fictional booking** on both generated opening scenes.
 - Do not show real hotels, real people, addresses, passports, payment details, reservation emails, credentials, or private browser data.
 - Do not imply that the generated scene is a real booking screen.
-- Report the tested native Chrome WebMCP configuration as `PASS`: HTTPS, `document.modelContext`, the exact four intended tools, zero discovery effects, and status recovery before retry. Do not generalize this bounded result to every Chrome release.
+- The retained native Chrome WebMCP record is `PASS` for its tested configuration: HTTPS, `document.modelContext`, the exact four intended tools, zero discovery effects, and status recovery before retry. Do not generalize this bounded result to every Chrome release or treat the public alignment as a new native run.
 - Keep the Site, Vercel, Devpost, and YouTube links as separate publication facts; one URL does not prove another.
 - Add Japanese subtitles as a separate subtitle file; English remains the primary spoken and burned-in language.
 
@@ -97,7 +98,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 | Official area | Evidence to point at |
 |---|---|
 | **WebMCP Leverage** | Panels 02, 05, and 06: four narrow tools recover state while confirmation stays human-only. |
-| **Execution** | Public Site, current Vercel production release, reproducible release, the matching 192 Node tests, native WebMCP reconciliation, and the 150-second narrated recording. |
+| **Execution** | Public Site version 14, current Vercel production release, reproducible release, the matching 194 Node tests, bounded WebMCP evidence, and the 150-second narrated recording. |
 | **Potential Impact** | The everyday failure mode: a traveler avoids a second reservation and a confusing cancellation hunt. |
 | **Creativity & Ambition** | Local-first recovery, stable identity, unique storage, visible event proof, and explicit authority limits in one small demo. |
 
@@ -111,6 +112,7 @@ The local thumbnail is [`docs/assets/devpost-hotel-thumbnail.png`](https://githu
 - [Release README](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/examples/hotel-booking-demo/README.md)
 - [Release package guide](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/docs/24-hotel-release-package.en.md)
 - [Public release readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-public-release-readback.json)
+- [Public release alignment readback](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/public-release-alignment-readback.json)
 - [Native WebMCP reconciliation record](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/metadata/hotel-native-webmcp-reconciliation.json)
 - [Video publication copy](https://github.com/Anionix/verifiable-offline-webmcp-agent-spec/blob/main/media/demo-video/publication-copy.md)
 

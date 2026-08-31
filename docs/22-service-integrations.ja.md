@@ -4,6 +4,8 @@ information_uuid_v5: "49a43c43-3343-5bbb-8864-c5defebddc73"
 event_uuid_v7: "01a04dcb-8678-7e22-973d-dc0d0617b0ce"
 observed_at: "2026-08-29T13:52:59.000Z"
 state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -> SITES_VERSION_10_AND_VERCEL_BROWSER_RUN_VERIFIED -> SITES_VERSION_11_AND_VERCEL_CURRENT_RELEASE_VERIFIED -> CODEQL_ALERTS_ISSUE_TRACKED -> LOCAL_SECURITY_PATCH_VALIDATED -> GITHUB_RESCAN_PENDING -> DEVPOST_VERSION_10_HOTEL_PROJECT_PACKET_READY -> DEVPOST_VERSION_11_SIXTY_SECOND_TEST_PUBLIC -> DEVPOST_OPEN_GRAPH_STALE_IMAGE_ASSOCIATION_INCONCLUSIVE -> VERCEL_CURRENT_DEPLOYMENT_READY_FIVE_FILES_MATCHED -> DEVPOST_FINAL_SUBMISSION_PENDING -> DEVPOST_FINAL_SUBMISSION_PROVIDER_VERIFIED -> SITES_VERSION_12_CURRENT_ARTIFACT_VERIFIED"
+public_release_alignment_event_uuid_v7: "01a055f0-2130-7abc-8000-000000000abc"
+public_release_alignment_observed_at: "2026-08-31T03:49:55.632Z"
 ---
 
 # サービス連携状態の読み方
@@ -12,7 +14,7 @@ state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -
 
 さらに導入の内訳として、端末へ正式導入されたか、今回のメッセージへ添付されたか、現在の作業から操作可能かを別々に記録します。`pluginState`の`ACTIVE`は「現在の作業から操作可能」という意味であり、端末への正式導入だけを表す値ではありません。
 
-機械が読む正本は[`metadata/service-integration-registry.json`](../metadata/service-integration-registry.json)、形式の契約は[`schemas/service-integration-registry.schema.json`](../schemas/service-integration-registry.schema.json)、検査処理は[`scripts/validate_service_integrations.mjs`](../scripts/validate_service_integrations.mjs)です。
+機械が読むサービス連携台帳は[`metadata/service-integration-registry.json`](../metadata/service-integration-registry.json)、形式の契約は[`schemas/service-integration-registry.schema.json`](../schemas/service-integration-registry.schema.json)、検査処理は[`scripts/validate_service_integrations.mjs`](../scripts/validate_service_integrations.mjs)です。公開先三者の現行版対応は、台帳の過去の公開観測を上書きせず、[`metadata/public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json)へ別記録します。
 
 ## 四つの状態
 
@@ -37,7 +39,7 @@ state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -
 | 実行 | `NOT_RUN` | 今回の成果物ではまだ試していない |
 | 実行 | `NOT_APPLICABLE` | 実行確認の対象ではない |
 
-## 現在の記録
+## 登録台帳の基準記録
 
 公開サービス状態の基準観測は2026年8月29日9時14分31秒（協定世界時）です。後続のセキュリティ検査は9時31分36秒に記録しました。Vercelの現行配置は13時35分38秒に`READY`となり、13時37分6秒までに提供元状態、二つの公開URL、五つの匿名配信ファイル、警告・エラーを読み戻しました。認証は、現在の作業で名前付きの読み取りまたは書き込み操作が実際に成功したサービスだけを成功扱いしています。認証成功から、公開成功や今回の成果物の実行成功は推測していません。
 
@@ -51,6 +53,13 @@ state_transition: "DEPENDABOT_ALERTS_ISSUE_TRACKED -> DEPENDENCY_GRAPH_PATCHED -
 | Shopify | `ACTIVE` | `CONFIRMED` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | 商取引との境界説明だけ |
 | Google Chrome | `ACTIVE` | `NOT_APPLICABLE` | `NOT_APPLICABLE` | `INCONCLUSIVE` | 一般公開版の画面は確認済み。ChromeのWebMCP実行機能は未露出 |
 | Devpost | `ACTIVE` | `CONFIRMED` | `CURRENT_ARTIFACT` | `NOT_APPLICABLE` | 京都ホテル向け説明、公開URL、動画、60秒手順を揃えた版11。Open Graph画像を読み戻し、提出番号`1158722`は`Submitted` |
+
+## 現在の公開版対応
+
+<!-- information_uuid_v5=bded1f61-139c-50b9-a0a1-d5f7901c2915 event_uuid_v7=01a055f0-2130-7abc-8000-000000000abc state_transition=PUBLIC_TARGETS_WITH_STALE_DESCRIPTION -> PUBLIC_TARGETS_AND_DESCRIPTION_ALIGNED occurred_at=2026-08-31T03:49:55.632Z -->
+<!-- machine-contract=The service registry remains a historical integration baseline; this record binds the submitted Site, Vercel fallback, and Devpost description only after separate readbacks. -->
+
+公開版の対応は、提出先をChatGPT Sites版14（ソース`2fbbf1b714ca660ef1681239b638205a9835f7c5`）、確認用Vercel本番（配置`dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu`、ソース`cda7ff7c51698f4ec7292f1c076468712a239bd8`）、Devpost版13へ分けて読み戻しました。三つの観測は、提出先URL、匿名HTTP 200、194件のNode試験、意図した四機能で一致します。これは[`metadata/public-release-alignment-readback.json`](../metadata/public-release-alignment-readback.json)の現行記録です。公開版の対応確認は、新しいネイティブWebMCP実行や外部効果を意味しません。
 
 ## Voidの端末内開発連携
 

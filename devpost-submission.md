@@ -3,7 +3,7 @@ title: "Kyoto Booking Retry Proof — Devpost submission record"
 information_uuid_v5: "faef02a2-712f-5fd3-b88f-dc44bc45db1f"
 event_uuid_v7: "01a04da9-0f6d-7c34-9f87-568058d8b8fe"
 occurred_at: "2026-08-29T13:15:20.301Z"
-state_transition: "GENERIC_PROJECT_COPY -> HOTEL_DEMO_ALIGNED -> VERSION_11_60_SECOND_TEST_PUBLIC -> OPEN_GRAPH_STALE_PROJECT_IMAGE_ASSOCIATION_INCONCLUSIVE -> FINAL_SUBMISSION_PENDING -> FINAL_SUBMISSION_VERIFIED"
+state_transition: "GENERIC_PROJECT_COPY -> HOTEL_DEMO_ALIGNED -> VERSION_11_60_SECOND_TEST_PUBLIC -> OPEN_GRAPH_STALE_PROJECT_IMAGE_ASSOCIATION_INCONCLUSIVE -> FINAL_SUBMISSION_PENDING -> FINAL_SUBMISSION_VERIFIED -> VERSION_13_PUBLIC_RELEASE_ALIGNED"
 ---
 
 # Title
@@ -113,7 +113,7 @@ npm test
 npm run typecheck
 ```
 
-Current repository evidence records **153 passing Node tests**, TypeScript checking, source-quality checks, repository schemas, production builds, and two consecutive full validation runs. Fresh public browser runs reached two attempts, one booking, and one effect start. The booking test also counts one physical row in the IndexedDB booking store.
+Current repository evidence records **194 passing Node tests**, TypeScript checking, source-quality checks, repository schemas, production builds, and two consecutive full validation runs. The public Sites and Vercel evaluation files report the same 194-test contract. The recorded browser proof reached two attempts, one booking, and one effect start. The booking test also counts one physical row in the IndexedDB booking store. The retained historical Devpost snapshot is explicitly marked **153 Node tests** and is not the current release count.
 
 ## Public Demo Link
 
@@ -121,6 +121,8 @@ Current repository evidence records **153 passing Node tests**, TypeScript check
 - Backup: https://kyoto-booking-retry-proof.vercel.app
 
 Both are fictional, require no account or personal information, and perform no payment or external reservation.
+
+The submitted website is ChatGPT Sites version 14 from source commit `2fbbf1b714ca660ef1681239b638205a9835f7c5`. The Vercel backup is production deployment `dpl_FqcLjo1xbpmRBoNsUA6WMny8L1Eu` from source commit `cda7ff7c51698f4ec7292f1c076468712a239bd8`. The three-target readback is [`metadata/public-release-alignment-readback.json`](metadata/public-release-alignment-readback.json); it keeps the Sites, Vercel, and Devpost observations separate.
 
 ## Public Repository Link
 
@@ -152,8 +154,8 @@ The proposed Devpost thumbnail is an AI-edited crop-and-reframe derivative of th
 - Devpost project identifier: `1405191`
 - Current project title: `Kyoto Booking Retry Proof`
 - Current tagline: `WebMCP stops a lost hotel-booking response from becoming a duplicate reservation.`
-- The hotel-copy update operation returned version `8`; the complete technology/link update advanced the project to version `9`; the judge-readable heading and retry-list update returned version `10`; the public 60-second reproduction steps returned version `11`.
-- Authenticated readback and anonymous HTML confirm the page title, heading, tagline, 153-test description, public links, video, and four reproduction steps.
+- The hotel-copy update operation returned version `8`; the complete technology/link update advanced the project to version `9`; the judge-readable heading and retry-list update returned version `10`; the public 60-second reproduction steps returned version `11`; the current release-alignment update returned version `13`.
+- Authenticated readback confirms the page title, heading, tagline, 194-test description, public Sites target, Vercel release markers, video, and four reproduction steps. The anonymous public evaluation files separately confirm HTTP 200 and the same contract.
 - Fresh anonymous HTML at `2026-08-29T13:17:42.000Z` reports `og:title` as `Kyoto Booking Retry Proof` and `og:image` as the exact uploaded hotel-image URL, closing the earlier stale-title and image-association gaps.
 - Devpost submission `1158722` returned status `Submitted`; authenticated readback confirmed `submitted_at` as `2026-08-29T13:14:00.129Z` for challenge `webmcp`.
 - Final submission URL: https://devpost.com/software/project-y79pb23hj1mz
@@ -164,7 +166,7 @@ The proposed Devpost thumbnail is an AI-edited crop-and-reframe derivative of th
 | Official judging area | Concrete evidence |
 |---|---|
 | WebMCP leverage | Four small named tools let the assistant check and recover state before retrying, while confirmation stays human-only. |
-| Execution | Public ChatGPT Site and Vercel backup, 153 Node tests, fresh-storage browser proof, offline reload, and a public 150-second video. |
+| Execution | Public ChatGPT Site version 14 and Vercel backup, 194 Node tests, bounded browser proof, offline reload, and a public 150-second video. |
 | Potential impact | Prevents an ordinary lost response from becoming a second reservation and avoids foreign-language cancellation work for travelers. |
 | Creativity and ambition | Combines safe retry, local-first recovery, stable identity, uniqueness constraints, and a visible cryptographic history without granting the assistant payment or cancellation authority. |
 

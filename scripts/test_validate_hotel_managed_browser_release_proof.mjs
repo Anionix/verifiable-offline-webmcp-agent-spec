@@ -638,8 +638,12 @@ test("candidate old browser observation remains unchanged", async () => {
   assert.deepEqual(browserObservationFrom(oldChromeProof, oldChromeProof.deployment.sourceCommit), legacyCandidateBrowserObservation);
 });
 
+// information_uuid_v5=a0fbdc59-0d0e-5134-89b8-1d30db405e5a
+// event_uuid_v7=01a05559-c305-7e15-9f68-1fa524ea30bf
+// state_transition=LIVE_CANDIDATE_BROWSER_OBSERVATION -> FROZEN_LEGACY_CANDIDATE_BROWSER_OBSERVATION occurred_at=2026-08-31T01:05:41.125Z
+// machine-contract: legacy rejection stays pinned to the frozen legacy browser observation while the live candidate may be managed.
 test("legacy Chrome rejects managed-only reconciliation fields", async () => {
-  const storedCandidate = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
+  const storedCandidateEnvelope = JSON.parse(await readFile(new URL("../metadata/hotel-release-candidate.json", import.meta.url), "utf8"));
   for (const [phase, values] of Object.entries(legacyManagedFieldsByPhase)) {
     for (const [field, value] of Object.entries(values)) {
       const invalid = structuredClone(legacyChromeProof);
@@ -651,7 +655,8 @@ test("legacy Chrome rejects managed-only reconciliation fields", async () => {
         `candidate ${phase}.${field}`,
       );
 
-      const candidateWithExtra = structuredClone(storedCandidate);
+      const candidateWithExtra = structuredClone(storedCandidateEnvelope);
+      candidateWithExtra.browserObservation = structuredClone(legacyCandidateBrowserObservation);
       candidateWithExtra.browserObservation.reconciliation[phase][field] = value;
       assert.throws(
         () => compareStable(candidateWithExtra, candidateWithExtra),

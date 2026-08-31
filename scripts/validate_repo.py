@@ -801,6 +801,7 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
     publication = video_production.get("publication")
     if isinstance(publication, dict) and isinstance(current_state, str) and isinstance(previous_state, str):
         suffix = current_state[len(previous_state) + len(" -> ") :].split(" -> ")
+        previous_state_tokens = set(previous_state.split(" -> "))
         newer_subtitle_events: list[tuple[int, str, int, set[str]]] = []
         for collection_name, timestamp_field in SUBTITLE_TIMESTAMP_FIELDS.items():
             records = publication.get(collection_name)
@@ -816,9 +817,13 @@ def document_history_errors(video_production: dict[str, Any]) -> list[str]:
                     record_time_ms = rfc3339_ms(record[timestamp_field])
                 except Exception:
                     continue
-                # An observation at the predecessor's millisecond is a new
-                # boundary event; observations before it remain historical.
-                if record_time_ms >= previous_updated_ms:
+                # An equal-time event is new only when its derived suffix is
+                # absent from the complete predecessor chain; older events
+                # already represented there remain historical.
+                if record_time_ms > previous_updated_ms or (
+                    record_time_ms == previous_updated_ms
+                    and not root_suffix_options & previous_state_tokens
+                ):
                     newer_subtitle_events.append(
                         (record_time_ms, collection_name, record_order, root_suffix_options)
                     )
@@ -981,6 +986,31 @@ def subtitle_root_suffix_fixture_errors(
     boundary_time_unrelated["stateTransition"] = f"{previous_state} -> UNRELATED_MEDIA_STATE"
     if not document_history_errors(boundary_time_unrelated):
         findings.append("root history accepted an unrelated suffix for a predecessor-time subtitle event")
+
+    predecessor_boundary_record = json.loads(
+        json.dumps(video_production["publication"]["subtitleAnonymousReadbacks"][0])
+    )
+    predecessor_boundary_record["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms, 0x8AF, 0x8AF0123456789AB
+    )
+    predecessor_boundary_record["recordedAt"] = rfc3339_from_ms(base_root_ms)
+    predecessor_boundary = json.loads(json.dumps(video_production))
+    predecessor_boundary["previousDocumentObservation"] = {
+        "informationUuidV5": previous_identity["informationUuidV5"],
+        "observationUuidV7": previous_identity["observationUuidV7"],
+        "updatedAt": video_production["updatedAt"],
+        "stateTransition": previous_state,
+    }
+    predecessor_boundary["publication"]["subtitleAnonymousReadbacks"].append(
+        predecessor_boundary_record
+    )
+    predecessor_boundary["identity"]["observationUuidV7"] = uuid7_for_ms(
+        base_root_ms + 1, 0x8B0, 0x8B00123456789AB
+    )
+    predecessor_boundary["updatedAt"] = rfc3339_from_ms(base_root_ms + 1)
+    predecessor_boundary["stateTransition"] = f"{previous_state} -> MEDIA_ONLY_READBACK_RECORDED"
+    if document_history_errors(predecessor_boundary):
+        findings.append("root history treated a predecessor-time event already in the old chain as new")
 
     different_time_reversal = json.loads(json.dumps(owner_failure))
     different_time_reversal["publication"]["subtitleAnonymousReadbacks"].append(json.loads(json.dumps(mismatch_record)))
